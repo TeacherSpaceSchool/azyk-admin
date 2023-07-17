@@ -166,7 +166,7 @@ const BuyBasket =  React.memo(
                         null
                 }
                 {
-                    !agent&&organization.minimumOrder>0?
+                    !agent&&organization.minimumOrder?
                         <>
                         <div style={{width: width}} className={classes.itogo}><b>Минимальный заказ:</b>{` ${organization.minimumOrder} сом`}</div>
                         </>
@@ -194,6 +194,7 @@ const BuyBasket =  React.memo(
                             if (agent || !organization.minimumOrder === 0 || organization.minimumOrder <= allPrice) {
                                if (paymentMethod.length > 0) {
                                    sessionStorage.catalog = '{}'
+                                   sessionStorage.catalogID = null
                                    if(navigator.onLine){
                                        if (agent&&geo&&client.address[0][1].includes(', ')) {
                                            let distance = getGeoDistance(geo.coords.latitude, geo.coords.longitude, ...(client.address[0][1].split(', ')))

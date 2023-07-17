@@ -645,7 +645,7 @@ const Organization = React.memo((props) => {
                                             </div>
                                         </div>
                                         {
-                                            minimumOrder>0?
+                                            minimumOrder?
                                                 <div className={classes.row}>
                                                     <div className={classes.nameField}>
                                                         Минимальный заказ:&nbsp;

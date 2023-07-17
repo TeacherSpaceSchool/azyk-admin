@@ -86,7 +86,7 @@ const UploadingClients = React.memo((props) => {
                     </div>
                     <br/>
                     {
-                        organization&&organization._id&&city.length&&document?
+                        organization&&organization._id&&city&&document?
                             <Button variant='contained' size='small' color='primary' onClick={async()=>{
                                 const action = async() => {
                                     let res = await uploadingClients({

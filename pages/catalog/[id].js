@@ -46,7 +46,7 @@ const Catalog = React.memo((props) => {
     }
     useEffect(()=>{
         (async()=>{
-            if(sessionStorage.catalog&&sessionStorage.catalog!=='{}'){
+            if(sessionStorage.catalog&&sessionStorage.catalog!=='{}'&&sessionStorage.catalogID===router.query.id){
                 setBasket(JSON.parse(sessionStorage.catalog))
             }
         })()
@@ -148,6 +148,7 @@ const Catalog = React.memo((props) => {
     }
     useEffect(()=>{
         if(!initialRender.current) {
+            sessionStorage.catalogID = router.query.id
             sessionStorage.catalog = JSON.stringify(basket)
             let keys = Object.keys(basket)
             allPrice = 0

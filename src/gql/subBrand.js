@@ -1,7 +1,5 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
-import { SingletonStore } from '../singleton/store';
-import { getReceiveDataByIndex, putReceiveDataByIndex } from '../service/idb/receiveData';
 
 export const getSubBrands = async({organization, search, city}, client)=>{
     try{
@@ -19,6 +17,7 @@ export const getSubBrands = async({organization, search, city}, client)=>{
                              priotiry
                              status
                              cities
+                             minimumOrder
                              name
                             organization
                                 {_id name consignation}
@@ -69,12 +68,13 @@ export const addSubBrand = async(element, subCategory)=>{
         let res = await client.mutate({
             variables: {...element, subCategory: subCategory},
             mutation : gql`
-                    mutation ($image: Upload!, $name: String!, $miniInfo: String!, $priotiry: Int, $organization: ID!, $cities: [String]!) {
-                        addSubBrand(image: $image, name: $name, miniInfo: $miniInfo, priotiry: $priotiry, organization: $organization, cities: $cities) {
+                    mutation ($minimumOrder: Int, $image: Upload!, $name: String!, $miniInfo: String!, $priotiry: Int, $organization: ID!, $cities: [String]!) {
+                        addSubBrand(minimumOrder: $minimumOrder, image: $image, name: $name, miniInfo: $miniInfo, priotiry: $priotiry, organization: $organization, cities: $cities) {
                              _id
                             createdAt  
                              image
                              miniInfo
+                             minimumOrder
                              priotiry
                              status
                              cities
@@ -95,8 +95,8 @@ export const setSubBrand = async(element)=>{
         await client.mutate({
             variables: {...element},
             mutation : gql`
-                    mutation ($_id: ID!, $image: Upload, $name: String, $miniInfo: String, $priotiry: Int, $cities: [String]) {
-                        setSubBrand(_id: $_id, image: $image, name: $name, miniInfo: $miniInfo, priotiry: $priotiry, cities: $cities) {
+                    mutation ($_id: ID!, $minimumOrder: Int, $image: Upload, $name: String, $miniInfo: String, $priotiry: Int, $cities: [String]) {
+                        setSubBrand(_id: $_id, minimumOrder: $minimumOrder, image: $image, name: $name, miniInfo: $miniInfo, priotiry: $priotiry, cities: $cities) {
                              data
                         }
                     }`})

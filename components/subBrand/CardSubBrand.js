@@ -49,6 +49,7 @@ const CardSubBrand = React.memo((props) => {
         setCities(event.target.value)
     };
     let [priotiry, setPriotiry] = useState(element?element.priotiry:0);
+    let [minimumOrder, setMinimumOrder] = useState(element?element.minimumOrder:0);
     let [organization, setOrganization] = useState(element?element.organization:{});
     let handleOrganization =  (event) => {
         setOrganization({_id: event.target.value, name: event.target.name})
@@ -145,6 +146,19 @@ const CardSubBrand = React.memo((props) => {
                                     'aria-label': 'description',
                                 }}
                             />
+                            <br/>
+                            <TextField
+                                type={ isMobileApp?'number':'text'}
+                                label='Минимальный заказ'
+                                value={minimumOrder}
+                                className={isMobileApp?classes.inputM:classes.input}
+                                onChange={(event)=>{
+                                    setMinimumOrder(checkInt(event.target.value))}
+                                }
+                                inputProps={{
+                                    'aria-label': 'description',
+                                }}
+                            />
                         </CardContent>
                     </CardActionArea>
                         <CardActions>
@@ -157,6 +171,7 @@ const CardSubBrand = React.memo((props) => {
                                         if (miniInfo.length > 0 && miniInfo !== element.miniInfo) editElement.miniInfo = miniInfo
                                         if (name.length > 0 && name !== element.name) editElement.name = name
                                         if (priotiry !== element.priotiry) editElement.priotiry = priotiry
+                                        if (minimumOrder !== element.minimumOrder) editElement.minimumOrder = minimumOrder
                                         if (image !== undefined) editElement.image = image
                                         const action = async () => {
                                             await setSubBrand(editElement)
@@ -197,11 +212,12 @@ const CardSubBrand = React.memo((props) => {
                                 setImage(undefined)
                                 setPreview('/static/add.png')
                                 setPriotiry(0)
+                                setMinimumOrder(0)
                                 setMiniInfo('')
                                 setName('')
                                 setCities(['Бишкек'])
                                 const action = async() => {
-                                    setList([(await addSubBrand({image, miniInfo, name, priotiry, organization: organization._id, cities})).addSubBrand, ...list])
+                                    setList([(await addSubBrand({image, miniInfo, name, minimumOrder, priotiry, organization: organization._id, cities})).addSubBrand, ...list])
                                 }
                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                 showMiniDialog(true)
