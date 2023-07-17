@@ -271,7 +271,11 @@ const list = {
             link: `/statistic/receivedatas`,
             role: ['admin', 'суперорганизация', 'организация', 'менеджер']
         },
-
+        {
+            name: 'Несинхронизованные заказы',
+            link: `/statistic/unsyncorder`,
+            role: ['admin']
+        },
     ],
     load: [
         {

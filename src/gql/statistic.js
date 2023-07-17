@@ -161,15 +161,15 @@ export const getStatisticAzykStoreOrder = async({company, dateStart, dateType, f
     }
 }
 
-export const getStatisticAzykStoreAgents = async({company, dateStart, dateType, filter, city}, client)=>{
+export const getStatisticUnsyncOrder = async({company, dateStart, dateType, city}, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {company, dateStart, dateType, filter, city},
+                variables: {company, dateStart, dateType, city},
                 query: gql`
-                    query ($company: ID, $dateStart: Date, $dateType: String, $filter: String, $city: String) {
-                        statisticAzykStoreAgents(company: $company, dateStart: $dateStart, dateType: $dateType, filter: $filter, city: $city) {
+                    query ($company: ID, $dateStart: Date, $dateType: String, $city: String) {
+                        statisticUnsyncOrder(company: $company, dateStart: $dateStart, dateType: $dateType, city: $city) {
                             columns
                             row 
                                 {_id data}
