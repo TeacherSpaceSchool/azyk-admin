@@ -267,14 +267,14 @@ const list = {
             role: ['admin']
         },
         {
+            name: 'Несинхронизованные заказы 1С',
+            link: `/statistic/unsyncorder`,
+            role: ['admin']
+        },
+        {
             name: 'Принятая интеграции 1С',
             link: `/statistic/receivedatas`,
             role: ['admin', 'суперорганизация', 'организация', 'менеджер']
-        },
-        {
-            name: 'Несинхронизованные заказы',
-            link: `/statistic/unsyncorder`,
-            role: ['admin']
         },
     ],
     load: [

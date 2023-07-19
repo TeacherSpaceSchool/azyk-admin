@@ -813,6 +813,24 @@ export const uploadingClients = async({document, organization, city}, client)=>{
     }
 }
 
+export const repairUnsyncOrder = async(ids)=>{
+    try{
+        let res = await (new SingletonApolloClient().getClient())
+            .mutate({
+                variables: {ids},
+                mutation: gql`
+                    mutation ($ids: [ID]!) {
+                        repairUnsyncOrder(ids: $ids) {
+                            data
+                        }
+                    }`,
+            })
+        return res.data
+    } catch(err){
+        console.error(err)
+    }
+}
+
 export const uploadingItems = async({document, organization, city}, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
