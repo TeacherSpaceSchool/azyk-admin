@@ -715,6 +715,27 @@ export const getStatisticClientGeo = async({organization, item, search, city}, c
     }
 }
 
+export const getStatisticAzykStoreAgents = async({company, dateStart, dateType, filter, city}, client)=>{
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        let res = await client
+            .query({
+                variables: {company, dateStart, dateType, filter, city},
+                query: gql`
+                    query ($company: ID, $dateStart: Date, $dateType: String, $filter: String, $city: String) {
+                        statisticAzykStoreAgents(company: $company, dateStart: $dateStart, dateType: $dateType, filter: $filter, city: $city) {
+                            columns
+                            row 
+                                {_id data}
+                        }
+                    }`,
+            })
+        return res.data
+    } catch(err){
+        console.error(err)
+    }
+}
+
 export const getStatisticRAM = async(client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
