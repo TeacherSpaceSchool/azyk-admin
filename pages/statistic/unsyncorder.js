@@ -19,7 +19,7 @@ import BuildIcon from '@material-ui/icons/Build';
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 
-const UnsyncOrder = React.memo((props) => {
+const Unsyncorder = React.memo((props) => {
     const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
     const classes = pageListStyle();
     const { showSnackBar } = props.snackbarActions;
@@ -95,7 +95,7 @@ const UnsyncOrder = React.memo((props) => {
     )
 })
 
-UnsyncOrder.getInitialProps = async function(ctx) {
+Unsyncorder.getInitialProps = async function(ctx) {
     await initialApp(ctx)
     if(!['admin'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
@@ -127,4 +127,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UnsyncOrder);
+export default connect(mapStateToProps, mapDispatchToProps)(Unsyncorder);
