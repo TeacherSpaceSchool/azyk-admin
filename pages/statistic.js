@@ -210,6 +210,11 @@ const list = {
             role: ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент']
         },
         {
+            name: 'Статистика RAM',
+            link: '/statistic/ram',
+            role: ['admin']
+        },
+        {
             name: 'Файловое хранилище',
             link: '/statistic/files',
             role: ['admin']

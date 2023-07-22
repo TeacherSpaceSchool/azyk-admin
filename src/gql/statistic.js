@@ -715,6 +715,22 @@ export const getStatisticClientGeo = async({organization, item, search, city}, c
     }
 }
 
+export const getStatisticRAM = async(client)=>{
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        let res = await client
+            .query({
+                query: gql`
+                    query {
+                        statisticRAM 
+                    }`,
+            })
+        return res.data
+    } catch(err){
+        console.error(err)
+    }
+}
+
 export const getActiveItem = async({organization}, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
