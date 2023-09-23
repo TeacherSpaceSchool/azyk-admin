@@ -103,6 +103,39 @@ export const getDistrict = async({_id}, client)=>{
     }
 }
 
+export const getСlientDistrict = async({organization}, client)=>{
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        let res = await client
+            .query({
+                variables: {organization},
+                query: gql`
+                    query ($organization: ID!) {
+                        clientDistrict(organization: $organization) {
+                            ecspeditor
+                                { 
+                                    phone
+                                    name
+                                }
+                            agent
+                                { 
+                                    phone
+                                    name
+                                }
+                            manager
+                                { 
+                                    phone
+                                    name
+                                }
+                        }
+                    }`,
+            })
+        return res.data
+    } catch(err){
+        console.error(err)
+    }
+}
+
 export const deleteDistrict = async(ids)=>{
     try{
         const client = new SingletonApolloClient().getClient()

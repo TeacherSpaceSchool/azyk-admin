@@ -26,6 +26,7 @@ import CardCatalogPlaceholder from '../../components/catalog/CardCatalogPlacehol
 import initialApp from '../../src/initialApp'
 import { getOrganization } from '../../src/gql/organization'
 import {getAdss} from '../../src/gql/ads'
+import {getСlientDistrict} from "../../src/gql/district";
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
@@ -177,8 +178,55 @@ const Catalog = React.memo((props) => {
                 <link rel='canonical' href={`${urlMain}/catalog`}/>
             </Head>
             <Card className={classes.page}>
-                <br/>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
+                    {
+                        data.clientDistrict?
+                            <>
+                                {
+                                    data.clientDistrict.agent&&data.clientDistrict.agent.name&&data.clientDistrict.agent.phone[0]?
+                                        <div className={classes.row}>
+                                            <div className={classes.nameField}>
+                                                Агент:&nbsp;
+                                            </div>
+                                            <a href={`tel:${data.clientDistrict.agent.phone[0]}`} className={classes.valueField}>
+                                                {data.clientDistrict.agent.name}
+                                            </a>
+                                        </div>
+                                        :
+                                        null
+                                }
+                                {
+                                    data.clientDistrict.manager&&data.clientDistrict.manager.name&&data.clientDistrict.manager.phone[0]?
+                                        <div className={classes.row}>
+                                            <div className={classes.nameField}>
+                                                Супервайзер:&nbsp;
+                                            </div>
+                                            <a href={`tel:${data.clientDistrict.manager.phone[0]}`} className={classes.valueField}>
+                                                {data.clientDistrict.manager.name}
+                                            </a>
+                                        </div>
+                                        :
+                                        null
+                                }
+                                {
+                                    data.clientDistrict.ecspeditor&&data.clientDistrict.ecspeditor.name&&data.clientDistrict.ecspeditor.phone[0]?
+                                        <div className={classes.row}>
+                                            <div className={classes.nameField}>
+                                                Экспедитор:&nbsp;
+                                            </div>
+                                            <a href={`tel:${data.clientDistrict.ecspeditor.phone[0]}`} className={classes.valueField}>
+                                                {data.clientDistrict.ecspeditor.name}
+                                            </a>
+                                        </div>
+                                        :
+                                        null
+                                }
+                                <Divider/>
+                                <br/>
+                            </>
+                            :
+                            null
+                    }
                     {
                         list?
                             list.map((row, idx) => {
@@ -341,6 +389,7 @@ Catalog.getInitialProps = async function(ctx) {
             brands,
             ...(ctx.store.getState().user.profile._id?await getClient({_id: ctx.store.getState().user.profile._id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{}),
             ...await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
+            ...await getСlientDistrict({organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
             ...await getAdss({search: '', organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
         }
     };

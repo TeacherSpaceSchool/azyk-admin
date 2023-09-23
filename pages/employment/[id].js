@@ -29,6 +29,7 @@ import TextField from '@material-ui/core/TextField';
 import Confirmation from '../../components/dialog/Confirmation'
 import { urlMain } from '../../redux/constants/other'
 import { getClientGqlSsr } from '../../src/getClientGQL'
+import {validPhone} from "../../src/lib";
 
 const Client = React.memo((props) => {
     const { profile } = props.user;
@@ -57,8 +58,18 @@ const Client = React.memo((props) => {
         setPhone(phone)
     };
     let editPhone = (event, idx)=>{
-        phone[idx] = event.target.value
-        setPhone([...phone])
+        if(event.target.value.length<14) {
+            phone[idx] = event.target.value
+            while (phone[idx].includes(' '))
+                phone[idx] = phone[idx].replace(' ', '')
+            while (phone[idx].includes('-'))
+                phone[idx] = phone[idx].replace('-', '')
+            while (phone[idx].includes(')'))
+                phone[idx] = phone[idx].replace(')', '')
+            while (phone[idx].includes('('))
+                phone[idx] = phone[idx].replace('(', '')
+            setPhone([...phone])
+        }
     };
     let deletePhone = (idx)=>{
         phone.splice(idx, 1);
@@ -145,7 +156,7 @@ const Client = React.memo((props) => {
                                             />
                                         {phone?phone.map((element, idx)=>
                                                 <FormControl key={`phone${idx}`} className={classes.input}>
-                                                    <InputLabel>Телефон. Формат: +996555780861</InputLabel>
+                                                    <InputLabel color={validPhone(element)?'primary':'secondary'}>Телефон. Формат: +996555780861</InputLabel>
                                                     <Input
                                                         placeholder='Телефон. Формат: +996555780861'
                                                         value={element}
@@ -154,6 +165,7 @@ const Client = React.memo((props) => {
                                                         inputProps={{
                                                             'aria-label': 'description',
                                                         }}
+                                                        error={!validPhone(element)}
                                                         endAdornment={
                                                             <InputAdornment position='end'>
                                                                 <IconButton
@@ -227,7 +239,14 @@ const Client = React.memo((props) => {
                                             {
                                                 router.query.id==='new'?
                                                     <Button onClick={async()=>{
-                                                        if (name.length>0&&password.length>0&&role.length>0&&organization._id!==undefined) {
+                                                        let checkPhone = !phone.length
+                                                        if(!checkPhone) {
+                                                            checkPhone = true
+                                                            for(let i=0; i<phone.length; i++){
+                                                                checkPhone = validPhone(phone[i])
+                                                            }
+                                                        }
+                                                        if (checkPhone&&name.length>0&&password.length>0&&role.length>0&&organization._id!==undefined) {
                                                             const action = async() => {
                                                                 await addEmployment({
                                                                     name: name,
@@ -251,18 +270,30 @@ const Client = React.memo((props) => {
                                                     :
                                                     <>
                                                     <Button onClick={async()=>{
-                                                        let editElement = {_id: data.employment._id}
-                                                        if(name.length>0&&name!==data.employment.name)editElement.name = name
-                                                        editElement.phone = phone
-                                                        if(login.length>0&&login!==data.employment.user.login)editElement.login = login
-                                                        if(email.length>0&&email!==data.employment.email)editElement.email = email
-                                                        if(password.length>0)editElement.newPass = password
-                                                        if(role.length>0&&role!==data.employment.role)editElement.role = role
-                                                        const action = async() => {
-                                                            await setEmployments(editElement)
+                                                        let checkPhone = !phone.length
+                                                        if(!checkPhone) {
+                                                            checkPhone = true
+                                                            for(let i=0; i<phone.length; i++){
+                                                                checkPhone = validPhone(phone[i])
+                                                            }
                                                         }
-                                                        setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                                                        showMiniDialog(true)
+                                                        if(checkPhone) {
+                                                            let editElement = {_id: data.employment._id}
+                                                            editElement.phone = phone
+                                                            if (name.length > 0 && name !== data.employment.name) editElement.name = name
+                                                            if (login.length > 0 && login !== data.employment.user.login) editElement.login = login
+                                                            if (email.length > 0 && email !== data.employment.email) editElement.email = email
+                                                            if (password.length > 0) editElement.newPass = password
+                                                            if (role.length > 0 && role !== data.employment.role) editElement.role = role
+                                                            const action = async () => {
+                                                                await setEmployments(editElement)
+                                                            }
+                                                            setMiniDialog('Вы уверены?', <Confirmation
+                                                                action={action}/>)
+                                                            showMiniDialog(true)
+                                                        }
+                                                        else
+                                                            showSnackBar('Заполните все поля')
                                                     }} size='small' color='primary'>
                                                         Сохранить
                                                     </Button>

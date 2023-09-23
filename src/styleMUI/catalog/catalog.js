@@ -53,6 +53,20 @@ export default makeStyles({
         fontSize: '1.125rem',
         fontFamily: 'Roboto'
     },
+    nameField: {
+        marginBottom: 10,
+        fontWeight: 'bold',
+        fontSize: '0.875rem',
+        fontFamily: 'Roboto',
+        color: '#A0A0A0'
+    },
+    valueField: {
+        marginBottom: 10,
+        fontWeight: '500',
+        fontSize: '0.875rem',
+        fontFamily: 'Roboto',
+        wordBreak: 'break-all'
+    },
     value: {
         marginBottom: 5,
         fontSize: '1rem',
