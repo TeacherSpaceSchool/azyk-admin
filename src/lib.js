@@ -15,9 +15,9 @@ export const getJWT = (cookie)=>{
         }
         if (c.indexOf(name) === 0) {
             let jwt = c.substring(name.length, c.length)
-            if(process.browser&&!localStorage.extended) {
-                localStorage.extended = true
-                document.cookie = `jwt=${jwt};expires=Sun, 31 May 2048 12:35:23 GMT;path=/`;
+            if(process.browser&&!sessionStorage.extended) {
+                sessionStorage.extended = true
+                document.cookie = `jwt=${jwt};expires=Sun, 31 May 2048 12:35:23 GMT;path=/;SameSite=Strict`;
             }
             //console.timeEnd('perfomance')
             return jwt;
