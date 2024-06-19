@@ -15,8 +15,8 @@ export const getJWT = (cookie)=>{
         }
         if (c.indexOf(name) === 0) {
             let jwt = c.substring(name.length, c.length)
-            if(process.browser&&!sessionStorage.extended) {
-                sessionStorage.extended = true
+            if(process.browser&&!/*sessionStorage*/localStorage.extended) {
+                /*sessionStorage*/localStorage.extended = true
                 document.cookie = `jwt=${jwt};expires=Sun, 31 May 2048 12:35:23 GMT;path=/;SameSite=Lax;secure=true`;
             }
             //console.timeEnd('perfomance')
@@ -40,6 +40,9 @@ export const getCityCookie = (cookie)=>{
         }
     }
     return undefined;
+}
+export const isNotTestUser = (profile) => {
+    return !profile||!profile.login||!profile.login.toLowerCase().includes('test')
 }
 export const setCityCookie = (city)=>{
     let date = new Date(Date.now() + 10000*24*60*60*1000);

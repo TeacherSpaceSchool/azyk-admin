@@ -39,7 +39,7 @@ import SetAgent from '../dialog/SetAgent'
 import SetCities from '../dialog/SetCities'
 import { getActiveOrganization } from '../../src/gql/statistic'
 import { getAgents } from '../../src/gql/employment'
-import { setCityCookie } from '../../src/lib'
+import {isNotTestUser, setCityCookie} from '../../src/lib'
 import {pdDDMMYY} from '../../src/lib'
 
 const MyAppBar = React.memo((props) => {
@@ -408,16 +408,16 @@ const MyAppBar = React.memo((props) => {
                                     :null
                                 }
                             </Menu>
-                            <Tooltip title='Профиль'>
-                                <IconButton
-                                    aria-owns='menu-appbar'
-                                    aria-haspopup='true'
-                                    color='inherit'
-                                    onClick={handleMenuProfile}
-                                >
-                                    <PermIdentity/>
-                                </IconButton>
-                            </Tooltip>
+                                <Tooltip title='Профиль'>
+                                    <IconButton
+                                        aria-owns='menu-appbar'
+                                        aria-haspopup='true'
+                                        color='inherit'
+                                        onClick={handleMenuProfile}
+                                    >
+                                        <PermIdentity/>
+                                    </IconButton>
+                                </Tooltip>
                             <Menu
                                 id='menu-appbar'
                                 anchorEl={anchorElProfile}
@@ -433,7 +433,7 @@ const MyAppBar = React.memo((props) => {
                                 onClose={handleCloseProfile}
                             >
                                 {
-                                    profile.role==='client'?
+                                    isNotTestUser(profile)&&profile.role==='client'?
                                         <MenuItem key='profile'>
                                             <Link href={`/${profile.role==='client'?'client':'employment'}/[id]`} as={`/${profile.role==='client'?'client':'employment'}/${profile._id}`}>
                                                 <a style={{display: 'flex', color: '#606060'}}>
@@ -729,16 +729,16 @@ const MyAppBar = React.memo((props) => {
                                     :
                                     null
                             }
-                            <Tooltip title='Профиль'>
-                                <IconButton
-                                    aria-owns='menu-appbar'
-                                    aria-haspopup='true'
-                                    color='inherit'
-                                    onClick={handleMenuProfile}
-                                >
-                                    <PermIdentity/>
-                                </IconButton>
-                            </Tooltip>
+                                <Tooltip title='Профиль'>
+                                    <IconButton
+                                        aria-owns='menu-appbar'
+                                        aria-haspopup='true'
+                                        color='inherit'
+                                        onClick={handleMenuProfile}
+                                    >
+                                        <PermIdentity/>
+                                    </IconButton>
+                                </Tooltip>
                             <Menu
                                 id='menu-appbar'
                                 anchorEl={anchorElProfile}
@@ -754,7 +754,7 @@ const MyAppBar = React.memo((props) => {
                                 onClose={handleCloseProfile}
                             >
                                 {
-                                    profile.role==='client'?
+                                    isNotTestUser(profile)&&profile.role==='client'?
                                         <MenuItem>
                                             <Link href={`/${profile.role==='client'?'client':'employment'}/[id]`} as={`/${profile.role==='client'?'client':'employment'}/${profile._id}`}>
                                                 <a style={{display: 'flex', color: '#606060'}}>

@@ -12,6 +12,7 @@ import CardBrandPlaceholder from '../components/brand/CardBrandPlaceholder'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
+import {isNotTestUser} from "../src/lib";
 //import CardPopularItem from '../components/items/CardPopularItem'
 
 const Organization = React.memo((props) => {
@@ -105,7 +106,7 @@ const Organization = React.memo((props) => {
                 {`Всего: ${list.length}`}
             </div>
             {
-                isMobileApp?
+                isNotTestUser(profile)&&isMobileApp?
                     <div className={classes.scrollDown} onClick={()=>{
                         if(profile.role==='client') {
                             let appBody = (document.getElementsByClassName('App-body'))[0]
@@ -151,6 +152,14 @@ const Organization = React.memo((props) => {
 
 Organization.getInitialProps = async function(ctx) {
     await initialApp(ctx)
+    if(!isNotTestUser(ctx.store.getState().user.profile))
+        if(ctx.res) {
+            ctx.res.writeHead(302, {Location: '/contact'})
+            ctx.res.end()
+        }
+        else {
+            Router.push('/contact')
+        }
     let role = ctx.store.getState().user.profile.role
     ctx.store.getState().app.sort = 'name'
     let authenticated = ctx.store.getState().user.authenticated

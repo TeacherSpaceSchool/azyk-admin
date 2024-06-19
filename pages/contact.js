@@ -383,7 +383,7 @@ const Contact = React.memo((props) => {
                                                     </div>
                                                 </div>
                                                 <div className={classes.row}>
-                                                    {/*<a
+                                                    <a
                                                         href='https://api.whatsapp.com/send?phone=996559995197&text='
                                                         className={classes.value}
                                                         style={{color: 'green', display: 'flex', fontSize: 20, alignItems: 'center'}}
@@ -397,7 +397,7 @@ const Contact = React.memo((props) => {
                                                         </svg>
                                                         WhatsApp
                                                     </a>
-                                                    &nbsp;&nbsp;&nbsp;*/}
+                                                    &nbsp;&nbsp;&nbsp;
                                                     <a
                                                         href='tel:+996554776667'
                                                         className={classes.value}
