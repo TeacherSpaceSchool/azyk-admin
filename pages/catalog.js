@@ -27,6 +27,7 @@ import initialApp from '../src/initialApp'
 import { getBrandOrganizations, getBrands } from '../src/gql/items'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {getSpecialPriceClients} from '../src/gql/specialPrice';
+import {getPlanClient} from "../src/gql/planClient";
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
@@ -96,6 +97,7 @@ const Catalog = React.memo((props) => {
         setInputValue(event.target.value);
     };
     let [list, setList] = useState(data.brands);
+    const [planClient, setPlanClient] = useState(null);
     const [basket, setBasket] = useState({});
     let [organization, setOrganization] = useState(data.organization);
     let [geo, setGeo] = useState(undefined);
@@ -169,6 +171,10 @@ const Catalog = React.memo((props) => {
                 if(specialPrices[list[i]._id]!=undefined)
                     list[i].price = specialPrices[list[i]._id]
             }
+            setPlanClient((await getPlanClient({client: client._id, organization: organization._id})).planClient)
+        }
+        else {
+            setPlanClient(null)
         }
         setList([...list]);
         setClient(client)
@@ -315,7 +321,25 @@ const Catalog = React.memo((props) => {
                                 )}
                             />
                     }
-                    <br/>
+                    {
+                        planClient?
+                            <>
+                                <Divider style={{marginTop: 10, marginBottom: 5}}/>
+                                <div className={classes.row} style={{justifyContent: 'center'}}>
+                                    <div className={classes.nameField} style={{marginBottom: 0}}>
+                                        План на месяц:&nbsp;
+                                    </div>
+                                    <div className={classes.valueField} style={{marginBottom: 0}}>
+                                        <div className={classes.row}>
+                                            {planClient.current} сом / <div style={{color: planClient.current<planClient.month?'orange':'green'}}>{planClient.month} сом</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <Divider style={{marginTop: 5, marginBottom: 15}}/>
+                            </>
+                            :
+                            <div style={{height: 10}}/>
+                    }
                     {
                         data.brandOrganizations.length>1?
                             <>
@@ -331,7 +355,7 @@ const Catalog = React.memo((props) => {
                                     <TextField {...params} label='Выберите организацию' variant='outlined' fullWidth />
                                 )}
                             />
-                            <br/>
+                                <br/>
                             </>
                             :null
 
@@ -344,11 +368,14 @@ const Catalog = React.memo((props) => {
                             }} size='small' color='primary'>
                                 Открыть каталог
                             </Button>
-                            <br/>
+                                <br/>
                             </>
                             :
                             null
                     }
+
+
+
                     {
                         list.map((row, idx) => {
                             let price
@@ -436,7 +463,12 @@ const Catalog = React.memo((props) => {
             <div className={isMobileApp?classes.bottomBasketM:classes.bottomBasketD}>
                 <div className={isMobileApp?classes.allPriceM:classes.allPriceD}>
                     <div className={isMobileApp?classes.value:classes.priceAllText}>Общая стоимость</div>
-                    <div className={isMobileApp?classes.nameM:classes.priceAll}>{`${allPrice} сом`}</div>
+                    <div className={classes.row} style={{alignItems: 'baseline'}}>
+                        <div className={isMobileApp?classes.nameM:classes.priceAll}>{`${allPrice} сом`}</div>
+                        {
+                            planClient?<>&nbsp;/&nbsp;<div style={{color: allPrice<planClient.visit?'orange':'green'}}>{planClient.visit} сом</div></>:null
+                        }
+                    </div>
                 </div>
                 <div className={isMobileApp?classes.buyM:classes.buyD} onClick={async ()=>{
                     if(allPrice>0) {

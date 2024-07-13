@@ -28,16 +28,15 @@ import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
 import ArtTrackIcon from '@material-ui/icons/ArtTrack';
 import EqualizerIcon from '@material-ui/icons/Build';
 import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
-import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore';
-import UnfoldLessIcon from '@material-ui/icons/UnfoldLess';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import TargetIcon from '@material-ui/icons/TrackChanges';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Badge from '@material-ui/core/Badge';
 import LocalGroceryStore from '@material-ui/icons/LocalGroceryStore';
-import {isNotTestUser} from "../../src/lib";
+import {isNotTestUser} from '../../src/lib';
 
 
 const MyDrawer = React.memo((props) => {
@@ -368,13 +367,26 @@ const MyDrawer = React.memo((props) => {
                 {
                     ['admin', 'суперагент', 'суперорганизация', 'организация', 'менеджер', 'агент', 'мерчендайзер'].includes(profile.role)?
                         <>
-                        <Link href={`/merchandisings${'admin'!==profile.role?'/[id]':''}`} as={`/merchandisings${profile.organization?`/${profile.organization}`:'/super'}`}>
-                            <ListItem style={{background: router.pathname.includes('merchandising')&&!router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
-                                <ListItemIcon><AssignmentIndIcon color='inherit'/></ListItemIcon>
-                                <ListItemText primary='Мерчендайзинг' />
-                            </ListItem>
-                        </Link>
-                        <Divider/>
+                            <Link href={`/merchandisings${'admin'!==profile.role?'/[id]':''}`} as={`/merchandisings${profile.organization?`/${profile.organization}`:'/super'}`}>
+                                <ListItem style={{background: router.pathname.includes('merchandising')&&!router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
+                                    <ListItemIcon><AssignmentIndIcon color='inherit'/></ListItemIcon>
+                                    <ListItemText primary='Мерчендайзинг' />
+                                </ListItem>
+                            </Link>
+                            <Divider/>
+                        </>
+                        :null
+                }
+                {
+                    ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)?
+                        <>
+                            <Link href={`/planClients${'admin'!==profile.role?'/[id]':''}`} as={`/planClients${profile.organization?`/${profile.organization}`:''}`}>
+                                <ListItem style={{background: router.pathname.includes('planClients')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
+                                    <ListItemIcon><TargetIcon color='inherit'/></ListItemIcon>
+                                    <ListItemText primary='Планы клиентов' />
+                                </ListItem>
+                            </Link>
+                            <Divider/>
                         </>
                         :null
                 }

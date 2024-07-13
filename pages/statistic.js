@@ -252,6 +252,11 @@ const list = {
             role: ['admin']
         },
         {
+            name: 'Загрузка планов клиентов 1C',
+            link: '/statistic/uploadingplanclients',
+            role: ['admin', 'суперорганизация', 'организация', 'менеджер']
+        },
+        {
             name: 'Загрузка районов 1C',
             link: '/statistic/uploadingdistricts',
             role: ['admin']
@@ -302,6 +307,11 @@ const list = {
             name: 'Выгрузка маршрутов',
             link: '/statistic/unloadingagentroutes',
             role: ['admin']
+        },
+        {
+            name: 'Выгрузка планов клиентов',
+            link: '/statistic/unloadplanclients',
+            role: ['admin', 'суперорганизация', 'организация', 'менеджер']
         },
         {
             name: 'Выгрузка районов',

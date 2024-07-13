@@ -11,6 +11,9 @@ export default makeStyles({
     input: {
         width: '100%',
     },
+    inputHalf: {
+        width: '50%',
+    },
     nameField: {
         marginBottom: 10,
         fontWeight: 'bold',

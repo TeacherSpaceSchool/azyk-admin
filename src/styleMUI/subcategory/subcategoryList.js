@@ -8,4 +8,9 @@ export default makeStyles({
         flexDirection: 'row',
         flexWrap: 'wrap'
     },
+    fab: {
+        position: 'fixed!important',
+        bottom: '20px',
+        right: '20px'
+    }
 })
