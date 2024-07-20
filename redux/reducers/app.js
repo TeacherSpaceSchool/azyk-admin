@@ -7,6 +7,7 @@ const initialState = {
     filter: '',
     sort: '-createdAt',
     isMobileApp: undefined,
+    device: undefined,
     load: false,
     countBasket: 0,
     date: '',

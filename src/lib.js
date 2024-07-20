@@ -173,3 +173,9 @@ export const validPhone = (phone) =>
 {
     return /^[+]{1}996[0-9]{9}$/.test(phone);
 }
+export const isPWA = () => {
+    if(process.browser) {
+        const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        return isInStandaloneMode;
+    }
+}

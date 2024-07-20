@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { setOrder, setInvoice } from '../../src/gql/order'
+import {setOrder, setInvoice, getOrder} from '../../src/gql/order'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Button from '@material-ui/core/Button';
@@ -17,7 +17,6 @@ import IconButton from '@material-ui/core/IconButton';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import {getAdss, checkAdss} from '../../src/gql/ads'
 
 const Order =  React.memo(
     (props) =>{
@@ -154,16 +153,16 @@ const Order =  React.memo(
                 <div className={classes.row}>
                     <div className={classes.nameField}>Статус:&nbsp;</div>
                     <div className={classes.value}>{
-                            element.orders[0].status==='принят'&&(element.confirmationForwarder||element.confirmationClient)?
-                                element.confirmationClient?
-                                    'подтвержден клиентом'
-                                    :
-                                    element.confirmationForwarder?
-                                        'доставлен поставщиком'
-                                        :
-                                        element.orders[0].status
+                        element.orders[0].status==='принят'&&(element.confirmationForwarder||element.confirmationClient)?
+                            element.confirmationClient?
+                                'подтвержден клиентом'
                                 :
-                                element.orders[0].status
+                                element.confirmationForwarder?
+                                    'доставлен поставщиком'
+                                    :
+                                    element.orders[0].status
+                            :
+                            element.orders[0].status
                     }</div>
                 </div>
                 {
@@ -191,12 +190,12 @@ const Order =  React.memo(
                 }
                 {
                     (['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)||allowOrganization)&&element.orders[0].updatedAt!==element.orders[0].createdAt?
-                       <a>
-                           <div style={{cursor: 'pointer'}} className={classes.row} onClick={()=>{setMiniDialog('История', <HistoryOrder invoice={element._id}/>)}}>
-                               <div className={classes.nameField}>Изменен:&nbsp;</div>
-                               <div className={classes.value}>{`${pdDDMMYYHHMM(element.orders[0].updatedAt)}${element.editor?`, ${element.editor}`:''}`}</div>
+                        <a>
+                            <div style={{cursor: 'pointer'}} className={classes.row} onClick={()=>{setMiniDialog('История', <HistoryOrder invoice={element._id}/>)}}>
+                                <div className={classes.nameField}>Изменен:&nbsp;</div>
+                                <div className={classes.value}>{`${pdDDMMYYHHMM(element.orders[0].updatedAt)}${element.editor?`, ${element.editor}`:''}`}</div>
                             </div>
-                       </a>
+                        </a>
                         :
                         null
                 }
@@ -281,45 +280,33 @@ const Order =  React.memo(
                         null
                 }
 
-                    <div
-                         onClick={()=>{
-                                setFullDialog('Акции', <OrderAdss invoice={element._id} organization={element.organization._id} setAdss={setAdss} adss={adss}/>)
-                                showFullDialog(true)
-                         }}
-                         className={classes.row}>
-                        <div className={classes.nameField}>Акции:&nbsp;</div>
-                        <div style={{cursor: 'pointer', ...(!adss[0]?{color: 'red'}:{color: '#ffb300'})}}>
-                            {adss.length>0?
-                                adss.map((ads, idx)=>
-                                    idx<4? <div key={`ads${idx}`} className={classes.value}>
-                                            {ads.title}
-                                        </div>
+                <div
+                    onClick={()=>{
+                        if(profile.role!=='client') {
+                            setFullDialog('Акции', <OrderAdss invoice={element._id}
+                                                              organization={element.organization._id}
+                                                              setAdss={setAdss} adss={adss}/>)
+                            showFullDialog(true)
+                        }
+                    }}
+                    className={classes.row}>
+                    <div className={classes.nameField}>Акции:&nbsp;</div>
+                    <div style={{cursor: 'pointer', ...(!adss[0]?{color: 'red'}:{color: '#ffb300'})}}>
+                        {adss.length>0?
+                            adss.map((ads, idx)=>
+                                idx<4? <div key={`ads${idx}`} className={classes.value}>
+                                        {ads.title}
+                                    </div>
+                                    :
+                                    idx===4?
+                                        '...'
                                         :
-                                        idx===4?
-                                            '...'
-                                            :
-                                            null
-                                )
-                                :
-                                <div className={classes.value}>нет</div>}
-                        </div>
+                                        null
+                            )
+                            :
+                            <div className={classes.value}>нет</div>}
                     </div>
-                {
-                    profile.role!=='client'?
-                     <div style={{color: '#ffb300', cursor: 'pointer'}} className={classes.value} onClick={async()=>{
-                            let allAdss = (await getAdss({search: '', organization: element.organization._id})).adss
-                            let _checkAdss = (await checkAdss(element._id)).checkAdss
-                            for(let i=0; i<_checkAdss.length; i++){
-                                let index = adss.findIndex(element=>element._id===_checkAdss[i])
-                                if(index===-1) {
-                                    adss.push(allAdss[allAdss.findIndex(element => element._id === _checkAdss[i])])
-                                }
-                            }
-                            setAdss([...adss])
-                        }}>Подобрать акции</div>
-                        :
-                        null
-                }
+                </div>
                 {
                     element.discount?
                         <div className={classes.row}>
@@ -345,24 +332,24 @@ const Order =  React.memo(
                 {
                     authenticated&&profile.role!=='client'?
                         <>
-                        {
-                            allTonnage?
-                                <div className={classes.row}>
-                                    <div className={classes.nameField}>Тоннаж:&nbsp;</div>
-                                    <div className={classes.value}>{allTonnage}&nbsp;кг</div>
-                                </div>
-                                :
-                                null
-                        }
-                        {
-                            allSize?
-                                <div className={classes.row}>
-                                    <div className={classes.nameField}>Кубатура:&nbsp;</div>
-                                    <div className={classes.value}>{allSize}&nbsp;см³</div>
-                                </div>
-                                :
-                                null
-                        }
+                            {
+                                allTonnage?
+                                    <div className={classes.row}>
+                                        <div className={classes.nameField}>Тоннаж:&nbsp;</div>
+                                        <div className={classes.value}>{allTonnage}&nbsp;кг</div>
+                                    </div>
+                                    :
+                                    null
+                            }
+                            {
+                                allSize?
+                                    <div className={classes.row}>
+                                        <div className={classes.nameField}>Кубатура:&nbsp;</div>
+                                        <div className={classes.value}>{allSize}&nbsp;см³</div>
+                                    </div>
+                                    :
+                                    null
+                            }
                         </>
                         :
                         null
@@ -441,7 +428,7 @@ const Order =  React.memo(
                                                 :null
 
                                         }
-                                         {
+                                        {
                                             showCons[order._id]||showReturn[order._id]?
                                                 <br/>
                                                 :null
@@ -449,39 +436,39 @@ const Order =  React.memo(
                                         {
                                             showCons[order._id]?
                                                 <>
-                                                <div className={classes.row}>
-                                                    <div className={classes.nameField}>Консигнации:&nbsp;</div>
-                                                    <div className={classes.column}>
-                                                        <div className={classes.row}>
-                                                            <div className={classes.counterbtn} onClick={()=>{decrementConsignation(idx)}}>-</div>
-                                                            <div className={classes.value}>{order.consignment}&nbsp;{order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}</div>
-                                                            <div className={classes.counterbtn} onClick={()=>{incrementConsignation(idx)}}>+</div>
-                                                        </div>
-                                                        <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
-                                                            let consignment = (parseInt(orders[idx].consignment/order.item.packaging)+1)*order.item.packaging
-                                                            if(consignment<=orders[idx].count){
-                                                                orders[idx].consignment = consignment
-                                                            }
-                                                            else
-                                                                orders[idx].consignment = orders[idx].count
-                                                            let price = orders[idx].allPrice/orders[idx].count
-                                                            orders[idx].consignmentPrice = orders[idx].consignment * price
-                                                            setOrders([...orders])
-                                                            canculateAllPrice()
-                                                        }}>
-                                                            Добавить упаковку
+                                                    <div className={classes.row}>
+                                                        <div className={classes.nameField}>Консигнации:&nbsp;</div>
+                                                        <div className={classes.column}>
+                                                            <div className={classes.row}>
+                                                                <div className={classes.counterbtn} onClick={()=>{decrementConsignation(idx)}}>-</div>
+                                                                <div className={classes.value}>{order.consignment}&nbsp;{order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}</div>
+                                                                <div className={classes.counterbtn} onClick={()=>{incrementConsignation(idx)}}>+</div>
+                                                            </div>
+                                                            <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
+                                                                let consignment = (parseInt(orders[idx].consignment/order.item.packaging)+1)*order.item.packaging
+                                                                if(consignment<=orders[idx].count){
+                                                                    orders[idx].consignment = consignment
+                                                                }
+                                                                else
+                                                                    orders[idx].consignment = orders[idx].count
+                                                                let price = orders[idx].allPrice/orders[idx].count
+                                                                orders[idx].consignmentPrice = orders[idx].consignment * price
+                                                                setOrders([...orders])
+                                                                canculateAllPrice()
+                                                            }}>
+                                                                Добавить упаковку
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div className={classes.row}>
-                                                    <div className={classes.nameField}>Стоимость консигнации:&nbsp;</div>
-                                                    <div className={classes.value}>{order.consignmentPrice}&nbsp;сом</div>
-                                                </div>
+                                                    <div className={classes.row}>
+                                                        <div className={classes.nameField}>Стоимость консигнации:&nbsp;</div>
+                                                        <div className={classes.value}>{order.consignmentPrice}&nbsp;сом</div>
+                                                    </div>
                                                 </>
                                                 :
                                                 null
                                         }
-                                     </div>
+                                    </div>
                                 )
                             else if(
                                 allowOrganization&&!confirmationForwarder
@@ -524,76 +511,76 @@ const Order =  React.memo(
                                                 <br/>
                                                 :null
                                         }
-                                                {
-                                                    showCons[order._id]?
-                                                        <>
-                                                        <div className={classes.row}>
-                                                            <div className={classes.nameField}>Консигнации:&nbsp;</div>
-                                                            <div className={classes.column}>
-                                                                <div className={classes.row}>
-                                                                    <div className={classes.counterbtn} onClick={()=>{decrementConsignation(idx)}}>-</div>
-                                                                    <div className={classes.value}>{order.consignment}&nbsp;{order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}</div>
-                                                                    <div className={classes.counterbtn} onClick={()=>{incrementConsignation(idx)}}>+</div>
-                                                                </div>
-                                                                <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
-                                                                    let consignment = (parseInt(orders[idx].consignment/order.item.packaging)+1)*order.item.packaging
-                                                                    if(consignment<=orders[idx].count){
-                                                                        orders[idx].consignment = consignment
-                                                                    }
-                                                                    else
-                                                                        orders[idx].consignment = orders[idx].count
-                                                                    let price = orders[idx].allPrice/orders[idx].count
-                                                                    orders[idx].consignmentPrice = orders[idx].consignment * price
-                                                                    setOrders([...orders])
-                                                                    canculateAllPrice()
-                                                                }}>
-                                                                    Добавить упаковку
-                                                                </div>
+                                        {
+                                            showCons[order._id]?
+                                                <>
+                                                    <div className={classes.row}>
+                                                        <div className={classes.nameField}>Консигнации:&nbsp;</div>
+                                                        <div className={classes.column}>
+                                                            <div className={classes.row}>
+                                                                <div className={classes.counterbtn} onClick={()=>{decrementConsignation(idx)}}>-</div>
+                                                                <div className={classes.value}>{order.consignment}&nbsp;{order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}</div>
+                                                                <div className={classes.counterbtn} onClick={()=>{incrementConsignation(idx)}}>+</div>
+                                                            </div>
+                                                            <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
+                                                                let consignment = (parseInt(orders[idx].consignment/order.item.packaging)+1)*order.item.packaging
+                                                                if(consignment<=orders[idx].count){
+                                                                    orders[idx].consignment = consignment
+                                                                }
+                                                                else
+                                                                    orders[idx].consignment = orders[idx].count
+                                                                let price = orders[idx].allPrice/orders[idx].count
+                                                                orders[idx].consignmentPrice = orders[idx].consignment * price
+                                                                setOrders([...orders])
+                                                                canculateAllPrice()
+                                                            }}>
+                                                                Добавить упаковку
                                                             </div>
                                                         </div>
+                                                    </div>
+                                                    <div className={classes.row}>
+                                                        <div className={classes.nameField}>Стоимость консигнации:&nbsp;</div>
+                                                        <div className={classes.value}>{order.consignmentPrice}&nbsp;сом</div>
+                                                    </div>
+                                                </>
+                                                :null
+                                        }
+                                        {
+                                            showReturn[order._id] ?
+                                                <div className={classes.row}>
+                                                    <div className={classes.nameField}>Отказ:&nbsp;</div>
+                                                    <div className={classes.column}>
                                                         <div className={classes.row}>
-                                                            <div className={classes.nameField}>Стоимость консигнации:&nbsp;</div>
-                                                            <div className={classes.value}>{order.consignmentPrice}&nbsp;сом</div>
-                                                        </div>
-                                                        </>
-                                                        :null
-                                                }
-                                                {
-                                                    showReturn[order._id] ?
-                                                        <div className={classes.row}>
-                                                            <div className={classes.nameField}>Отказ:&nbsp;</div>
-                                                            <div className={classes.column}>
-                                                                <div className={classes.row}>
-                                                                    <div className={classes.counterbtn} onClick={() => {
-                                                                        decrementReturned(idx)
-                                                                    }}>-
-                                                                    </div>
-                                                                    <div
-                                                                        className={classes.value}>{order.returned}&nbsp;
-                                                                        {order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}
-                                                                    </div>
-                                                                    <div className={classes.counterbtn} onClick={() => {
-                                                                        incrementReturned(idx)
-                                                                    }}>+
-                                                                    </div>
-                                                                </div>
-                                                                <div className={classes.addPackaging}
-                                                                     style={{color: '#ffb300'}} onClick={() => {
-                                                                    let returned = (parseInt(orders[idx].returned / order.item.packaging) + 1) * order.item.packaging
-                                                                    if (returned <= orders[idx].count) {
-                                                                        orders[idx].returned = returned
-                                                                    }
-                                                                    else
-                                                                        orders[idx].returned = orders[idx].count
-                                                                    setOrders([...orders])
-                                                                    canculateAllPrice()
-                                                                }}>
-                                                                    Добавить упаковку
-                                                                </div>
+                                                            <div className={classes.counterbtn} onClick={() => {
+                                                                decrementReturned(idx)
+                                                            }}>-
+                                                            </div>
+                                                            <div
+                                                                className={classes.value}>{order.returned}&nbsp;
+                                                                {order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}
+                                                            </div>
+                                                            <div className={classes.counterbtn} onClick={() => {
+                                                                incrementReturned(idx)
+                                                            }}>+
                                                             </div>
                                                         </div>
-                                                        : null
-                                                }
+                                                        <div className={classes.addPackaging}
+                                                             style={{color: '#ffb300'}} onClick={() => {
+                                                            let returned = (parseInt(orders[idx].returned / order.item.packaging) + 1) * order.item.packaging
+                                                            if (returned <= orders[idx].count) {
+                                                                orders[idx].returned = returned
+                                                            }
+                                                            else
+                                                                orders[idx].returned = orders[idx].count
+                                                            setOrders([...orders])
+                                                            canculateAllPrice()
+                                                        }}>
+                                                            Добавить упаковку
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                : null
+                                        }
                                         <br/>
                                     </div>
                                 )
@@ -624,14 +611,14 @@ const Order =  React.memo(
                                         {
                                             order.consignment?
                                                 <>
-                                                <div className={classes.row}>
-                                                    <div className={classes.nameField}>Консигнации:&nbsp;</div>
-                                                    <div className={classes.value}>{order.consignment}&nbsp;{order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}</div>
-                                                </div>
-                                                <div className={classes.row}>
-                                                    <div className={classes.nameField}>Стоимость консигнации:&nbsp;</div>
-                                                    <div className={classes.value}>{order.consignmentPrice}&nbsp;сом</div>
-                                                </div>
+                                                    <div className={classes.row}>
+                                                        <div className={classes.nameField}>Консигнации:&nbsp;</div>
+                                                        <div className={classes.value}>{order.consignment}&nbsp;{order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}</div>
+                                                    </div>
+                                                    <div className={classes.row}>
+                                                        <div className={classes.nameField}>Стоимость консигнации:&nbsp;</div>
+                                                        <div className={classes.value}>{order.consignmentPrice}&nbsp;сом</div>
+                                                    </div>
                                                 </>
                                                 :
                                                 null
@@ -639,10 +626,10 @@ const Order =  React.memo(
                                         {
                                             order.returned?
                                                 <>
-                                                <div className={classes.row}>
-                                                    <div className={classes.nameField}>Отказ:&nbsp;</div>
-                                                    <div className={classes.value}>{order.returned}&nbsp;{order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}</div>
-                                                </div>
+                                                    <div className={classes.row}>
+                                                        <div className={classes.nameField}>Отказ:&nbsp;</div>
+                                                        <div className={classes.value}>{order.returned}&nbsp;{order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}</div>
+                                                    </div>
                                                 </>
                                                 :
                                                 null
@@ -656,21 +643,21 @@ const Order =  React.memo(
                 {element.orders[0].status==='обработка'?<br/>:null}
                 {
                     consignmentPrice?
-                    <div>
-                        <FormControlLabel
-                            disabled={!(['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)||allowOrganization)}
-                            control={
-                                <Checkbox
-                                    checked={paymentConsignation}
-                                    onChange={()=>{
-                                        setPaymentConsignation(!paymentConsignation);
-                                    }}
-                                    color='primary'
-                                />
-                            }
-                            label='Консигнации оплачены'
-                        />
-                    </div>
+                        <div>
+                            <FormControlLabel
+                                disabled={!(['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)||allowOrganization)}
+                                control={
+                                    <Checkbox
+                                        checked={paymentConsignation}
+                                        onChange={()=>{
+                                            setPaymentConsignation(!paymentConsignation);
+                                        }}
+                                        color='primary'
+                                    />
+                                }
+                                label='Консигнации оплачены'
+                            />
+                        </div>
                         :
                         null
                 }
@@ -778,55 +765,59 @@ const Order =  React.memo(
                         }
                     />
                 </div>
-                    <div>
-                {
-                    ((profile.role==='client'||allowOrganization||['агент', 'экспедитор'].includes(profile.role)||['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)))?
-                        <Button variant='contained' color='primary' onClick={()=>{
-                            const action = async() => {
-                                let invoice = {invoice: element._id, adss: adss.map(ads=>ads._id)}
-                                if(element.taken!==taken)invoice.taken=taken;
-                                if(element.confirmationClient!==confirmationClient) invoice.confirmationClient=confirmationClient;
-                                if(element.confirmationForwarder!==confirmationForwarder) invoice.confirmationForwarder=confirmationForwarder;
-                                if(element.cancelClient!==cancelClient) invoice.cancelClient=cancelClient;
-                                if(element.cancelForwarder!==cancelForwarder) invoice.cancelForwarder=cancelForwarder;
-                                if(element.paymentConsignation!==paymentConsignation) invoice.paymentConsignation=paymentConsignation;
-                                await setInvoice(invoice)
+                <center>
+                    {
+                        ((profile.role==='client'||allowOrganization||['агент', 'экспедитор'].includes(profile.role)||['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)))?
+                            <Button variant='contained' color='primary' onClick={()=>{
+                                const action = async() => {
 
-                                let sendOrders = [];
-                                if(changeOrders)
-                                    sendOrders = orders.map((order) => {
-                                        return {
-                                            _id: order._id,
-                                            consignmentPrice: order.consignmentPrice,
-                                            name: order.item.name,
-                                            returned: taken !== true ? 0 : order.returned,
-                                            consignment: order.consignment,
-                                            count: order.count,
-                                            allPrice: order.allPrice,
-                                            allTonnage: order.allTonnage,
-                                            allSize: order.allSize,
-                                            status: order.status
-                                        }
-                                    })
-                                let res = await setOrder({orders: sendOrders, invoice: element._id})
-                                if (res&&list) {
-                                    let _list = [...list]
-                                    _list[idx] = res
-                                    setList(_list)
+                                    let sendOrders = [];
+                                    if(changeOrders)
+                                        sendOrders = orders.map((order) => {
+                                            return {
+                                                _id: order._id,
+                                                consignmentPrice: order.consignmentPrice,
+                                                name: order.item.name,
+                                                returned: taken !== true ? 0 : order.returned,
+                                                consignment: order.consignment,
+                                                count: order.count,
+                                                allPrice: order.allPrice,
+                                                allTonnage: order.allTonnage,
+                                                allSize: order.allSize,
+                                                status: order.status
+                                            }
+                                        })
+                                    await setOrder({orders: sendOrders, invoice: element._id})
+
+                                    let invoice = {invoice: element._id, adss: adss.map(ads=>ads._id)}
+                                    if(element.taken!==taken)invoice.taken=taken;
+                                    if(element.confirmationClient!==confirmationClient) invoice.confirmationClient=confirmationClient;
+                                    if(element.confirmationForwarder!==confirmationForwarder) invoice.confirmationForwarder=confirmationForwarder;
+                                    if(element.cancelClient!==cancelClient) invoice.cancelClient=cancelClient;
+                                    if(element.cancelForwarder!==cancelForwarder) invoice.cancelForwarder=cancelForwarder;
+                                    if(element.paymentConsignation!==paymentConsignation) invoice.paymentConsignation=paymentConsignation;
+                                    await setInvoice(invoice)
+
+                                    const res = (await getOrder({_id: element._id})).invoice
+
+                                    if (res&&list) {
+                                        let _list = [...list]
+                                        _list[idx] = res
+                                        setList(_list)
+                                    }
+                                    showMiniDialog(false);
                                 }
-                                showMiniDialog(false);
-                            }
-                            setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                        }} className={classes.button}>
-                            Сохранить
-                        </Button>
-                        :
-                        null
-                }
-                <Button variant='contained' color='secondary' onClick={()=>{showMiniDialog(false);}} className={classes.button}>
-                    Закрыть
-                </Button>
-                    </div>
+                                setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                            }} className={classes.button}>
+                                Сохранить
+                            </Button>
+                            :
+                            null
+                    }
+                    <Button variant='contained' color='secondary' onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                        Закрыть
+                    </Button>
+                </center>
             </div>
         );
     }

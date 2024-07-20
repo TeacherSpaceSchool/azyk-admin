@@ -3,16 +3,18 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import {getAdss, checkAdss} from '../../src/gql/ads'
+import {getAdss} from '../../src/gql/ads'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import CardAds from '../ads/CardAds'
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Checkbox from '@material-ui/core/Checkbox';
+import * as snackbarActions from '../../redux/actions/snackbar'
 
 const OrderAdss =  React.memo(
     (props) =>{
         const { classes, organization, setAdss, adss, invoice } = props;
+        const { showSnackBar } = props.snackbarActions;
         let [selectedAdss, setSelectedAdss] = useState(adss);
         let [allAdss, setAllAdss] = useState([]);
         useEffect(()=>{
@@ -52,21 +54,6 @@ const OrderAdss =  React.memo(
                     else if(index!==undefined) return <CardAds element={element}/>
                 }):null}
                 <br/>
-                <center>
-                    <Button variant="contained" color="primary" onClick={async()=>{
-                        let _checkAdss = (await checkAdss(invoice)).checkAdss
-                        for(let i=0; i<_checkAdss.length; i++){
-                            let index = selectedAdss.findIndex(element=>element._id===_checkAdss[i])
-                            if(index===-1) {
-                                selectedAdss.push(allAdss[allAdss.findIndex(element => element._id === _checkAdss[i])])
-                                setSelectedAdss([...selectedAdss])
-                            }
-                        }
-                    }} className={classes.button}>
-                        Подобрать акции
-                    </Button>
-                </center>
-                <br/>
                 <div>
                     {
                         profile.role!=='client'?
@@ -98,6 +85,7 @@ function mapStateToProps (state) {
 function mapDispatchToProps(dispatch) {
     return {
         mini_dialogActions: bindActionCreators(mini_dialogActions, dispatch),
+        snackbarActions: bindActionCreators(snackbarActions, dispatch),
     }
 }
 

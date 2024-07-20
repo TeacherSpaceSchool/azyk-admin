@@ -215,21 +215,6 @@ export const addAds = async(element)=>{
     }
 }
 
-export const checkAdss = async(invoice)=>{
-    try{
-        const client = new SingletonApolloClient().getClient()
-        let res = await client.query({
-            variables: {invoice: invoice},
-            query : gql`
-                    query ($invoice: ID!) {
-                        checkAdss(invoice: $invoice)
-                    }`})
-        return(res.data)
-    } catch(err){
-        console.error(err)
-    }
-}
-
 export const setAds = async(element)=>{
     try{
         const client = new SingletonApolloClient().getClient()

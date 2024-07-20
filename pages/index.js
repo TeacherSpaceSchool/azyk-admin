@@ -12,13 +12,13 @@ import CardBrandPlaceholder from '../components/brand/CardBrandPlaceholder'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
-import {isNotTestUser} from "../src/lib";
+import {isNotTestUser, isPWA} from '../src/lib';
 //import CardPopularItem from '../components/items/CardPopularItem'
 
 const Organization = React.memo((props) => {
     const classes = pageListStyle();
     const { data } = props;
-     const { search, filter, sort, isMobileApp, city } = props.app;
+     const { search, filter, sort, isMobileApp, city, device } = props.app;
     const { profile } = props.user;
     let [list, setList] = useState(data.brandOrganizations);
     /*const popularItemsRef = useRef(null);
@@ -84,6 +84,29 @@ const Organization = React.memo((props) => {
             }
         })()
     },[search])
+    //установка pwa
+    let [deferredPrompt, setDeferredPrompt] = useState(device.vendor==='Apple');
+    useEffect(()=>{
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Сохраняем событие для последующего использования
+            setDeferredPrompt(e);
+        });
+    },[])
+    const prompt = () => {
+        if(device.vendor==='Apple') {
+            Router.push('/howtoinstall/ios')
+
+        }
+        else {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    setDeferredPrompt(null)
+                }
+            });
+        }
+    }
+    //pagination
     let [pagination, setPagination] = useState(100);
     const checkPagination = ()=>{
         if(pagination<list.length){
@@ -106,22 +129,17 @@ const Organization = React.memo((props) => {
                 {`Всего: ${list.length}`}
             </div>
             {
-                isNotTestUser(profile)&&isMobileApp?
+                isNotTestUser(profile)&&isMobileApp&&(profile.role!=='client'||deferredPrompt&&!isPWA())?
                     <div className={classes.scrollDown} onClick={()=>{
                         if(profile.role==='client') {
-                            let appBody = (document.getElementsByClassName('App-body'))[0]
-                            appBody.scroll({
-                                top: appBody.offsetHeight + appBody.scrollTop - 122,
-                                left: 0,
-                                behavior: 'smooth'
-                            })
+                            prompt()
                         }
                         else {
                             setType(type==='👁'?'⚙':'👁')
                         }
                     }}>
                         <div className={classes.scrollDownContainer}>
-                            {profile.role==='client'?'▼ЕЩЕ БРЕНДЫ▼':type}
+                            {profile.role==='client'?'📲УСТАНОВИТЬ ПРИЛОЖЕНИЕ':type}
                             <div className={classes.scrollDownDiv}/>
                         </div>
                     </div>
