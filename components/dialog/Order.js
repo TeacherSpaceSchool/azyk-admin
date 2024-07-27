@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import {setOrder, setInvoice, getOrder} from '../../src/gql/order'
+import {setOrder, setInvoice} from '../../src/gql/order'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Button from '@material-ui/core/Button';
@@ -645,7 +645,7 @@ const Order =  React.memo(
                     consignmentPrice?
                         <div>
                             <FormControlLabel
-                                disabled={!(['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)||allowOrganization)}
+                                disabled={changeOrders||!(['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)||allowOrganization)}
                                 control={
                                     <Checkbox
                                         checked={paymentConsignation}
@@ -663,11 +663,10 @@ const Order =  React.memo(
                 }
                 <div>
                     <FormControlLabel
-                        disabled=
-                            {['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)?
+                        disabled={changeOrders||(['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)?
                                 !['обработка','принят'].includes(element.orders[0].status)
                                 :
-                                !(allowOrganization&&['обработка','принят'].includes(element.orders[0].status))}
+                                !(allowOrganization&&['обработка','принят'].includes(element.orders[0].status)))}
                         control={
                             <Checkbox
                                 checked={taken}
@@ -682,11 +681,12 @@ const Order =  React.memo(
                 </div>
                 <div>
                     <FormControlLabel
-                        disabled={
+                        disabled={changeOrders||(
                             ['admin', 'суперэкспедитор'].includes(profile.role)?
                                 !['выполнен','принят'].includes(element.orders[0].status)
                                 :
-                                !((allowOrganization||'экспедитор'===profile.role)&&'принят'===element.orders[0].status)}
+                                !((allowOrganization||'экспедитор'===profile.role)&&'принят'===element.orders[0].status)
+                        )}
                         control={
                             <Checkbox
                                 checked={confirmationForwarder}
@@ -701,7 +701,7 @@ const Order =  React.memo(
                 </div>
                 <div>
                     <FormControlLabel
-                        disabled={
+                        disabled={changeOrders||(
                             profile.role==='admin'?
                                 !['выполнен','принят'].includes(element.orders[0].status)
                                 :
@@ -709,7 +709,7 @@ const Order =  React.memo(
                                     'принят'!==element.orders[0].status
                                     :
                                     true
-                        }
+                        )}
                         control={
                             <Checkbox
                                 checked={confirmationClient}
@@ -724,7 +724,7 @@ const Order =  React.memo(
                 </div>
                 <div>
                     <FormControlLabel
-                        disabled={(
+                        disabled={changeOrders||(
                             ['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)?
                                 !['отмена','обработка'].includes(element.orders[0].status)
                                 :
@@ -770,6 +770,16 @@ const Order =  React.memo(
                         ((profile.role==='client'||allowOrganization||['агент', 'экспедитор'].includes(profile.role)||['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)))?
                             <Button variant='contained' color='primary' onClick={()=>{
                                 const action = async() => {
+                                    if(!changeOrders) {
+                                        let invoice = {invoice: element._id, adss: adss.map(ads => ads._id)}
+                                        if (element.taken !== taken) invoice.taken = taken;
+                                        if (element.confirmationClient !== confirmationClient) invoice.confirmationClient = confirmationClient;
+                                        if (element.confirmationForwarder !== confirmationForwarder) invoice.confirmationForwarder = confirmationForwarder;
+                                        if (element.cancelClient !== cancelClient) invoice.cancelClient = cancelClient;
+                                        if (element.cancelForwarder !== cancelForwarder) invoice.cancelForwarder = cancelForwarder;
+                                        if (element.paymentConsignation !== paymentConsignation) invoice.paymentConsignation = paymentConsignation;
+                                        await setInvoice(invoice)
+                                    }
 
                                     let sendOrders = [];
                                     if(changeOrders)
@@ -787,18 +797,7 @@ const Order =  React.memo(
                                                 status: order.status
                                             }
                                         })
-                                    await setOrder({orders: sendOrders, invoice: element._id})
-
-                                    let invoice = {invoice: element._id, adss: adss.map(ads=>ads._id)}
-                                    if(element.taken!==taken)invoice.taken=taken;
-                                    if(element.confirmationClient!==confirmationClient) invoice.confirmationClient=confirmationClient;
-                                    if(element.confirmationForwarder!==confirmationForwarder) invoice.confirmationForwarder=confirmationForwarder;
-                                    if(element.cancelClient!==cancelClient) invoice.cancelClient=cancelClient;
-                                    if(element.cancelForwarder!==cancelForwarder) invoice.cancelForwarder=cancelForwarder;
-                                    if(element.paymentConsignation!==paymentConsignation) invoice.paymentConsignation=paymentConsignation;
-                                    await setInvoice(invoice)
-
-                                    const res = (await getOrder({_id: element._id})).invoice
+                                    const res = await setOrder({orders: sendOrders, invoice: element._id})
 
                                     if (res&&list) {
                                         let _list = [...list]
