@@ -19,6 +19,7 @@ import Button from '@material-ui/core/Button';
 import * as appActions from '../../redux/actions/app'
 
 const UnloadEquipments = React.memo((props) => {
+    const { profile } = props.user;
     const classes = pageListStyle();
     const { data } = props;
     let [organization, setOrganization] = useState(undefined);
@@ -54,28 +55,34 @@ const UnloadEquipments = React.memo((props) => {
                 <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
                 <meta property='og:type' content='website' />
                 <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property="og:url" content={`${urlMain}/statistic/unloadequipments`} />
+                <meta property='og:url' content={`${urlMain}/statistic/unloadequipments`} />
                 <link rel='canonical' href={`${urlMain}/statistic/unloadequipments`}/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
-                    <div className={classes.row}>
-                        <Autocomplete
-                            className={classes.input}
-                            options={activeOrganization}
-                            getOptionLabel={option => option.name}
-                            value={organization}
-                            onChange={(event, newValue) => {
-                                setOrganization(newValue)
-                            }}
-                            noOptionsText='Ничего не найдено'
-                            renderInput={params => (
-                                <TextField {...params} label='Организация' fullWidth />
-                            )}
-                        />
-                    </div>
+                    {
+                        !profile.organization?
+                            <div className={classes.row}>
+                                <Autocomplete
+                                    className={classes.input}
+                                    options={activeOrganization}
+                                    getOptionLabel={option => option.name}
+                                    value={organization}
+                                    onChange={(event, newValue) => {
+                                        setOrganization(newValue)
+                                    }}
+                                    noOptionsText='Ничего не найдено'
+                                    renderInput={params => (
+                                        <TextField {...params} label='Организация' fullWidth />
+                                    )}
+                                />
+                            </div>
+                            :
+                            null
+                    }
                     <br/>
                     <Button variant='contained' size='small' color='primary' onClick={async()=>{
+                        if(profile.organization) organization = {_id: profile.organization}
                         if(organization&&organization._id) {
                             await showLoad(true)
                             window.open(((await getUnloadEquipments({
@@ -94,7 +101,7 @@ const UnloadEquipments = React.memo((props) => {
 
 UnloadEquipments.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin', 'суперорганизация', 'организация', 'менеджер'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'

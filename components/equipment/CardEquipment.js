@@ -89,23 +89,13 @@ const CardEquipment = React.memo((props) => {
                         />
                         <br/>
                         <FormControl className={classes.input} error={!model}>
-                            <InputLabel>Тип графика</InputLabel>
+                            <InputLabel>Модель</InputLabel>
                             <Select value={model} onChange={handleModel}>
                                 {models.map((element)=>
                                     <MenuItem key={element} value={element}>{element}</MenuItem>
                                 )}
                             </Select>
                         </FormControl>
-                        <TextField
-                            error={!model}
-                            label='Модель'
-                            value={model}
-                            className={classes.input}
-                            onChange={(event)=>{setModel(event.target.value)}}
-                            inputProps={{
-                                'aria-label': 'description',
-                            }}
-                        />
                         <br/>
                         {
                             process.browser?

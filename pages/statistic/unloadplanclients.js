@@ -17,9 +17,10 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import * as appActions from '../../redux/actions/app'
-import {getDistricts} from "../../src/gql/district";
+import {getDistricts} from '../../src/gql/district';
 
 const UnloadPlanClients = React.memo((props) => {
+    const { profile } = props.user;
     const classes = pageListStyle();
     const { data } = props;
     let [organization, setOrganization] = useState(undefined);
@@ -73,12 +74,14 @@ const UnloadPlanClients = React.memo((props) => {
                 <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
                 <meta property='og:type' content='website' />
                 <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property="og:url" content={`${urlMain}/statistic/unloadplanclients`} />
+                <meta property='og:url' content={`${urlMain}/statistic/unloadplanclients`} />
                 <link rel='canonical' href={`${urlMain}/statistic/unloadplanclients`}/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     <div className={classes.row}>
+                        {
+                            !profile.organization?
                         <Autocomplete
                             className={classes.input}
                             options={activeOrganization}
@@ -92,6 +95,9 @@ const UnloadPlanClients = React.memo((props) => {
                                 <TextField {...params} label='Организация' fullWidth />
                             )}
                         />
+                                :
+                                <><br/><br/></>
+                        }
                         <Autocomplete
                             className={classes.input}
                             options={districts}
@@ -113,6 +119,7 @@ const UnloadPlanClients = React.memo((props) => {
                     </div>
                     <br/>
                     <Button variant='contained' size='small' color='primary' onClick={async()=>{
+                        if(profile.organization) organization = {_id: profile.organization}
                         if(organization&&organization._id) {
                             await showLoad(true)
                             window.open(((await getUnloadPlanClients({
@@ -132,7 +139,7 @@ const UnloadPlanClients = React.memo((props) => {
 
 UnloadPlanClients.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin', 'суперорганизация', 'организация', 'менеджер'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
