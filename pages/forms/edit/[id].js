@@ -399,6 +399,7 @@ const NewForms = React.memo((props) => {
                                 {
                                     router.query.id==='new'?
                                         <Button onClick={async()=>{
+                                            if(profile.organization) organization = {_id: profile.organization}
                                             if (title.length>0&&questions.length>0&&organization) {
                                                 const action = async() => {
                                                     await addTemplateForm({

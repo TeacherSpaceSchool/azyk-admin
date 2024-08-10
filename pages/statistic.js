@@ -309,6 +309,11 @@ const list = {
             role: ['admin']
         },
         {
+            name: 'Выгрузка оборудования',
+            link: '/statistic/unloadingequipments',
+            role: ['admin', 'суперорганизация', 'организация', 'менеджер']
+        },
+        {
             name: 'Выгрузка планов клиентов',
             link: '/statistic/unloadplanclients',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер']

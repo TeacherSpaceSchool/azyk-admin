@@ -2,7 +2,7 @@ import Head from 'next/head';
 import React, { useState, useEffect, useRef } from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
-import {getRepairEquipment, setRepairEquipment, deleteRepairEquipment, addRepairEquipment} from '../../src/gql/equipment'
+import {getRepairEquipment, setRepairEquipment, deleteRepairEquipment, addRepairEquipment} from '../../src/gql/repairEquipment'
 import { getClients } from '../../src/gql/client'
 import organizationStyle from '../../src/styleMUI/equipment/equipment'
 import Card from '@material-ui/core/Card';

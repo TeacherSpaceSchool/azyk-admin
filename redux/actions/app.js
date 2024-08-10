@@ -1,4 +1,18 @@
-import { SET_CITY, SET_AGENT, SHOW_APPBAR, SHOW_DRAWER, SET_SEARCH, SET_FILTER, SET_SORT, SET_IS_MOBILE_APP, SHOW_LOAD, SET_COUNT_BASKET, SET_DATE, SET_ORGANIZATION } from '../constants/app'
+import {
+    SET_CITY,
+    SET_AGENT,
+    SHOW_APPBAR,
+    SHOW_DRAWER,
+    SET_SEARCH,
+    SET_FILTER,
+    SET_SORT,
+    SET_IS_MOBILE_APP,
+    SHOW_LOAD,
+    SET_COUNT_BASKET,
+    SET_DATE,
+    SET_ORGANIZATION,
+    SET_DISTRICT
+} from '../constants/app'
 
 export function setCity(data) {
     return {
@@ -31,6 +45,13 @@ export function setAgent(data) {
 export function setOrganization(data) {
     return {
         type: SET_ORGANIZATION,
+        payload: data
+    }
+}
+
+export function setDistrict(data) {
+    return {
+        type: SET_DISTRICT,
         payload: data
     }
 }

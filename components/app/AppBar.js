@@ -41,14 +41,16 @@ import { getActiveOrganization } from '../../src/gql/statistic'
 import { getAgents } from '../../src/gql/employment'
 import {isNotTestUser, setCityCookie} from '../../src/lib'
 import {pdDDMMYY} from '../../src/lib'
+import {getDistricts} from '../../src/gql/district';
+import SetDistrict from '../dialog/SetDistrict';
 
 const MyAppBar = React.memo((props) => {
     //props
     const initialRender = useRef(true);
     const classes = appbarStyle();
-    const { filters, sorts, pageName, dates, searchShow, unread, defaultOpenSearch, organizations, cityShow, agents, cities } = props
-    const { drawer, search, filter, sort, isMobileApp, date, organization, agent, city } = props.app;
-    const { showDrawer, setSearch, setFilter, setSort, setDate, setOrganization, setAgent, setCity } = props.appActions;
+    const { filters, sorts, pageName, dates, searchShow, unread, defaultOpenSearch, organizations, cityShow, agents, showDistrict, cities } = props
+    const { drawer, search, filter, sort, isMobileApp, date, organization, agent, district, city } = props.app;
+    const { showDrawer, setSearch, setFilter, setSort, setDate, setOrganization, setAgent, setDistrict, setCity } = props.appActions;
     const { authenticated, profile } = props.user;
     const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
     const { logout } = props.userActions;
@@ -109,6 +111,14 @@ const MyAppBar = React.memo((props) => {
     let handleCloseAgents = () => {
         setAnchorElAgents(null);
     }
+    const [anchorElDistricts, setAnchorElDistricts] = useState(null);
+    const openDistricts = Boolean(anchorElDistricts);
+    let handleMenuDistricts = (event) => {
+        setAnchorElDistricts(event.currentTarget);
+    }
+    let handleCloseDistricts = () => {
+        setAnchorElDistricts(null);
+    }
     const [anchorElCities, setAnchorElCities] = useState(null);
     const openCities = Boolean(anchorElCities);
     let handleMenuCities = (event) => {
@@ -168,7 +178,7 @@ const MyAppBar = React.memo((props) => {
                             {
                                 cityShow||dates||searchShow||filters||sorts?
                                     <IconButton
-                                        style={{background: date||organization||agent||city||filter?'rgba(51, 143, 255, 0.29)': 'transparent'}}
+                                        style={{background: date||organization||agent||showDistrict||city||filter?'rgba(51, 143, 255, 0.29)': 'transparent'}}
                                         aria-owns={openMobileMenu ? 'menu-appbar' : undefined}
                                         aria-haspopup='true'
                                         onClick={handleMobileMenu}
@@ -375,6 +385,38 @@ const MyAppBar = React.memo((props) => {
                                     ]
                                     :null
                                 }
+                                {organization&&showDistrict&&['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
+                                    [
+                                        <MenuItem key='districtMenu' onClick={handleMenuDistricts} style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}}>
+                                            <div style={{display: 'flex', color: '#606060'}}>
+                                                <GroupIcon/>&nbsp;Агенты
+                                            </div>
+                                        </MenuItem>,
+                                        <Menu
+                                            key='districts'
+                                            id='menu-appbar'
+                                            anchorEl={anchorElDistricts}
+                                            anchorOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            open={openDistricts}
+                                            onClose={handleCloseDistricts}
+                                        >
+                                            <MenuItem key='onDistrict' style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async ()=>{let districts = (await getDistricts({_id: organization, search: '', sort: '-createdAt'})).districts;setMiniDialog('Район', <SetDistrict setDistrict={setDistrict} districts={districts}/>);showMiniDialog(true);handleCloseDistricts();handleCloseMobileMenu();}}>
+                                                По району
+                                            </MenuItem>
+                                            <MenuItem key='allDistricts' style={{background: !district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setDistrict(undefined);handleCloseDistricts();handleCloseMobileMenu();}}>
+                                                Все
+                                            </MenuItem>
+                                        </Menu>
+                                    ]
+                                    :null
+                                }
                                 {cityShow&&['admin'].includes(profile.role)?
                                     [
                                         <MenuItem key='cityMenu' onClick={handleMenuCities} style={{background: city?'rgba(255, 179, 0, 0.15)': '#fff'}}>
@@ -568,45 +610,84 @@ const MyAppBar = React.memo((props) => {
                                 </>
                                 :null
                             }
-                            {organization&&agents&&['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
-                                <>
-                                <Tooltip title='Агенты'>
-                                    <IconButton
-                                        style={{background: agent?'rgba(51, 143, 255, 0.29)': 'transparent'}}
-                                        aria-owns={openAgents ? 'menu-appbar' : undefined}
-                                        aria-haspopup='true'
-                                        onClick={handleMenuAgents}
-                                        color='inherit'
-                                    >
-                                        <GroupIcon/>
-                                    </IconButton>
-                                </Tooltip>
-                                <Menu
-                                    key='Agents'
-                                    id='menu-appbar'
-                                    anchorEl={anchorElAgents}
-                                    anchorOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    open={openAgents}
-                                    onClose={handleCloseAgents}
-                                >
-                                    <MenuItem style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async ()=>{let agents = (await getAgents({_id: organization})).agents;setMiniDialog('Агент', <SetAgent agents={agents}/>);showMiniDialog(true);handleCloseAgents();}}>
-                                        По агенту
-                                    </MenuItem>
-                                    <MenuItem style={{background: !agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setAgent(undefined);handleCloseAgents();}}>
-                                        Все
-                                    </MenuItem>
-                                </Menu>
-                                &nbsp;
-                                </>
-                                :null
-                            }
+                                {organization&&agents&&['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
+                                    <>
+                                        <Tooltip title='Агенты'>
+                                            <IconButton
+                                                style={{background: agent?'rgba(51, 143, 255, 0.29)': 'transparent'}}
+                                                aria-owns={openAgents ? 'menu-appbar' : undefined}
+                                                aria-haspopup='true'
+                                                onClick={handleMenuAgents}
+                                                color='inherit'
+                                            >
+                                                <GroupIcon/>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Menu
+                                            key='Agents'
+                                            id='menu-appbar'
+                                            anchorEl={anchorElAgents}
+                                            anchorOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            open={openAgents}
+                                            onClose={handleCloseAgents}
+                                        >
+                                            <MenuItem style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async ()=>{let agents = (await getAgents({_id: organization})).agents;setMiniDialog('Агент', <SetAgent agents={agents}/>);showMiniDialog(true);handleCloseAgents();}}>
+                                                По агенту
+                                            </MenuItem>
+                                            <MenuItem style={{background: !agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setAgent(undefined);handleCloseAgents();}}>
+                                                Все
+                                            </MenuItem>
+                                        </Menu>
+                                        &nbsp;
+                                    </>
+                                    :null
+                                }
+                                {organization&&showDistrict&&['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
+                                    <>
+                                        <Tooltip title='Районы'>
+                                            <IconButton
+                                                style={{background: district?'rgba(51, 143, 255, 0.29)': 'transparent'}}
+                                                aria-owns={openDistricts ? 'menu-appbar' : undefined}
+                                                aria-haspopup='true'
+                                                onClick={handleMenuDistricts}
+                                                color='inherit'
+                                            >
+                                                <GroupIcon/>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Menu
+                                            key='Districts'
+                                            id='menu-appbar'
+                                            anchorEl={anchorElDistricts}
+                                            anchorOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            open={openDistricts}
+                                            onClose={handleCloseDistricts}
+                                        >
+                                            <MenuItem style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async ()=>{let districts = (await getDistricts({_id: organization, search: '', sort: '-createdAt'})).districts;setMiniDialog('Район', <SetDistrict setDistrict={setDistrict} districts={districts}/>);showMiniDialog(true);handleCloseDistricts();}}>
+                                                По району
+                                            </MenuItem>
+                                            <MenuItem style={{background: !district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setDistrict(undefined);handleCloseDistricts();}}>
+                                                Все
+                                            </MenuItem>
+                                        </Menu>
+                                        &nbsp;
+                                    </>
+                                    :null
+                                }
                             {dates?
                                 <>
                                 <Tooltip title='Дата'>

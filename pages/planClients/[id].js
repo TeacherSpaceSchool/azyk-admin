@@ -20,6 +20,9 @@ import {bindActionCreators} from 'redux';
 import {getDistricts} from '../../src/gql/district';
 import RemoveIcon from '@material-ui/icons/Clear';
 import Tooltip from '@material-ui/core/Tooltip';
+import SettingsIcon from "@material-ui/icons/Settings";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const Plan = React.memo((props) => {
     const classes = pageListStyle();
@@ -27,10 +30,9 @@ const Plan = React.memo((props) => {
     const { profile } = props.user;
     const router = useRouter()
     const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
-    let [district, setDistrict] = useState(null);
     let [list, setList] = useState(data.planClients);
     let [count, setCount] = useState(data.planClientsCount);
-    const { search, city } = props.app;
+    const { search, city, district } = props.app;
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     let [paginationWork, setPaginationWork] = useState(true);
     const checkPagination = async()=>{
@@ -58,8 +60,15 @@ const Plan = React.memo((props) => {
         }, 500)
         setSearchTimeOut(searchTimeOut)
     },[search, city, district])
+    let [anchorEl, setAnchorEl] = useState(null);
+    let open = event => {
+        setAnchorEl(event.currentTarget);
+    };
+    let close = () => {
+        setAnchorEl(null);
+    };
     return (
-        <App checkPagination={checkPagination} cityShow cities={data.organization.cities} searchShow={true} pageName={data.organization.name}>
+        <App checkPagination={checkPagination} cityShow showDistrict cities={data.organization.cities} searchShow={true} pageName={data.organization.name}>
             <Head>
                 <title>{data.organization.name}</title>
                 <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
@@ -92,29 +101,36 @@ const Plan = React.memo((props) => {
                     ):null
                 }
             </div>
-            {
-                ['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
-                    <Tooltip title='Район'>
-                        <Fab onClick={async () => {
-                            if(district) {
-                                setDistrict(null)
-                            }
-                            else {
-                                const districts = (await getDistricts({
-                                    organization: router.query.id,
-                                    search: '',
-                                    sort: 'name'
-                                })).districts
-                                setMiniDialog('Район', <SetDistrict setDistrict={setDistrict} districts={districts}/>)
-                                showMiniDialog(true)
-                            }
-                        }} color={district?'secondary':'primary'} aria-label='add' className={classes.fab}>
-                            {district?<RemoveIcon />:<GroupIcon />}
-                        </Fab>
-                    </Tooltip>
-                    :
-                    null
-            }
+            <Fab onClick={open} color='primary' aria-controls="simple-menu" aria-haspopup="true" className={classes.fab}>
+                <SettingsIcon />
+            </Fab>
+            <Menu
+                id="simple-menu"
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={close}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                }}
+                transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                <MenuItem onClick={()=>{
+                    close()
+                    Router.push('/statistic/unloadplanclients')
+                }}>
+                    Выгрузить
+                </MenuItem>
+                <MenuItem onClick={()=>{
+                    close()
+                    Router.push('/statistic/uploadingplanclients')
+                }}>
+                    Загрузить
+                </MenuItem>
+            </Menu>
         </App>
     )
 })
@@ -129,6 +145,7 @@ Plan.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
+    ctx.store.getState().app.organization = ctx.query.id
     return {
         data: {
             ...(await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):null)),

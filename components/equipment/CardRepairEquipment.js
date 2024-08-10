@@ -9,7 +9,7 @@ import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import Confirmation from '../../components/dialog/Confirmation'
-import {deleteRepairEquipment} from '../../src/gql/equipment';
+import {deleteRepairEquipment} from '../../src/gql/repairEquipment';
 import Link from 'next/link';
 import { pdDDMMYYYY } from '../../src/lib'
 

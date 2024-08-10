@@ -302,13 +302,26 @@ const MyDrawer = React.memo((props) => {
                 {
                     ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент', 'ремонтник'].includes(profile.role)?
                         <>
-                        <Link href={profile.organization?`/repairequipments/${profile.organization}`:'/repairequipments'}>
-                            <ListItem style={{background: router.pathname.includes('repairequipment')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{showDrawer(false)}}>
-                                <ListItemIcon><AllInboxIcon color='inherit'/></ListItemIcon>
-                                <ListItemText primary='Ремонт оборудования' />
-                            </ListItem>
-                        </Link>
-                        <Divider/>
+                            <Link href={profile.organization?`/equipments/${profile.organization}`:'/equipments'}>
+                                <ListItem style={{background: router.pathname.includes('equipment')&&!router.pathname.includes('repairequipment')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{showDrawer(false)}}>
+                                    <ListItemIcon><AllInboxIcon color='inherit'/></ListItemIcon>
+                                    <ListItemText primary='Оборудование' />
+                                </ListItem>
+                            </Link>
+                            <Divider/>
+                        </>
+                        :null
+                }
+                {
+                    ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент', 'ремонтник'].includes(profile.role)?
+                        <>
+                            <Link href={profile.organization?`/repairequipments/${profile.organization}`:'/repairequipments'}>
+                                <ListItem style={{background: router.pathname.includes('repairequipment')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{showDrawer(false)}}>
+                                    <ListItemIcon><AllInboxIcon color='inherit'/></ListItemIcon>
+                                    <ListItemText primary='Ремонт оборудования' />
+                                </ListItem>
+                            </Link>
+                            <Divider/>
                         </>
                         :null
                 }

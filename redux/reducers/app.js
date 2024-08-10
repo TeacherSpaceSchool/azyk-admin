@@ -1,4 +1,18 @@
-import { SET_AGENT, SET_CITY, SHOW_APPBAR, SHOW_DRAWER, SET_FILTER, SET_SORT, SET_SEARCH, SET_IS_MOBILE_APP, SHOW_LOAD, SET_COUNT_BASKET, SET_DATE, SET_ORGANIZATION } from '../constants/app'
+import {
+    SET_AGENT,
+    SET_CITY,
+    SHOW_APPBAR,
+    SHOW_DRAWER,
+    SET_FILTER,
+    SET_SORT,
+    SET_SEARCH,
+    SET_IS_MOBILE_APP,
+    SHOW_LOAD,
+    SET_COUNT_BASKET,
+    SET_DATE,
+    SET_ORGANIZATION,
+    SET_DISTRICT
+} from '../constants/app'
 
 const initialState = {
     showAppBar: true,
@@ -14,6 +28,7 @@ const initialState = {
     city: 'Бишкек',
     agent: undefined,
     organization: undefined,
+    district: undefined,
 }
 
 export default function mini_dialog(state = initialState, action) {
@@ -24,6 +39,8 @@ export default function mini_dialog(state = initialState, action) {
             return {...state, drawer: action.payload}
         case SET_SORT:
             return {...state, sort: action.payload}
+        case SET_DISTRICT:
+            return {...state, district: action.payload}
         case SET_FILTER:
             return {...state, filter: action.payload}
         case SET_SEARCH:
