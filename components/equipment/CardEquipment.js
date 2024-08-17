@@ -29,6 +29,7 @@ const CardEquipment = React.memo((props) => {
     const { element, setList, list, idx, agents, city } = props;
     const { showSnackBar } = props.snackbarActions;
     const { isMobileApp } = props.app;
+    const { profile } = props.user;
     const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
     let [number, setNumber] = useState(element&&element.number?element.number:'');
     let [model, setModel] = useState(element&&element.model?element.model:'');
@@ -127,19 +128,24 @@ const CardEquipment = React.memo((props) => {
                                             />
                                         )}
                                     />
-                                    <Autocomplete
-                                        className={classes.input}
-                                        options={agents}
-                                        value={agent}
-                                        getOptionLabel={option => option.name}
-                                        onChange={(event, newValue) => {
-                                            setAgent(newValue)
-                                        }}
-                                        noOptionsText='Ничего не найдено'
-                                        renderInput={params => (
-                                            <TextField {...params} label='Выберите агента' variant='standard' fullWidth />
-                                        )}
-                                    />
+                                    {
+                                        !['агент', 'суперагент'].includes(profile.role)?
+                                            <Autocomplete
+                                                className={classes.input}
+                                                options={agents}
+                                                value={agent}
+                                                getOptionLabel={option => option.name}
+                                                onChange={(event, newValue) => {
+                                                    setAgent(newValue)
+                                                }}
+                                                noOptionsText='Ничего не найдено'
+                                                renderInput={params => (
+                                                    <TextField {...params} label='Выберите агента' variant='standard' fullWidth />
+                                                )}
+                                            />
+                                            :
+                                            null
+                                    }
                                 </>
                                 :
                                 null
@@ -216,6 +222,7 @@ const CardEquipment = React.memo((props) => {
 function mapStateToProps (state) {
     return {
         app: state.app,
+        user: state.user,
     }
 }
 
