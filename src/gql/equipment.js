@@ -54,7 +54,7 @@ export const deleteEquipment = async(_id)=>{
         await client.mutate({
             variables: {_id},
             mutation : gql`
-                    mutation ($_id: ID!) {
+                    mutation ($_id: [ID]!) {
                         deleteEquipment(_id: $_id) {
                              data
                         }

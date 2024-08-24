@@ -114,7 +114,7 @@ const CardEquipment = React.memo((props) => {
                                         value={client}
                                         noOptionsText='Ничего не найдено'
                                         renderInput={params => (
-                                            <TextField {...params} label='Выберите клиента' variant='standard' fullWidth
+                                            <TextField error={['менеджер', 'агент'].includes(profile.role)&&!client} {...params} label='Выберите клиента' variant='standard' fullWidth
                                                        onChange={handleChange}
                                                        InputProps={{
                                                            ...params.InputProps,
@@ -129,7 +129,7 @@ const CardEquipment = React.memo((props) => {
                                         )}
                                     />
                                     {
-                                        !['агент', 'суперагент'].includes(profile.role)?
+                                        profile.role!=='агент'?
                                             <Autocomplete
                                                 className={classes.input}
                                                 options={agents}
@@ -156,7 +156,7 @@ const CardEquipment = React.memo((props) => {
                     {
                         !element ?
                             <Button onClick={async()=>{
-                                if (number.length>0) {
+                                if (number&&model&&(!['менеджер', 'агент'].includes(profile.role)||client)) {
                                     const action = async() => {
                                         let equipment = {
                                             number,
@@ -170,8 +170,8 @@ const CardEquipment = React.memo((props) => {
                                         const res = await addEquipment(equipment)
                                         setList([res.addEquipment, ...list])
                                         setModel('')
-                                        setAgent({})
-                                        setClient({})
+                                        setAgent(null)
+                                        setClient(null)
                                         setNumber('')
                                     }
                                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
