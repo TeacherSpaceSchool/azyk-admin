@@ -69,7 +69,7 @@ const MyDrawer = React.memo((props) => {
             <List>
                 <Divider />
                 {
-                    isNotTestUser(profile)&&['admin', 'client'].includes(profile.role)?
+                    ['admin', 'client'].includes(profile.role)?
                         <>
                         <Link href='/'>
                             <ListItem style={{background: (router.pathname===('/')||router.pathname.includes('brand'))&&!router.pathname.includes('subbrands')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
@@ -145,7 +145,7 @@ const MyDrawer = React.memo((props) => {
                             null
                 }
                 {
-                    isNotTestUser(profile)&&['admin', 'client', 'суперорганизация', 'организация', 'менеджер', 'агент', 'суперагент'].includes(profile.role)?
+                    ['admin', 'client', 'суперорганизация', 'организация', 'менеджер', 'агент', 'суперагент'].includes(profile.role)?
                         <>
                         <Link href={`/ads`} as={`/ads`}>
                             <ListItem style={{background: router.pathname.includes('ads')&&!router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
@@ -184,7 +184,7 @@ const MyDrawer = React.memo((props) => {
                         :null
                 }
                 {
-                    isNotTestUser(profile)&&['экспедитор', 'client', 'admin', 'суперорганизация', 'организация', 'менеджер', 'агент', 'суперагент', 'суперэкспедитор'].includes(profile.role)?
+                    ['экспедитор', 'client', 'admin', 'суперорганизация', 'организация', 'менеджер', 'агент', 'суперагент', 'суперэкспедитор'].includes(profile.role)?
                         <>
                         <Link href='/orders'>
                             <ListItem style={{background: router.pathname==='/orders'&&!router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>

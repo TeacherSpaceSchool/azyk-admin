@@ -170,14 +170,6 @@ const Organization = React.memo((props) => {
 
 Organization.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!isNotTestUser(ctx.store.getState().user.profile))
-        if(ctx.res) {
-            ctx.res.writeHead(302, {Location: '/contact'})
-            ctx.res.end()
-        }
-        else {
-            Router.push('/contact')
-        }
     let role = ctx.store.getState().user.profile.role
     ctx.store.getState().app.sort = 'name'
     let authenticated = ctx.store.getState().user.authenticated

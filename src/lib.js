@@ -44,6 +44,9 @@ export const getCityCookie = (cookie)=>{
 export const isNotTestUser = (profile) => {
     return !profile||!profile.login||!profile.login.toLowerCase().includes('test')
 }
+export const isTestUser = (profile) => {
+    return profile&&profile.login&&profile.login.toLowerCase().includes('test')
+}
 export const setCityCookie = (city)=>{
     let date = new Date(Date.now() + 10000*24*60*60*1000);
     date = date.toUTCString();
