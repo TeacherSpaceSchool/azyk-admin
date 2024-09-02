@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
@@ -13,6 +13,7 @@ import {setEquipment, deleteEquipment, addEquipment} from '../../src/gql/equipme
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import * as snackbarActions from '../../redux/actions/snackbar'
+import * as appActions from '../../redux/actions/app'
 import {useRouter} from 'next/router';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {getClients} from '../../src/gql/client';
@@ -20,6 +21,7 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import Lightbox from 'react-awesome-lightbox';
 
 const models = ['USS175', 'USS374', 'USS440', 'Super FD']
 
@@ -27,10 +29,37 @@ const CardEquipment = React.memo((props) => {
     const classes = cardAutoStyle();
     const router = useRouter()
     const { element, setList, list, idx, agents, city } = props;
+    const { showLoad, showAppBar } = props.appActions;
     const { showSnackBar } = props.snackbarActions;
     const { isMobileApp } = props.app;
     const { profile } = props.user;
     const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
+    let [preview, setPreview] = useState(element&&element.image?element.image:'/static/add.png');
+    let [showLightbox, setShowLightbox] = useState(false);
+    const showImage = () => {
+        showAppBar(false)
+        setShowLightbox(true)
+    }
+    const refImageInput = useRef()
+    let clickImageInput = () => {refImageInput.current.click()}
+    let handleChangeImage = async (event) => {
+        if(event.target.files[0].size/1024/1024<50) {
+            const image = event.target.files[0]
+            const preview = URL.createObjectURL(event.target.files[0])
+            await showLoad(true)
+            const res = await setEquipment({
+                _id: element._id,
+                image
+            })
+            if(res.setEquipment.data==='OK')
+                setPreview(preview)
+            else
+                showSnackBar('Ошибка')
+            await showLoad(false)
+        } else {
+            showSnackBar('Файл слишком большой')
+        }
+    }
     let [number, setNumber] = useState(element&&element.number?element.number:'');
     let [model, setModel] = useState(element&&element.model?element.model:'');
     let handleModel =  (event) => {
@@ -75,115 +104,132 @@ const CardEquipment = React.memo((props) => {
         setOpen(false)
     };
     return (
-           <Card className={isMobileApp?classes.cardM:classes.cardD}>
-                <CardActionArea>
-                    <CardContent>
-                        <TextField
-                            error={!number}
-                            label='Номер'
-                            value={number}
-                            className={classes.input}
-                            onChange={(event)=>{setNumber(event.target.value)}}
-                            inputProps={{
-                                'aria-label': 'description',
-                            }}
-                        />
-                        <br/>
-                        <FormControl className={classes.input} error={!model}>
-                            <InputLabel>Модель</InputLabel>
-                            <Select value={model} onChange={handleModel}>
-                                {models.map((element)=>
-                                    <MenuItem key={element} value={element}>{element}</MenuItem>
-                                )}
-                            </Select>
-                        </FormControl>
-                        <br/>
+        <Card className={isMobileApp?classes.cardM:classes.cardD}>
+            <CardActionArea>
+                <CardContent>
+                    <div className={classes.line}>
                         {
-                            process.browser?
-                                <>
-                                    <Autocomplete
-                                        onClose={()=>setOpen(false)}
-                                        open={open}
-                                        disableOpenOnFocus
-                                        className={classes.input}
-                                        options={clients}
-                                        getOptionLabel={option => `${option.name}${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
-                                        onChange={(event, newValue) => {
-                                            handleClient(newValue)
-                                        }}
-                                        value={client}
-                                        noOptionsText='Ничего не найдено'
-                                        renderInput={params => (
-                                            <TextField error={['менеджер', 'агент'].includes(profile.role)&&!client} {...params} label='Выберите клиента' variant='standard' fullWidth
-                                                       onChange={handleChange}
-                                                       InputProps={{
-                                                           ...params.InputProps,
-                                                           endAdornment: (
-                                                               <React.Fragment>
-                                                                   {loading ? <CircularProgress color='inherit' size={20} /> : null}
-                                                                   {params.InputProps.endAdornment}
-                                                               </React.Fragment>
-                                                           ),
-                                                       }}
-                                            />
-                                        )}
-                                    />
-                                    {
-                                        profile.role!=='агент'?
-                                            <Autocomplete
-                                                className={classes.input}
-                                                options={agents}
-                                                value={agent}
-                                                getOptionLabel={option => option.name}
-                                                onChange={(event, newValue) => {
-                                                    setAgent(newValue)
-                                                }}
-                                                noOptionsText='Ничего не найдено'
-                                                renderInput={params => (
-                                                    <TextField {...params} label='Выберите агента' variant='standard' fullWidth />
-                                                )}
-                                            />
-                                            :
-                                            null
-                                    }
-                                </>
+                            element?
+                                <img
+                                    onClick={() => {
+                                        showAppBar(false)
+                                        setShowLightbox(true)
+                                    }}
+                                    className={classes.mediaO}
+                                    src={preview}
+                                    alt={number}
+                                />
                                 :
                                 null
                         }
-                    </CardContent>
-                </CardActionArea>
-               <CardActions>
+                        <div style={{width: element?'calc(100% - 120px)':'100%'}}>
+                            <TextField
+                                error={!number}
+                                label='Номер'
+                                value={number}
+                                className={classes.input}
+                                onChange={(event)=>{setNumber(event.target.value)}}
+                                inputProps={{
+                                    'aria-label': 'description',
+                                }}
+                            />
+                            <br/>
+                            <FormControl className={classes.input} error={!model}>
+                                <InputLabel>Модель</InputLabel>
+                                <Select value={model} onChange={handleModel}>
+                                    {models.map((element)=>
+                                        <MenuItem key={element} value={element}>{element}</MenuItem>
+                                    )}
+                                </Select>
+                            </FormControl>
+                        </div>
+                    </div>
                     {
-                        !element ?
-                            <Button onClick={async()=>{
-                                if (number&&model&&(!['менеджер', 'агент'].includes(profile.role)||client)) {
-                                    const action = async() => {
-                                        let equipment = {
-                                            number,
-                                            model,
-                                            organization: router.query.id
-                                        }
-                                        if(agent)
-                                            equipment.agent = agent._id;
-                                        if(client)
-                                            equipment.client = client._id;
-                                        const res = await addEquipment(equipment)
-                                        setList([res.addEquipment, ...list])
-                                        setModel('')
-                                        setAgent(null)
-                                        setClient(null)
-                                        setNumber('')
-                                    }
-                                    setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                                    showMiniDialog(true)
-                                } else {
-                                    showSnackBar('Заполните все поля')
-                                }
-                            }} model='small' color='primary'>
-                                Добавить
-                            </Button>
-                            :
+                        process.browser?
                             <>
+                                <Autocomplete
+                                    onClose={()=>setOpen(false)}
+                                    open={open}
+                                    disableOpenOnFocus
+                                    className={classes.input}
+                                    options={clients}
+                                    getOptionLabel={option => `${option.name}${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
+                                    onChange={(event, newValue) => {
+                                        handleClient(newValue)
+                                    }}
+                                    value={client}
+                                    noOptionsText='Ничего не найдено'
+                                    renderInput={params => (
+                                        <TextField error={['менеджер', 'агент'].includes(profile.role)&&!client} {...params} label='Выберите клиента' variant='standard' fullWidth
+                                                   onChange={handleChange}
+                                                   InputProps={{
+                                                       ...params.InputProps,
+                                                       endAdornment: (
+                                                           <React.Fragment>
+                                                               {loading ? <CircularProgress color='inherit' size={20} /> : null}
+                                                               {params.InputProps.endAdornment}
+                                                           </React.Fragment>
+                                                       ),
+                                                   }}
+                                        />
+                                    )}
+                                />
+                                {
+                                    profile.role!=='агент'?
+                                        <Autocomplete
+                                            className={classes.input}
+                                            options={agents}
+                                            value={agent}
+                                            getOptionLabel={option => option.name}
+                                            onChange={(event, newValue) => {
+                                                setAgent(newValue)
+                                            }}
+                                            noOptionsText='Ничего не найдено'
+                                            renderInput={params => (
+                                                <TextField {...params} label='Выберите агента' variant='standard' fullWidth />
+                                            )}
+                                        />
+                                        :
+                                        null
+                                }
+                            </>
+                            :
+                            null
+                    }
+                </CardContent>
+            </CardActionArea>
+            <CardActions>
+                {
+                    !element ?
+                        <Button onClick={async()=>{
+                            if (number&&model&&(!['менеджер', 'агент'].includes(profile.role)||client)) {
+                                const action = async() => {
+                                    let equipment = {
+                                        number,
+                                        model,
+                                        organization: router.query.id
+                                    }
+                                    if(agent)
+                                        equipment.agent = agent._id;
+                                    if(client)
+                                        equipment.client = client._id;
+                                    const res = await addEquipment(equipment)
+                                    setList([res.addEquipment, ...list])
+                                    setModel('')
+                                    setAgent(null)
+                                    setClient(null)
+                                    setNumber('')
+                                }
+                                setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                                showMiniDialog(true)
+                            } else {
+                                showSnackBar('Заполните все поля')
+                            }
+                        }} model='small' color='primary'>
+                            Добавить
+                        </Button>
+                        :
+                        <>
                             <Button onClick={async()=>{
                                 let editElement = {_id: element._id}
                                 if(model!==element.model)editElement.model = model
@@ -212,10 +258,30 @@ const CardEquipment = React.memo((props) => {
                             } model='small' color='secondary'>
                                 Удалить
                             </Button>
-                            </>
-                    }
-               </CardActions>
-            </Card>
+                                <Button model='small' color='primary' onClick={clickImageInput}>
+                                    Загрузить фото
+                                </Button>
+                        </>
+                }
+            </CardActions>
+            <input
+                ref={refImageInput}
+                accept='image/*'
+                style={{ display: 'none' }}
+                type='file'
+                onChange={handleChangeImage}
+            />
+            {
+                showLightbox?
+                    <Lightbox
+                        images={[preview]}
+                        startIndex={0}
+                        onClose={() => {showAppBar(true); setShowLightbox(false)}}
+                    />
+                    :
+                    null
+            }
+        </Card>
     );
 })
 
@@ -230,6 +296,7 @@ function mapDispatchToProps(dispatch) {
     return {
         mini_dialogActions: bindActionCreators(mini_dialogActions, dispatch),
         snackbarActions: bindActionCreators(snackbarActions, dispatch),
+        appActions: bindActionCreators(appActions, dispatch),
     }
 }
 

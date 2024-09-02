@@ -31,6 +31,7 @@ export const getEquipments = async({organization, search, agent}, client)=>{
                         equipments(organization: $organization, search: $search, agent: $agent) {
                             _id
                             createdAt
+                            image
                             number
                             model
                             client 
@@ -67,14 +68,15 @@ export const deleteEquipment = async(_id)=>{
 export const setEquipment = async(element)=>{
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
+        let res = await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($_id: ID!, $client: ID, $number: String, $model: String, $agent: ID) {
-                        setEquipment(_id: $_id, client: $client, number: $number, model: $model, agent: $agent) {
+                    mutation ($_id: ID!, $client: ID, $number: String, $model: String, $agent: ID, $image: Upload) {
+                        setEquipment(_id: $_id, client: $client, number: $number, model: $model, agent: $agent, image: $image) {
                              data
                         }
                     }`})
+        return res.data
     } catch(err){
         console.error(err)
     }

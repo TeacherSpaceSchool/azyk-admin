@@ -43,4 +43,18 @@ export default makeStyles({
         flexDirection: 'row',
         alignItems: 'baseline'
     },
+    line: {
+        marginBottom: 10,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+    },
+    mediaO: {
+        borderRadius: 10,
+        objectFit: 'cover',
+        height: '110px',
+        width: '110px',
+        marginRight: 10
+    },
 })
