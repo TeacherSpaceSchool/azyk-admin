@@ -38,6 +38,8 @@ export const getEquipments = async({organization, search, agent}, client)=>{
                                 {name _id address}
                             agent
                                 {_id name}
+                            agentsHistory
+                                {_id name}
                             organization
                                 {_id name}
                         }

@@ -22,6 +22,8 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Lightbox from 'react-awesome-lightbox';
+import HistoryAgents from '../dialog/HistoryAgents';
+import History from '@material-ui/icons/History';
 
 const models = ['USS175', 'USS374', 'USS440', 'Super FD']
 
@@ -111,10 +113,7 @@ const CardEquipment = React.memo((props) => {
                         {
                             element?
                                 <img
-                                    onClick={() => {
-                                        showAppBar(false)
-                                        setShowLightbox(true)
-                                    }}
+                                    onClick={showImage}
                                     className={classes.mediaO}
                                     src={preview}
                                     alt={number}
@@ -176,19 +175,28 @@ const CardEquipment = React.memo((props) => {
                                 />
                                 {
                                     profile.role!=='агент'?
-                                        <Autocomplete
-                                            className={classes.input}
-                                            options={agents}
-                                            value={agent}
-                                            getOptionLabel={option => option.name}
-                                            onChange={(event, newValue) => {
-                                                setAgent(newValue)
-                                            }}
-                                            noOptionsText='Ничего не найдено'
-                                            renderInput={params => (
-                                                <TextField {...params} label='Выберите агента' variant='standard' fullWidth />
-                                            )}
-                                        />
+                                        <>
+                                            <div className={classes.line}>
+                                                <Autocomplete
+                                                    className={classes.input}
+                                                    options={agents}
+                                                    value={agent}
+                                                    getOptionLabel={option => option.name}
+                                                    onChange={(event, newValue) => {
+                                                        setAgent(newValue)
+                                                    }}
+                                                    noOptionsText='Ничего не найдено'
+                                                    renderInput={params => (
+                                                        <TextField {...params} label='Выберите агента' variant='standard' fullWidth />
+                                                    )}
+                                                />
+                                                {element?<History style={{marginLeft: 20, fontSize: 34, color: 'rgba(0, 0, 0, 0.55)'}} onClick={()=>{
+                                                    setMiniDialog('История агентов', <HistoryAgents agents={element.agentsHistory}/>)
+                                                    showMiniDialog(true)
+                                                }}/>:null}
+
+                                            </div>
+                                        </>
                                         :
                                         null
                                 }
@@ -198,7 +206,7 @@ const CardEquipment = React.memo((props) => {
                     }
                 </CardContent>
             </CardActionArea>
-            <CardActions>
+            <CardActions style={{position: 'relative'}}>
                 {
                     !element ?
                         <Button onClick={async()=>{
@@ -244,7 +252,10 @@ const CardEquipment = React.memo((props) => {
                             }} model='small' color='primary'>
                                 Сохранить
                             </Button>
-                            <Button onClick={
+                                <Button model='small' color='primary' onClick={clickImageInput}>
+                                    Загрузить фото
+                                </Button>
+                            <Button style={{position: 'absolute', right: 10}} onClick={
                                 async()=>{
                                     const action = async() => {
                                         await deleteEquipment([element._id])
@@ -258,9 +269,6 @@ const CardEquipment = React.memo((props) => {
                             } model='small' color='secondary'>
                                 Удалить
                             </Button>
-                                <Button model='small' color='primary' onClick={clickImageInput}>
-                                    Загрузить фото
-                                </Button>
                         </>
                 }
             </CardActions>

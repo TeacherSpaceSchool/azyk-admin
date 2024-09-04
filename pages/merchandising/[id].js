@@ -666,7 +666,7 @@ const Merchandising = React.memo((props) => {
                                                 <Button onClick={async () => {
                                                     const action = async () => {
                                                         await checkMerchandising({ids: router.query.id, reviewerScore, reviewerComment})
-                                                        Router.push(`/merchandisings/${organization?organization._id:'super'}`)
+                                                        Router.back()
                                                     }
                                                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                     showMiniDialog(true)
@@ -681,7 +681,7 @@ const Merchandising = React.memo((props) => {
                                                 <Button onClick={async()=>{
                                                     const action = async() => {
                                                         await deleteMerchandising([router.query.id])
-                                                        Router.push(`/merchandisings/${organization?organization._id:'super'}`)
+                                                        Router.back()
                                                     }
                                                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                     showMiniDialog(true)
