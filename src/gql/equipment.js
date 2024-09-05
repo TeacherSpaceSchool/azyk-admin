@@ -39,7 +39,7 @@ export const getEquipments = async({organization, search, agent}, client)=>{
                             agent
                                 {_id name}
                             agentsHistory
-                                {_id name}
+                                {agent {_id name} date}
                             organization
                                 {_id name}
                         }
@@ -102,6 +102,8 @@ export const addEquipment = async(element)=>{
                                 {_id name}
                             organization
                                 {_id name}
+                            agentsHistory
+                                {agent {_id name} date}
                         }
                     }`})
         return res.data

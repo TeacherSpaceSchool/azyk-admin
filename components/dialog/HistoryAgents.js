@@ -14,27 +14,36 @@ const HistoryAgents =  React.memo(
     (props) =>{
         const { isMobileApp } = props.app;
         const { showMiniDialog } = props.mini_dialogActions;
-        const { classes, agents } = props;
+        const { classes, agentsHistory } = props;
         const width = isMobileApp? (window.innerWidth-112) : 500;
         return (
             <div className={classes.column} style={{width: width}}>
                 {
-                    agents.map((agent) =>
-                        <Link href='/employment/[id]' as={`/employment/${agent._id}`}>
-                            <div style={{cursor: 'pointer', color: '#ffb300',
-                                marginBottom: 10,
-                                fontWeight: '500',
-                                fontSize: '0.95rem',
-                                fontFamily: 'Roboto'}}>{agent.name}</div>
-                        </Link>
+                    agentsHistory.map((agentHistory) =>
+                        <>
+                            <div className={classes.row}>
+                                <div className={classes.nameField}>Изменен:&nbsp;</div>
+                                <div className={classes.value}>{pdDDMMYYHHMM(new Date(agentHistory.date))}</div>
+                            </div>
+                            <div className={classes.row}>
+                                <div className={classes.nameField}>Агент:&nbsp;</div>
+                                <Link href='/employment/[id]' as={`/employment/${agentHistory.agent._id}`}>
+                                    <div style={{cursor: 'pointer', color: '#ffb300',
+                                        marginBottom: 10,
+                                        fontWeight: '500',
+                                        fontSize: '0.95rem',
+                                        fontFamily: 'Roboto'}}>{agentHistory.agent.name}</div>
+                                </Link>
+                            </div>
+                        </>
                     )
                 }
                 <br/>
-                <div>
+                <center>
                     <Button variant='contained' color='secondary' onClick={()=>{showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
-                </div>
+                </center>
             </div>
         );
     }

@@ -191,7 +191,7 @@ const CardEquipment = React.memo((props) => {
                                                     )}
                                                 />
                                                 {element?<History style={{marginLeft: 20, fontSize: 34, color: 'rgba(0, 0, 0, 0.55)'}} onClick={()=>{
-                                                    setMiniDialog('История агентов', <HistoryAgents agents={element.agentsHistory}/>)
+                                                    setMiniDialog('История агентов', <HistoryAgents agentsHistory={element.agentsHistory}/>)
                                                     showMiniDialog(true)
                                                 }}/>:null}
 
