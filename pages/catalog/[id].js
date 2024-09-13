@@ -332,7 +332,7 @@ const Catalog = React.memo((props) => {
                     if(allPrice>0) {
                         let proofeAddress = data.client.address[0]&&data.client.address[0][0].length > 0
                         if (
-                            data.client._id && proofeAddress && data.client.name.length > 0 && data.client.phone.length > 0
+                            true||data.client._id && proofeAddress && data.client.name.length > 0 && data.client.phone.length > 0
                         ) {
                             setMiniDialog('Купить', <BuyBasket
                                 agent={false}
