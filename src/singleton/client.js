@@ -39,7 +39,11 @@ export class SingletonApolloClient {
         const linkError = onError((ctx) => {
             if (ctx.graphQLErrors)
                 ctx.graphQLErrors.map(({ message, locations, path }) =>{
-                    new SingletonStore().getStore().dispatch(showSnackBar('Ошибка'))
+                    let snackBarMsg = 'Ошибка'
+                    if(message&&message.includes('Error, expected `login` to be unique')) {
+                        snackBarMsg = 'Логин уже используется'
+                    }
+                    new SingletonStore().getStore().dispatch(showSnackBar(snackBarMsg))
                     console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
                 });
             if (ctx.networkError) console.log(`[Network error]: ${ctx.networkError}`);

@@ -26,7 +26,7 @@ import CardCatalogPlaceholder from '../../components/catalog/CardCatalogPlacehol
 import initialApp from '../../src/initialApp'
 import { getOrganization } from '../../src/gql/organization'
 import {getAdss} from '../../src/gql/ads'
-import {getСlientDistrict} from "../../src/gql/district";
+import {getСlientDistrict} from '../../src/gql/district';
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
@@ -330,10 +330,10 @@ const Catalog = React.memo((props) => {
                 </div>
                 <div className={isMobileApp?classes.buyM:classes.buyD} onClick={async ()=>{
                     if(allPrice>0) {
-                        let proofeAddress = data.client.address[0]&&data.client.address[0][0].length > 0
+                        /*let proofeAddress = data.client.address[0]&&data.client.address[0][0].length > 0
                         if (
-                            true||data.client._id && proofeAddress && data.client.name.length > 0 && data.client.phone.length > 0
-                        ) {
+                            data.client._id && proofeAddress && data.client.name.length > 0 && data.client.phone.length > 0
+                        ) {*/
                             setMiniDialog('Купить', <BuyBasket
                                 agent={false}
                                 client={data.client}
@@ -342,10 +342,10 @@ const Catalog = React.memo((props) => {
                                 adss={data.adss}
                                 organization={data.organization}/>)
                             showMiniDialog(true)
-                        }
+                        /*}
                         else {
                             Router.push(`/client/${data.client._id}`)
-                        }
+                        }*/
                     }
                     else
                         showSnackBar('Добавьте товар в корзину')

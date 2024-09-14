@@ -202,6 +202,7 @@ export const getClient = async({_id: _id}, client)=>{
                             _id
                             image
                             createdAt
+                            updatedAt
                             lastActive
                             name
                             email

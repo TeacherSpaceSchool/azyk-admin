@@ -145,18 +145,27 @@ const Client = React.memo((props) => {
                                     </label>
                                     {
                                         ['admin', 'суперагент'].includes(profile.role)&&data.client.createdAt?
-                                            <div className={classes.row}>
-                                                <b>
-                                                    Регистрация:&nbsp;
-                                                </b>
-                                                <div>
-                                                    {pdDDMMYYHHMM(data.client.createdAt)}
+                                            <>
+                                                <div className={classes.row}>
+                                                    <b>
+                                                        Регистрация:&nbsp;
+                                                    </b>
+                                                    <div>
+                                                        {pdDDMMYYHHMM(data.client.createdAt)}
+                                                    </div>
                                                 </div>
-                                            </div>
+                                                <div className={classes.row}>
+                                                    <b>
+                                                        Обновлен:&nbsp;
+                                                    </b>
+                                                    <div>
+                                                        {pdDDMMYYHHMM(data.client.updatedAt)}
+                                                    </div>
+                                                </div>
+                                            </>
                                             :
                                             null
                                     }
-                                    <br/>
                                     {
                                         ['admin', 'суперагент'].includes(profile.role)&&data.client.lastActive?
                                             <div className={classes.row}>
