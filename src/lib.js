@@ -4,7 +4,6 @@ export const checkMobile = (ua)=>{
     return regexpUA.exec(ua)!==null
 }
 export const getJWT = (cookie)=>{
-    //console.time('perfomance')
     let name = 'jwt=';
     let decodedCookie = decodeURIComponent(cookie);
     let ca = decodedCookie.split(';');
@@ -15,15 +14,22 @@ export const getJWT = (cookie)=>{
         }
         if (c.indexOf(name) === 0) {
             let jwt = c.substring(name.length, c.length)
-            if(process.browser&&!/*sessionStorage*/localStorage.extended) {
-                /*sessionStorage*/localStorage.extended = true
-                document.cookie = `jwt=${jwt};expires=Sun, 31 May 2048 12:35:23 GMT;path=/;SameSite=Lax;secure=true`;
+            if(process.browser) {
+                const now = new Date()
+                let needExtended = true
+                if(localStorage.extendedJWT) {
+                    const extendedJWT = new Date(localStorage.extendedJWT)
+                    if(!isNaN(extendedJWT.getTime()))
+                        needExtended = ((now - extendedJWT)/1000/60/60/24)>90
+                }
+                if(needExtended) {
+                    localStorage.extendedJWT = now
+                    document.cookie = `jwt=${jwt};expires=Sun, 31 May 2048 12:35:23 GMT;path=/;SameSite=Lax;secure=true`;
+                }
             }
-            //console.timeEnd('perfomance')
             return jwt;
         }
     }
-    //console.timeEnd('perfomance')
     return undefined;
 }
 export const getCityCookie = (cookie)=>{
