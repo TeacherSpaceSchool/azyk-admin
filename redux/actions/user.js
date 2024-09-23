@@ -183,6 +183,7 @@ export function logout(reload) {
             type: SET_PROFILE,
             payload: {}
         })
+        localStorage.removeItem('extendedJWT')
         if(reload) {
             await unregister()
             await Router.push('/contact')

@@ -27,6 +27,7 @@ import LocationCityIcon from '@material-ui/icons/LocationCity';
 import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
 import ArtTrackIcon from '@material-ui/icons/ArtTrack';
 import EqualizerIcon from '@material-ui/icons/Build';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import TargetIcon from '@material-ui/icons/TrackChanges';
@@ -37,7 +38,8 @@ import { useRouter } from 'next/router';
 import Badge from '@material-ui/core/Badge';
 import LocalGroceryStore from '@material-ui/icons/LocalGroceryStore';
 import {isNotTestUser} from '../../src/lib';
-
+import Sign from '../dialog/Sign';
+import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 
 const MyDrawer = React.memo((props) => {
     const { classes, unread } = props
@@ -48,6 +50,7 @@ const MyDrawer = React.memo((props) => {
     const open = isMobileApp?drawer:true;
     const router = useRouter();
     const [uncover, setUncover] = useState(null);
+    const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
     return (
         <Drawer
             disableSwipeToOpen = {true}
@@ -440,15 +443,32 @@ const MyDrawer = React.memo((props) => {
                 {
                     ['admin','суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)?
                         <>
-                        <Link href={'/statistic'}>
-                            <ListItem style={{background: router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
-                                <ListItemIcon><EqualizerIcon color='inherit'/></ListItemIcon>
-                                <ListItemText primary='Инструменты' />
-                            </ListItem>
-                        </Link>
-                        <Divider/>
+                            <Link href={'/statistic'}>
+                                <ListItem style={{background: router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
+                                    <ListItemIcon><EqualizerIcon color='inherit'/></ListItemIcon>
+                                    <ListItemText primary='Инструменты' />
+                                </ListItem>
+                            </Link>
+                            <Divider/>
                         </>
                         :null
+                }
+                {
+                    !profile.role?
+                        <>
+                            <ListItem button onClick={()=>{
+                                setMiniDialog('Вход', <Sign isMobileApp={isMobileApp}/>)
+                                showMiniDialog(true)
+                                setUncover(false);
+                                showDrawer(false)
+                            }}>
+                                <ListItemIcon><ExitToAppIcon color='inherit'/></ListItemIcon>
+                                <ListItemText primary='Войти в приложение' />
+                            </ListItem>
+                            <Divider/>
+                        </>
+                        :
+                        null
                 }
             </List>
         </Drawer>
@@ -465,6 +485,7 @@ function mapStateToProps (state) {
 function mapDispatchToProps(dispatch) {
     return {
         appActions: bindActionCreators(appActions, dispatch),
+        mini_dialogActions: bindActionCreators(mini_dialogActions, dispatch),
     }
 }
 

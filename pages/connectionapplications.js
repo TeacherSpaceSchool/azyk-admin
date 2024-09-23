@@ -12,6 +12,9 @@ import CardConnectionApplicationsPlaceholder from '../components/connectionAppli
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
+import Sign from '../components/dialog/Sign';
+import {bindActionCreators} from 'redux';
+import * as mini_dialogActions from '../redux/actions/mini_dialog';
 
 const ConnectionApplications = React.memo((props) => {
     const classes = pageListStyle();
@@ -19,7 +22,7 @@ const ConnectionApplications = React.memo((props) => {
     const { data } = props;
     let [list, setList] = useState(data.connectionApplications);
     let [simpleStatistic, setSimpleStatistic] = useState(data.connectionApplicationsSimpleStatistic);
-    const { filter } = props.app;
+    const { filter, isMobileApp } = props.app;
     let height = 189
     let [paginationWork, setPaginationWork] = useState(true);
     const checkPagination = async()=>{
@@ -44,6 +47,7 @@ const ConnectionApplications = React.memo((props) => {
             await getList()
         })()
     },[filter])
+    const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
     return (
         <App checkPagination={checkPagination} setList={setList} list={list} filters={data.filterConnectionApplication} pageName='Заявка на подключение'>
             <Head>
@@ -79,7 +83,18 @@ const ConnectionApplications = React.memo((props) => {
                         {`Всего: ${simpleStatistic}`}
                     </div>
                     :
-                    null
+                    !profile.role?
+                        <div className={classes.scrollDown} onClick={()=>{
+                            setMiniDialog('Вход', <Sign isMobileApp={isMobileApp}/>)
+                            showMiniDialog(true)
+                        }}>
+                            <div className={classes.scrollDownContainer}>
+                                ВОЙТИ В ПРИЛОЖЕНИЕ
+                                <div className={classes.scrollDownDiv}/>
+                            </div>
+                        </div>
+                        :
+                        null
             }
         </App>
     )
@@ -110,4 +125,10 @@ function mapStateToProps (state) {
     }
 }
 
-export default connect(mapStateToProps)(ConnectionApplications);
+function mapDispatchToProps(dispatch) {
+    return {
+        mini_dialogActions: bindActionCreators(mini_dialogActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ConnectionApplications);

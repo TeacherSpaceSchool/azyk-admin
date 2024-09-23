@@ -23,7 +23,8 @@ import Geo from '../components/dialog/Geo'
 import { urlMain } from '../redux/constants/other'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
-import PhoneIcon from "@material-ui/icons/Phone";
+import PhoneIcon from '@material-ui/icons/Phone';
+import Sign from '../components/dialog/Sign';
 
 
 const Contact = React.memo((props) => {
@@ -438,6 +439,20 @@ const Contact = React.memo((props) => {
                 type='file'
                 onChange={handleChangeImage}
             />
+            {
+                !profile.role?
+                    <div className={classes.scrollDown} onClick={()=>{
+                        setMiniDialog('Вход', <Sign isMobileApp={isMobileApp}/>)
+                        showMiniDialog(true)
+                    }}>
+                        <div className={classes.scrollDownContainer}>
+                            ВОЙТИ В ПРИЛОЖЕНИЕ
+                            <div className={classes.scrollDownDiv}/>
+                        </div>
+                    </div>
+                    :
+                    null
+            }
         </App>
     )
 })

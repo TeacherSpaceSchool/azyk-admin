@@ -20,7 +20,7 @@ export const getJWT = (cookie)=>{
                 if(localStorage.extendedJWT) {
                     const extendedJWT = new Date(localStorage.extendedJWT)
                     if(!isNaN(extendedJWT.getTime()))
-                        needExtended = ((now - extendedJWT)/1000/60/60/24)>90
+                        needExtended = ((now - extendedJWT)/1000/60/60/24)>30
                 }
                 if(needExtended) {
                     localStorage.extendedJWT = now
