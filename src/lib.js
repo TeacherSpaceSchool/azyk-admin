@@ -14,7 +14,7 @@ export const getJWT = (cookie)=>{
         }
         if (c.indexOf(name) === 0) {
             let jwt = c.substring(name.length, c.length)
-            if(process.browser) {
+            /*if(process.browser) {
                 const now = new Date()
                 let needExtended = true
                 if(localStorage.extendedJWT) {
@@ -26,7 +26,7 @@ export const getJWT = (cookie)=>{
                     localStorage.extendedJWT = now
                     document.cookie = `jwt=${jwt};expires=Sun, 31 May 2048 12:35:23 GMT;path=/;SameSite=Lax;secure=true`;
                 }
-            }
+            }*/
             return jwt;
         }
     }
