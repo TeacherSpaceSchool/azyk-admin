@@ -2,7 +2,9 @@ import { db } from '../idb'
 
 export let initOfflineOrders = (db) => {
     try {
-        db.deleteObjectStore('offlineOrders');
+        if (db.objectStoreNames.contains('offlineOrders')) {
+            db.deleteObjectStore('offlineOrders');
+        }
         db.createObjectStore('offlineOrders', {
             keyPath: 'id',
             autoIncrement: true,

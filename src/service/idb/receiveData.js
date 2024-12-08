@@ -2,7 +2,9 @@ import { db } from '../idb'
 
 export let initReceiveData = (db) => {
     try {
-        db.deleteObjectStore('receiveData');
+        if (db.objectStoreNames.contains('receiveData')) {
+            db.deleteObjectStore('receiveData');
+        }
         const store = db.createObjectStore('receiveData', {
             keyPath: 'id',
             autoIncrement: true,
@@ -10,7 +12,7 @@ export let initReceiveData = (db) => {
         store.createIndex('name', 'name', { unique: true });
     }
     catch (error){
-        console.error(error)
+        console.error('initReceiveData', error)
     }
 }
 
@@ -21,7 +23,7 @@ export let getReceiveDataByIndex = async(index) => {
         }
     }
     catch (error){
-        console.error(error)
+        console.error('getReceiveDataByIndex', error)
     }
 }
 
@@ -41,6 +43,6 @@ export let putReceiveDataByIndex = async(index,  data) => {
         }
     }
     catch (error){
-        console.error(error)
+        console.error('putReceiveDataByIndex', error)
     }
 }
