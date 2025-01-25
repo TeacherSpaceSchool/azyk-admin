@@ -21,6 +21,10 @@ const CardMerchandising = React.memo((props) => {
             <Link href='/merchandising/[id]' as={`/merchandising/${element._id}`}>
                 <a>
                 <CardContent>
+                    <div className={classes.row}>
+                        <div className={classes.nameField}>Тип:&nbsp;</div>
+                        <div className={classes.value} style={{color: 'black'}}>{element.type}</div>
+                    </div>
                     <div className={classes.row} style={{color: differenceDate<7?'green':differenceDate<31?'orange':'red'}}>
                         <div className={classes.nameField}>Дата проверки:&nbsp;</div>
                         <div className={classes.value}>{pdDDMMYYHHMM(element.date)}</div>

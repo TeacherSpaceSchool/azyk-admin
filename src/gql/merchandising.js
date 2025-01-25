@@ -18,6 +18,7 @@ export const getMerchandisings = async(args, client)=>{
                             stateProduct 
                             check
                             _id
+                            type
                             fhos
                                 {state}
                           }
@@ -56,6 +57,7 @@ export const getMerchandising = async(args, client)=>{
                                 {_id name address}
                             productAvailability
                             productInventory
+                            type
                             productConditions
                             productLocation
                             images
@@ -115,8 +117,8 @@ export const addMerchandising = async(element)=>{
         await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($organization: ID!, $client: ID!, $geo: String, $productAvailability: [String]!, $productInventory: Boolean!, $productConditions: Int!, $productLocation: Int!, $images: [Upload]!, $fhos: [InputFho]!, $needFho: Boolean!, $stateProduct: Int!, $comment: String!) {
-                        addMerchandising(organization: $organization, geo: $geo, client: $client, productAvailability: $productAvailability, productInventory: $productInventory, productConditions: $productConditions, productLocation: $productLocation, images: $images, fhos: $fhos, needFho: $needFho, stateProduct: $stateProduct, comment: $comment) {
+                    mutation ($organization: ID!, $client: ID!, $type: String!, $geo: String, $productAvailability: [String]!, $productInventory: Boolean!, $productConditions: Int!, $productLocation: Int!, $images: [Upload]!, $fhos: [InputFho]!, $needFho: Boolean!, $stateProduct: Int!, $comment: String!) {
+                        addMerchandising(organization: $organization, type: $type, geo: $geo, client: $client, productAvailability: $productAvailability, productInventory: $productInventory, productConditions: $productConditions, productLocation: $productLocation, images: $images, fhos: $fhos, needFho: $needFho, stateProduct: $stateProduct, comment: $comment) {
                             data
                         }
                     }`})

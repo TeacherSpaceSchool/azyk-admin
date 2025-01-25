@@ -17,6 +17,8 @@ import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../redux/actions/app'
 import { pdDatePicker } from '../../src/lib'
+import {getDistricts} from "../../src/gql/district";
+import {getDistributer} from "../../src/gql/distributer";
 
 const ClientStatistic = React.memo((props) => {
 
@@ -28,23 +30,38 @@ const ClientStatistic = React.memo((props) => {
     let [activeOrganization, setActiveOrganization] = useState(data.activeOrganization);
     let [dateStart, setDateStart] = useState(data.dateStart);
     let [dateType, setDateType] = useState('day');
-    let [statisticClient, setStatisticClient] = useState(undefined);
+    let [statisticClients, setStatisticClients] = useState(undefined);
     let [showStat, setShowStat] = useState(false);
-    let [organization, setOrganization] = useState({_id: 'all'});
+    let [organization, setOrganization] = useState(undefined);
+    let [districts, setDistricts] = useState();
+    let [district, setDistrict] = useState();
     const { showLoad } = props.appActions;
     useEffect(()=>{
         (async()=>{
                 await showLoad(true)
-                setStatisticClient((await getStatisticClients({
+                setStatisticClients((await getStatisticClients({
                     company: organization ? organization._id : 'all',
                     dateStart: dateStart ? dateStart : null,
                     dateType: dateType,
-                    online: filter,
-                    city: city
+                    ...filter? {filter}:{},
+                    ...district? {district: district._id}:{},
+                    city
                 })).statisticClients)
                 await showLoad(false)
         })()
-    },[organization, dateStart, dateType, filter, activeOrganization])
+    },[organization, dateStart, dateType, filter, activeOrganization, district])
+    useEffect(()=>{
+        (async()=>{
+            await showLoad(true)
+            setDistrict(undefined)
+            let districts = []
+            if(organization){
+                districts = (await getDistricts({search: '', sort: '-name', organization: organization._id})).districts
+            }
+            setDistricts(districts)
+            await showLoad(false)
+        })()
+    },[organization])
     useEffect(()=>{
         if(process.browser){
             let appBody = document.getElementsByClassName('App-body')
@@ -65,9 +82,9 @@ const ClientStatistic = React.memo((props) => {
         })()
     },[city])
 
-    const filters = [{name: 'Все', value: false}, {name: 'Online', value: true}]
+    const filters = [{name: 'Все', value: undefined}, {name: 'Online', value: 'online'}, {name: 'Offline', value: 'offline'}]
     return (
-        <App cityShow pageName='Статистика клиентов' filters={filters}>
+        <App cityShow pageName='Статистика клиентов' filters={filters} style={{overflow: 'hidden'}}>
             <Head>
                 <title>Статистика клиентов</title>
                 <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
@@ -94,7 +111,7 @@ const ClientStatistic = React.memo((props) => {
                             Год
                         </Button>
                     </div>
-                    <div className={classes.row}>
+                    <div className={classes.row} style={{flexWrap: 'nowrap'}}>
                         {
                             profile.role === 'admin' ?
                                 <Autocomplete
@@ -113,6 +130,21 @@ const ClientStatistic = React.memo((props) => {
                                 :
                                 null
                         }
+                        {
+                            organization?<Autocomplete
+                                className={classes.input}
+                                options={districts}
+                                getOptionLabel={option => option.name}
+                                value={district}
+                                onChange={(event, newValue) => {
+                                    setDistrict(newValue)
+                                }}
+                                noOptionsText='Ничего не найдено'
+                                renderInput={params => (
+                                    <TextField {...params} label='Район' fullWidth />
+                                )}
+                            />:null
+                        }
                         <TextField
                             className={classes.input}
                             label='Дата начала'
@@ -128,28 +160,34 @@ const ClientStatistic = React.memo((props) => {
                         />
                     </div>
                     {
-                        statisticClient?
-                            <Table type='client' row={(statisticClient.row).slice(1)} columns={statisticClient.columns}/>
+                        statisticClients?
+                            <Table type='client' row={(statisticClients.row).slice(1)} columns={statisticClients.columns}/>
                             :null
                     }
                 </CardContent>
             </Card>
             <div className='count' onClick={()=>setShowStat(!showStat)}>
                 {
-                    statisticClient?
+                    statisticClients?
                         <>
-                        <div className={classes.rowStatic}>{`Клиентов: ${parseInt(statisticClient.row[0].data[0])}`}</div>
-                        {
-                            showStat?
-                                <>
-                                <div className={classes.rowStatic}>{`Выручка: ${statisticClient.row[0].data[1]} сом`}</div>
-                                <div className={classes.rowStatic}>{`Выполнено: ${statisticClient.row[0].data[2]} шт`}</div>
-                                <div className={classes.rowStatic}>{`Отказов: ${statisticClient.row[0].data[3]} сом`}</div>
-                                <div className={classes.rowStatic}>{`Конс: ${statisticClient.row[0].data[4]} сом`}</div>
-                                </>
-                                :
-                                null
-                        }
+                        <div className={classes.rowStatic}>{`Клиентов: ${parseInt(statisticClients.row[0].data[0])}`}</div>
+                            {
+                                showStat?
+                                    <>
+                                        <div className={classes.rowStatic}> {`Выручка: ${statisticClients.row[0].data[1]} сом`}</div>
+                                        {statisticClients.row[0].data[2]?
+                                            <div className={classes.rowStatic}> {`Выручка online: ${statisticClients.row[0].data[2]} сом`}</div>:null}
+                                        {statisticClients.row[0].data[3]?
+                                            <div className={classes.rowStatic}> {`Выручка offline: ${statisticClients.row[0].data[3]} сом`}</div>:null}
+                                        <div className={classes.rowStatic}> {`Выполнено: ${statisticClients.row[0].data[4]} шт`}</div>
+                                        {statisticClients.row[0].data[5]?
+                                            <div className={classes.rowStatic}> {`Выполнено online: ${statisticClients.row[0].data[5]} шт`}</div>:null}
+                                        {statisticClients.row[0].data[6]?
+                                            <div className={classes.rowStatic}> {`Выполнено offline: ${statisticClients.row[0].data[6]} шт`}</div>:null}
+                                    </>
+                                    :
+                                    null
+                            }
                         </>
                         :null
                 }

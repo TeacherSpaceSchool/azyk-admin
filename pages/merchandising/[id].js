@@ -41,6 +41,8 @@ import IconButton from '@material-ui/core/IconButton';
 import RemoveIcon from '@material-ui/icons/Remove';
 import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const marks = [
     {
@@ -104,6 +106,11 @@ const Merchandising = React.memo((props) => {
             showSnackBar('Файл слишком большой')
         }
     })
+    const types = ['холодные полки', 'теплые полки'];
+    let [type, setType] = useState(data.merchandising?data.merchandising.type:'холодные полки');
+    let handleType =  (event) => {
+        setType(event.target.value)
+    };
     const searchTimeOutRef = useRef(null);
     useEffect(()=>{
         if(router.query.id === 'new') {
@@ -198,6 +205,21 @@ const Merchandising = React.memo((props) => {
                     data.merchandising?
                         ['admin', 'суперагент', 'суперорганизация', 'организация', 'менеджер', 'агент', 'мерчендайзер'].includes(profile.role)?
                             <>
+                                <FormControl className={classes.input}>
+                                    <InputLabel>Тип</InputLabel>
+                                    <Select
+                                        inputProps={{
+                                            'aria-label': 'description',
+                                            readOnly: router.query.id!=='new',
+                                        }}
+                                        value={type}
+                                        onChange={handleType}
+                                    >
+                                        {types?types.map((element)=>
+                                            <MenuItem key={element} value={element}>{element}</MenuItem>
+                                        ):null}
+                                    </Select>
+                                </FormControl>
                             {router.query.id==='new'&&['суперагент', 'admin'].includes(profile.role)?
                                 <Autocomplete
                                     className={classes.input}
@@ -437,7 +459,7 @@ const Merchandising = React.memo((props) => {
                                                 'aria-label': 'description',
                                             }}
                                             endAdornment={
-                                                <InputAdornment position="end">
+                                                <InputAdornment position='end'>
                                                     <IconButton
                                                         onClick={()=>{
                                                             if(router.query.id==='new') {
@@ -626,6 +648,7 @@ const Merchandising = React.memo((props) => {
                                                         fhos: fhos.map((fho)=>{delete fho.previews; return fho}),
                                                         needFho,
                                                         stateProduct,
+                                                        type,
                                                         comment,
                                                         geo
                                                     })
