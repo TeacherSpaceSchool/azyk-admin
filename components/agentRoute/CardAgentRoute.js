@@ -24,21 +24,12 @@ const CardAgentRoute = React.memo((props) => {
                 <CardActionArea>
                     <CardContent className={classes.column}>
                         <div className={classes.row}>
-                            <div className={classes.number}>{element.name}</div>
+                            <div className={classes.number}>{element.district.name}</div>
                         </div>
                         <div className={classes.row}>
                             <div className={classes.nameField}>Организация:&nbsp;</div>
                             <div className={classes.value}>{element.organization?element.organization.name:'AZYK.STORE'}</div>
                         </div>
-                        {
-                            element.district?
-                                <div className={classes.row}>
-                                    <div className={classes.nameField}>Район:&nbsp;</div>
-                                    <div className={classes.value}>{element.district.name}</div>
-                                </div>
-                                :
-                                null
-                        }
                     </CardContent>
                 </CardActionArea>
             </Link>

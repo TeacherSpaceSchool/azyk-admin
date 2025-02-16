@@ -14,7 +14,6 @@ export const getAgentRoutes = async({search, organization}, client)=>{
                             createdAt
                             organization
                                 {_id name}
-                            name
                             district
                                 {_id name}
                         }
@@ -37,6 +36,7 @@ export const getDistrictsWithoutAgentRoutes = async({organization}, client)=>{
                         districtsWithoutAgentRoutes(organization: $organization) {
                             _id
                             createdAt
+                            name
                             organization
                                 {_id name}
                             client
@@ -55,7 +55,6 @@ export const getDistrictsWithoutAgentRoutes = async({organization}, client)=>{
                                     user 
                                         {status}
                                 }
-                            name
                         }
                     }`,
             })
@@ -78,7 +77,6 @@ export const getAgentRoute = async({_id}, client)=>{
                             createdAt
                             organization
                                 {_id name}
-                            name
                             district
                                 {
                                     _id 
@@ -132,8 +130,8 @@ export const addAgentRoute = async(element)=>{
         await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($organization: ID, $clients: [[ID]]!, $name: String!, $district: ID) {
-                        addAgentRoute(organization: $organization, clients: $clients, name: $name, district: $district) {
+                    mutation ($organization: ID, $clients: [[ID]]!, $district: ID) {
+                        addAgentRoute(organization: $organization, clients: $clients, district: $district) {
                              data
                         }
                     }`})
@@ -148,8 +146,8 @@ export const setAgentRoute = async(element)=>{
         await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($_id: ID!, $clients: [[ID]], $name: String) {
-                        setAgentRoute(_id: $_id, clients: $clients, name: $name) {
+                    mutation ($_id: ID!, $clients: [[ID]]) {
+                        setAgentRoute(_id: $_id, clients: $clients) {
                              data
                         }
                     }`})

@@ -32,7 +32,7 @@ const ClientStatistic = React.memo((props) => {
     let [dateType, setDateType] = useState('day');
     let [statisticClients, setStatisticClients] = useState(undefined);
     let [showStat, setShowStat] = useState(false);
-    let [organization, setOrganization] = useState(undefined);
+    let [organization, setOrganization] = useState(profile.organization?{_id: profile.organization}:undefined);
     let [districts, setDistricts] = useState();
     let [district, setDistrict] = useState();
     const { showLoad } = props.appActions;

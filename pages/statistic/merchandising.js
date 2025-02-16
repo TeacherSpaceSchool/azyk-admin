@@ -162,14 +162,14 @@ const MerchandisingStatistic = React.memo((props) => {
             <div className='count' onClick={()=>setShowStat(!showStat)}>
                 {
                     statisticMerchandising?
-                        !agent?
+                        !agent._id?
                         <>
-                        <div className={classes.rowStatic}>{`Всего: ${statisticMerchandising.row[0].data[0]}`}</div>
+                        <div className={classes.rowStatic}>{`Всего(хол|теп): ${statisticMerchandising.row[0].data[0]}`}</div>
                         {
                             showStat?
                                 <>
-                                <div className={classes.rowStatic}> {`Проверено: ${statisticMerchandising.row[0].data[1]}`}</div>
-                                <div className={classes.rowStatic}> {`Обработка: ${statisticMerchandising.row[0].data[2]}`}</div>
+                                <div className={classes.rowStatic}> {`Проверено(хол|теп): ${statisticMerchandising.row[0].data[1]}`}</div>
+                                <div className={classes.rowStatic}> {`Обработка(хол|теп): ${statisticMerchandising.row[0].data[2]}`}</div>
                                 </>
                                 :
                                 null
@@ -177,7 +177,7 @@ const MerchandisingStatistic = React.memo((props) => {
                         </>
                             :
                             <>
-                            <div className={classes.rowStatic}> {`Сделано: ${statisticMerchandising.row[0].data[0]}`}</div>
+                            <div className={classes.rowStatic}> {`Сделано(хол|теп): ${statisticMerchandising.row[0].data[0]}`}</div>
                             <div className={classes.rowStatic}> {`Пропущено: ${statisticMerchandising.row[0].data[1]}`}</div>
                             </>
                         :null

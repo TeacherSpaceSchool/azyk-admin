@@ -60,10 +60,6 @@ const AgentRoute = React.memo((props) => {
             setPagination(pagination+100)
         }
     }
-    let [name, setName] = useState(data.agentRoute?data.agentRoute.name:'');
-    let handleName =  (event) => {
-        setName(event.target.value)
-    };
     let [districts, setDistricts] = useState([]);
     let [district, setDistrict] = useState(data.agentRoute&&data.agentRoute.district?data.agentRoute.district:{})
     let handleDistrict =  (event) => {
@@ -145,9 +141,9 @@ const AgentRoute = React.memo((props) => {
     return (
         <App cityShow={router.query.id==='new'} searchShow={true} checkPagination={checkPagination} pageName={data.agentRoute?router.query.id==='new'?'Добавить':data.agentRoute.name:'Ничего не найдено'}>
             <Head>
-                <title>{data.agentRoute?router.query.id==='new'?'Добавить':data.agentRoute.name:'Ничего не найдено'}</title>
+                <title>{data.agentRoute?router.query.id==='new'?'Добавить':data.agentRoute.district.name:'Ничего не найдено'}</title>
                 <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:title' content={data.agentRoute?router.query.id==='new'?'Добавить':data.agentRoute.name:'Ничего не найдено'} />
+                <meta property='og:title' content={data.agentRoute?router.query.id==='new'?'Добавить':data.agentRoute.district.name:'Ничего не найдено'} />
                 <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
                 <meta property='og:type' content='website' />
                 <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
@@ -158,16 +154,6 @@ const AgentRoute = React.memo((props) => {
                 <CardContent className={classes.column}>
                     {data.agentRoute?
                         <>
-                            <TextField
-                                label='Название'
-                                value={name}
-                                className={isMobileApp?classes.inputM:classes.inputDF}
-                                onChange={handleName}
-                                inputProps={{
-                                    'aria-label': 'description',
-                                    readOnly: ['агент', 'суперагент'].includes(profile.role),
-                                }}
-                            />
                         {router.query.id==='new'&&profile.role==='admin'?
                             <FormControl className={isMobileApp?classes.inputM:classes.inputDF}>
                                 <InputLabel>Организация</InputLabel>
@@ -320,12 +306,11 @@ const AgentRoute = React.memo((props) => {
                             {
                                 router.query.id==='new'?
                                     <Button onClick={async()=>{
-                                        if (name.length>0&&district._id&&organization._id) {
+                                        if (district._id&&organization._id) {
                                             const action = async() => {
                                                 await addAgentRoute({
                                                     organization: organization._id,
                                                     clients: clients,
-                                                    name: name,
                                                     district: district._id,
                                                 })
                                                 Router.push(`/agentroutes/${organization._id}`)
@@ -343,7 +328,6 @@ const AgentRoute = React.memo((props) => {
                                     <Button onClick={async()=>{
                                         const action = async() => {
                                             let editElement = {_id: data.agentRoute._id, clients: clients}
-                                            if(name.length>0&&name!==data.agentRoute.name)editElement.name = name;
                                             await setAgentRoute(editElement)
                                         }
                                         setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
@@ -390,7 +374,7 @@ AgentRoute.getInitialProps = async function(ctx) {
                 Router.push('/contact')
     return {
         data: {
-            ...ctx.query.id!=='new'?await getAgentRoute({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined): {agentRoute: {organization: {}, clients: [[],[],[],[],[],[],[]], name: '', district: {}}},
+            ...ctx.query.id!=='new'?await getAgentRoute({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined): {agentRoute: {organization: {}, clients: [[],[],[],[],[],[],[]], district: {}}},
             organizations: [{name: 'AZYK.STORE', _id: 'super'}, ...(await getOrganizations({search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)).organizations]
         }
     };
