@@ -25,6 +25,7 @@ export const getOrganization = async({_id: _id}, client)=>{
                             minimumOrder
                             accessToClient
                             consignation
+                            refusal
                             catalog
                             priotiry
                             unite
@@ -151,8 +152,8 @@ export const addOrganization = async(element)=>{
         await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($cities: [String]!, $catalog: Upload, $miniInfo: String!, $image: Upload!, $priotiry: Int, $minimumOrder: Int, $name: String!, $address: [String]!, $email: [String]!, $phone: [String]!, $info: String!, $consignation: Boolean!, $accessToClient: Boolean!, $unite: Boolean!, $superagent: Boolean!, $onlyDistrict: Boolean!, $addedClient: Boolean!, $autoIntegrate: Boolean!, $onlyIntegrate: Boolean!, $autoAcceptAgent: Boolean!, $autoAcceptNight: Boolean!, $divideBySubBrand: Boolean!, $dateDelivery: Boolean!, $warehouse: String!, $pass: String) {
-                        addOrganization(cities: $cities, catalog: $catalog, miniInfo: $miniInfo, image: $image, priotiry: $priotiry, minimumOrder: $minimumOrder, name: $name, address: $address, email: $email, phone: $phone, info: $info, consignation: $consignation, unite: $unite, superagent: $superagent, accessToClient: $accessToClient, onlyDistrict: $onlyDistrict, addedClient: $addedClient, autoIntegrate: $autoIntegrate, onlyIntegrate: $onlyIntegrate, autoAcceptAgent: $autoAcceptAgent, autoAcceptNight: $autoAcceptNight, divideBySubBrand: $divideBySubBrand, dateDelivery: $dateDelivery, warehouse: $warehouse, pass: $pass) {
+                    mutation ($cities: [String]!, $catalog: Upload, $miniInfo: String!, $image: Upload!, $priotiry: Int, $minimumOrder: Int, $name: String!, $address: [String]!, $email: [String]!, $phone: [String]!, $info: String!, $consignation: Boolean!, $refusal: Boolean!, $accessToClient: Boolean!, $unite: Boolean!, $superagent: Boolean!, $onlyDistrict: Boolean!, $addedClient: Boolean!, $autoIntegrate: Boolean!, $onlyIntegrate: Boolean!, $autoAcceptAgent: Boolean!, $autoAcceptNight: Boolean!, $divideBySubBrand: Boolean!, $dateDelivery: Boolean!, $warehouse: String!, $pass: String) {
+                        addOrganization(cities: $cities, catalog: $catalog, miniInfo: $miniInfo, image: $image, priotiry: $priotiry, minimumOrder: $minimumOrder, name: $name, address: $address, email: $email, phone: $phone, info: $info, consignation: $consignation, refusal: $refusal, unite: $unite, superagent: $superagent, accessToClient: $accessToClient, onlyDistrict: $onlyDistrict, addedClient: $addedClient, autoIntegrate: $autoIntegrate, onlyIntegrate: $onlyIntegrate, autoAcceptAgent: $autoAcceptAgent, autoAcceptNight: $autoAcceptNight, divideBySubBrand: $divideBySubBrand, dateDelivery: $dateDelivery, warehouse: $warehouse, pass: $pass) {
                              data
                         }
                     }`})
@@ -167,8 +168,8 @@ export const setOrganization = async(element)=>{
         await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($cities: [String], $catalog: Upload, $miniInfo: String, $_id: ID!, $consignation: Boolean, $priotiry: Int, $accessToClient: Boolean, $image: Upload, $minimumOrder: Int, $name: String, $address: [String], $email: [String], $phone: [String], $info: String, $unite: Boolean, $superagent: Boolean, $onlyDistrict: Boolean, $addedClient: Boolean, $autoIntegrate: Boolean, $onlyIntegrate: Boolean, $autoAcceptAgent: Boolean, $autoAcceptNight: Boolean, $divideBySubBrand: Boolean, $dateDelivery: Boolean, $warehouse: String, $pass: String) {
-                        setOrganization(cities: $cities, catalog: $catalog, miniInfo: $miniInfo, _id: $_id, priotiry: $priotiry, consignation: $consignation, accessToClient: $accessToClient, image: $image, minimumOrder: $minimumOrder, name: $name, address: $address, unite: $unite, superagent: $superagent, email: $email, phone: $phone, info: $info, addedClient: $addedClient, autoIntegrate: $autoIntegrate, onlyDistrict: $onlyDistrict, onlyIntegrate: $onlyIntegrate, divideBySubBrand: $divideBySubBrand, autoAcceptAgent: $autoAcceptAgent, autoAcceptNight: $autoAcceptNight, dateDelivery: $dateDelivery, warehouse: $warehouse, pass: $pass) {
+                    mutation ($cities: [String], $catalog: Upload, $miniInfo: String, $_id: ID!, $consignation: Boolean, $refusal: Boolean, $priotiry: Int, $accessToClient: Boolean, $image: Upload, $minimumOrder: Int, $name: String, $address: [String], $email: [String], $phone: [String], $info: String, $unite: Boolean, $superagent: Boolean, $onlyDistrict: Boolean, $addedClient: Boolean, $autoIntegrate: Boolean, $onlyIntegrate: Boolean, $autoAcceptAgent: Boolean, $autoAcceptNight: Boolean, $divideBySubBrand: Boolean, $dateDelivery: Boolean, $warehouse: String, $pass: String) {
+                        setOrganization(cities: $cities, catalog: $catalog, miniInfo: $miniInfo, _id: $_id, priotiry: $priotiry, consignation: $consignation, refusal: $refusal, accessToClient: $accessToClient, image: $image, minimumOrder: $minimumOrder, name: $name, address: $address, unite: $unite, superagent: $superagent, email: $email, phone: $phone, info: $info, addedClient: $addedClient, autoIntegrate: $autoIntegrate, onlyDistrict: $onlyDistrict, onlyIntegrate: $onlyIntegrate, divideBySubBrand: $divideBySubBrand, autoAcceptAgent: $autoAcceptAgent, autoAcceptNight: $autoAcceptNight, dateDelivery: $dateDelivery, warehouse: $warehouse, pass: $pass) {
                              data
                         }
                     }`})

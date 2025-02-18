@@ -439,7 +439,7 @@ export const getOrder = async({_id})=>{
                             provider
                                 {_id name}
                             organization
-                                {_id name consignation minimumOrder}
+                                {_id name consignation refusal minimumOrder}
                             cancelForwarder
                             paymentConsignation
                             confirmationClient

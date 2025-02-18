@@ -53,6 +53,7 @@ const Organization = React.memo((props) => {
     let [dateDelivery, setDateDelivery] = useState(data.organization&&data.organization.dateDelivery!==null?data.organization.dateDelivery:false);
     let [warehouse, setWarehouse] = useState(data.organization&&data.organization.warehouse!==null?data.organization.warehouse:'');
     let [consignation, setConsignation] = useState(data.organization&&data.organization.consignation!==null?data.organization.consignation:false);
+    let [refusal, setRefusal] = useState(data.organization&&data.organization.refusal!==null?data.organization.refusal:false);
     let [minimumOrder, setMinimumOrder] = useState(data.organization!==null?data.organization.minimumOrder:0);
     let [priotiry, setPriotiry] = useState(data.organization!==null?data.organization.priotiry:0);
     let [address, setAddress] = useState(data.organization?data.organization.address:[]);
@@ -177,6 +178,17 @@ const Organization = React.memo((props) => {
                                                     />
                                                 }
                                                 label='Консигнации'
+                                            />
+                                            <FormControlLabel
+                                                control={
+                                                    <Switch
+                                                        checked={refusal}
+                                                        onChange={()=>{setRefusal(!refusal)}}
+                                                        color="primary"
+                                                        inputProps={{ 'aria-label': 'primary checkbox' }}
+                                                    />
+                                                }
+                                                label='Отказы'
                                             />
                                             <FormControlLabel
                                                 control={
@@ -512,6 +524,7 @@ const Organization = React.memo((props) => {
                                                                 miniInfo: miniInfo,
                                                                 priotiry: checkInt(priotiry),
                                                                 consignation: consignation,
+                                                                refusal: refusal,
                                                                 onlyDistrict: onlyDistrict,
                                                                 unite: unite,
                                                                 superagent: superagent,
@@ -567,6 +580,7 @@ const Organization = React.memo((props) => {
                                                     if(dateDelivery!==data.organization.dateDelivery)editElement.dateDelivery = dateDelivery
                                                     if(warehouse!==data.organization.warehouse)editElement.warehouse = warehouse
                                                     if(consignation!==data.organization.consignation)editElement.consignation = consignation
+                                                    if(refusal!==data.organization.refusal)editElement.refusal = refusal
                                                     if(minimumOrder!==data.organization.minimumOrder)editElement.minimumOrder = checkInt(minimumOrder)
                                                     if(catalog&&catalog!==data.organization.catalog)editElement.catalog = catalog
                                                     if(priotiry!==data.organization.priotiry)editElement.priotiry = checkInt(priotiry)
@@ -713,7 +727,7 @@ Organization.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            ...ctx.query.id!=='new'?await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{organization:{name: '',image: '/static/add.png',address: [],email: [],phone: [],info: '',miniInfo: '',priotiry: 0,minimumOrder: 0,consignation: false,accessToClient: false, onlyDistrict: false, onlyIntegrate: false, addedClient: false, autoIntegrate: false, autoAcceptNight: false, divideBySubBrand: false, autoAcceptAgent: false, dateDelivery: false, warehouse: ''}}
+            ...ctx.query.id!=='new'?await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{organization:{name: '',image: '/static/add.png',address: [],email: [],phone: [],info: '',miniInfo: '',priotiry: 0,minimumOrder: 0,consignation: false,refusal: false,accessToClient: false, onlyDistrict: false, onlyIntegrate: false, addedClient: false, autoIntegrate: false, autoAcceptNight: false, divideBySubBrand: false, autoAcceptAgent: false, dateDelivery: false, warehouse: ''}}
         }
 
     };

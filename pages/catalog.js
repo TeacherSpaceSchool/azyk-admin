@@ -473,10 +473,10 @@ const Catalog = React.memo((props) => {
                 <div className={isMobileApp?classes.buyM:classes.buyD} onClick={async ()=>{
                     if(allPrice>0) {
                         if(client&&client._id) {
-                            let proofeAddress = client.address[0]&&client.address[0][0]&&client.address[0][0].length > 0&&client.address[0][1]&&client.address[0][1].length > 0
+                            /*let proofeAddress = client.address[0]&&client.address[0][0]&&client.address[0][0].length > 0&&client.address[0][1]&&client.address[0][1].length > 0
                             if (
                                 client._id && proofeAddress && client.name && client.name.length > 0 && client.phone && client.phone.length > 0
-                            ) {
+                            ) {*/
                                 setMiniDialog('Купить', <BuyBasket
                                     geo={geo}
                                     agent={true}
@@ -485,10 +485,10 @@ const Catalog = React.memo((props) => {
                                     allPrice={allPrice}
                                     organization={organization}/>)
                                 showMiniDialog(true)
-                            }
+                            /*}
                             else {
                                 Router.push(`/client/${client._id}`)
-                            }
+                            }*/
                         }
                         else
                             showSnackBar('Пожалуйста выберите клиента')

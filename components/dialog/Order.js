@@ -421,7 +421,7 @@ const Order =  React.memo(
                                             <div className={classes.value}>{order.allPrice}&nbsp;сом</div>
                                         </div>
                                         {
-                                            profile.role!=='client'||element.organization.consignation?
+                                            element.organization.consignation?
                                                 <div className={classes.row}>
                                                     <div onClick={()=>{showCons[order._id]=!showCons[order._id];setShowCons({...showCons})}} style={showCons[order._id]?{background: '#ffb300'}:{}} className={classes.minibtn}>КОНС</div>
                                                 </div>
@@ -499,12 +499,16 @@ const Order =  React.memo(
                                             </div>
                                         </div>
                                         <div className={classes.row}>
-                                            {profile.role!=='client'||element.organization.consignation?
+                                            {element.organization.consignation?
                                                 <div onClick={()=>{showCons[order._id]=!showCons[order._id];setShowCons({...showCons})}} style={showCons[order._id]?{background: '#ffb300'}:{}} className={classes.minibtn}>КОНС</div>
                                                 :
                                                 null
                                             }
-                                            <div onClick={()=>{showReturn[order._id]=!showReturn[order._id];setShowReturn({...showReturn})}} style={showReturn[order._id]?{background: '#ffb300'}:{}} className={classes.minibtn}>ОТКАЗ</div>
+                                            {element.organization.refusal?
+                                                <div onClick={()=>{showReturn[order._id]=!showReturn[order._id];setShowReturn({...showReturn})}} style={showReturn[order._id]?{background: '#ffb300'}:{}} className={classes.minibtn}>ОТКАЗ</div>
+                                                :
+                                                null
+                                            }
                                         </div>
                                         {
                                             showCons[order._id]||showReturn[order._id]?
