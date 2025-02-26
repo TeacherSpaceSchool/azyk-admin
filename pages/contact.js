@@ -400,7 +400,7 @@ const Contact = React.memo((props) => {
                                                     </a>
                                                     &nbsp;&nbsp;&nbsp;
                                                     <a
-                                                        href='tel:+996554776667'
+                                                        href='tel:+996559995197'
                                                         className={classes.value}
                                                         style={{color: 'blue', display: 'flex', fontSize: 20, alignItems: 'center'}}
                                                     >
