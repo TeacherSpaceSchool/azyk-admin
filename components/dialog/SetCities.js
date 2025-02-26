@@ -10,6 +10,7 @@ import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { setCityCookie } from '../../src/lib'
+import * as lib from '../../src/lib'
 
 const SetCities =  React.memo(
     (props) =>{
@@ -19,7 +20,7 @@ const SetCities =  React.memo(
         const { showMiniDialog } = props.mini_dialogActions;
         const { setCity } = props.appActions;
         const width = isMobileApp? (window.innerWidth-112) : 500
-        const _cities = cities?cities:['Бишкек', 'Кара-Балта', 'Токмок', 'Кочкор', 'Нарын', 'Боконбаева', 'Каракол', 'Чолпон-Ата', 'Балыкчы', 'Казарман', 'Талас', 'Жалал-Абад', 'Ош', 'Москва']
+        const _cities = cities?cities:lib.cities
         return (
             <div className={classes.main}>
                 <Autocomplete

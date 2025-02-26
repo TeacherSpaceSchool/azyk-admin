@@ -7,7 +7,7 @@ import { getSubCategorys } from '../../src/gql/subcategory'
 import { getSubBrands } from '../../src/gql/subBrand'
 import { getOrganizations } from '../../src/gql/organization'
 import { getItem, addItem, setItem, onoffItem, deleteItem } from '../../src/gql/items'
-import { checkInt, checkFloat, inputInt, inputFloat } from '../../src/lib'
+import {checkInt, checkFloat, inputInt, inputFloat, cities} from '../../src/lib'
 import itemStyle from '../../src/styleMUI/item/item'
 import { useRouter } from 'next/router'
 import Card from '@material-ui/core/Card';
@@ -45,7 +45,6 @@ const Item = React.memo((props) => {
     let [subCategory, setSubCategory] = useState(data.item?data.item.subCategory:{});
     let [subBrand, setSubBrand] = useState(data.item&&data.item.subBrand?data.item.subBrand:{});
     let [subBrands, setSubBrands] = useState([]);
-    const cities = ['Бишкек', 'Кара-Балта', 'Токмок', 'Кочкор', 'Нарын', 'Боконбаева', 'Каракол', 'Чолпон-Ата', 'Балыкчы', 'Казарман', 'Талас', 'Жалал-Абад', 'Ош', 'Москва']
     let [city, setCity] = useState(data.item&&data.item.city?data.item.city:'Бишкек');
     let handleCity =  (event) => {
         setCity(event.target.value)

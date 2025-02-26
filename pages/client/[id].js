@@ -22,7 +22,7 @@ import { urlMain } from '../../redux/constants/other'
 import Confirmation from '../../components/dialog/Confirmation'
 import Geo from '../../components/dialog/Geo'
 import { useRouter } from 'next/router'
-import { pdDDMMYYHHMM } from '../../src/lib'
+import {cities, pdDDMMYYHHMM} from '../../src/lib'
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import * as snackbarActions from '../../redux/actions/snackbar'
@@ -75,7 +75,6 @@ const Client = React.memo((props) => {
     if(data.client.address.length>0&&!Array.isArray(data.client.address[0])) data.client.address.map((addres)=>[addres])
 
     let [address, setAddress] = useState(data.client&&data.client.address&&data.client.address.length>0?data.client.address:[['']]);
-    const cities = ['Бишкек', 'Кара-Балта', 'Токмок', 'Кочкор', 'Нарын', 'Боконбаева', 'Каракол', 'Чолпон-Ата', 'Балыкчы', 'Казарман', 'Талас', 'Жалал-Абад', 'Ош', 'Москва']
     let [city, setCity] = useState(data.client&&data.client.city?data.client.city:'Бишкек');
     let handleCity =  (event) => {
         setCity(event.target.value)

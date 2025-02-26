@@ -30,6 +30,7 @@ import Switch from '@material-ui/core/Switch';
 import Geo from '../../components/dialog/Geo'
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import * as lib from '../../src/lib'
 
 const Organization = React.memo((props) => {
     const classes = organizationStyle();
@@ -57,7 +58,6 @@ const Organization = React.memo((props) => {
     let [minimumOrder, setMinimumOrder] = useState(data.organization!==null?data.organization.minimumOrder:0);
     let [priotiry, setPriotiry] = useState(data.organization!==null?data.organization.priotiry:0);
     let [address, setAddress] = useState(data.organization?data.organization.address:[]);
-    const _cities = ['Бишкек', 'Кара-Балта', 'Токмок', 'Кочкор', 'Нарын', 'Боконбаева', 'Каракол', 'Чолпон-Ата', 'Балыкчы', 'Казарман', 'Талас', 'Жалал-Абад', 'Ош', 'Москва']
     let [cities, setCities] = useState(data.organization&&data.organization.cities?data.organization.cities:['Бишкек']);
     let handleCities =  (event) => {
         setCities(event.target.value)
@@ -357,7 +357,7 @@ const Organization = React.memo((props) => {
                                                 }
                                             }}
                                         >
-                                            {_cities.map((city) => (
+                                            {lib.cities.map((city) => (
                                                 <MenuItem key={city} value={city}>
                                                     {city}
                                                 </MenuItem>

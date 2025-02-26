@@ -16,6 +16,7 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import Confirmation from '../dialog/Confirmation';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import {cities} from "../../src/lib";
 
 const CardIntegrate = React.memo((props) => {
     const classes = cardCategoryStyle();
@@ -27,7 +28,6 @@ const CardIntegrate = React.memo((props) => {
     let handleGuid =  (event) => {
         setGuid(event.target.value)
     };
-    const cities = ['Бишкек', 'Кара-Балта', 'Токмок', 'Кочкор', 'Нарын', 'Боконбаева', 'Каракол', 'Чолпон-Ата', 'Балыкчы', 'Казарман', 'Талас', 'Жалал-Абад', 'Ош', 'Москва']
     let [city, setCity] = useState(element&&element.item?element.item.city:'Бишкек');
     let handleCity =  (event) => {
         setItem({})
