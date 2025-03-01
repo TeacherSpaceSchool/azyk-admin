@@ -38,6 +38,7 @@ export function signup(payload) {
                            client
                            employment
                            addedClient
+                           agentSubBrand
                            _id
                            city
                         }
@@ -100,6 +101,7 @@ export function signin(payload) {
                            client
                            employment
                            addedClient
+                           agentSubBrand
                            _id
                            city
                         }
@@ -212,6 +214,7 @@ export function setProfile() {
                            client
                            employment
                            addedClient
+                           agentSubBrand
                            _id
                            city
                           }
@@ -243,6 +246,7 @@ export async function getProfile(client) {
                            client
                            employment
                            addedClient
+                           agentSubBrand
                           _id
                           city
                        }

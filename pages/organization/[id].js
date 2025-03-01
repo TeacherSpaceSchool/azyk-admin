@@ -47,6 +47,7 @@ const Organization = React.memo((props) => {
     let [superagent, setSuperagent] = useState(data.organization&&data.organization.superagent!=null?data.organization.superagent:true);
     let [onlyIntegrate, setOnlyIntegrate] = useState(data.organization&&data.organization.onlyIntegrate!==null?data.organization.onlyIntegrate:false);
     let [addedClient, setAddedClient] = useState(data.organization&&data.organization.addedClient!==null?data.organization.addedClient:false);
+    let [agentSubBrand, setAgentSubBrand] = useState(data.organization&&data.organization.agentSubBrand!==null?data.organization.agentSubBrand:false);
     let [autoIntegrate, setAutoIntegrate] = useState(data.organization&&data.organization.autoIntegrate!==null?data.organization.autoIntegrate:false);
     let [autoAcceptAgent, setAutoAcceptAgent] = useState(data.organization&&data.organization.autoAcceptAgent!==null?data.organization.autoAcceptAgent:false);
     let [autoAcceptNight, setAutoAcceptNight] = useState(data.organization&&data.organization.autoAcceptNight!==null?data.organization.autoAcceptNight:false);
@@ -255,6 +256,17 @@ const Organization = React.memo((props) => {
                                                     />
                                                 }
                                                 label='Добавлять клиентов'
+                                            />
+                                            <FormControlLabel
+                                                control={
+                                                    <Switch
+                                                        checked={agentSubBrand}
+                                                        onChange={()=>{setAgentSubBrand(!agentSubBrand)}}
+                                                        color='primary'
+                                                        inputProps={{ 'aria-label': 'primary checkbox' }}
+                                                    />
+                                                }
+                                                label='Подбренды у агента'
                                             />
                                                 <FormControlLabel
                                                     control={
@@ -530,6 +542,7 @@ const Organization = React.memo((props) => {
                                                                 superagent: superagent,
                                                                 onlyIntegrate: onlyIntegrate,
                                                                 addedClient: addedClient,
+                                                                agentSubBrand: agentSubBrand,
                                                                 autoIntegrate,
                                                                 autoAcceptAgent: autoAcceptAgent,
                                                                 autoAcceptNight: autoAcceptNight,
@@ -573,6 +586,7 @@ const Organization = React.memo((props) => {
                                                     if(superagent!==data.organization.superagent)editElement.superagent = superagent
                                                     if(onlyIntegrate!==data.organization.onlyIntegrate)editElement.onlyIntegrate = onlyIntegrate
                                                     if(addedClient!==data.organization.addedClient)editElement.addedClient = addedClient
+                                                    if(agentSubBrand!==data.organization.agentSubBrand)editElement.agentSubBrand = agentSubBrand
                                                     if(autoIntegrate!==data.organization.autoIntegrate)editElement.autoIntegrate = autoIntegrate
                                                     if(autoAcceptAgent!==data.organization.autoAcceptAgent)editElement.autoAcceptAgent = autoAcceptAgent
                                                     if(autoAcceptNight!==data.organization.autoAcceptNight)editElement.autoAcceptNight = autoAcceptNight
@@ -727,7 +741,7 @@ Organization.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            ...ctx.query.id!=='new'?await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{organization:{name: '',image: '/static/add.png',address: [],email: [],phone: [],info: '',miniInfo: '',priotiry: 0,minimumOrder: 0,consignation: false,refusal: false,accessToClient: false, onlyDistrict: false, onlyIntegrate: false, addedClient: false, autoIntegrate: false, autoAcceptNight: false, divideBySubBrand: false, autoAcceptAgent: false, dateDelivery: false, warehouse: ''}}
+            ...ctx.query.id!=='new'?await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{organization:{name: '',image: '/static/add.png',address: [],email: [],phone: [],info: '',miniInfo: '',priotiry: 0,minimumOrder: 0,consignation: false,refusal: false,accessToClient: false, onlyDistrict: false, onlyIntegrate: false, addedClient: false, agentSubBrand: false, autoIntegrate: false, autoAcceptNight: false, divideBySubBrand: false, autoAcceptAgent: false, dateDelivery: false, warehouse: ''}}
         }
 
     };
