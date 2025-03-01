@@ -84,7 +84,7 @@ const Catalog = React.memo((props) => {
                 if (searchTimeOut)
                     clearTimeout(searchTimeOut)
                 searchTimeOut = setTimeout(async () => {
-                    setClients((await getClients({search: inputValue, sort: '-name', filter: 'all'})).clients)
+                    setClients((await getClients({search: inputValue, sort: '-name', filter: 'Включенные'})).clients)
                     if (!open)
                         setOpen(true)
                     setLoading(false)
@@ -300,7 +300,7 @@ const Catalog = React.memo((props) => {
                                 disableOpenOnFocus
                                 className={classes.input}
                                 options={clients}
-                                getOptionLabel={option => `${option.name}${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
+                                getOptionLabel={option => `${/*option.name*/''}${option.address&&option.address[0]?`${/*' ('*/''}${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]}${/*')'*/''}`:''}`}
                                 onChange={(event, newValue) => {
                                     handleClient(newValue)
                                 }}

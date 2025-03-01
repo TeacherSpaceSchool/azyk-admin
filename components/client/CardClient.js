@@ -166,7 +166,7 @@ const CardOrganization = React.memo((props) => {
                         </Link>
                     </CardContent>
             </CardActionArea>
-            <CardActions>
+            <CardActions style={isMobileApp?{flexDirection: 'row-reverse'}:{}}>
                 {
                     ['агент', 'суперагент'].includes(profile.role)&&buy ?
                         <>
