@@ -66,6 +66,7 @@ const marks = [
         label: '100%',
     },
 ];
+const types = ['холодные полки', 'теплые полки'];
 
 const Merchandising = React.memo((props) => {
     const { profile } = props.user;
@@ -106,8 +107,7 @@ const Merchandising = React.memo((props) => {
             showSnackBar('Файл слишком большой')
         }
     })
-    const types = ['холодные полки', 'теплые полки'];
-    let [type, setType] = useState(data.merchandising?data.merchandising.type:'холодные полки');
+    let [type, setType] = useState(data.merchandising?data.merchandising.type:types[0]);
     let handleType =  (event) => {
         setType(event.target.value)
     };
@@ -206,7 +206,7 @@ const Merchandising = React.memo((props) => {
                         ['admin', 'суперагент', 'суперорганизация', 'организация', 'менеджер', 'агент', 'мерчендайзер'].includes(profile.role)?
                             <>
                                 <FormControl className={classes.input}>
-                                    <InputLabel>Тип</InputLabel>
+                                    <InputLabel>Тип полок</InputLabel>
                                     <Select
                                         inputProps={{
                                             'aria-label': 'description',
@@ -765,7 +765,7 @@ Merchandising.getInitialProps = async function(ctx) {
             ...ctx.query.id!=='new' ?
                 await getMerchandising({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
                 :
-                {merchandising: {organization: undefined, client: undefined, productAvailability: [], geo:undefined, productInventory: false, productConditions: 0, productLocation: 0, images: [], fhos: [], needFho: false, check: false, stateProduct: 0, comment:''}}
+                {merchandising: {organization: undefined, type: types[0], client: undefined, productAvailability: [], geo:undefined, productInventory: false, productConditions: 0, productLocation: 0, images: [], fhos: [], needFho: false, check: false, stateProduct: 0, comment:''}}
         }
     };
 };

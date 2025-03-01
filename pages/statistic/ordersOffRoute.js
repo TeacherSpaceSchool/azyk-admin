@@ -11,63 +11,45 @@ import initialApp from '../../src/initialApp'
 import Table from '../../components/app/Table'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import { pdDatePicker } from '../../src/lib'
-import { getStatisticMerchandising, getActiveOrganization } from '../../src/gql/statistic'
+import { getStatisticOrdersOffRoute, getActiveOrganization } from '../../src/gql/statistic'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../redux/actions/app'
-import Button from '@material-ui/core/Button';
-import { getAgents } from '../../src/gql/employment'
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 
-const MerchandisingStatistic = React.memo((props) => {
+const OrderOffRouteStatistic = React.memo((props) => {
     const classes = pageListStyle();
     const { data } = props;
-    const { isMobileApp, city } = props.app;
+    const { isMobileApp, filter, city } = props.app;
     const { profile } = props.user;
     const initialRender = useRef(true);
     let [activeOrganization, setActiveOrganization] = useState(data.activeOrganization);
-    let [statisticMerchandising, setStatisticMerchandising] = useState(undefined);
-    let [showStat, setShowStat] = useState(false);
-    let [agents, setAgents] = useState([]);
-    let [agent, setAgent] = useState({_id: undefined});
-    let [organization, setOrganization] = useState(data.organization);
     let [dateStart, setDateStart] = useState(data.dateStart);
     let [dateType, setDateType] = useState('day');
-    let [type, setType] = useState({name:'Все', value: undefined});
-    const types = [{name:'Все', value: undefined}, {name:'Холодные полки', value: 'холодные полки'}, {name:'Теплые полки', value: 'теплые полки'}]
-    let handleType =  (event) => {
-        setType({value: event.target.value, name: event.target.name})
-    };
+    let [statisticOrdersOffRoute, setStatisticOrdersOffRoute] = useState(undefined);
+    let [showStat, setShowStat] = useState(false);
+    let [organization, setOrganization] = useState(undefined);
     const { showLoad } = props.appActions;
     useEffect(()=>{
         (async()=>{
-            await showLoad(true)
-            setStatisticMerchandising((await getStatisticMerchandising({
-                organization: organization ? organization._id : undefined,
-                dateStart: dateStart ? dateStart : null,
-                dateType: dateType,
-                agent: agent?agent._id:undefined,
-                type: type?type.value:undefined
-            })).statisticMerchandising)
-            await showLoad(false)
+                await showLoad(true)
+                setStatisticOrdersOffRoute((await getStatisticOrdersOffRoute({
+                    company: organization ? organization._id : undefined,
+                    dateStart: dateStart ? dateStart : null,
+                    dateType: dateType,
+                    online: filter,
+                    city: city
+                })).statisticOrdersOffRoute)
+                await showLoad(false)
         })()
-    },[organization, dateStart, dateType, activeOrganization, agent, type])
+    },[organization, dateStart, dateType, filter, activeOrganization])
     useEffect(()=>{
         if(process.browser){
             let appBody = document.getElementsByClassName('App-body')
             appBody[0].style.paddingBottom = '0px'
         }
     },[process.browser])
-    useEffect(()=>{
-        (async()=>{
-            setAgents(organization?(await getAgents({_id: organization._id?organization._id:'super'})).agents:[])
-            setAgent({_id: undefined})
-        })()
-    },[organization])
     useEffect(()=>{
         (async()=>{
             if(initialRender.current) {
@@ -77,23 +59,22 @@ const MerchandisingStatistic = React.memo((props) => {
                 await showLoad(true)
                 setOrganization(undefined)
                 setActiveOrganization((await getActiveOrganization(city)).activeOrganization)
-                setAgents((await getAgents({})).agents)
-                setAgent({_id: undefined})
                 await showLoad(false)
             }
         })()
     },[city])
+    const filters = [{name: 'Все', value: false}, {name: organization&&organization._id==='super'? 'Суперагент' : 'Online', value: true}]
     return (
-        <App cityShow pageName='Статистика мерчендайзинга'>
+        <App cityShow pageName='Статистика заказов' filters={filters}>
             <Head>
-                <title>Статистика мерчендайзинга</title>
+                <title>Статистика заказов</title>
                 <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:title' content='Статистика мерчендайзинга' />
+                <meta property='og:title' content='Статистика заказов' />
                 <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
                 <meta property='og:type' content='website' />
                 <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property='og:url' content={`${urlMain}/statistic/merchandisings`} />
-                <link rel='canonical' href={`${urlMain}/statistic/merchandisings`}/>
+                <meta property='og:url' content={`${urlMain}/statistic/order`} />
+                <link rel='canonical' href={`${urlMain}/statistic/order`}/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
@@ -115,8 +96,8 @@ const MerchandisingStatistic = React.memo((props) => {
                         {
                             profile.role === 'admin' ?
                                 <Autocomplete
-                                    className={agents&&agents.length?profile.role === 'admin'?classes.inputFour:classes.input:classes.inputThird}
-                                    options={[{name: 'AZYK.STORE', _id: undefined}, ...activeOrganization]}
+                                    className={classes.input}
+                                    options={activeOrganization}
                                     getOptionLabel={option => option.name}
                                     value={organization}
                                     onChange={(event, newValue) => {
@@ -130,36 +111,8 @@ const MerchandisingStatistic = React.memo((props) => {
                                 :
                                 null
                         }
-                        {
-                            agents&&agents.length?
-                                <>
-                                    <FormControl className={profile.role === 'admin'?classes.inputFour:classes.inputThird}>
-                                        <InputLabel>Тип полок</InputLabel>
-                                        <Select value={type.value} onChange={handleType}>
-                                            {types.map((element)=>
-                                                <MenuItem key={element.value} value={element.value} ola={element.name}>{element.name}</MenuItem>
-                                            )}
-                                        </Select>
-                                    </FormControl>
-                                    <Autocomplete
-                                        className={profile.role === 'admin'?classes.inputFour:classes.inputThird}
-                                        options={agents}
-                                        getOptionLabel={option => option.name}
-                                        value={agent}
-                                        onChange={(event, newValue) => {
-                                            setAgent(newValue)
-                                        }}
-                                        noOptionsText='Ничего не найдено'
-                                        renderInput={params => (
-                                            <TextField {...params} label='Агент' fullWidth />
-                                        )}
-                                    />
-                                </>
-                                :
-                                null
-                        }
                         <TextField
-                            className={agents&&agents.length&&profile.role === 'admin'?classes.inputFour:classes.inputThird}
+                            className={classes.input}
                             label='Дата начала'
                             type='date'
                             InputLabelProps={{
@@ -173,33 +126,28 @@ const MerchandisingStatistic = React.memo((props) => {
                         />
                     </div>
                     {
-                        statisticMerchandising?
-                            <Table type='item' row={(statisticMerchandising.row).slice(1)} columns={statisticMerchandising.columns}/>
+                        statisticOrdersOffRoute?
+                            <Table type='item' row={(statisticOrdersOffRoute.row).slice(1)} columns={statisticOrdersOffRoute.columns}/>
                             :null
                     }
                 </CardContent>
             </Card>
             <div className='count' onClick={()=>setShowStat(!showStat)}>
                 {
-                    statisticMerchandising?
-                        !(agent&&agent._id)?
+                    statisticOrdersOffRoute?
                         <>
-                        <div className={classes.rowStatic}>{`Всего: ${statisticMerchandising.row[0].data[0]}`}</div>
-                        {
+                            <div className={classes.rowStatic}> {`Выполнено: ${statisticOrdersOffRoute.row[0].data[0]} шт`}</div>
+                            {
                             showStat?
                                 <>
-                                <div className={classes.rowStatic}> {`Проверено: ${statisticMerchandising.row[0].data[1]}`}</div>
-                                <div className={classes.rowStatic}> {`Обработка: ${statisticMerchandising.row[0].data[2]}`}</div>
+                                <div className={classes.rowStatic}> {`Выручка: ${statisticOrdersOffRoute.row[0].data[1]} сом`}</div>
+                                <div className={classes.rowStatic}>{`Отказов: ${statisticOrdersOffRoute.row[0].data[2]} сом`}</div>
+                                <div className={classes.rowStatic}>{`Конс: ${statisticOrdersOffRoute.row[0].data[3]} сом`}</div>
                                 </>
                                 :
                                 null
                         }
                         </>
-                            :
-                            <>
-                            <div className={classes.rowStatic}> {`Сделано: ${statisticMerchandising.row[0].data[0]}`}</div>
-                            <div className={classes.rowStatic}> {`Пропущено: ${statisticMerchandising.row[0].data[1]}`}</div>
-                            </>
                         :null
                 }
             </div>
@@ -207,9 +155,10 @@ const MerchandisingStatistic = React.memo((props) => {
     )
 })
 
-MerchandisingStatistic.getInitialProps = async function(ctx) {
+OrderOffRouteStatistic.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin', 'суперорганизация',  'организация', 'менеджер'].includes(ctx.store.getState().user.profile.role))
+    ctx.store.getState().app.filter = false
+    if(!['admin', 'суперорганизация'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -217,21 +166,14 @@ MerchandisingStatistic.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
-    let organization
-    if(ctx.store.getState().user.profile.role==='admin')
-        organization = {name: 'AZYK.STORE', _id: undefined}
-    else
-        organization = {_id: ctx.store.getState().user.profile.organization}
-
     let dateStart = new Date()
     if (dateStart.getHours()<3)
         dateStart.setDate(dateStart.getDate() - 1)
     return {
         data: {
             ...await getActiveOrganization(ctx.store.getState().app.city, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-            organization,
             dateStart: pdDatePicker(dateStart)
-}
+        }
     };
 };
 
@@ -250,4 +192,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(MerchandisingStatistic);
+export default connect(mapStateToProps, mapDispatchToProps)(OrderOffRouteStatistic);

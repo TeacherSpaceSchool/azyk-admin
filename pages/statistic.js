@@ -108,6 +108,11 @@ const list = {
             role: ['admin', 'суперорганизация']
         },
         {
+            name: 'Статистика заказов вне маршрута',
+            link: '/statistic/ordersOffRoute',
+            role: ['admin', 'суперорганизация']
+        },
+        {
             name: 'Статистика клиента',
             link: '/statistic/client/super',
             role: ['admin', 'суперорганизация']

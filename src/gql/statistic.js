@@ -35,15 +35,15 @@ export const getAgentMapGeos = async({agent, date}, client)=>{
     }
 }
 
-export const getStatisticMerchandising = async({organization, dateStart, dateType, agent}, client)=>{
+export const getStatisticMerchandising = async({organization, type, dateStart, dateType, agent}, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {organization, dateStart, dateType, agent},
+                variables: {organization, dateStart, dateType, type, agent},
                 query: gql`
-                    query ($organization: ID, $dateStart: Date, $dateType: String, $agent: ID) {
-                        statisticMerchandising(organization: $organization, dateStart: $dateStart, dateType: $dateType, agent: $agent)  {
+                    query ($organization: ID, $dateStart: Date, $type: String, $dateType: String, $agent: ID) {
+                        statisticMerchandising(organization: $organization, type: $type, dateStart: $dateStart, dateType: $dateType, agent: $agent)  {
                             columns
                             row 
                                 {_id data}
@@ -98,7 +98,7 @@ export const getStatisticHours = async({organization, dateStart, dateType, city,
     }
 }
 
-export const getStatisticOrder = async({company, dateStart, dateType, online, city}, client)=>{
+export const getStatisticOrdersOffRoute = async({company, dateStart, dateType, online, city}, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
@@ -106,7 +106,7 @@ export const getStatisticOrder = async({company, dateStart, dateType, online, ci
                 variables: {company, dateStart, dateType, online, city},
                 query: gql`
                     query ($company: String, $dateStart: Date, $dateType: String, $online: Boolean, $city: String) {
-                        statisticOrder(company: $company, dateStart: $dateStart, dateType: $dateType, online: $online, city: $city) {
+                        statisticOrdersOffRoute(company: $company, dateStart: $dateStart, dateType: $dateType, online: $online, city: $city) {
                             columns
                             row 
                                 {_id data}

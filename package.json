@@ -32,6 +32,7 @@
     "babel-polyfill": "^6.26.0",
     "classnames": "^2.2.6",
     "core-js": "^3.6.4",
+    "file-saver": "^2.0.5",
     "graphql": "^14.5.8",
     "idb": "^5.0.4",
     "isomorphic-unfetch": "^3.0.0",
@@ -65,7 +66,8 @@
     "robust-point-in-polygon": "^1.0.3",
     "subscriptions-transport-ws": "^0.9.16",
     "ua-parser-js": "^0.7.21",
-    "ws": "^7.2.0"
+    "ws": "^7.2.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.6",

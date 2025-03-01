@@ -2,6 +2,7 @@ import React from 'react';
 import MUIDataTable from 'mui-datatables';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Router from 'next/router'
+import {exportToExcel} from "../../src/excel";
 
 let getMuiTheme = () => createMuiTheme({
     overrides: {
@@ -51,7 +52,23 @@ const MyTable =  React.memo(
             rowsPerPageOptions: [100],
             count: data.length,
             responsive: 'scroll',
-            downloadOptions: {filename: 'tableDownload.csv', separator: ','},
+            onDownload: (buildHead, buildBody, columns, data) => {
+                const parsedData = [[]]
+                for(let i=0; i<columns.length; i++) {
+                    parsedData[0].push(columns[i].name)
+                }
+                for(let i=0; i<data.length; i++) {
+                    for(let i1=0; i1<data[i].data.length; i1++) {
+                        if (data[i].data[i1] !== null && data[i].data[i1] !== undefined) {
+                            data[i].data[i1] = String(data[i].data[i1]).replace(/\./g, ',');
+                        }
+                    }
+
+                    parsedData.push(data[i].data)
+                }
+                exportToExcel(parsedData)
+                return false;
+            },
             onCellClick: (colData, colMeta) => {
                 if(type==='client'&&colMeta.colIndex===0&&row[colMeta.rowIndex]._id)
                     Router.push(`/statistic/client/${row[colMeta.rowIndex]._id}`);
