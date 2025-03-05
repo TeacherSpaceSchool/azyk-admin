@@ -57,6 +57,7 @@ const Organization = React.memo((props) => {
     let [consignation, setConsignation] = useState(data.organization&&data.organization.consignation!==null?data.organization.consignation:false);
     let [refusal, setRefusal] = useState(data.organization&&data.organization.refusal!==null?data.organization.refusal:false);
     let [minimumOrder, setMinimumOrder] = useState(data.organization!==null?data.organization.minimumOrder:0);
+    let [agentHistory, setAgentHistory] = useState(data.organization!==null?data.organization.agentHistory:100);
     let [priotiry, setPriotiry] = useState(data.organization!==null?data.organization.priotiry:0);
     let [address, setAddress] = useState(data.organization?data.organization.address:[]);
     let [cities, setCities] = useState(data.organization&&data.organization.cities?data.organization.cities:['Бишкек']);
@@ -397,6 +398,17 @@ const Organization = React.memo((props) => {
                                         />
                                     </FormControl>
                                     <FormControl className={isMobileApp?classes.inputM:classes.inputD}>
+                                        <InputLabel>История агента</InputLabel>
+                                        <Input
+                                            type={ isMobileApp?'number':'text'}
+                                            value={agentHistory}
+                                            onChange={(event)=>{setAgentHistory(inputInt(event.target.value))}}
+                                            inputProps={{
+                                                'aria-label': 'description',
+                                            }}
+                                        />
+                                    </FormControl>
+                                    <FormControl className={isMobileApp?classes.inputM:classes.inputD}>
                                         <InputLabel>Приоритет</InputLabel>
                                         <Input
                                             type={ isMobileApp?'number':'text'}
@@ -556,7 +568,9 @@ const Organization = React.memo((props) => {
                                                                 email: email,
                                                                 phone: phone,
                                                                 info: info,
-                                                                minimumOrder: checkInt(minimumOrder)})
+                                                                minimumOrder: checkInt(minimumOrder),
+                                                                agentHistory: checkInt(agentHistory)
+                                                            })
                                                             Router.push('/organizations')
                                                         }
                                                         setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
@@ -596,6 +610,7 @@ const Organization = React.memo((props) => {
                                                     if(consignation!==data.organization.consignation)editElement.consignation = consignation
                                                     if(refusal!==data.organization.refusal)editElement.refusal = refusal
                                                     if(minimumOrder!==data.organization.minimumOrder)editElement.minimumOrder = checkInt(minimumOrder)
+                                                    if(agentHistory!==data.organization.agentHistory)editElement.agentHistory = checkInt(agentHistory)
                                                     if(catalog&&catalog!==data.organization.catalog)editElement.catalog = catalog
                                                     if(priotiry!==data.organization.priotiry)editElement.priotiry = checkInt(priotiry)
                                                     const action = async() => {
@@ -741,7 +756,7 @@ Organization.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            ...ctx.query.id!=='new'?await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{organization:{name: '',image: '/static/add.png',address: [],email: [],phone: [],info: '',miniInfo: '',priotiry: 0,minimumOrder: 0,consignation: false,refusal: false,accessToClient: false, onlyDistrict: false, onlyIntegrate: false, addedClient: false, agentSubBrand: false, autoIntegrate: false, autoAcceptNight: false, divideBySubBrand: false, autoAcceptAgent: false, dateDelivery: false, warehouse: ''}}
+            ...ctx.query.id!=='new'?await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{organization:{name: '',image: '/static/add.png',address: [],email: [],phone: [],info: '',miniInfo: '',priotiry: 0,minimumOrder: 0,agentHistory: 100, consignation: false,refusal: false,accessToClient: false, onlyDistrict: false, onlyIntegrate: false, addedClient: false, agentSubBrand: false, autoIntegrate: false, autoAcceptNight: false, divideBySubBrand: false, autoAcceptAgent: false, dateDelivery: false, warehouse: ''}}
         }
 
     };
