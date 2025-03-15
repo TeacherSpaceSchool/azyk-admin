@@ -31,6 +31,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import TargetIcon from '@material-ui/icons/TrackChanges';
+import DashboardIcon from '@material-ui/icons/Dashboard';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
@@ -400,6 +401,19 @@ const MyDrawer = React.memo((props) => {
                                 <ListItem style={{background: router.pathname.includes('planClients')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
                                     <ListItemIcon><TargetIcon color='inherit'/></ListItemIcon>
                                     <ListItemText primary='Планы клиентов' />
+                                </ListItem>
+                            </Link>
+                            <Divider/>
+                        </>
+                        :null
+                }
+                {
+                    ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)?
+                        <>
+                            <Link href={`/stocks${'admin'!==profile.role?'/[id]':''}`} as={`/stocks${profile.organization?`/${profile.organization}`:''}`}>
+                                <ListItem style={{background: router.pathname.includes('stocks')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
+                                    <ListItemIcon><DashboardIcon color='inherit'/></ListItemIcon>
+                                    <ListItemText primary='Остатки' />
                                 </ListItem>
                             </Link>
                             <Divider/>

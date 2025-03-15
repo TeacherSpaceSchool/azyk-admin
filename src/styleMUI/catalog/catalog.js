@@ -201,6 +201,17 @@ export default makeStyles({
         userSelect: 'none',
         width: 140
     },
+    stock: {
+        fontWeight: 'bold',
+        marginTop: 10,
+        textAlign: 'center',
+        fontSize: '0.875rem',
+        fontFamily: 'Roboto',
+        whiteSpace: 'pre-wrap',
+        cursor: 'pointer',
+        userSelect: 'none',
+        width: 140
+    },
     showCons: {
         marginLeft: 15,
         padding: 3,

@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import pageListStyle from '../../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat} from '../../src/lib';
+import {checkInt, checkFloat, isNotEmpty} from '../../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
@@ -82,6 +82,9 @@ const Catalog = React.memo((props) => {
             basket[id] = {_id: id, count: 0, allPrice: 0, consignment: 0}
         basket[id].count = checkInt(basket[id].count)
         basket[id].count+=list[idx].apiece?1:list[idx].packaging
+        if(isNotEmpty(list[idx].stock)&&basket[id].count>list[idx].stock) {
+            basket[id].count = list[idx].stock
+        }
         basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
         setBasket({...basket})
     }
@@ -91,6 +94,9 @@ const Catalog = React.memo((props) => {
             if(basket[id].count>0) {
                 basket[id].count = checkInt(basket[id].count)
                 basket[id].count -= list[idx].apiece?1:list[idx].packaging
+                if(basket[id].count<0) {
+                    basket[id].count = 0
+                }
                 basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
                 setBasket({...basket})
             }
@@ -123,6 +129,9 @@ const Catalog = React.memo((props) => {
         if(!basket[id])
             basket[id] = {_id: id, count: 0, allPrice: 0, consignment: 0}
         basket[id].count = checkInt(count)
+        if(isNotEmpty(list[idx].stock)&&basket[id].count>list[idx].stock) {
+            basket[id].count = list[idx].stock
+        }
         basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
         setBasket({...basket})
     }
@@ -133,6 +142,9 @@ const Catalog = React.memo((props) => {
         basket[id].count = checkInt(basket[id].count)
         if(list[idx].packaging){
             basket[id].count = (parseInt(basket[id].count/list[idx].packaging)+1)*list[idx].packaging
+            if(isNotEmpty(list[idx].stock)&&basket[id].count>list[idx].stock) {
+                basket[id].count = list[idx].stock
+            }
             basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
             setBasket({...basket})
         }

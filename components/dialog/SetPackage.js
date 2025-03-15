@@ -13,7 +13,7 @@ const SetPackage =  React.memo(
     (props) =>{
         const { action, classes, idx } = props;
         const { showMiniDialog } = props.mini_dialogActions;
-        let [count, setCount] = useState(0);
+        let [count, setCount] = useState('');
         let handleCount =  (event) => {
             setCount(checkInt(event.target.value))
         };

@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import pageListStyle from '../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat} from '../src/lib';
+import {checkInt, checkFloat, isNotEmpty} from '../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import * as snackbarActions from '../redux/actions/snackbar'
@@ -27,7 +27,7 @@ import initialApp from '../src/initialApp'
 import { getBrandOrganizations, getBrands } from '../src/gql/items'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {getSpecialPriceClients} from '../src/gql/specialPrice';
-import {getPlanClient} from "../src/gql/planClient";
+import {getPlanClient} from '../src/gql/planClient';
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
@@ -188,6 +188,9 @@ const Catalog = React.memo((props) => {
             basket[id] = {_id: id, count: 0, allPrice: 0, consignment: 0}
         basket[id].count = checkInt(basket[id].count)
         basket[id].count+=list[idx].apiece?1:(list[idx].packaging?list[idx].packaging:1)
+        if(isNotEmpty(list[idx].stock)&&basket[id].count>list[idx].stock) {
+            basket[id].count = list[idx].stock
+        }
         basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
         setBasket({...basket})
     }
@@ -197,6 +200,9 @@ const Catalog = React.memo((props) => {
             if(basket[id].count>0) {
                 basket[id].count = checkInt(basket[id].count)
                 basket[id].count -= list[idx].apiece?1:(list[idx].packaging?list[idx].packaging:1)
+                if(basket[id].count<0) {
+                    basket[id].count = 0
+                }
                 basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
                 setBasket({...basket})
             }
@@ -229,6 +235,9 @@ const Catalog = React.memo((props) => {
         if(!basket[id])
             basket[id] = {_id: id, count: 0, allPrice: 0, consignment: 0}
         basket[id].count = checkInt(count)
+        if(isNotEmpty(list[idx].stock)&&basket[id].count>list[idx].stock) {
+            basket[id].count = list[idx].stock
+        }
         basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
         setBasket({...basket})
     }
@@ -238,6 +247,9 @@ const Catalog = React.memo((props) => {
             basket[id] = {_id: id, count: 0, allPrice: 0, consignment: 0}
         basket[id].count = checkInt(basket[id].count)
         basket[id].count = count*(list[idx].packaging?list[idx].packaging:1)
+        if(isNotEmpty(list[idx].stock)&&basket[id].count>list[idx].stock) {
+            basket[id].count = list[idx].stock
+        }
         basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
         setBasket({...basket})
     }
@@ -277,7 +289,7 @@ const Catalog = React.memo((props) => {
                 <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
                 <meta property='og:type' content='website' />
                 <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property="og:url" content={`${urlMain}/catalog`} />
+                <meta property='og:url' content={`${urlMain}/catalog`} />
                 <link rel='canonical' href={`${urlMain}/catalog`}/>
             </Head>
             <Card className={classes.page}>
@@ -312,7 +324,7 @@ const Catalog = React.memo((props) => {
                                                    ...params.InputProps,
                                                    endAdornment: (
                                                        <React.Fragment>
-                                                           {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                                                           {loading ? <CircularProgress color='inherit' size={20} /> : null}
                                                            {params.InputProps.endAdornment}
                                                        </React.Fragment>
                                                    ),
@@ -416,13 +428,20 @@ const Catalog = React.memo((props) => {
                                                             КОНС
                                                         </div>
                                                     </div>
-                                                    <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
-                                                        setMiniDialog('Упаковок', <SetPackage
-                                                            action={setPackage}
-                                                            idx={idx}/>)
-                                                        showMiniDialog(true)
-                                                    }}>
-                                                        Упаковок: {basket[row._id]?(basket[row._id].count/(row.packaging?row.packaging:1)).toFixed(1):0}
+                                                    <div className={classes.row}>
+                                                        <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
+                                                            setMiniDialog('Упаковок', <SetPackage
+                                                                action={setPackage}
+                                                                idx={idx}/>)
+                                                            showMiniDialog(true)
+                                                        }}>
+                                                            Упаковок: {basket[row._id]?(basket[row._id].count/(row.packaging?row.packaging:1)).toFixed(1):0}
+                                                        </div>
+                                                        {
+                                                            isNotEmpty(row.stock)?<div className={classes.stock}>
+                                                                Остаток: {row.stock}
+                                                            </div>:null
+                                                        }
                                                     </div>
                                                     {
                                                         basket[row._id]&&basket[row._id].showConsignment?

@@ -189,4 +189,12 @@ export const isPWA = () => {
     }
 }
 
+export const isNotEmpty = (value) => {
+    return value !== undefined && value !== null;
+}
+
+export const isEmpty = (value) => {
+    return value === undefined || value === null;
+}
+
 export const cities = ['Бишкек', 'Баткен', 'Балыкчы', 'Боконбаева', 'Жалал-Абад', 'Кара-Балта', 'Каракол', 'Казарман', 'Кочкор', 'Кызыл-Кия', 'Нарын', 'Ош', 'Талас', 'Токмок', 'Чолпон-Ата', 'Москва'];

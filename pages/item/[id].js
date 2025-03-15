@@ -142,11 +142,11 @@ const Item = React.memo((props) => {
                     :null
             }
             <Card className={classes.page}>
-                    <CardContent className={isMobileApp?classes.column:classes.row}>
-                        {
-                            profile.role==='admin'||(['суперорганизация', 'организация'].includes(profile.role)&&organization._id===profile.organization)?
-                                data.item!==null||router.query.id==='new'?
-                                    <>
+                <CardContent className={isMobileApp?classes.column:classes.row}>
+                    {
+                        profile.role==='admin'||(['суперорганизация', 'организация'].includes(profile.role)&&organization._id===profile.organization)?
+                            data.item!==null||router.query.id==='new'?
+                                <>
                                     <div className={classes.column}>
                                         <label htmlFor='contained-button-file'>
                                             <img
@@ -435,75 +435,75 @@ const Item = React.memo((props) => {
                                                     </Button>
                                                     :
                                                     <>
-                                                    <Button onClick={async()=>{
-                                                        if (categorys.length>0){
-                                                            let editElement = {_id: data.item._id, categorys: categorys, subBrand: subBrand?subBrand._id:subBrand}
-                                                            if(city!==data.item.city)editElement.city = city
-                                                            if(name.length>0&&name!==data.item.name)editElement.name = name
-                                                            if(packaging!==data.item.packaging&&checkInt(packaging)>0)editElement.packaging = checkInt(packaging)
-                                                            if(image!==undefined)editElement.image = image
-                                                            if(info.length>0&&info!==data.item.info)editElement.info = info
-                                                            if(price>0&&price!==data.item.price)editElement.price = checkFloat(price)
-                                                            if(costPrice!==data.item.costPrice)editElement.costPrice = checkFloat(costPrice)
-                                                            if(weight!==data.item.weight)editElement.weight = checkFloat(weight)
-                                                            if(size!==data.item.size)editElement.size = checkFloat(size)
-                                                            if(hit!==data.item.hit)editElement.hit = hit
-                                                            if(apiece!==data.item.apiece)editElement.apiece = apiece
-                                                            if(unit!==data.item.unit)editElement.unit = unit
-                                                            if(latest!==data.item.latest)editElement.latest = latest
-                                                            if(organization._id!==data.item.organization._id)editElement.organization = organization._id
-                                                            if(subCategory._id!==data.item.subCategory._id)editElement.subCategory = subCategory._id
-                                                            if(priotiry!==data.item.priotiry)editElement.priotiry = checkInt(priotiry)
-                                                            const action = async() => {
-                                                                await setItem(editElement, subCategory._id)
-                                                            }
-                                                            setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                                                            showMiniDialog(true)
-                                                        } else {
-                                                            showSnackBar('Заполните все поля')
-                                                        }
-                                                    }} size='small' color='primary'>
-                                                        Сохранить
-                                                    </Button>
-                                                    <Button onClick={async()=>{
-                                                        const action = async() => {
-                                                            await onoffItem([data.item._id])
-                                                            setStatus(status==='active'?'deactive':'active')
-                                                        }
-                                                        setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                                                        showMiniDialog(true)
-                                                    }} size='small' color={status==='active'?'primary':'secondary'}>
-                                                        {status==='active'?'Отключить':'Включить'}
-                                                    </Button>
-                                                    {
-                                                        profile.role==='admin'?
-                                                            <Button onClick={async()=>{
+                                                        <Button onClick={async()=>{
+                                                            if (categorys.length>0){
+                                                                let editElement = {_id: data.item._id, categorys: categorys, subBrand: subBrand?subBrand._id:subBrand}
+                                                                if(city!==data.item.city)editElement.city = city
+                                                                if(name.length>0&&name!==data.item.name)editElement.name = name
+                                                                if(packaging!==data.item.packaging&&checkInt(packaging)>0)editElement.packaging = checkInt(packaging)
+                                                                if(image!==undefined)editElement.image = image
+                                                                if(info.length>0&&info!==data.item.info)editElement.info = info
+                                                                if(price>0&&price!==data.item.price)editElement.price = checkFloat(price)
+                                                                if(costPrice!==data.item.costPrice)editElement.costPrice = checkFloat(costPrice)
+                                                                if(weight!==data.item.weight)editElement.weight = checkFloat(weight)
+                                                                if(size!==data.item.size)editElement.size = checkFloat(size)
+                                                                if(hit!==data.item.hit)editElement.hit = hit
+                                                                if(apiece!==data.item.apiece)editElement.apiece = apiece
+                                                                if(unit!==data.item.unit)editElement.unit = unit
+                                                                if(latest!==data.item.latest)editElement.latest = latest
+                                                                if(organization._id!==data.item.organization._id)editElement.organization = organization._id
+                                                                if(subCategory._id!==data.item.subCategory._id)editElement.subCategory = subCategory._id
+                                                                if(priotiry!==data.item.priotiry)editElement.priotiry = checkInt(priotiry)
                                                                 const action = async() => {
-                                                                    await deleteItem([data.item._id], subCategory._id)
-                                                                    Router.push(`/items/${subCategory._id}`)
+                                                                    await setItem(editElement, subCategory._id)
                                                                 }
                                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                                 showMiniDialog(true)
-                                                            }} size='small' color='secondary'>
-                                                                Удалить
-                                                            </Button>
-                                                            :
-                                                            null
-                                                    }
+                                                            } else {
+                                                                showSnackBar('Заполните все поля')
+                                                            }
+                                                        }} size='small' color='primary'>
+                                                            Сохранить
+                                                        </Button>
+                                                        <Button onClick={async()=>{
+                                                            const action = async() => {
+                                                                await onoffItem([data.item._id])
+                                                                setStatus(status==='active'?'deactive':'active')
+                                                            }
+                                                            setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                                                            showMiniDialog(true)
+                                                        }} size='small' color={status==='active'?'primary':'secondary'}>
+                                                            {status==='active'?'Отключить':'Включить'}
+                                                        </Button>
+                                                        {
+                                                            profile.role==='admin'?
+                                                                <Button onClick={async()=>{
+                                                                    const action = async() => {
+                                                                        await deleteItem([data.item._id], subCategory._id)
+                                                                        Router.push(`/items/${subCategory._id}`)
+                                                                    }
+                                                                    setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                                                                    showMiniDialog(true)
+                                                                }} size='small' color='secondary'>
+                                                                    Удалить
+                                                                </Button>
+                                                                :
+                                                                null
+                                                        }
                                                     </>
                                             }
                                         </div>
 
                                     </div>
-                                    </>
-                                    :
-                                    'Ничего не найдено'
-
+                                </>
                                 :
-                                data.item===null||router.query.id==='new'?
-                                    'Ничего не найдено'
-                                    :
-                                    <>
+                                'Ничего не найдено'
+
+                            :
+                            data.item===null||router.query.id==='new'?
+                                'Ничего не найдено'
+                                :
+                                <>
                                     <div className={classes.divImage}>
                                         <img
                                             className={classes.media}
@@ -534,9 +534,9 @@ const Item = React.memo((props) => {
                                         </div>
                                         <br/>
                                     </div>
-                                    </>
-                        }
-                    </CardContent>
+                                </>
+                    }
+                </CardContent>
             </Card>
             <input
                 accept='image/*'
@@ -562,22 +562,22 @@ Item.getInitialProps = async function(ctx) {
     return {
         data: {
             ...ctx.query.id!=='new'?await getItem({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{
-                    item:{
-                        priotiry: 0,
-                        image: '/static/add.png',
-                        packaging: 1,
-                        costPrice: 0,
-                        name: '',
-                        info: '',
-                        categorys: ['A','B','C','D','Horeca'],
-                        price: 0,
-                        subCategory: {_id: undefined},
-                        subBrand: {_id: undefined},
-                        organization: {_id: undefined},
-                        hit: false,
-                        latest: false
-                    }
-                },
+                item:{
+                    priotiry: 0,
+                    image: '/static/add.png',
+                    packaging: 1,
+                    costPrice: 0,
+                    name: '',
+                    info: '',
+                    categorys: ['A','B','C','D','Horeca'],
+                    price: 0,
+                    subCategory: {_id: undefined},
+                    subBrand: {_id: undefined},
+                    organization: {_id: undefined},
+                    hit: false,
+                    latest: false
+                }
+            },
             ...await getOrganizations({search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
             ...await getSubCategorys({category: 'all', search: '', sort: 'name', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
         }
