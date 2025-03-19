@@ -119,15 +119,15 @@ export const getStatisticOrder = async({company, dateStart, dateType, online, ci
     }
 }
 
-export const getStatisticOrdersOffRoute = async({company, dateStart, dateType, online, city}, client)=>{
+export const getStatisticOrdersOffRoute = async(variables, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {company, dateStart, dateType, online, city},
+                variables: variables,
                 query: gql`
-                    query ($company: String, $dateStart: Date, $dateType: String, $online: Boolean, $city: String) {
-                        statisticOrdersOffRoute(company: $company, dateStart: $dateStart, dateType: $dateType, online: $online, city: $city) {
+                    query ($type: String, $company: String, $dateStart: Date, $dateType: String, $online: Boolean, $city: String, $district: ID) {
+                        statisticOrdersOffRoute(type: $type, company: $company, dateStart: $dateStart, dateType: $dateType, online: $online, city: $city, district: $district) {
                             columns
                             row 
                                 {_id data}

@@ -17,6 +17,11 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../redux/actions/app'
+import {getDistricts} from "../../src/gql/district";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const OrderOffRouteStatistic = React.memo((props) => {
     const classes = pageListStyle();
@@ -27,9 +32,16 @@ const OrderOffRouteStatistic = React.memo((props) => {
     let [activeOrganization, setActiveOrganization] = useState(data.activeOrganization);
     let [dateStart, setDateStart] = useState(data.dateStart);
     let [dateType, setDateType] = useState('day');
+    let [districts, setDistricts] = useState();
+    let [district, setDistrict] = useState();
     let [statisticOrdersOffRoute, setStatisticOrdersOffRoute] = useState(undefined);
     let [showStat, setShowStat] = useState(false);
-    let [organization, setOrganization] = useState(undefined);
+    let [organization, setOrganization] = useState(profile.organization?{_id: profile.organization}:undefined);
+    let [type, setType] = useState({name:'Районы', value: 'районы'});
+    const types = [{name:'Районы', value: 'районы'}, {name:'Клиенты', value: 'клиенты'}]
+    let handleType =  (event) => {
+        setType({value: event.target.value, name: event.target.name})
+    };
     const { showLoad } = props.appActions;
     useEffect(()=>{
         (async()=>{
@@ -38,12 +50,26 @@ const OrderOffRouteStatistic = React.memo((props) => {
                     company: organization ? organization._id : undefined,
                     dateStart: dateStart ? dateStart : null,
                     dateType: dateType,
+                    ...district? {district: district._id}:{},
                     online: filter,
-                    city: city
+                    type: type.value,
+                    city
                 })).statisticOrdersOffRoute)
                 await showLoad(false)
         })()
-    },[organization, dateStart, dateType, filter, activeOrganization])
+    },[organization, dateStart, dateType, filter, activeOrganization, district, type])
+    useEffect(()=>{
+        (async()=>{
+            await showLoad(true)
+            setDistrict(undefined)
+            let districts = []
+            if(organization){
+                districts = (await getDistricts({search: '', sort: '-name', organization: organization._id})).districts
+            }
+            setDistricts(districts)
+            await showLoad(false)
+        })()
+    },[organization])
     useEffect(()=>{
         if(process.browser){
             let appBody = document.getElementsByClassName('App-body')
@@ -96,7 +122,7 @@ const OrderOffRouteStatistic = React.memo((props) => {
                         {
                             profile.role === 'admin' ?
                                 <Autocomplete
-                                    className={classes.input}
+                                    className={profile.role === 'admin'?classes.inputFour:classes.inputThird}
                                     options={activeOrganization}
                                     getOptionLabel={option => option.name}
                                     value={organization}
@@ -111,8 +137,31 @@ const OrderOffRouteStatistic = React.memo((props) => {
                                 :
                                 null
                         }
+                        <FormControl className={profile.role === 'admin'?classes.inputFour:classes.inputThird}>
+                            <InputLabel>Тип полок</InputLabel>
+                            <Select value={type.value} onChange={handleType}>
+                                {types.map((element)=>
+                                    <MenuItem key={element.value} value={element.value} ola={element.name}>{element.name}</MenuItem>
+                                )}
+                            </Select>
+                        </FormControl>
+                        {
+                            organization?<Autocomplete
+                                className={profile.role === 'admin'?classes.inputFour:classes.inputThird}
+                                options={districts}
+                                getOptionLabel={option => option.name}
+                                value={district}
+                                onChange={(event, newValue) => {
+                                    setDistrict(newValue)
+                                }}
+                                noOptionsText='Ничего не найдено'
+                                renderInput={params => (
+                                    <TextField {...params} label='Район' fullWidth />
+                                )}
+                            />:null
+                        }
                         <TextField
-                            className={classes.input}
+                            className={profile.role === 'admin'?classes.inputFour:classes.inputThird}
                             label='Дата начала'
                             type='date'
                             InputLabelProps={{
