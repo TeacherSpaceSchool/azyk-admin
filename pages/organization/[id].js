@@ -51,6 +51,7 @@ const Organization = React.memo((props) => {
     let [autoIntegrate, setAutoIntegrate] = useState(data.organization&&data.organization.autoIntegrate!==null?data.organization.autoIntegrate:false);
     let [autoAcceptAgent, setAutoAcceptAgent] = useState(data.organization&&data.organization.autoAcceptAgent!==null?data.organization.autoAcceptAgent:false);
     let [autoAcceptNight, setAutoAcceptNight] = useState(data.organization&&data.organization.autoAcceptNight!==null?data.organization.autoAcceptNight:false);
+    let [clientDuplicate, setClientDuplicate] = useState(data.organization&&data.organization.clientDuplicate!==null?data.organization.clientDuplicate:false);
     let [divideBySubBrand, setDivideBySubBrand] = useState(data.organization&&data.organization.divideBySubBrand!==null?data.organization.divideBySubBrand:false);
     let [dateDelivery, setDateDelivery] = useState(data.organization&&data.organization.dateDelivery!==null?data.organization.dateDelivery:false);
     let [warehouse, setWarehouse] = useState(data.organization&&data.organization.warehouse!==null?data.organization.warehouse:'');
@@ -294,6 +295,17 @@ const Organization = React.memo((props) => {
                                                 <FormControlLabel
                                                     control={
                                                         <Switch
+                                                            checked={clientDuplicate}
+                                                            onChange={()=>{setClientDuplicate(!clientDuplicate)}}
+                                                            color="primary"
+                                                            inputProps={{ 'aria-label': 'primary checkbox' }}
+                                                        />
+                                                    }
+                                                    label='Клиенты повторяются в районах'
+                                                />
+                                                <FormControlLabel
+                                                    control={
+                                                        <Switch
                                                             checked={divideBySubBrand}
                                                             onChange={()=>{
                                                                 setDivideBySubBrand(!divideBySubBrand)
@@ -426,6 +438,7 @@ const Organization = React.memo((props) => {
                                         onChange={(event)=>{setPass(event.target.value)}}
                                         inputProps={{
                                             'aria-label': 'description',
+                                            readOnly: profile.role!=='admin',
                                         }}
                                     />
                                     {address.map((element, idx)=>
@@ -558,6 +571,7 @@ const Organization = React.memo((props) => {
                                                                 autoIntegrate,
                                                                 autoAcceptAgent: autoAcceptAgent,
                                                                 autoAcceptNight: autoAcceptNight,
+                                                                clientDuplicate: clientDuplicate,
                                                                 divideBySubBrand,
                                                                 dateDelivery,
                                                                 warehouse: warehouse,
@@ -604,6 +618,7 @@ const Organization = React.memo((props) => {
                                                     if(autoIntegrate!==data.organization.autoIntegrate)editElement.autoIntegrate = autoIntegrate
                                                     if(autoAcceptAgent!==data.organization.autoAcceptAgent)editElement.autoAcceptAgent = autoAcceptAgent
                                                     if(autoAcceptNight!==data.organization.autoAcceptNight)editElement.autoAcceptNight = autoAcceptNight
+                                                    if(clientDuplicate!==data.organization.clientDuplicate)editElement.clientDuplicate = clientDuplicate
                                                     if(divideBySubBrand!==data.organization.divideBySubBrand)editElement.divideBySubBrand = divideBySubBrand
                                                     if(dateDelivery!==data.organization.dateDelivery)editElement.dateDelivery = dateDelivery
                                                     if(warehouse!==data.organization.warehouse)editElement.warehouse = warehouse
@@ -756,7 +771,7 @@ Organization.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            ...ctx.query.id!=='new'?await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{organization:{name: '',image: '/static/add.png',address: [],email: [],phone: [],info: '',miniInfo: '',priotiry: 0,minimumOrder: 0,agentHistory: 100, consignation: false,refusal: false,accessToClient: false, onlyDistrict: false, onlyIntegrate: false, addedClient: false, agentSubBrand: false, autoIntegrate: false, autoAcceptNight: false, divideBySubBrand: false, autoAcceptAgent: false, dateDelivery: false, warehouse: ''}}
+            ...ctx.query.id!=='new'?await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{organization:{name: '',image: '/static/add.png',address: [],email: [],phone: [],info: '',miniInfo: '',priotiry: 0,minimumOrder: 0,agentHistory: 100, consignation: false,refusal: false,accessToClient: false, onlyDistrict: false, onlyIntegrate: false, addedClient: false, agentSubBrand: false, autoIntegrate: false, autoAcceptNight: false, clientDuplicate: false, divideBySubBrand: false, autoAcceptAgent: false, dateDelivery: false, warehouse: ''}}
         }
 
     };

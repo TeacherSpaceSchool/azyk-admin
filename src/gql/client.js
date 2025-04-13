@@ -58,8 +58,8 @@ export const getClients = async(arg, client)=>{
             .query({
                 variables: arg,
                 query: gql`
-                    query ($search: String!, $sort: String!, $filter: String!, $date: String, $skip: Int, $city: String) {
-                        clients(search: $search, sort: $sort, filter: $filter, date: $date, skip: $skip, city: $city) {
+                    query ($search: String!, $sort: String!, $filter: String!, $date: String, $skip: Int, $city: String, $catalog: Boolean) {
+                        clients(search: $search, sort: $sort, filter: $filter, date: $date, skip: $skip, city: $city, catalog: $catalog) {
                                             _id
                                             image
                                             createdAt
@@ -159,15 +159,15 @@ export const getClientsTrashSimpleStatistic = async(arg, client)=>{
     }
 }
 
-export const getClientsWithoutDistrict = async({organization, city}, client)=>{
+export const getClientsWithoutDistrict = async({organization, district, city}, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {organization, city},
+                variables: {organization, district, city},
                 query: gql`
-                    query ($organization: ID, $city: String) {
-                        clientsWithoutDistrict(organization: $organization, city: $city) {
+                    query ($organization: ID, $district: ID, $city: String) {
+                        clientsWithoutDistrict(organization: $organization, district: $district, city: $city) {
                                             _id
                                             image
                                             createdAt

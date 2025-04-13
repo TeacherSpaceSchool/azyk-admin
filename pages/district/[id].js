@@ -97,7 +97,9 @@ const District = React.memo((props) => {
                 }
                 else{
                     if(city)
-                        setUnselectedClient((await getClientsWithoutDistrict({organization: organization._id, city})).clientsWithoutDistrict)
+                        setUnselectedClient((await getClientsWithoutDistrict({
+                            ...router.query.id!=='new'?{district: router.query.id}:{},
+                            organization: organization._id, city})).clientsWithoutDistrict)
                     else
                         setUnselectedClient([])
                 }
@@ -124,7 +126,11 @@ const District = React.memo((props) => {
                     setAgents((await getAgents({_id: organization._id})).agents)
                     setManagers((await getManagers({_id: organization._id})).managers)
                     setEcspeditors((await getEcspeditors({_id: organization._id})).ecspeditors)
-                    setUnselectedClient((await getClientsWithoutDistrict({organization: organization._id, city: city?city:data.district.organization&&data.district.organization.cities[0]})).clientsWithoutDistrict)
+                    setUnselectedClient((await getClientsWithoutDistrict({
+                        organization: organization._id,
+                        ...router.query.id!=='new'?{district: router.query.id}:{},
+                        city: city?city:data.district.organization&&data.district.organization.cities[0]
+                    })).clientsWithoutDistrict)
                 }
             }
         })()

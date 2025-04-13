@@ -84,7 +84,7 @@ const Catalog = React.memo((props) => {
                 if (searchTimeOut)
                     clearTimeout(searchTimeOut)
                 searchTimeOut = setTimeout(async () => {
-                    setClients((await getClients({search: inputValue, sort: '-name', filter: 'Включенные'})).clients)
+                    setClients((await getClients({search: inputValue, sort: '-name', filter: 'Включенные', catalog: true})).clients)
                     if (!open)
                         setOpen(true)
                     setLoading(false)
