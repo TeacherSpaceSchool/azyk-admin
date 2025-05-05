@@ -247,6 +247,7 @@ export async function getProfile(client) {
                            employment
                            addedClient
                            agentSubBrand
+                           category
                           _id
                           city
                        }

@@ -28,6 +28,7 @@ import { getBrandOrganizations, getBrands } from '../src/gql/items'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {getSpecialPriceClients} from '../src/gql/specialPrice';
 import {getPlanClient} from '../src/gql/planClient';
+import {getSpecialPriceCategories} from "../src/gql/specialPriceCategory";
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
@@ -51,15 +52,22 @@ const Catalog = React.memo((props) => {
             for(let i=0; i<list.length; i++){
                 normalPrices[list[i]._id] = list[i].price
             }
-            if(client){
+            if(client) {
                 const _specialPrices = await getSpecialPriceClients({client: client._id, organization: organization._id})
                 const specialPrices = {}
                 for(let i=0; i<_specialPrices.length; i++){
                     specialPrices[_specialPrices[i].item._id] = _specialPrices[i].price
                 }
+                const _specialPriceCategories = await getSpecialPriceCategories({client: client._id, organization: organization._id})
+                const specialPriceCategories = {}
+                for(let i=0; i<_specialPriceCategories.length; i++){
+                    specialPriceCategories[_specialPriceCategories[i].item._id] = _specialPriceCategories[i].price
+                }
                 for(let i=0; i<list.length; i++){
-                    if(specialPrices[list[i]._id]!=undefined)
+                    if(isNotEmpty(specialPrices[list[i]._id]))
                         list[i].price = specialPrices[list[i]._id]
+                    else if(isNotEmpty(specialPriceCategories[list[i]._id]))
+                        list[i].price = specialPriceCategories[list[i]._id]
                 }
             }
             setList([...list]);
@@ -167,9 +175,16 @@ const Catalog = React.memo((props) => {
             for(let i=0; i<_specialPrices.length; i++){
                 specialPrices[_specialPrices[i].item._id] = _specialPrices[i].price
             }
+            const _specialPriceCategories = await getSpecialPriceCategories({client: client._id, organization: organization._id})
+            const specialPriceCategories = {}
+            for(let i=0; i<_specialPriceCategories.length; i++){
+                specialPriceCategories[_specialPriceCategories[i].item._id] = _specialPriceCategories[i].price
+            }
             for(let i=0; i<list.length; i++){
-                if(specialPrices[list[i]._id]!=undefined)
+                if(isNotEmpty(specialPrices[list[i]._id]))
                     list[i].price = specialPrices[list[i]._id]
+                else if(isNotEmpty(specialPriceCategories[list[i]._id]))
+                    list[i].price = specialPriceCategories[list[i]._id]
             }
             setPlanClient((await getPlanClient({client: client._id, organization: organization._id})).planClient)
         }
@@ -545,9 +560,16 @@ Catalog.getInitialProps = async function(ctx) {
         for(let i=0; i<_specialPrices.length; i++){
             specialPrices[_specialPrices[i].item._id] = _specialPrices[i].price
         }
+        const _specialPriceCategories = await getSpecialPriceCategories({client: ctx.query.client, organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+        const specialPriceCategories = {}
+        for(let i=0; i<_specialPriceCategories.length; i++){
+            specialPriceCategories[_specialPriceCategories[i].item._id] = _specialPriceCategories[i].price
+        }
         for(let i=0; i<brands.length; i++){
-            if(specialPrices[brands[i]._id]!=undefined)
+            if(isNotEmpty(specialPrices[brands[i]._id]))
                 brands[i].price = specialPrices[brands[i]._id]
+            else if(isNotEmpty(specialPriceCategories[brands[i]._id]))
+                brands[i].price = specialPriceCategories[brands[i]._id]
         }
     }
     return {

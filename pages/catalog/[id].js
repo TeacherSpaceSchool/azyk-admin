@@ -27,6 +27,7 @@ import initialApp from '../../src/initialApp'
 import { getOrganization } from '../../src/gql/organization'
 import {getAdss} from '../../src/gql/ads'
 import {getСlientDistrict} from '../../src/gql/district';
+import {getSpecialPriceCategories} from "../../src/gql/specialPriceCategory";
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
@@ -395,7 +396,16 @@ Catalog.getInitialProps = async function(ctx) {
             }
         }
     }
-
+    const specialPriceCategories = await getSpecialPriceCategories({category: ctx.store.getState().user.profile.category, organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+    while(specialPriceCategories.length) {
+        for(let i=0; i<brands.length; i++){
+            if(specialPriceCategories[0].item._id===brands[i]._id) {
+                brands[i].price = specialPriceCategories[0].price
+                specialPriceCategories.splice(0, 1)
+                break
+            }
+        }
+    }
     return {
         data: {
             brands,
