@@ -49,6 +49,7 @@ const Organization = React.memo((props) => {
     let [addedClient, setAddedClient] = useState(data.organization&&data.organization.addedClient!==null?data.organization.addedClient:false);
     let [agentSubBrand, setAgentSubBrand] = useState(data.organization&&data.organization.agentSubBrand!==null?data.organization.agentSubBrand:false);
     let [autoIntegrate, setAutoIntegrate] = useState(data.organization&&data.organization.autoIntegrate!==null?data.organization.autoIntegrate:false);
+    let [calculateStock, setCalculateStock] = useState(data.organization&&data.organization.calculateStock!==null?data.organization.calculateStock:false);
     let [autoAcceptAgent, setAutoAcceptAgent] = useState(data.organization&&data.organization.autoAcceptAgent!==null?data.organization.autoAcceptAgent:false);
     let [autoAcceptNight, setAutoAcceptNight] = useState(data.organization&&data.organization.autoAcceptNight!==null?data.organization.autoAcceptNight:false);
     let [clientDuplicate, setClientDuplicate] = useState(data.organization&&data.organization.clientDuplicate!==null?data.organization.clientDuplicate:false);
@@ -327,6 +328,17 @@ const Organization = React.memo((props) => {
                                                 }
                                                 label='Автоприем интеграции'
                                             />
+                                            <FormControlLabel
+                                                control={
+                                                    <Switch
+                                                        checked={calculateStock}
+                                                        onChange={()=>{setCalculateStock(!calculateStock)}}
+                                                        color='primary'
+                                                        inputProps={{ 'aria-label': 'primary checkbox' }}
+                                                    />
+                                                }
+                                                label='Подсчет остатков'
+                                            />
                                             <br/>
                                             <div className={classes.geo} style={{color: warehouse&&warehouse.length>0?'#ffb300':'red'}} onClick={()=>{
                                                 setFullDialog('Геолокация', <Geo change={true} geo={warehouse} setAddressGeo={setWarehouse}/>)
@@ -556,32 +568,33 @@ const Organization = React.memo((props) => {
                                                         const action = async() => {
                                                             await addOrganization({
                                                                 catalog,
-                                                                cities: cities,
-                                                                pass: pass,
-                                                                miniInfo: miniInfo,
+                                                                cities,
+                                                                pass,
+                                                                miniInfo,
                                                                 priotiry: checkInt(priotiry),
-                                                                consignation: consignation,
-                                                                refusal: refusal,
-                                                                onlyDistrict: onlyDistrict,
-                                                                unite: unite,
-                                                                superagent: superagent,
-                                                                onlyIntegrate: onlyIntegrate,
-                                                                addedClient: addedClient,
-                                                                agentSubBrand: agentSubBrand,
+                                                                consignation,
+                                                                refusal,
+                                                                onlyDistrict,
+                                                                unite,
+                                                                superagent,
+                                                                onlyIntegrate,
+                                                                addedClient,
+                                                                agentSubBrand,
                                                                 autoIntegrate,
-                                                                autoAcceptAgent: autoAcceptAgent,
-                                                                autoAcceptNight: autoAcceptNight,
-                                                                clientDuplicate: clientDuplicate,
+                                                                calculateStock,
+                                                                autoAcceptAgent,
+                                                                autoAcceptNight,
+                                                                clientDuplicate,
                                                                 divideBySubBrand,
                                                                 dateDelivery,
-                                                                warehouse: warehouse,
-                                                                accessToClient: accessToClient,
-                                                                image: image,
-                                                                name: name,
-                                                                address: address,
-                                                                email: email,
-                                                                phone: phone,
-                                                                info: info,
+                                                                warehouse,
+                                                                accessToClient,
+                                                                image,
+                                                                name,
+                                                                address,
+                                                                email,
+                                                                phone,
+                                                                info,
                                                                 minimumOrder: checkInt(minimumOrder),
                                                                 agentHistory: checkInt(agentHistory)
                                                             })
@@ -616,6 +629,7 @@ const Organization = React.memo((props) => {
                                                     if(addedClient!==data.organization.addedClient)editElement.addedClient = addedClient
                                                     if(agentSubBrand!==data.organization.agentSubBrand)editElement.agentSubBrand = agentSubBrand
                                                     if(autoIntegrate!==data.organization.autoIntegrate)editElement.autoIntegrate = autoIntegrate
+                                                    if(calculateStock!==data.organization.calculateStock)editElement.calculateStock = calculateStock
                                                     if(autoAcceptAgent!==data.organization.autoAcceptAgent)editElement.autoAcceptAgent = autoAcceptAgent
                                                     if(autoAcceptNight!==data.organization.autoAcceptNight)editElement.autoAcceptNight = autoAcceptNight
                                                     if(clientDuplicate!==data.organization.clientDuplicate)editElement.clientDuplicate = clientDuplicate

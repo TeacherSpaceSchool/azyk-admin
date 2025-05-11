@@ -786,7 +786,7 @@ const Order =  React.memo(
                                     }
 
                                     let sendOrders = [];
-                                    if(changeOrders)
+                                    if(changeOrders) {
                                         sendOrders = orders.map((order) => {
                                             return {
                                                 _id: order._id,
@@ -801,6 +801,7 @@ const Order =  React.memo(
                                                 status: order.status
                                             }
                                         })
+                                    }
                                     const res = await setOrder({orders: sendOrders, invoice: element._id})
 
                                     if (res&&list) {
