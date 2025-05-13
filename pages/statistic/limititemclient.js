@@ -9,8 +9,8 @@ import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
 import { urlMain } from '../../redux/constants/other'
 import initialApp from '../../src/initialApp'
-import CardLimitItemClient from '../../components/limitItemclient/CardLimitItemClient'
-import CardLimitItemClientPlaceholder from '../../components/limitItemclient/CardLimitItemClientPlaceholder'
+import CardLimitItemClient from '../../components/limitItemClient/CardLimitItemClient'
+import CardLimitItemClientPlaceholder from '../../components/limitItemClient/CardLimitItemClientPlaceholder'
 import { getActiveOrganization } from '../../src/gql/statistic'
 import { getItemsForLimitItemClients, getLimitItemClients } from '../../src/gql/limitItemClient'
 import Autocomplete from '@material-ui/lab/Autocomplete';
