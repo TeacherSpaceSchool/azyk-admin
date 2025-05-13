@@ -2,12 +2,12 @@ import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 import { SingletonStore } from '../singleton/store';
 
-export const getEmploymentsTrash = async({search: search}, client)=>{
+export const getEmploymentsTrash = async({search}, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {search: search},
+                variables: {search},
                 query: gql`
                     query ($search: String!) {
                         employmentsTrash(search: $search) {
@@ -30,12 +30,12 @@ export const getEmploymentsTrash = async({search: search}, client)=>{
     }
 }
 
-export const getEmployments = async({organization, search: search, sort: sort, filter: filter}, client)=>{
+export const getEmployments = async({organization, search, sort, filter: filter}, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {organization: organization, search: search, sort: sort, filter: filter},
+                variables: {organization: organization, search, sort, filter: filter},
                 query: gql`
                     query ($organization: ID, $search: String!, $sort: String!, $filter: String!) {
                         employments(organization: $organization, search: $search, sort: $sort, filter: $filter) {

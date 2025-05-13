@@ -1,12 +1,12 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 
-export const getAutos = async({search: search, sort: sort, organization: organization}, client)=>{
+export const getAutos = async({search, sort, organization: organization}, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {search: search, sort: sort, organization: organization},
+                variables: {search, sort, organization: organization},
                 query: gql`
                     query ($organization: ID!, $search: String!, $sort: String!) {
                         autos(organization: $organization, search: $search, sort: $sort) {

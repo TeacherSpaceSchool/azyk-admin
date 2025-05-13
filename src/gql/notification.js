@@ -2,12 +2,12 @@ import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 import { SingletonStore } from '../singleton/store';
 
-export const getNotifications = async({search: search})=>{
+export const getNotifications = async({search})=>{
     try{
         const client = new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {search: search},
+                variables: {search},
                 query: gql`
                     query ($search: String!) {
                         notifications(search: $search) {

@@ -6,7 +6,7 @@ export const getAgentRoutes = async({search, organization}, client)=>{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {search: search, organization: organization},
+                variables: {search, organization: organization},
                 query: gql`
                     query ($organization: ID, $search: String!) {
                         agentRoutes(organization: $organization, search: $search) {

@@ -29,7 +29,7 @@ const Faqs = React.memo((props) => {
                 if(searchTimeOut)
                     clearTimeout(searchTimeOut)
                 searchTimeOut = setTimeout(async()=>{
-                    setList((await getFaqs({search: search})).faqs)
+                    setList((await getFaqs({search})).faqs)
                     setPagination(100);
                     forceCheck();
                     (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });

@@ -23,7 +23,7 @@ const NotificationStatistic = React.memo((props) => {
     useEffect(()=>{
         (async()=>{
             setPagination(100)
-            setList((await getNotificationStatistics({search: search})).notificationStatistics)
+            setList((await getNotificationStatistics({search})).notificationStatistics)
         })()
     },[search])
     let height = 214

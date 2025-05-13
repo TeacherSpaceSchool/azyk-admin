@@ -28,7 +28,7 @@ const Districts = React.memo((props) => {
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     const initialRender = useRef(true);
     const getList = async ()=> {
-        setList((await getDistricts({organization: router.query.id, search: search, sort: sort})).districts)
+        setList((await getDistricts({organization: router.query.id, search, sort})).districts)
         setPagination(100);
         forceCheck();
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });

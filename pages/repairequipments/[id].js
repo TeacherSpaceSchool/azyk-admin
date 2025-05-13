@@ -28,7 +28,7 @@ const RepairEquipments = React.memo((props) => {
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     const initialRender = useRef(true);
     const getList = async ()=>{
-        setList((await getRepairEquipments({organization: router.query.id, search: search, filter: filter})).repairEquipments)
+        setList((await getRepairEquipments({organization: router.query.id, search, filter: filter})).repairEquipments)
         setPagination(100);
         forceCheck();
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });

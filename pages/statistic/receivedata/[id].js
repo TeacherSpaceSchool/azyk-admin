@@ -30,7 +30,7 @@ const ReceiveData = React.memo((props) => {
     let [list, setList] = useState(data.receivedDatas);
     useEffect(()=>{
         (async()=>{
-            setList((await getReceivedDatas({organization: router.query.id, search: search, filter: filter})).receivedDatas)
+            setList((await getReceivedDatas({organization: router.query.id, search, filter: filter})).receivedDatas)
             setPagination(100)
             forceCheck()
         })()

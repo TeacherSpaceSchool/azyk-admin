@@ -57,7 +57,7 @@ const Organization = React.memo((props) => {
     let [type, setType] = useState('👁');
     const initialRender = useRef(true);
     const getList = async ()=>{
-        setList((await getBrandOrganizations({search: search, sort: sort, filter: filter, city: city})).brandOrganizations);
+        setList((await getBrandOrganizations({search, sort, filter: filter, city: city})).brandOrganizations);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         setPagination(100);
         forceCheck();

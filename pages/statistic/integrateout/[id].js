@@ -37,9 +37,9 @@ const IntegrateOutShoro = React.memo((props) => {
         if(paginationWork){
             let addedList =
                 type==='Возвраты'?
-                    (await outXMLReturnedShoros({search: search, filter: filter, skip: list.length, organization: router.query.id})).outXMLReturnedShoros
+                    (await outXMLReturnedShoros({search, filter: filter, skip: list.length, organization: router.query.id})).outXMLReturnedShoros
                     :
-                    (await outXMLShoros({search: search, filter: filter, skip: list.length, organization: router.query.id})).outXMLShoros
+                    (await outXMLShoros({search, filter: filter, skip: list.length, organization: router.query.id})).outXMLShoros
             if(addedList.length>0){
                 setList([...list, ...addedList])
             }
@@ -50,9 +50,9 @@ const IntegrateOutShoro = React.memo((props) => {
     const getList = async ()=>{
         setList(
             type==='Возвраты'?
-                (await outXMLReturnedShoros({search: search, filter: filter, skip: 0, organization: router.query.id})).outXMLReturnedShoros
+                (await outXMLReturnedShoros({search, filter: filter, skip: 0, organization: router.query.id})).outXMLReturnedShoros
                 :
-                (await outXMLShoros({search: search, filter: filter, skip: 0, organization: router.query.id})).outXMLShoros
+                (await outXMLShoros({search, filter: filter, skip: 0, organization: router.query.id})).outXMLShoros
         )
         setSimpleStatistic(
             type==='Возвраты'?

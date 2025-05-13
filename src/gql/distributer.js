@@ -7,7 +7,7 @@ export const getDistributers = async({search, sort}, client)=>{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {search: search, sort: sort},
+                variables: {search, sort},
                 query: gql`
                     query ($sort: String!, $search: String!) {
                         distributers(sort: $sort, search: $search) {

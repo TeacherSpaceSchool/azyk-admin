@@ -30,7 +30,7 @@ const Merchandisings = React.memo((props) => {
     let [paginationWork, setPaginationWork] = useState(true);
     const checkPagination = async()=>{
         if(paginationWork){
-            let addedList = (await getMerchandisings({...router.query.client?{client: router.query.client}:{}, agent, date: date, organization: router.query.id, sort: sort, filter: filter, search: search, skip: list.length})).merchandisings
+            let addedList = (await getMerchandisings({...router.query.client?{client: router.query.client}:{}, agent, date: date, organization: router.query.id, sort, filter: filter, search, skip: list.length})).merchandisings
             if(addedList.length>0){
                 setList([...list, ...addedList])
             }
@@ -39,7 +39,7 @@ const Merchandisings = React.memo((props) => {
         }
     }
     const getList = async()=>{
-        setList((await getMerchandisings({...router.query.client?{client: router.query.client}:{}, agent, date: date, organization: router.query.id, sort: sort, filter: filter, search: search, skip: 0})).merchandisings)
+        setList((await getMerchandisings({...router.query.client?{client: router.query.client}:{}, agent, date: date, organization: router.query.id, sort, filter: filter, search, skip: 0})).merchandisings)
         setPaginationWork(true);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         forceCheck()

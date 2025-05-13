@@ -116,7 +116,7 @@ export const getItemsTrash = async({search}, client)=>{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {search: search},
+                variables: {search},
                 query: gql`
                     query ($search: String!) {
                         itemsTrash( search: $search) {
@@ -155,7 +155,7 @@ export const getBrands = async({organization,  search,  sort, city}, client)=>{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {organization: organization, search: search, sort: sort, city},
+                variables: {organization: organization, search, sort, city},
                 query: gql`
                     query ($organization: ID!,$search: String!, $sort: String!, $city: String) {
                         brands(organization: $organization, search: $search, sort: $sort, city: $city) {

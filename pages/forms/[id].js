@@ -30,7 +30,7 @@ const Forms = React.memo((props) => {
     let [paginationWork, setPaginationWork] = useState(true);
     const checkPagination = async()=>{
         if(paginationWork){
-            let addedList = (await getForms({templateForm: router.query.id, search: search, skip: list.length})).forms
+            let addedList = (await getForms({templateForm: router.query.id, search, skip: list.length})).forms
             if(addedList.length>0){
                 setList([...list, ...addedList])
             }
@@ -39,7 +39,7 @@ const Forms = React.memo((props) => {
         }
     }
     const getList = async()=>{
-        setList((await getForms({templateForm: router.query.id, search: search, skip: 0})).forms)
+        setList((await getForms({templateForm: router.query.id, search, skip: 0})).forms)
         setPaginationWork(true);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         forceCheck()

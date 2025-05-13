@@ -6,7 +6,7 @@ export const getDistricts = async({search, sort, organization}, client)=>{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {search: search, sort: sort, organization: organization},
+                variables: {search, sort, organization: organization},
                 query: gql`
                     query ($organization: ID, $search: String!, $sort: String!) {
                         districts(organization: $organization, search: $search, sort: $sort) {

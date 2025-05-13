@@ -38,7 +38,7 @@ const Returneds = React.memo((props) => {
     let [paginationWork, setPaginationWork] = useState(true);
     const checkPagination = async()=>{
         if(paginationWork){
-            let addedList = (await getReturneds({search: search, sort: sort, date: date, skip: list.length, city})).returneds
+            let addedList = (await getReturneds({search, sort, date: date, skip: list.length, city})).returneds
             if(addedList.length>0){
                 setList([...list, ...addedList])
             }
@@ -48,8 +48,8 @@ const Returneds = React.memo((props) => {
     }
     const getList = async ()=>{
         setSelected([])
-        setList((await getReturneds({search: search, sort: sort, date: date, skip: 0, city})).returneds)
-        setSimpleStatistic((await getReturnedsSimpleStatistic({search: search, date: date, city})).returnedsSimpleStatistic);
+        setList((await getReturneds({search, sort, date: date, skip: 0, city})).returneds)
+        setSimpleStatistic((await getReturnedsSimpleStatistic({search, date: date, city})).returnedsSimpleStatistic);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
         forceCheck()
         setPaginationWork(true);
@@ -66,7 +66,7 @@ const Returneds = React.memo((props) => {
         (async()=>{
             if(initialRender.current) {
                 initialRender.current = false;
-                setSimpleStatistic((await getReturnedsSimpleStatistic({search: search, date: date, city})).returnedsSimpleStatistic)
+                setSimpleStatistic((await getReturnedsSimpleStatistic({search, date: date, city})).returnedsSimpleStatistic)
             } else {
                 if (searchTimeOut)
                     clearTimeout(searchTimeOut)

@@ -98,7 +98,7 @@ const Catalog = React.memo((props) => {
     useEffect(()=>{
         (async()=>{
             if(organization._id){
-                setList((await getBrands({organization: organization._id, search: search, sort: '-priotiry'})).brands)
+                setList((await getBrands({organization: organization._id, search, sort: '-priotiry'})).brands)
             }
         })()
     },[filter, search, organization])

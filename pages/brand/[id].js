@@ -28,7 +28,7 @@ const Brand = React.memo((props) => {
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     const initialRender = useRef(true);
     const getList = async ()=>{
-        setList((await getBrands({city: city, organization: router.query.id, search: search, sort: sort})).brands)
+        setList((await getBrands({city: city, organization: router.query.id, search, sort})).brands)
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         forceCheck();

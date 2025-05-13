@@ -80,12 +80,12 @@ export const getOrganizations = async({search, filter, city}, client)=>{
     }
 }
 
-export const getOrganizationsTrash = async({search: search}, client)=>{
+export const getOrganizationsTrash = async({search}, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {search: search},
+                variables: {search},
                 query: gql`
                     query ($search: String!) {
                         organizationsTrash(search: $search) {

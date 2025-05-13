@@ -33,7 +33,7 @@ const ClientsSync = React.memo((props) => {
     let [simpleStatistic, setSimpleStatistic] = useState(data.clientsSyncStatistic);
     const checkPagination = async()=>{
         if(paginationWork){
-            let addedList = (await getClientsSync({search: search, organization: router.query.id, skip: list.length, city})).clientsSync
+            let addedList = (await getClientsSync({search, organization: router.query.id, skip: list.length, city})).clientsSync
             if(addedList.length>0){
                 setList([...list, ...addedList])
             }
@@ -45,9 +45,9 @@ const ClientsSync = React.memo((props) => {
         if(searchTimeOut)
             clearTimeout(searchTimeOut)
         searchTimeOut = setTimeout(async()=>{
-            let list = (await getClientsSync({search: search, organization: router.query.id, skip: 0, city})).clientsSync
+            let list = (await getClientsSync({search, organization: router.query.id, skip: 0, city})).clientsSync
             setList(list)
-            setSimpleStatistic((await getClientsSyncStatistic({search: search, organization: router.query.id, city})).clientsSyncStatistic)
+            setSimpleStatistic((await getClientsSyncStatistic({search, organization: router.query.id, city})).clientsSyncStatistic)
             setPaginationWork(true);
             (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
             forceCheck()

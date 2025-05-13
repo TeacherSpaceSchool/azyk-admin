@@ -26,7 +26,7 @@ const Client = React.memo((props) => {
     let [paginationWork, setPaginationWork] = useState(true);
     const checkPagination = async()=>{
         if(paginationWork){
-            let addedList = (await getClients({search: search, sort: sort, filter: filter, date: date, skip: list.length, city: city})).clients
+            let addedList = (await getClients({search, sort, filter: filter, date: date, skip: list.length, city: city})).clients
             if(addedList.length>0){
                 setList([...list, ...addedList])
             }
@@ -35,8 +35,8 @@ const Client = React.memo((props) => {
         }
     }
     const getList = async ()=>{
-        setList((await getClients({search: search, sort: sort, filter: filter, date: date, skip: 0, city: city})).clients);
-        setSimpleStatistic((await getClientsSimpleStatistic({search: search, filter: filter, date: date, city: city})).clientsSimpleStatistic[0]);
+        setList((await getClients({search, sort, filter: filter, date: date, skip: 0, city: city})).clients);
+        setSimpleStatistic((await getClientsSimpleStatistic({search, filter: filter, date: date, city: city})).clientsSimpleStatistic[0]);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
         forceCheck();
         setPaginationWork(true);

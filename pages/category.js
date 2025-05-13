@@ -23,7 +23,7 @@ const Index = React.memo((props) => {
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     const initialRender = useRef(true);
     const getList = async ()=>{
-        setList((await getCategorys({search: search, sort: sort, filter: filter})).categorys);
+        setList((await getCategorys({search, sort, filter: filter})).categorys);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         setPagination(100);
         forceCheck();

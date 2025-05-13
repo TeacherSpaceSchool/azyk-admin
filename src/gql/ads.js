@@ -102,12 +102,12 @@ export const getAdss = async(args, client)=>{
     }
 }
 
-export const getAdssTrash = async({search: search, organization: organization}, client)=>{
+export const getAdssTrash = async({search, organization: organization}, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {search: search, organization: organization},
+                variables: {search, organization: organization},
                 query: gql`
                     query ($search: String!) {
                         adssTrash(search: $search) {

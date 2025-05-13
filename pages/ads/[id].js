@@ -32,7 +32,7 @@ const Ads = React.memo((props) => {
                 if(searchTimeOut)
                     clearTimeout(searchTimeOut)
                 searchTimeOut = setTimeout(async()=>{
-                    setList((await getAdss({search: search, organization: router.query.id})).adss)
+                    setList((await getAdss({search, organization: router.query.id})).adss)
                     setPagination(100);
                     forceCheck();
                     (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });

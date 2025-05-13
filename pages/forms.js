@@ -27,7 +27,7 @@ const Forms = React.memo((props) => {
     let [paginationWork, setPaginationWork] = useState(true);
     const checkPagination = async()=>{
         if(paginationWork){
-            let addedList = (await getTemplateForms({organization: organization, search: search, skip: list.length})).templateForms
+            let addedList = (await getTemplateForms({organization: organization, search, skip: list.length})).templateForms
             if(addedList.length>0){
                 setList([...list, ...addedList])
             }
@@ -36,7 +36,7 @@ const Forms = React.memo((props) => {
         }
     }
     const getList = async ()=>{
-        setList((await getTemplateForms({organization: organization, search: search, skip: 0})).templateForms);
+        setList((await getTemplateForms({organization: organization, search, skip: 0})).templateForms);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         forceCheck()
         setPaginationWork(true);

@@ -29,7 +29,7 @@ const Routes = React.memo((props) => {
     const { search, filter, sort, date } = props.app;
     const checkPagination = async()=>{
         if(paginationWork){
-            let addedList = (await getRoutes({organization: router.query.id, search: search, sort: sort, filter: filter, date: date, skip: list.length})).routes
+            let addedList = (await getRoutes({organization: router.query.id, search, sort, filter: filter, date: date, skip: list.length})).routes
             if(addedList.length>0){
                 setList([...list, ...addedList])
             }
@@ -38,7 +38,7 @@ const Routes = React.memo((props) => {
         }
     }
     const getList = async ()=>{
-        setList((await getRoutes({organization: router.query.id, search: search, sort: sort, filter: filter, date: date, skip: 0})).routes)
+        setList((await getRoutes({organization: router.query.id, search, sort, filter: filter, date: date, skip: 0})).routes)
         forceCheck()
         setPaginationWork(true);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });

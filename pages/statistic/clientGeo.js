@@ -57,7 +57,7 @@ const ClientGeoStatistic = React.memo((props) => {
                     clearTimeout(searchTimeOut)
                 searchTimeOut = setTimeout(async()=>{
                     await showLoad(true)
-                    setStatisticClientGeo((await getStatisticClientGeo({city: city, search: search, organization: organization ? organization._id : null, item: item ? item._id : null})).statisticClientGeo)
+                    setStatisticClientGeo((await getStatisticClientGeo({city: city, search, organization: organization ? organization._id : null, item: item ? item._id : null})).statisticClientGeo)
                     await showLoad(false)
                 }, 500)
                 setSearchTimeOut(searchTimeOut)

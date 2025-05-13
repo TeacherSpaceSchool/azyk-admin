@@ -6,7 +6,7 @@ export const getRoutes = async({search, sort, filter, date, skip, organization},
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {search: search, sort: sort, filter: filter, date: date, skip: skip, organization: organization},
+                variables: {search, sort, filter: filter, date: date, skip: skip, organization: organization},
                 query: gql`
                     query ($organization: ID, $search: String!, $sort: String!, $filter: String!, $date: String!, $skip: Int) {
                         routes(organization: $organization, search: $search, sort: $sort, filter: $filter, date: $date, skip: $skip) {

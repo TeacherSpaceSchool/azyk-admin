@@ -41,11 +41,11 @@ const Trash = React.memo((props) => {
             if(['Клиенты', 'Заказы', 'Возвраты'].includes(filter)){
                 let addedList
                 if(filter==='Клиенты')
-                    addedList = (await getClientsTrash({search: search, skip: list.length})).clientsTrash
+                    addedList = (await getClientsTrash({search, skip: list.length})).clientsTrash
                 else if(filter==='Заказы')
-                    addedList = (await getOrdersTrash({search: search, skip: list.length})).invoicesTrash
+                    addedList = (await getOrdersTrash({search, skip: list.length})).invoicesTrash
                 else if(filter==='Возвраты')
-                    addedList = (await getReturnedsTrash({search: search, skip: list.length})).returnedsTrash
+                    addedList = (await getReturnedsTrash({search, skip: list.length})).returnedsTrash
                 if(addedList.length>0){
                     setList([...list, ...addedList])
                 }
@@ -64,32 +64,32 @@ const Trash = React.memo((props) => {
                 clearTimeout(searchTimeOut)
             searchTimeOut = setTimeout(async()=>{
                 if(filter==='Клиенты'){
-                    list = (await getClientsTrash({search: search, skip: 0})).clientsTrash
-                    simpleStatistic = (await getClientsTrashSimpleStatistic({search: search})).clientsTrashSimpleStatistic
+                    list = (await getClientsTrash({search, skip: 0})).clientsTrash
+                    simpleStatistic = (await getClientsTrashSimpleStatistic({search})).clientsTrashSimpleStatistic
 
                 }
                 else if(filter==='Заказы'){
-                    list = (await getOrdersTrash({search: search, skip: 0})).invoicesTrash
-                    simpleStatistic = (await getInvoicesTrashSimpleStatistic({search: search})).invoicesTrashSimpleStatistic
+                    list = (await getOrdersTrash({search, skip: 0})).invoicesTrash
+                    simpleStatistic = (await getInvoicesTrashSimpleStatistic({search})).invoicesTrashSimpleStatistic
                 }
                 else if(filter==='Возвраты'){
-                    list = (await getReturnedsTrash({search: search, skip: 0})).returnedsTrash
-                    simpleStatistic = (await getReturnedsTrashSimpleStatistic({search: search})).returnedsTrashSimpleStatistic
+                    list = (await getReturnedsTrash({search, skip: 0})).returnedsTrash
+                    simpleStatistic = (await getReturnedsTrashSimpleStatistic({search})).returnedsTrashSimpleStatistic
                 }
                 else if(filter==='Товары'){
-                    list = (await getItemsTrash({search: search})).itemsTrash
+                    list = (await getItemsTrash({search})).itemsTrash
                     simpleStatistic = [list.length]
                 }
                 else if(filter==='Организации'){
-                    list = (await getOrganizationsTrash({search: search})).organizationsTrash
+                    list = (await getOrganizationsTrash({search})).organizationsTrash
                     simpleStatistic = [list.length]
                 }
                 else if(filter==='Акции'){
-                    list = (await getAdssTrash({search: search})).adssTrash
+                    list = (await getAdssTrash({search})).adssTrash
                     simpleStatistic = [list.length]
                 }
                 else if(filter==='Сотрудники'){
-                    list = (await getEmploymentsTrash({search: search})).employmentsTrash
+                    list = (await getEmploymentsTrash({search})).employmentsTrash
                     simpleStatistic = [list.length]
                 }
                 setList(list)

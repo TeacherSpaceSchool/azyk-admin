@@ -29,7 +29,7 @@ const Subcategory = React.memo((props) => {
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     const initialRender = useRef(true);
     const getList = async ()=>{
-        setList((await getSubCategorys({category: router.query.id, search: search, sort: sort, filter: filter})).subCategorys)
+        setList((await getSubCategorys({category: router.query.id, search, sort, filter: filter})).subCategorys)
         setPagination(100);
         forceCheck();
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });

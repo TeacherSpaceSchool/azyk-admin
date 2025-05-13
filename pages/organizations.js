@@ -26,7 +26,7 @@ const Organization = React.memo((props) => {
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     const initialRender = useRef(true);
     const getList = async ()=>{
-        setList((await getOrganizations({search: search, filter: filter, city: city})).organizations);
+        setList((await getOrganizations({search, filter: filter, city: city})).organizations);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         setPagination(100);
         forceCheck();

@@ -28,7 +28,7 @@ const Employment = React.memo((props) => {
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     const initialRender = useRef(true);
     const getList = async ()=>{
-        setList((await getEmployments({organization: router.query.id, search: search, sort: sort, filter: filter})).employments)
+        setList((await getEmployments({organization: router.query.id, search, sort, filter: filter})).employments)
         setPagination(100);
         forceCheck();
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });

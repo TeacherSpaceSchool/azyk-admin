@@ -7,7 +7,7 @@ export const getSubCategorys = async({category,  search,  sort,  filter}, client
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {category: category, search: search, sort: sort, filter: filter},
+                variables: {category: category, search, sort, filter: filter},
                 query: gql`
                     query ($category: ID!,$search: String!, $sort: String!, $filter: String!) {
                         subCategorys(category: $category, search: $search, sort: $sort, filter: $filter) {

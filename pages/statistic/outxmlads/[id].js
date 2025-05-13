@@ -25,7 +25,7 @@ const OutXMLAds = React.memo((props) => {
     const { profile } = props.user;
     useEffect(()=>{
         (async()=>{
-            setList(await outXMLAdsShoros({organization: router.query.id, search: search}))
+            setList(await outXMLAdsShoros({organization: router.query.id, search}))
         })()
     },[sort, search])
     useEffect(()=>{

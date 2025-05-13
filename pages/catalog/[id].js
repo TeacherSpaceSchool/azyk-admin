@@ -27,7 +27,8 @@ import initialApp from '../../src/initialApp'
 import { getOrganization } from '../../src/gql/organization'
 import {getAdss} from '../../src/gql/ads'
 import {getСlientDistrict} from '../../src/gql/district';
-import {getSpecialPriceCategories} from "../../src/gql/specialPriceCategory";
+import {getSpecialPriceCategories} from '../../src/gql/specialPriceCategory';
+import {getLimitItemClients} from '../../src/gql/limitItemClient';
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
@@ -40,8 +41,21 @@ const Catalog = React.memo((props) => {
     const [basket, setBasket] = useState({});
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     const initialRender = useRef(true);
+    const checkMaxCount = (idx) => {
+        let maxCount
+        if(isNotEmpty(list[idx].stock)&&isNotEmpty(data.limitItemClient[list[idx]._id])) {
+            maxCount = list[idx].stock<data.limitItemClient[list[idx]._id]?list[idx].stock:data.limitItemClient[list[idx]._id]
+        }
+        else if(isNotEmpty(list[idx].stock)) {
+            maxCount = list[idx].stock
+        }
+        else if(isNotEmpty(data.limitItemClient[list[idx]._id])) {
+            maxCount = data.limitItemClient[list[idx]._id]
+        }
+        return maxCount
+    }
     const getList = async ()=>{
-        setList((await getBrands({organization: router.query.id, search: search, sort: sort})).brands)
+        setList((await getBrands({organization: router.query.id, search, sort})).brands)
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         forceCheck();
@@ -83,9 +97,12 @@ const Catalog = React.memo((props) => {
             basket[id] = {_id: id, count: 0, allPrice: 0, consignment: 0}
         basket[id].count = checkInt(basket[id].count)
         basket[id].count+=list[idx].apiece?1:list[idx].packaging
-        if(isNotEmpty(list[idx].stock)&&basket[id].count>list[idx].stock) {
-            basket[id].count = list[idx].stock
+
+        const maxCount = checkMaxCount(idx)
+        if(isNotEmpty(maxCount)&&basket[id].count>maxCount) {
+            basket[id].count = maxCount
         }
+
         basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
         setBasket({...basket})
     }
@@ -130,9 +147,12 @@ const Catalog = React.memo((props) => {
         if(!basket[id])
             basket[id] = {_id: id, count: 0, allPrice: 0, consignment: 0}
         basket[id].count = checkInt(count)
-        if(isNotEmpty(list[idx].stock)&&basket[id].count>list[idx].stock) {
-            basket[id].count = list[idx].stock
+
+        const maxCount = checkMaxCount(idx)
+        if(isNotEmpty(maxCount)&&basket[id].count>maxCount) {
+            basket[id].count = maxCount
         }
+
         basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
         setBasket({...basket})
     }
@@ -143,9 +163,12 @@ const Catalog = React.memo((props) => {
         basket[id].count = checkInt(basket[id].count)
         if(list[idx].packaging){
             basket[id].count = (parseInt(basket[id].count/list[idx].packaging)+1)*list[idx].packaging
-            if(isNotEmpty(list[idx].stock)&&basket[id].count>list[idx].stock) {
-                basket[id].count = list[idx].stock
+
+            const maxCount = checkMaxCount(idx)
+            if(isNotEmpty(maxCount)&&basket[id].count>maxCount) {
+                basket[id].count = maxCount
             }
+
             basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
             setBasket({...basket})
         }
@@ -187,7 +210,7 @@ const Catalog = React.memo((props) => {
                 <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
                 <meta property='og:type' content='website' />
                 <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property="og:url" content={`${urlMain}/catalog`} />
+                <meta property='og:url' content={`${urlMain}/catalog`} />
                 <link rel='canonical' href={`${urlMain}/catalog`}/>
             </Head>
             <Card className={classes.page}>
@@ -406,6 +429,13 @@ Catalog.getInitialProps = async function(ctx) {
             }
         }
     }
+
+    const res = await getLimitItemClients({client: ctx.store.getState().user.profile.client, organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+    const limitItemClient = {}
+    for(let i=0;i<res.length;i++){
+        limitItemClient[res[i].item._id] = res[i].limit
+    }
+
     return {
         data: {
             brands,
@@ -413,6 +443,7 @@ Catalog.getInitialProps = async function(ctx) {
             ...await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
             ...await getСlientDistrict({organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
             ...await getAdss({search: '', organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
+            limitItemClient
         }
     };
 };

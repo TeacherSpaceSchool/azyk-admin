@@ -28,7 +28,8 @@ import { getBrandOrganizations, getBrands } from '../src/gql/items'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {getSpecialPriceClients} from '../src/gql/specialPrice';
 import {getPlanClient} from '../src/gql/planClient';
-import {getSpecialPriceCategories} from "../src/gql/specialPriceCategory";
+import {getSpecialPriceCategories} from '../src/gql/specialPriceCategory';
+import {getLimitItemClients} from '../src/gql/limitItemClient';
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
@@ -38,6 +39,20 @@ const Catalog = React.memo((props) => {
     const { data } = props;
     const [clients, setClients] = useState([]);
     let [normalPrices, setNormalPrices] = useState(data.normalPrices);
+    let [limitItemClient, setLimitItemClient] = useState({});
+    const checkMaxCount = (idx) => {
+        let maxCount
+        if(isNotEmpty(list[idx].stock)&&isNotEmpty(limitItemClient[list[idx]._id])) {
+            maxCount = list[idx].stock<limitItemClient[list[idx]._id]?list[idx].stock:limitItemClient[list[idx]._id]
+        }
+        else if(isNotEmpty(list[idx].stock)) {
+            maxCount = list[idx].stock
+        }
+        else if(isNotEmpty(limitItemClient[list[idx]._id])) {
+            maxCount = limitItemClient[list[idx]._id]
+        }
+        return maxCount
+    }
     const { search } = props.app;
     const [inputValue, setInputValue] = React.useState('');
     let [searchTimeOut, setSearchTimeOut] = useState(null);
@@ -48,7 +63,7 @@ const Catalog = React.memo((props) => {
     const getList = async ()=>{
         normalPrices = {}
         if(organization&&organization._id) {
-            list = (await getBrands({organization: organization._id, search: search, sort: '-priotiry'})).brands
+            list = (await getBrands({organization: organization._id, search, sort: '-priotiry'})).brands
             for(let i=0; i<list.length; i++){
                 normalPrices[list[i]._id] = list[i].price
             }
@@ -203,9 +218,12 @@ const Catalog = React.memo((props) => {
             basket[id] = {_id: id, count: 0, allPrice: 0, consignment: 0}
         basket[id].count = checkInt(basket[id].count)
         basket[id].count+=list[idx].apiece?1:(list[idx].packaging?list[idx].packaging:1)
-        if(isNotEmpty(list[idx].stock)&&basket[id].count>list[idx].stock) {
-            basket[id].count = list[idx].stock
+
+        const maxCount = checkMaxCount(idx)
+        if(isNotEmpty(maxCount)&&basket[id].count>maxCount) {
+            basket[id].count = maxCount
         }
+
         basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
         setBasket({...basket})
     }
@@ -250,9 +268,12 @@ const Catalog = React.memo((props) => {
         if(!basket[id])
             basket[id] = {_id: id, count: 0, allPrice: 0, consignment: 0}
         basket[id].count = checkInt(count)
-        if(isNotEmpty(list[idx].stock)&&basket[id].count>list[idx].stock) {
-            basket[id].count = list[idx].stock
+
+        const maxCount = checkMaxCount(idx)
+        if(isNotEmpty(maxCount)&&basket[id].count>maxCount) {
+            basket[id].count = maxCount
         }
+
         basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
         setBasket({...basket})
     }
@@ -262,9 +283,12 @@ const Catalog = React.memo((props) => {
             basket[id] = {_id: id, count: 0, allPrice: 0, consignment: 0}
         basket[id].count = checkInt(basket[id].count)
         basket[id].count = count*(list[idx].packaging?list[idx].packaging:1)
-        if(isNotEmpty(list[idx].stock)&&basket[id].count>list[idx].stock) {
-            basket[id].count = list[idx].stock
+
+        const maxCount = checkMaxCount(idx)
+        if(isNotEmpty(maxCount)&&basket[id].count>maxCount) {
+            basket[id].count = maxCount
         }
+
         basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
         setBasket({...basket})
     }
@@ -295,6 +319,20 @@ const Catalog = React.memo((props) => {
             setPagination(pagination+100)
         }
     }
+    useEffect(()=>{
+        (async()=>{
+            limitItemClient = {}
+            if(client) {
+                const res = await getLimitItemClients({client: client._id, organization: organization._id})
+                if(res) {
+                    for(let i=0;i<res.length;i++){
+                        limitItemClient[res[i].item._id] = res[i].limit
+                    }
+                }
+            }
+            setLimitItemClient({...limitItemClient})
+        })()
+    },[client])
     return (
         <App checkPagination={checkPagination} searchShow={true} pageName='Каталог'>
             <Head>
@@ -455,6 +493,11 @@ const Catalog = React.memo((props) => {
                                                         {
                                                             isNotEmpty(row.stock)?<div className={classes.stock}>
                                                                 Остаток: {row.stock}
+                                                            </div>:null
+                                                        }
+                                                        {
+                                                            isNotEmpty(limitItemClient[row._id])?<div className={classes.stock}>
+                                                                Лимит: {limitItemClient[row._id]}
                                                             </div>:null
                                                         }
                                                     </div>

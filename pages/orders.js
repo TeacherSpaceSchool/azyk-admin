@@ -41,7 +41,7 @@ const Orders = React.memo((props) => {
     let paginationWork = useRef(true);
     const checkPagination = async()=>{
         if(paginationWork.current){
-            let addedList = (await getOrders({search: search, sort: sort, filter: filter, date: date, skip: list.length, organization: organization, city: city})).invoices
+            let addedList = (await getOrders({search, sort, filter: filter, date: date, skip: list.length, organization: organization, city: city})).invoices
             if(addedList.length>0){
                 setList([...list, ...addedList])
             }
@@ -51,8 +51,8 @@ const Orders = React.memo((props) => {
     }
     const getList = async (_numberSearch)=>{
         setSelected([])
-        let list = (await getOrders({search: search, sort: sort, filter: filter, date: date, skip: 0, organization: organization, city: city})).invoices
-        let simpleStatistic = (await getInvoicesSimpleStatistic({search: search, filter: filter, date: date, organization: organization, city: city})).invoicesSimpleStatistic
+        let list = (await getOrders({search, sort, filter: filter, date: date, skip: 0, organization: organization, city: city})).invoices
+        let simpleStatistic = (await getInvoicesSimpleStatistic({search, filter: filter, date: date, organization: organization, city: city})).invoicesSimpleStatistic
         if(!_numberSearch||_numberSearch===numberSearch.current) {
             setList(list)
             setSimpleStatistic(simpleStatistic);
@@ -75,7 +75,7 @@ const Orders = React.memo((props) => {
         (async ()=>{
             if(initialRender.current) {
                 initialRender.current = false;
-                setSimpleStatistic((await getInvoicesSimpleStatistic({search: search, filter: filter, date: date, organization: organization, city: city})).invoicesSimpleStatistic)
+                setSimpleStatistic((await getInvoicesSimpleStatistic({search, filter: filter, date: date, organization: organization, city: city})).invoicesSimpleStatistic)
             } else {
                 if(searchTimeOut)
                     clearTimeout(searchTimeOut)
