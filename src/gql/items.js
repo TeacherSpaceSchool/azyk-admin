@@ -173,7 +173,6 @@ export const getBrands = async({organization,  search,  sort, city}, client)=>{
                             packaging
                             image
                             info
-                            stock
                             price
                             reiting
                             organization

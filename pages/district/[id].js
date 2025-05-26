@@ -29,6 +29,7 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import CardClientPlaceholder from '../../components/client/CardClientPlaceholder'
 import { forceCheck } from 'react-lazyload';
+import {getWarehouses} from '../../src/gql/warehouse';
 const height = 140
 
 const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
@@ -59,6 +60,10 @@ const District = React.memo((props) => {
     let handleAgent =  (event) => {
         setAgent({_id: event.target.value, name: event.target.name})
     };
+    let [warehouse, setWarehouse] = useState(data.district&&data.district.warehouse?data.district.warehouse:{});
+    let handleWarehouse =  (event) => {
+        setWarehouse({_id: event.target.value, name: event.target.name})
+    };
     let [ecspeditor, setEcspeditor] = useState(data.district&&data.district.ecspeditor?data.district.ecspeditor:{});
     let handleEcspeditor =  (event) => {
         setEcspeditor({_id: event.target.value, name: event.target.name})
@@ -72,6 +77,7 @@ const District = React.memo((props) => {
     let [filtredClient, setFiltredClient] = useState([]);
     let [unselectedClient, setUnselectedClient] = useState([]);
     let [agents, setAgents] = useState([]);
+    let [warehouses, setWarehouses] = useState([]);
     let [ecspeditors, setEcspeditors] = useState([]);
     let [managers, setManagers] = useState([]);
     let [selectType, setSelectType] = useState(['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role)?'Все':'Выбраные');
@@ -119,6 +125,7 @@ const District = React.memo((props) => {
             if(data.district) {
                 if (router.query.id === 'new') {
                     setAgent({})
+                    setWarehouse({})
                     setManager({})
                     setEcspeditor({})
                 }
@@ -131,6 +138,8 @@ const District = React.memo((props) => {
                         ...router.query.id!=='new'?{district: data.district._id}:{},
                         city: city?city:data.district.organization&&data.district.organization.cities[0]
                     })).clientsWithoutDistrict)
+                    setWarehouses((await getWarehouses({search: '', organization: organization._id})))
+
                 }
             }
         })()
@@ -287,6 +296,26 @@ const District = React.memo((props) => {
                                     }}
                                 />
                             }
+                            {['admin', 'суперорганизация', 'организация'].includes(profile.role)?
+                                    <FormControl className={isMobileApp?classes.inputM:classes.inputDF}>
+                                        <InputLabel>Склад</InputLabel>
+                                        <Select value={warehouse._id} onChange={handleWarehouse}>
+                                            {warehouses.map((element)=>
+                                                <MenuItem key={element._id} value={element._id} ola={element.name}>{element.name}</MenuItem>
+                                            )}
+                                        </Select>
+                                    </FormControl>
+                                    :
+                                    <TextField
+                                        label='Склад'
+                                        value={warehouse?warehouse.name:'Основной'}
+                                        className={isMobileApp?classes.inputM:classes.inputDF}
+                                        inputProps={{
+                                            'aria-label': 'description',
+                                            readOnly: true
+                                        }}
+                                    />
+                                }
                             <br/>
                             {['admin', 'суперорганизация', 'агент', 'организация', 'менеджер'].includes(profile.role)?
                                 <div style={{ justifyContent: 'center' }} className={classes.row}>
@@ -356,6 +385,7 @@ const District = React.memo((props) => {
                                                             client: client,
                                                             name: name,
                                                             agent: agent._id,
+                                                            warehouse: warehouse._id,
                                                             manager: manager._id,
                                                             ecspeditor: ecspeditor._id,
                                                         })
@@ -375,6 +405,7 @@ const District = React.memo((props) => {
                                                 const action = async() => {
                                                     let editElement = {_id: data.district._id, client: client.map(element=>element._id)}
                                                     if(!data.district.agent||agent._id!==data.district.agent._id)editElement.agent = agent._id;
+                                                    if(!data.district.warehouse||warehouse._id!==data.district.warehouse._id)editElement.warehouse = warehouse._id;
                                                     if(!data.district.manager||manager._id!==data.district.manager._id)editElement.manager = manager._id;
                                                     if(!data.district.ecspeditor||ecspeditor._id!==data.district.ecspeditor._id)editElement.ecspeditor = ecspeditor._id;
                                                     if(name!==data.district.name)editElement.name = name;
@@ -434,7 +465,7 @@ District.getInitialProps = async function(ctx) {
     return {
         data: {
             ...ctx.query.id!=='new'?await getDistrict({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined): {district: {organization: {}, client: [], name: '', agent: {}, ecspeditor: {}}},
-            organizations: [{name: 'AZYK.STORE', _id: 'super'}, ...(await getOrganizations({search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)).organizations]
+            organizations: [{name: 'AZYK.STORE', _id: 'super'}, ...(await getOrganizations({search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)).organizations],
         }
     };
 };

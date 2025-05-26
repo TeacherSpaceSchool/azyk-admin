@@ -22,19 +22,20 @@ export const getItemsForStocks = async({organization}, client)=>{
     }
 }
 
-export const getStocks = async({search, organization}, client)=>{
+export const getStocks = async(variables, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
-                variables: {search, organization},
+                variables: variables,
                 query: gql`
-                    query ($search: String!, $organization: ID!) {
-                        stocks(search: $search, organization: $organization) {
+                    query ($search: String!, $client: ID, $organization: ID!) {
+                        stocks(search: $search, client: $client, organization: $organization) {
                             _id
                             createdAt
                             item {_id name}
                             organization {_id name}
+                            warehouse {_id name}
                             count
                         }
                     }`,
@@ -67,11 +68,12 @@ export const addStock = async(element)=>{
         let res = await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($item: ID!, $count: Float!, $organization: ID!) {
-                        addStock(item: $item, count: $count, organization: $organization) {
+                    mutation ($item: ID!, $count: Float!, $organization: ID!, $warehouse: ID) {
+                        addStock(item: $item, count: $count, organization: $organization, warehouse: $warehouse) {
                             _id
                             createdAt
                             item {_id name}
+                            warehouse {_id name}
                             count
                           }
                     }`})

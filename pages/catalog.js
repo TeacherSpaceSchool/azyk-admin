@@ -30,6 +30,7 @@ import {getSpecialPriceClients} from '../src/gql/specialPrice';
 import {getPlanClient} from '../src/gql/planClient';
 import {getSpecialPriceCategories} from '../src/gql/specialPriceCategory';
 import {getLimitItemClients} from '../src/gql/limitItemClient';
+import {getStocks} from '../src/gql/stock';
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
@@ -40,13 +41,14 @@ const Catalog = React.memo((props) => {
     const [clients, setClients] = useState([]);
     let [normalPrices, setNormalPrices] = useState(data.normalPrices);
     let [limitItemClient, setLimitItemClient] = useState({});
+    let [stockClient, setStockClient] = useState({});
     const checkMaxCount = (idx) => {
         let maxCount
-        if(isNotEmpty(list[idx].stock)&&isNotEmpty(limitItemClient[list[idx]._id])) {
-            maxCount = list[idx].stock<limitItemClient[list[idx]._id]?list[idx].stock:limitItemClient[list[idx]._id]
+        if(isNotEmpty(stockClient[list[idx]._id])&&isNotEmpty(limitItemClient[list[idx]._id])) {
+            maxCount = stockClient[list[idx]._id]<limitItemClient[list[idx]._id]?stockClient[list[idx]._id]:limitItemClient[list[idx]._id]
         }
-        else if(isNotEmpty(list[idx].stock)) {
-            maxCount = list[idx].stock
+        else if(isNotEmpty(stockClient[list[idx]._id])) {
+            maxCount = stockClient[list[idx]._id]
         }
         else if(isNotEmpty(limitItemClient[list[idx]._id])) {
             maxCount = limitItemClient[list[idx]._id]
@@ -322,15 +324,23 @@ const Catalog = React.memo((props) => {
     useEffect(()=>{
         (async()=>{
             limitItemClient = {}
+            stockClient = {}
             if(client) {
-                const res = await getLimitItemClients({client: client._id, organization: organization._id})
+                let res = await getLimitItemClients({client: client._id, organization: organization._id})
                 if(res) {
                     for(let i=0;i<res.length;i++){
                         limitItemClient[res[i].item._id] = res[i].limit
                     }
                 }
+                res = await getStocks({client: client._id, search: '', organization: organization._id})
+                if(res&&res.stocks) {
+                    for(let i=0;i<res.stocks.length;i++){
+                        stockClient[res.stocks[i].item._id] = res.stocks[i].count
+                    }
+                }
             }
             setLimitItemClient({...limitItemClient})
+            setStockClient({...stockClient})
         })()
     },[client])
     return (
@@ -491,8 +501,8 @@ const Catalog = React.memo((props) => {
                                                             Упаковок: {basket[row._id]?(basket[row._id].count/(row.packaging?row.packaging:1)).toFixed(1):0}
                                                         </div>
                                                         {
-                                                            isNotEmpty(row.stock)?<div className={classes.stock}>
-                                                                Остаток: {row.stock}
+                                                            isNotEmpty(stockClient[row._id])?<div className={classes.stock}>
+                                                                Остаток: {stockClient[row._id]}
                                                             </div>:null
                                                         }
                                                         {

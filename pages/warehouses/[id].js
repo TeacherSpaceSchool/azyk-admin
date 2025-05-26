@@ -2,32 +2,29 @@ import Head from 'next/head';
 import React, { useState, useEffect, useRef } from 'react';
 import App from '../../layouts/App';
 import pageListStyle from '../../src/styleMUI/statistic/statisticsList'
-import {getItemsForStocks, getStocks} from '../../src/gql/stock'
-import CardStock from '../../components/stock/CardStock'
+import {getWarehouses} from '../../src/gql/warehouse'
+import CardWarehouse from '../../components/warehouse/CardWarehouse'
 import { connect } from 'react-redux'
 import Router from 'next/router'
 import { urlMain } from '../../redux/constants/other'
 import LazyLoad from 'react-lazyload';
 import { forceCheck } from 'react-lazyload';
-import CardStockPlaceholder from '../../components/stock/CardStockPlaceholder'
+import CardWarehousePlaceholder from '../../components/warehouse/CardWarehousePlaceholder'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
-import {getBrands, getItems} from "../../src/gql/items";
-import {getWarehouses} from "../../src/gql/warehouse";
 const height = 186
 
-const Stock = React.memo((props) => {
-    const { profile } = props.user;
+const Warehouse = React.memo((props) => {
     const classes = pageListStyle();
     const { data } = props;
-    let [list, setList] = useState(data.stocks);
+    let [list, setList] = useState(data.warehouses);
     const { search } = props.app;
     const router = useRouter()
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     const initialRender = useRef(true);
     const getList = async ()=>{
-        setList((await getStocks({organization: router.query.id, search})).stocks)
+        setList(await getWarehouses({organization: router.query.id, search}))
         setPagination(100);
         forceCheck();
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
@@ -61,32 +58,27 @@ const Stock = React.memo((props) => {
         }
     }
     return (
-        <App checkPagination={checkPagination} searchShow={true} filters={data.filterStock} sorts={data.sortStock} pageName='Остатки'>
+        <App checkPagination={checkPagination} searchShow={true} pageName='Склады'>
             <Head>
-                <title>Остатки</title>
+                <title>Склады</title>
                 <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:title' content='Остатки' />
+                <meta property='og:title' content='Склады' />
                 <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
                 <meta property='og:type' content='website' />
                 <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property="og:url" content={`${urlMain}/stocks/${router.query.id}`} />
-                <link rel='canonical' href={`${urlMain}/stocks/${router.query.id}`}/>
+                <meta property="og:url" content={`${urlMain}/warehouses/${router.query.id}`} />
+                <link rel='canonical' href={`${urlMain}/warehouses/${router.query.id}`}/>
             </Head>
             <div className='count'>
                 {`Всего: ${list.length}`}
             </div>
             <div className={classes.page}>
-                {
-                    ['admin', 'суперорганизация', 'организация'].includes(profile.role)?
-                        <CardStock list={list} setList={setList} warehouses={data.warehouses} items={data.itemsForStocks} organization={router.query.id}/>
-                        :
-                        null
-                }
+                <CardWarehouse list={list} setList={setList} organization={router.query.id}/>
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardStockPlaceholder height={height}/>}>
-                                <CardStock list={list} idx={idx} key={element._id} warehouses={data.warehouses}  items={data.itemsForStocks} organization={router.query.id} setList={setList} element={element}/>
+                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardWarehousePlaceholder height={height}/>}>
+                                <CardWarehouse list={list} idx={idx} key={element._id} items={data.itemsForWarehouses} organization={router.query.id} setList={setList} element={element}/>
                             </LazyLoad>
                         )}
                 ):null}
@@ -95,9 +87,9 @@ const Stock = React.memo((props) => {
     )
 })
 
-Stock.getInitialProps = async function(ctx) {
+Warehouse.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin', 'суперорганизация', 'организация', 'менеджер', 'агент'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin', 'суперорганизация', 'организация'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -107,9 +99,7 @@ Stock.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            warehouses: await getWarehouses({organization: ctx.query.id, search: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-            ...(await getStocks({organization: ctx.query.id, search: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)),
-            ...(await getItemsForStocks({organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)),
+            warehouses: await getWarehouses({organization: ctx.query.id, search: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
         }
     };
 };
@@ -121,4 +111,4 @@ function mapStateToProps (state) {
     }
 }
 
-export default connect(mapStateToProps)(Stock);
+export default connect(mapStateToProps)(Warehouse);

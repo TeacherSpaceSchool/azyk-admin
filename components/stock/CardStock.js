@@ -16,10 +16,14 @@ import {addStock, deleteStock, setStock} from '../../src/gql/stock';
 
 const CardStock = React.memo((props) => {
     const classes = cardCategoryStyle();
-    const { element, setList, organization, items, idx, list } = props;
+    const { element, setList, organization, items, idx, list, warehouses } = props;
     const { isMobileApp } = props.app;
     //addCard
     let [count, setCount] = useState(element?element.count:'');
+    let [warehouse, setWarehouse] = useState(element?element.warehouse:undefined);
+    let handleWarehouse =  (warehouse) => {
+        setWarehouse(warehouse)
+    };
     let [item, setItem] = useState(element?element.item:undefined);
     let handleItem =  (item) => {
         setItem(item)
@@ -30,6 +34,35 @@ const CardStock = React.memo((props) => {
             <Card className={isMobileApp?classes.cardM:classes.cardD}>
                 <CardActionArea>
                     <CardContent>
+                        {
+                            element?
+                                <TextField
+                                    label='Склад'
+                                    value={warehouse?warehouse.name:'Основной'}
+                                    className={classes.input}
+                                    inputProps={{
+                                        'aria-label': 'description',
+                                        readOnly: true,
+                                    }}
+                                />
+                                :
+                                <Autocomplete
+                                    className={classes.input}
+                                    options={warehouses}
+                                    getOptionLabel={option => option.name}
+                                    value={warehouse}
+                                    onChange={(event, newValue) => {
+                                        handleWarehouse(newValue)
+                                    }}
+                                    noOptionsText='Ничего не найдено'
+                                    renderInput={params => (
+                                        <TextField {...params} label='Выберите склад' fullWidth />
+                                    )}
+                                />
+
+                        }
+                        <br/>
+                        <br/>
                         {
                             element?
                                 <TextField
@@ -105,10 +138,11 @@ const CardStock = React.memo((props) => {
                                         let element = {
                                             count: checkFloat(count),
                                             organization,
-                                            item: item._id
+                                            item: item._id,
+                                            warehouse: warehouse._id
                                         }
                                         let res = await addStock(element)
-                                        if (res)
+                                        if (res&&res.addStock)
                                             setList([res.addStock, ...list])
                                     }
                                     setCount('')

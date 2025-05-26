@@ -32,6 +32,7 @@ import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import TargetIcon from '@material-ui/icons/TrackChanges';
 import DashboardIcon from '@material-ui/icons/Dashboard';
+import WarehousesIcon from '@material-ui/icons/Home';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
@@ -414,6 +415,19 @@ const MyDrawer = React.memo((props) => {
                                 <ListItem style={{background: router.pathname.includes('stocks')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
                                     <ListItemIcon><DashboardIcon color='inherit'/></ListItemIcon>
                                     <ListItemText primary='Остатки' />
+                                </ListItem>
+                            </Link>
+                            <Divider/>
+                        </>
+                        :null
+                }
+                {
+                    ['admin', 'суперорганизация', 'организация'].includes(profile.role)?
+                        <>
+                            <Link href={`/warehouses${'admin'!==profile.role?'/[id]':''}`} as={`/warehouses${profile.organization?`/${profile.organization}`:''}`}>
+                                <ListItem style={{background: router.pathname.includes('warehouses')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
+                                    <ListItemIcon><WarehousesIcon color='inherit'/></ListItemIcon>
+                                    <ListItemText primary='Склады' />
                                 </ListItem>
                             </Link>
                             <Divider/>

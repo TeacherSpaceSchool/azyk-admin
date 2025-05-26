@@ -26,8 +26,35 @@ const ItemStatistic = React.memo((props) => {
     const { profile } = props.user;
     const initialRender = useRef(true);
     let [activeOrganization, setActiveOrganization] = useState(data.activeOrganization);
-    let [dateStart, setDateStart] = useState(data.dateStart);
-    let [dateType, setDateType] = useState('day');
+    const [dateRange, setDateRange] = useState({ start: data.dateStart, end: null });
+    const handleDateRange = (type, value) => {
+        let start = dateRange.start;
+        let end = dateRange.end;
+
+        if (type === 'start') {
+            start = value || pdDatePicker(new Date());
+        } else {
+            end = value;
+        }
+
+        if (start && end) {
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+
+            if (endDate < startDate) {
+                endDate.setDate(startDate.getDate() + 1);
+                end = pdDatePicker(endDate);
+            } else {
+                const maxEnd = new Date(startDate);
+                maxEnd.setMonth(maxEnd.getMonth() + 1);
+                if (endDate > maxEnd) {
+                    end = pdDatePicker(maxEnd);
+                }
+            }
+        }
+
+        setDateRange({ start, end });
+    };
     let [statisticItem, setStatisticItem] = useState(undefined);
     let [showStat, setShowStat] = useState(false);
     let [organization, setOrganization] = useState({_id: 'all'});
@@ -37,14 +64,14 @@ const ItemStatistic = React.memo((props) => {
                 await showLoad(true)
                 setStatisticItem((await getStatisticItem({
                     company: organization ? organization._id : 'all',
-                    dateStart: dateStart ? dateStart : null,
-                    dateType: dateType,
+                    dateStart: dateRange.start ? dateRange.start : null,
+                    dateEnd: dateRange.end ? dateRange.end : null,
                     online: filter,
                     city: city
                 })).statisticItem)
                 await showLoad(false)
         })()
-    },[organization, dateStart, dateType, filter, activeOrganization])
+    },[organization, dateRange, filter, activeOrganization])
     useEffect(()=>{
         if(process.browser){
             let appBody = document.getElementsByClassName('App-body')
@@ -80,21 +107,10 @@ const ItemStatistic = React.memo((props) => {
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     <div className={classes.row}>
-                        <Button style={{width: 50, margin: 5}} variant='contained' onClick={()=>setDateType('day')} size='small' color={dateType==='day'?'primary':''}>
-                            День
-                        </Button>
-                        <Button style={{width: 50, margin: 5}} variant='contained' onClick={()=>setDateType('week')} size='small' color={dateType==='week'?'primary':''}>
-                            Неделя
-                        </Button>
-                        <Button style={{width: 50, margin: 5}} variant='contained' onClick={()=>setDateType('month')} size='small' color={dateType==='month'?'primary':''}>
-                            Месяц
-                        </Button>
-                    </div>
-                    <div className={classes.row}>
                         {
                             profile.role === 'admin' ?
                                 <Autocomplete
-                                    className={classes.input}
+                                    className={classes.inputThird}
                                     options={activeOrganization}
                                     getOptionLabel={option => option.name}
                                     value={organization}
@@ -110,17 +126,30 @@ const ItemStatistic = React.memo((props) => {
                                 null
                         }
                         <TextField
-                            className={classes.input}
-                            label='Дата начала'
+                            className={profile.role==='admin'?classes.inputThird:classes.inputHalf}
+                            label='Дата от'
                             type='date'
                             InputLabelProps={{
                                 shrink: true,
                             }}
-                            value={dateStart}
+                            value={dateRange.start}
                             inputProps={{
                                 'aria-label': 'description',
                             }}
-                            onChange={ event => setDateStart(event.target.value) }
+                            onChange={e => handleDateRange('start', e.target.value)}
+                        />
+                        <TextField
+                            className={profile.role==='admin'?classes.inputThird:classes.inputHalf}
+                            label='Дата до'
+                            type='date'
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            value={dateRange.end}
+                            inputProps={{
+                                'aria-label': 'description',
+                            }}
+                            onChange={e => handleDateRange('end', e.target.value)}
                         />
                     </div>
                     {
@@ -139,9 +168,7 @@ const ItemStatistic = React.memo((props) => {
                             showStat?
                                 <>
                                 <div className={classes.rowStatic}>{`Выручка: ${statisticItem.row[0].data[1]} сом`}</div>
-                                <div className={classes.rowStatic}>{`Выполнено: ${statisticItem.row[0].data[2]} шт`}</div>
-                                <div className={classes.rowStatic}>{`Отказ: ${statisticItem.row[0].data[3]} сом`}</div>
-                                <div className={classes.rowStatic}>{`Конс: ${statisticItem.row[0].data[4]} сом`}</div>
+                                <div className={classes.rowStatic}>{`Заказов: ${statisticItem.row[0].data[2]} шт`}</div>
                                 </>
                                 :
                                 null

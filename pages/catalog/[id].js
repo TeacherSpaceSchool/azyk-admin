@@ -29,6 +29,7 @@ import {getAdss} from '../../src/gql/ads'
 import {getСlientDistrict} from '../../src/gql/district';
 import {getSpecialPriceCategories} from '../../src/gql/specialPriceCategory';
 import {getLimitItemClients} from '../../src/gql/limitItemClient';
+import {getStocks} from '../../src/gql/stock';
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
@@ -43,11 +44,11 @@ const Catalog = React.memo((props) => {
     const initialRender = useRef(true);
     const checkMaxCount = (idx) => {
         let maxCount
-        if(isNotEmpty(list[idx].stock)&&isNotEmpty(data.limitItemClient[list[idx]._id])) {
-            maxCount = list[idx].stock<data.limitItemClient[list[idx]._id]?list[idx].stock:data.limitItemClient[list[idx]._id]
+        if(isNotEmpty(data.stockClient[list[idx]._id])&&isNotEmpty(data.limitItemClient[list[idx]._id])) {
+            maxCount = data.stockClient[list[idx]._id]<data.limitItemClient[list[idx]._id]?data.stockClient[list[idx]._id]:data.limitItemClient[list[idx]._id]
         }
-        else if(isNotEmpty(list[idx].stock)) {
-            maxCount = list[idx].stock
+        else if(isNotEmpty(data.stockClient[list[idx]._id])) {
+            maxCount = data.stockClient[list[idx]._id]
         }
         else if(isNotEmpty(data.limitItemClient[list[idx]._id])) {
             maxCount = data.limitItemClient[list[idx]._id]
@@ -430,10 +431,17 @@ Catalog.getInitialProps = async function(ctx) {
         }
     }
 
-    const res = await getLimitItemClients({client: ctx.store.getState().user.profile.client, organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+    let res = await getLimitItemClients({client: ctx.store.getState().user.profile.client, organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
     const limitItemClient = {}
     for(let i=0;i<res.length;i++){
         limitItemClient[res[i].item._id] = res[i].limit
+    }
+    res = await getStocks({client: ctx.store.getState().user.profile.client, search: '', organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+    const stockClient = {}
+    if(res&&res.stocks) {
+        for(let i=0;i<res.stocks.length;i++){
+            stockClient[res.stocks[i].item._id] = res.stocks[i].count
+        }
     }
 
     return {
@@ -443,7 +451,8 @@ Catalog.getInitialProps = async function(ctx) {
             ...await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
             ...await getСlientDistrict({organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
             ...await getAdss({search: '', organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-            limitItemClient
+            limitItemClient,
+            stockClient
         }
     };
 };

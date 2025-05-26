@@ -94,6 +94,11 @@ export const getDistrict = async({_id}, client)=>{
                                     _id
                                     name
                                 }
+                            warehouse
+                                { 
+                                    _id
+                                    name
+                                }
                         }
                     }`,
             })
@@ -158,8 +163,8 @@ export const addDistrict = async(element)=>{
         await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($organization: ID, $client: [ID]!, $name: String!, $agent: ID, $ecspeditor: ID, $manager: ID) {
-                        addDistrict(organization: $organization, client: $client, name: $name, agent: $agent, ecspeditor: $ecspeditor, manager: $manager) {
+                    mutation ($organization: ID, $client: [ID]!, $name: String!, $agent: ID, $ecspeditor: ID, $manager: ID, $warehouse: ID) {
+                        addDistrict(organization: $organization, client: $client, name: $name, agent: $agent, ecspeditor: $ecspeditor, manager: $manager, warehouse: $warehouse) {
                              data
                         }
                     }`})
@@ -174,8 +179,8 @@ export const setDistrict = async(element)=>{
         await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($_id: ID!, $client: [ID], $name: String, $agent: ID, $ecspeditor: ID, $manager: ID) {
-                        setDistrict(_id: $_id, client: $client, name: $name, agent: $agent, ecspeditor: $ecspeditor, manager: $manager) {
+                    mutation ($_id: ID!, $client: [ID], $name: String, $agent: ID, $ecspeditor: ID, $manager: ID, $warehouse: ID) {
+                        setDistrict(_id: $_id, client: $client, name: $name, agent: $agent, ecspeditor: $ecspeditor, manager: $manager, warehouse: $warehouse) {
                              data
                         }
                     }`})
