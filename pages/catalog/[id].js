@@ -409,36 +409,62 @@ Catalog.getInitialProps = async function(ctx) {
     if(ctx.query.search){
         ctx.store.getState().app.search = ctx.query.search
     }
-    let brands = (await getBrands({organization: ctx.query.id, search: ctx.query.search?ctx.query.search:'', sort: ctx.store.getState().app.sort}, ctx.req?await getClientGqlSsr(ctx.req):undefined)).brands
-    const specialPrices = await getSpecialPriceClients({client: ctx.store.getState().user.profile.client, organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+
+    const { client, category } = ctx.store.getState().user.profile
+    const organization = ctx.query.id
+    const search = ctx.query.search || ''
+    const sort = ctx.store.getState().app.sort
+    const gqlClient = ctx.req ? await getClientGqlSsr(ctx.req) : undefined
+
+// Все асинхронные запросы запускаются параллельно
+    const [
+        brandsRes,
+        specialPrices,
+        specialCategoryPrices,
+        limitItemClientRes,
+        stockRes
+        // eslint-disable-next-line no-undef
+    ] = await Promise.all([
+        getBrands({ organization, search, sort }, gqlClient),
+        getSpecialPriceClients({ client, organization }, gqlClient),
+        getSpecialPriceCategories({ category, organization }, gqlClient),
+        getLimitItemClients({ client, organization }, gqlClient),
+        getStocks({ client, search: '', organization }, gqlClient)
+    ])
+
+    const brands = brandsRes.brands || []
+// Обновляем цены по клиентским спецценам
     // eslint-disable-next-line no-undef
-    const specialPriceMap = new Map(
-        specialPrices.map(sp => [sp.item._id, sp.price])
-    )
+    const specialPriceMap = new Map(specialPrices.map(sp => [sp.item._id, sp.price]))
     for (const brand of brands) {
         if (specialPriceMap.has(brand._id)) {
             brand.price = specialPriceMap.get(brand._id)
         }
     }
-    const specialPriceCategories = await getSpecialPriceCategories({category: ctx.store.getState().user.profile.category, organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+
+
+// Обновляем цены по спецценам категории (перезаписывает клиентские)
     // eslint-disable-next-line no-undef
-    const categoryPriceMap = new Map(
-        specialPriceCategories.map(sp => [sp.item._id, sp.price])
-    )
+    const categoryPriceMap = new Map(specialCategoryPrices.map(sp => [sp.item._id, sp.price]))
     for (const brand of brands) {
         if (categoryPriceMap.has(brand._id)) {
             brand.price = categoryPriceMap.get(brand._id)
         }
     }
-    let res = await getLimitItemClients({client: ctx.store.getState().user.profile.client, organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
-    const limitItemClient = Object.fromEntries(res.map(r => [r.item._id, r.limit]))
-    res = await getStocks({client: ctx.store.getState().user.profile.client, search: '', organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
-    const stockClient = {}
-    if(res&&res.stocks) {
-        for(let i=0;i<res.stocks.length;i++){
-            stockClient[res.stocks[i].item._id] = res.stocks[i].count
-        }
-    }
+
+
+// Словарь лимитов на товары
+    const limitItemClient = Object.fromEntries(
+        limitItemClientRes.map(r => [r.item._id, r.limit])
+    )
+
+
+// Словарь остатков
+    const stockClient = stockRes?.stocks
+        ? Object.fromEntries(stockRes.stocks.map(s => [s.item._id, s.count]))
+        : {}
+
+
     return {
         data: {
             brands,
