@@ -411,31 +411,27 @@ Catalog.getInitialProps = async function(ctx) {
     }
     let brands = (await getBrands({organization: ctx.query.id, search: ctx.query.search?ctx.query.search:'', sort: ctx.store.getState().app.sort}, ctx.req?await getClientGqlSsr(ctx.req):undefined)).brands
     const specialPrices = await getSpecialPriceClients({client: ctx.store.getState().user.profile.client, organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
-    while(specialPrices.length) {
-        for(let i=0; i<brands.length; i++){
-            if(specialPrices[0].item._id===brands[i]._id) {
-                brands[i].price = specialPrices[0].price
-                specialPrices.splice(0, 1)
-                break
-            }
+    // eslint-disable-next-line no-undef
+    const specialPriceMap = new Map(
+        specialPrices.map(sp => [sp.item._id, sp.price])
+    )
+    for (const brand of brands) {
+        if (specialPriceMap.has(brand._id)) {
+            brand.price = specialPriceMap.get(brand._id)
         }
     }
     const specialPriceCategories = await getSpecialPriceCategories({category: ctx.store.getState().user.profile.category, organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
-    while(specialPriceCategories.length) {
-        for(let i=0; i<brands.length; i++){
-            if(specialPriceCategories[0].item._id===brands[i]._id) {
-                brands[i].price = specialPriceCategories[0].price
-                specialPriceCategories.splice(0, 1)
-                break
-            }
+    // eslint-disable-next-line no-undef
+    const categoryPriceMap = new Map(
+        specialPriceCategories.map(sp => [sp.item._id, sp.price])
+    )
+    for (const brand of brands) {
+        if (categoryPriceMap.has(brand._id)) {
+            brand.price = categoryPriceMap.get(brand._id)
         }
     }
-
     let res = await getLimitItemClients({client: ctx.store.getState().user.profile.client, organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
-    const limitItemClient = {}
-    for(let i=0;i<res.length;i++){
-        limitItemClient[res[i].item._id] = res[i].limit
-    }
+    const limitItemClient = Object.fromEntries(res.map(r => [r.item._id, r.limit]))
     res = await getStocks({client: ctx.store.getState().user.profile.client, search: '', organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
     const stockClient = {}
     if(res&&res.stocks) {
@@ -443,7 +439,6 @@ Catalog.getInitialProps = async function(ctx) {
             stockClient[res.stocks[i].item._id] = res.stocks[i].count
         }
     }
-
     return {
         data: {
             brands,
