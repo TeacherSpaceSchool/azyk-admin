@@ -40,6 +40,7 @@ const Client = React.memo((props) => {
     const { showSnackBar } = props.snackbarActions;
     let [status, setStatus] = useState(data.client&&data.client.user?data.client.user.status:'');
     let [name, setName] = useState(data.client&&data.client.name?data.client.name:'');
+    let [inn, setInn] = useState(data.client&&data.client.inn?data.client.inn:'');
     let [email, setEmail] = useState(data.client&&data.client.email?data.client.email:'');
     let [phone, setPhone] = useState(data.client&&data.client.phone&&data.client.phone.length>0?data.client.phone:['+996']);
     let addPhone = ()=>{
@@ -303,7 +304,15 @@ const Client = React.memo((props) => {
                                     }} size='small' color='primary'>
                                         Добавить телефон
                                     </Button>
-
+                                    <TextField
+                                        label='ИНН'
+                                        value={inn}
+                                        className={classes.input}
+                                        onChange={(event)=>{setInn(event.target.value)}}
+                                        inputProps={{
+                                            'aria-label': 'description',
+                                        }}
+                                    />
                                     <TextField
                                         label='email'
                                         value={email}
@@ -341,7 +350,8 @@ const Client = React.memo((props) => {
                                                         if (name && name.length > 0 && name !== data.client.name) editElement.name = name
                                                         if (category && category !== data.client.category) editElement.category = category
                                                         editElement.address = address
-                                                        if (email && email.length > 0 && email !== data.client.email) editElement.email = email
+                                                        if (email !== data.client.email) editElement.email = email
+                                                        if (inn !== data.client.inn) editElement.inn = inn
                                                         if (login && login.length > 0 && data.client.user.login !== login) editElement.login = login
                                                         editElement.phone = phone
                                                         if (info && info.length > 0 && info !== data.client.info) editElement.info = info
@@ -405,6 +415,7 @@ const Client = React.memo((props) => {
                                                             if(name.length>0)editElement.name = name
                                                             editElement.address = address
                                                             if(email.length>0)editElement.email = email
+                                                            if(inn.length>0)editElement.inn = inn
                                                             editElement.phone = phone
                                                             if(info.length>0)editElement.info = info
                                                             if(city.length>0)editElement.city = city
@@ -479,6 +490,14 @@ const Client = React.memo((props) => {
                                     </div>
                                     <div className={classes.row}>
                                         <div className={classes.nameField}>
+                                            ИНН:&nbsp;
+                                        </div>
+                                        <div className={classes.value}>
+                                            {inn}
+                                        </div>
+                                    </div>
+                                    <div className={classes.row}>
+                                        <div className={classes.nameField}>
                                             E-mail:&nbsp;
                                         </div>
                                         <div className={classes.value}>
@@ -529,6 +548,7 @@ Client.getInitialProps = async function(ctx) {
                     {
                         name: '',
                         email: '',
+                        inn: '',
                         phone: [],
                         address: [],
                         info: '',

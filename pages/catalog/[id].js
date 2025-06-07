@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import pageListStyle from '../../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat, isNotEmpty} from '../../src/lib';
+import {checkInt, checkFloat, isNotEmpty, isEmpty} from '../../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
@@ -267,92 +267,92 @@ const Catalog = React.memo((props) => {
                     {
                         list?
                             list.map((row, idx) => {
-                            let price
-                            if(basket[row._id]&&basket[row._id].allPrice)
-                                price = basket[row._id].allPrice
-                            else
-                                price = row.price
-                            if(idx<pagination)
-                                return(
-                                    <LazyLoad scrollContainer={'.App-body'} key={row._id} offset={[186, 0]} debounce={0} once={true}  placeholder={<CardCatalogPlaceholder/>}>
-                                        <div style={{width: '100%'}}>
-                                            <div className={classes.line}>
-                                                <img className={classes.media} style={{border: `solid ${row.hit? 'yellow': row.latest? 'green': 'transparent'} 1px`}} src={row.image} onClick={()=>{
-                                                    setFullDialog(row.name, <Image imgSrc={row.image}/>)
-                                                    showFullDialog(true)
-                                                }}/>
-                                                <div className={classes.column} style={{width: 'calc(100% - 142px)'}}>
-                                                    <div className={classes.value}>{row.name}</div>
-                                                    <b className={classes.value}>
-                                                        {`${price} сом`}
-                                                    </b>
-                                                    <div className={classes.line}>
-                                                        <div className={classes.counter}>
-                                                            <div className={classes.counterbtn} onClick={() => {
-                                                                decrement(idx)
-                                                            }}>–
+                                let price
+                                if(basket[row._id]&&basket[row._id].allPrice)
+                                    price = basket[row._id].allPrice
+                                else
+                                    price = row.price
+                                if(idx<pagination&&(isEmpty(data.stockClient[row._id])||data.stockClient[row._id]>0))
+                                    return(
+                                        <LazyLoad scrollContainer={'.App-body'} key={row._id} offset={[186, 0]} debounce={0} once={true}  placeholder={<CardCatalogPlaceholder/>}>
+                                            <div style={{width: '100%'}}>
+                                                <div className={classes.line}>
+                                                    <img className={classes.media} style={{border: `solid ${row.hit? 'yellow': row.latest? 'green': 'transparent'} 1px`}} src={row.image} onClick={()=>{
+                                                        setFullDialog(row.name, <Image imgSrc={row.image}/>)
+                                                        showFullDialog(true)
+                                                    }}/>
+                                                    <div className={classes.column} style={{width: 'calc(100% - 142px)'}}>
+                                                        <div className={classes.value}>{row.name}</div>
+                                                        <b className={classes.value}>
+                                                            {`${price} сом`}
+                                                        </b>
+                                                        <div className={classes.line}>
+                                                            <div className={classes.counter}>
+                                                                <div className={classes.counterbtn} onClick={() => {
+                                                                    decrement(idx)
+                                                                }}>–
+                                                                </div>
+                                                                <input readOnly={!row.apiece} type={isMobileApp?'number':'text'} className={classes.counternmbr}
+                                                                       value={basket[row._id]?basket[row._id].count:''} onChange={(event) => {
+                                                                    setBasketChange(idx, event.target.value)
+                                                                }}/>
+                                                                <div className={classes.counterbtn} onClick={() => {
+                                                                    increment(idx)
+                                                                }}>+
+                                                                </div>
                                                             </div>
-                                                            <input readOnly={!row.apiece} type={isMobileApp?'number':'text'} className={classes.counternmbr}
-                                                                   value={basket[row._id]?basket[row._id].count:''} onChange={(event) => {
-                                                                setBasketChange(idx, event.target.value)
-                                                            }}/>
-                                                            <div className={classes.counterbtn} onClick={() => {
-                                                                increment(idx)
-                                                            }}>+
-                                                            </div>
+                                                            {
+                                                                row.organization.consignation?
+                                                                    <>
+                                                                    &nbsp;&nbsp;&nbsp;
+                                                                    <div className={classes.showCons} style={{color: basket[row._id]&&basket[row._id].showConsignment?'#ffb300':'#000'}} onClick={()=>{
+                                                                        showConsignment(idx)
+                                                                    }}>
+                                                                        КОНС
+                                                                    </div>
+                                                                    </>
+                                                                    :
+                                                                    null
+                                                            }
                                                         </div>
+                                                        {row.apiece?
+                                                            <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
+                                                                addPackaging(idx)
+                                                            }}>
+                                                                Добавить упаковку
+                                                            </div>
+                                                            :
+                                                            <div className={classes.addPackaging} style={{color: '#ffb300'}}>
+                                                                Упаковок: {basket[row._id]?(basket[row._id].count/row.packaging).toFixed(1):0}
+                                                            </div>
+                                                        }
                                                         {
-                                                            row.organization.consignation?
+                                                            basket[row._id]&&basket[row._id].showConsignment?
                                                                 <>
-                                                                &nbsp;&nbsp;&nbsp;
-                                                                <div className={classes.showCons} style={{color: basket[row._id]&&basket[row._id].showConsignment?'#ffb300':'#000'}} onClick={()=>{
-                                                                    showConsignment(idx)
+                                                                <br/>
+                                                                <div className={classes.row}>
+                                                                    <div className={classes.valuecons}>Консигнация</div>
+                                                                    <div className={classes.counterbtncons} onClick={()=>{decrementConsignment(idx)}}>-</div>
+                                                                    <div className={classes.valuecons}>{basket[row._id]?basket[row._id].consignment:0}&nbsp;шт</div>
+                                                                    <div className={classes.counterbtncons} onClick={()=>{incrementConsignment(idx)}}>+</div>
+                                                                </div>
+                                                                <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
+                                                                    addPackagingConsignment(idx)
                                                                 }}>
-                                                                    КОНС
+                                                                    Добавить упаковку
                                                                 </div>
                                                                 </>
                                                                 :
                                                                 null
                                                         }
                                                     </div>
-                                                    {row.apiece?
-                                                        <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
-                                                            addPackaging(idx)
-                                                        }}>
-                                                            Добавить упаковку
-                                                        </div>
-                                                        :
-                                                        <div className={classes.addPackaging} style={{color: '#ffb300'}}>
-                                                            Упаковок: {basket[row._id]?(basket[row._id].count/row.packaging).toFixed(1):0}
-                                                        </div>
-                                                    }
-                                                    {
-                                                        basket[row._id]&&basket[row._id].showConsignment?
-                                                            <>
-                                                            <br/>
-                                                            <div className={classes.row}>
-                                                                <div className={classes.valuecons}>Консигнация</div>
-                                                                <div className={classes.counterbtncons} onClick={()=>{decrementConsignment(idx)}}>-</div>
-                                                                <div className={classes.valuecons}>{basket[row._id]?basket[row._id].consignment:0}&nbsp;шт</div>
-                                                                <div className={classes.counterbtncons} onClick={()=>{incrementConsignment(idx)}}>+</div>
-                                                            </div>
-                                                            <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
-                                                                addPackagingConsignment(idx)
-                                                            }}>
-                                                                Добавить упаковку
-                                                            </div>
-                                                            </>
-                                                            :
-                                                            null
-                                                    }
                                                 </div>
+                                                <br/>
+                                                <Divider/>
+                                                <br/>
                                             </div>
-                                            <br/>
-                                            <Divider/>
-                                            <br/>
-                                        </div>
-                                    </LazyLoad>
-                                )
+                                        </LazyLoad>
+                                    )
                             })
                             :
                             null

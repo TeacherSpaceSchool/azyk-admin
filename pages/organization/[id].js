@@ -48,6 +48,7 @@ const Organization = React.memo((props) => {
     let [onlyIntegrate, setOnlyIntegrate] = useState(data.organization&&data.organization.onlyIntegrate!==null?data.organization.onlyIntegrate:false);
     let [addedClient, setAddedClient] = useState(data.organization&&data.organization.addedClient!==null?data.organization.addedClient:false);
     let [agentSubBrand, setAgentSubBrand] = useState(data.organization&&data.organization.agentSubBrand!==null?data.organization.agentSubBrand:false);
+    let [clientSubBrand, setClientSubBrand] = useState(data.organization&&data.organization.clientSubBrand!==null?data.organization.clientSubBrand:false);
     let [autoIntegrate, setAutoIntegrate] = useState(data.organization&&data.organization.autoIntegrate!==null?data.organization.autoIntegrate:false);
     let [calculateStock, setCalculateStock] = useState(data.organization&&data.organization.calculateStock!==null?data.organization.calculateStock:false);
     let [autoAcceptAgent, setAutoAcceptAgent] = useState(data.organization&&data.organization.autoAcceptAgent!==null?data.organization.autoAcceptAgent:false);
@@ -270,6 +271,17 @@ const Organization = React.memo((props) => {
                                                     />
                                                 }
                                                 label='Подбренды у агента'
+                                            />
+                                            <FormControlLabel
+                                                control={
+                                                    <Switch
+                                                        checked={clientSubBrand}
+                                                        onChange={()=>{setClientSubBrand(!clientSubBrand)}}
+                                                        color='primary'
+                                                        inputProps={{ 'aria-label': 'primary checkbox' }}
+                                                    />
+                                                }
+                                                label='Подбренды у клиента'
                                             />
                                                 <FormControlLabel
                                                     control={
@@ -580,6 +592,7 @@ const Organization = React.memo((props) => {
                                                                 onlyIntegrate,
                                                                 addedClient,
                                                                 agentSubBrand,
+                                                                clientSubBrand,
                                                                 autoIntegrate,
                                                                 calculateStock,
                                                                 autoAcceptAgent,
@@ -628,6 +641,7 @@ const Organization = React.memo((props) => {
                                                     if(onlyIntegrate!==data.organization.onlyIntegrate)editElement.onlyIntegrate = onlyIntegrate
                                                     if(addedClient!==data.organization.addedClient)editElement.addedClient = addedClient
                                                     if(agentSubBrand!==data.organization.agentSubBrand)editElement.agentSubBrand = agentSubBrand
+                                                    if(clientSubBrand!==data.organization.clientSubBrand)editElement.clientSubBrand = clientSubBrand
                                                     if(autoIntegrate!==data.organization.autoIntegrate)editElement.autoIntegrate = autoIntegrate
                                                     if(calculateStock!==data.organization.calculateStock)editElement.calculateStock = calculateStock
                                                     if(autoAcceptAgent!==data.organization.autoAcceptAgent)editElement.autoAcceptAgent = autoAcceptAgent
@@ -785,7 +799,7 @@ Organization.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            ...ctx.query.id!=='new'?await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{organization:{name: '',image: '/static/add.png',address: [],email: [],phone: [],info: '',miniInfo: '',priotiry: 0,minimumOrder: 0,agentHistory: 100, consignation: false,refusal: false,accessToClient: false, onlyDistrict: false, onlyIntegrate: false, addedClient: false, agentSubBrand: false, autoIntegrate: false, autoAcceptNight: false, clientDuplicate: false, divideBySubBrand: false, autoAcceptAgent: false, dateDelivery: false, warehouse: ''}}
+            ...ctx.query.id!=='new'?await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{organization:{name: '',image: '/static/add.png',address: [],email: [],phone: [],info: '',miniInfo: '',priotiry: 0,minimumOrder: 0,agentHistory: 100, consignation: false,refusal: false,accessToClient: false, onlyDistrict: false, onlyIntegrate: false, addedClient: false, agentSubBrand: false, clientSubBrand: false, autoIntegrate: false, autoAcceptNight: false, clientDuplicate: false, divideBySubBrand: false, autoAcceptAgent: false, dateDelivery: false, warehouse: ''}}
         }
 
     };

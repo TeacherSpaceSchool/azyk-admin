@@ -17,8 +17,7 @@ import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../redux/actions/app'
 import { pdDatePicker } from '../../src/lib'
-import {getDistricts} from "../../src/gql/district";
-import {getDistributer} from "../../src/gql/distributer";
+import {getDistricts} from '../../src/gql/district';
 
 const ClientStatistic = React.memo((props) => {
 

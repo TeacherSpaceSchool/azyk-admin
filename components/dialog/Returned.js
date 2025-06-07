@@ -30,7 +30,7 @@ const Returned =  React.memo(
         let [confirmationForwarder, setConfirmationForwarder] = useState(element.confirmationForwarder);
         let [cancelForwarder, setCancelForwarder] = useState(element.cancelForwarder!=undefined&&element.cancelForwarder);
         const width = isMobileApp? (window.innerWidth-112) : 500;
-        const allowOrganization = (['менеджер', 'суперорганизация', 'организация', 'агент'].includes(profile.role)&&((profile.organization===element.organization._id&&!element.distributer)||(element.distributer&&profile.organization===element.distributer._id)))
+        const allowOrganization = (['менеджер', 'суперорганизация', 'организация', 'агент'].includes(profile.role)&&profile.organization===element.organization._id)
         const { showSnackBar } = props.snackbarActions;
         let canculateAllPrice = ()=>{
             allTonnage=0
@@ -143,28 +143,6 @@ const Returned =  React.memo(
                         <div className={classes.value}>{element.organization.name}</div>
                     </div>
                 </a>
-                {
-                    element.sales?
-                        <a href={`/organization/${element.sales._id}`} target='_blank'>
-                            <div className={classes.row}>
-                                <div className={classes.nameField}>Дистрибьютор:&nbsp;</div>
-                                <div className={classes.value}>{element.sales.name}</div>
-                            </div>
-                        </a>
-                        :
-                        null
-                }
-                {
-                    element.provider?
-                        <a href={`/organization/${element.provider._id}`} target='_blank'>
-                            <div className={classes.row}>
-                                <div className={classes.nameField}>Поставщик:&nbsp;</div>
-                                <div className={classes.value}>{element.provider.name}</div>
-                            </div>
-                        </a>
-                        :
-                        null
-                }
                 {
                     element.agent&&element.agent.name?
                         <a href={`/employment/${element.agent._id}`} target='_blank'>

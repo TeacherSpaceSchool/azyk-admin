@@ -91,10 +91,6 @@ export const getRoute = async({_id}, client)=>{
                                     track
                                     forwarder
                                         {_id name}
-                                    sale
-                                        {_id name}
-                                    provider
-                                        {_id name}
                                     organization
                                         {_id name}
                                     cancelForwarder
@@ -147,10 +143,6 @@ export const getRoute = async({_id}, client)=>{
                                     district
                                     track
                                     forwarder
-                                        {_id name}
-                                    sale
-                                        {_id name}
-                                    provider
                                         {_id name}
                                     organization
                                         {_id name}
@@ -273,10 +265,6 @@ export const buildRoute = async({autoTonnage, orders, provider, length})=>{
                                 district
                                 track
                                 forwarder
-                                    {_id name}
-                                sale
-                                    {_id name}
-                                provider
                                     {_id name}
                                 organization
                                     {_id name}

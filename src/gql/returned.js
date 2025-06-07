@@ -49,10 +49,6 @@ export const getReturnedsTrash = async(args, client)=>{
                             district
                             agent
                                 {_id name}
-                            sale
-                                {_id name}
-                            provider
-                                {_id name}
                             organization
                                 {_id name}
                             cancelForwarder
@@ -115,10 +111,6 @@ export const getReturneds = async(args, client)=>{
                                 {_id name}
                             district
                             agent
-                                {_id name}
-                            sale
-                                {_id name}
-                            provider
                                 {_id name}
                             organization
                                 {_id name}
@@ -185,10 +177,6 @@ export const getReturnedsFromDistrict = async(args, client)=>{
                                 {_id name}
                             district
                             agent
-                                {_id name}
-                            sale
-                                {_id name}
-                            provider
                                 {_id name}
                             organization
                                 {_id name}
@@ -368,10 +356,6 @@ export const setReturned = async(element)=>{
                                 {_id name}
                             district
                             agent
-                                {_id name}
-                            sale
-                                {_id name}
-                            provider
                                 {_id name}
                             organization
                                 {_id name}

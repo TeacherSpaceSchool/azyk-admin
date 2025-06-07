@@ -4,9 +4,8 @@ import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import { getActiveOrganization } from '../../src/gql/statistic'
 import { getOrdersForRouting } from '../../src/gql/order'
-import { getRoute, addRoute, buildRoute, listDownload, listUnload, getUnloadingInvoicesFromRouting, setRoute } from '../../src/gql/route'
+import { getRoute, addRoute, buildRoute, listDownload, getUnloadingInvoicesFromRouting, setRoute } from '../../src/gql/route'
 import { getDistricts } from '../../src/gql/district'
-import { getDistributer } from '../../src/gql/distributer'
 import { getEcspeditors } from '../../src/gql/employment'
 import { getAutos } from '../../src/gql/auto'
 import routeStyle from '../../src/styleMUI/route/route'
@@ -65,8 +64,7 @@ const Route = React.memo((props) => {
         setOrders([])
         setSelectedOrders([])
         if(provider){
-            let distributer = (await getDistributer({_id: provider._id})).distributer
-            produsers = [...provider._id!=='super'?[provider]:[], ...distributer?distributer.provider:[]]
+            produsers = [...provider._id!=='super'?[provider]:[]]
             setProdusers([...produsers])
             ecspeditors = (await getEcspeditors({_id: provider._id})).ecspeditors
             if(ecspeditors)

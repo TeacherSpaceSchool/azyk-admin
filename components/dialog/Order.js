@@ -40,7 +40,7 @@ const Order =  React.memo(
         let [cancelClient, setCancelClient] = useState(element.cancelClient!=undefined&&element.cancelClient);
         let [changeOrders, setChangeOrders] = useState(false);
         const width = isMobileApp? (window.innerWidth-112) : 500;
-        const allowOrganization = (['экспедитор', 'менеджер', 'суперорганизация', 'организация', 'агент'].includes(profile.role)&&((profile.organization===element.organization._id&&!element.sale)||(element.sale&&profile.organization===element.sale._id)))
+        const allowOrganization = (['экспедитор', 'менеджер', 'суперорганизация', 'организация', 'агент'].includes(profile.role)&&profile.organization===element.organization._id)
         const { showSnackBar } = props.snackbarActions;
         let canculateAllPrice = ()=>{
             allTonnage=0
@@ -254,28 +254,6 @@ const Order =  React.memo(
                             <div className={classes.nameField}>Экспедитор:&nbsp;</div>
                             <div className={classes.value}>{element.forwarder.name}</div>
                         </div>
-                        :
-                        null
-                }
-                {
-                    element.sale?
-                        <a href={`/organization/${element.sale._id}`} target='_blank'>
-                            <div className={classes.row}>
-                                <div className={classes.nameField}>Дистрибьютор:&nbsp;</div>
-                                <div className={classes.value}>{element.sale.name}</div>
-                            </div>
-                        </a>
-                        :
-                        null
-                }
-                {
-                    element.provider?
-                        <a href={`/organization/${element.provider._id}`} target='_blank'>
-                            <div className={classes.row}>
-                                <div className={classes.nameField}>Поставщик:&nbsp;</div>
-                                <div className={classes.value}>{element.provider.name}</div>
-                            </div>
-                        </a>
                         :
                         null
                 }

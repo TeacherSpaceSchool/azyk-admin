@@ -139,7 +139,7 @@ const CardStock = React.memo((props) => {
                                             count: checkFloat(count),
                                             organization,
                                             item: item._id,
-                                            warehouse: warehouse._id
+                                            warehouse: warehouse?warehouse._id:warehouse
                                         }
                                         let res = await addStock(element)
                                         if (res&&res.addStock)

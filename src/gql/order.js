@@ -49,10 +49,6 @@ export const getOrders = async(args, client)=>{
                             track
                             forwarder
                                 {_id name}
-                            sale
-                                {_id name}
-                            provider
-                                {_id name}
                             organization
                                 {_id name}
                             cancelForwarder
@@ -126,10 +122,6 @@ export const getOrdersFromDistrict = async(args, client)=>{
                             track
                             forwarder
                                 {_id name}
-                            sale
-                                {_id name}
-                            provider
-                                {_id name}
                             organization
                                 {_id name}
                             cancelForwarder
@@ -201,10 +193,6 @@ export const getOrdersTrash = async(args, client)=>{
                             district
                             track
                             forwarder
-                                {_id name}
-                            sale
-                                {_id name}
-                            provider
                                 {_id name}
                             organization
                                 {_id name}
@@ -340,10 +328,6 @@ export const getOrdersForRouting = async(arg)=>{
                             track
                             forwarder
                                 {_id name}
-                            sale
-                                {_id name}
-                            provider
-                                {_id name}
                             organization
                                 {_id name}
                             cancelForwarder
@@ -433,10 +417,6 @@ export const getOrder = async({_id})=>{
                             district
                             track
                             forwarder
-                                {_id name}
-                            sale
-                                {_id name}
-                            provider
                                 {_id name}
                             organization
                                 {_id name consignation refusal minimumOrder}
@@ -614,10 +594,6 @@ export const setOrder = async(element)=>{
                             track
                             forwarder
                                 {_id name}
-                            sale
-                                {_id name}
-                            provider
-                                {_id name}
                             organization
                                 {_id name}
                             cancelForwarder
@@ -681,10 +657,6 @@ export const subscriptionOrder = gql`
                             district
                             track
                             forwarder
-                                {_id name}
-                            sale
-                                {_id name}
-                            provider
                                 {_id name}
                             organization
                                 {_id name}

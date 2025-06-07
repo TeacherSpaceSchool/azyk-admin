@@ -22,7 +22,6 @@ const CardBrand = React.memo((props) => {
     const { isMobileApp } = props.app;
     const { profile } = props.user;
     let [priotiry, setPriotiry] = useState(element.priotiry);
-    console.log(`/${profile.role==='client'?'catalog':'brand'}/[id]`, `/${profile.role==='client'?'catalog':'brand'}/${element._id}`)
     return (
         isMobileApp&&(profile.role==='client'||type==='👁')?
             <Link href={`/${profile.role==='client'?'catalog':'brand'}/[id]`} as={`/${profile.role==='client'?'catalog':'brand'}/${element._id}`}>

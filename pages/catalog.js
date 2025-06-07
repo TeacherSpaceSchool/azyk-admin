@@ -210,6 +210,7 @@ const Catalog = React.memo((props) => {
         }
         setList([...list]);
         setClient(client)
+        setBasket({})
         setOpen(false)
     };
     let [allPrice, setAllPrice] = useState(0);
@@ -419,6 +420,7 @@ const Catalog = React.memo((props) => {
                         data.brandOrganizations.length>1&&profile.agentSubBrand?
                             <>
                             <Autocomplete
+                                style={{marginBottom: 10}}
                                 className={classes.input}
                                 options={data.brandOrganizations}
                                 getOptionLabel={option => option.name}
@@ -430,24 +432,28 @@ const Catalog = React.memo((props) => {
                                     <TextField {...params} label='Выберите организацию' variant='outlined' fullWidth />
                                 )}
                             />
-                                <br/>
                             </>
                             :null
 
                     }
-                    {
-                        organization&&organization.catalog?
-                            <>
-                            <Button className={classes.input} onClick={async()=> {
-                                window.open(organization.catalog, '_blank');
-                            }} size='small' color='primary'>
-                                Открыть каталог
-                            </Button>
-                                <br/>
-                            </>
-                            :
-                            null
-                    }
+                    <div style={{display: 'flex', width: '100%', justifyContent: 'center', marginBottom: 10}}>
+                        {
+                            organization&&organization.catalog?
+                                <Button className={classes.input} onClick={() => window.open(organization.catalog, '_blank')} size='small' color='primary'>
+                                    Открыть каталог
+                                </Button>
+                                :
+                                null
+                        }
+                        {
+                            client?
+                                <Button className={classes.input} onClick={() => window.open(`/client/${client._id}`, '_blank')} size='small' color='primary'>
+                                    Посмотреть клиента
+                                </Button>
+                                :
+                                null
+                        }
+                    </div>
 
 
 

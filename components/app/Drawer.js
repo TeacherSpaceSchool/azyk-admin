@@ -292,19 +292,6 @@ const MyDrawer = React.memo((props) => {
                         :null
                 }
                 {
-                    'admin'===profile.role?
-                        <>
-                        <Link href={'/distributers'} as={'/distributers'}>
-                            <ListItem style={{background: router.pathname.includes('distributer')&&!router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
-                                <ListItemIcon><LocalShipping color='inherit'/></ListItemIcon>
-                                <ListItemText primary='Дистрибьюторы' />
-                            </ListItem>
-                        </Link>
-                        <Divider/>
-                        </>
-                        :null
-                }
-                {
                     ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент', 'ремонтник'].includes(profile.role)?
                         <>
                             <Link href={profile.organization?`/equipments/${profile.organization}`:'/equipments'}>

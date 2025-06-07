@@ -26,7 +26,6 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import Menu from '@material-ui/core/Menu';
 import * as snackbarActions from '../../redux/actions/snackbar'
 import dynamic from 'next/dynamic'
-import { getDistributer } from '../../src/gql/distributer'
 import Button from '@material-ui/core/Button';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -90,10 +89,6 @@ const LogistiOorder = React.memo((props) => {
             if(forwarder){
                 setDistricts((await getDistricts({search: '', sort: '-name', organization: forwarder._id})).districts)
                 organizations = [forwarder]
-                let distributer = (await getDistributer({_id: forwarder._id})).distributer
-                if(distributer){
-                    organizations = [...organizations, ...distributer.provider]
-                }
             }
             setOrganizations(organizations)
             await showLoad(false)

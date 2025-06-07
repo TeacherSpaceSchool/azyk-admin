@@ -27,7 +27,6 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import * as snackbarActions from '../../redux/actions/snackbar'
 import dynamic from 'next/dynamic'
-import { getDistributer } from '../../src/gql/distributer'
 import { checkInt } from '../../src/lib'
 import { forceCheck } from 'react-lazyload';
 
@@ -90,10 +89,6 @@ const DiscountClient = React.memo((props) => {
             if(forwarder){
                 setDistricts((await getDistricts({search: '', sort: '-name', organization: forwarder._id})).districts)
                 organizations = [forwarder]
-                let distributer = (await getDistributer({_id: forwarder._id})).distributer
-                if(distributer){
-                    organizations = [...organizations, ...distributer.provider]
-                }
             }
             setOrganizations(organizations)
             await showLoad(false)
