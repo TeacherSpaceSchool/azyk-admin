@@ -28,7 +28,7 @@ const App = React.memo(props => {
     const { setProfile, logout } = props.userActions;
     const { setIsMobileApp } = props.appActions;
     const { profile, authenticated } = props.user;
-    const { load, search, showAppBar, filter } = props.app;
+    const { load, search, showAppBar, city, filter } = props.app;
     let { checkPagination, sorts, filters, pageName, dates, searchShow, setList, list, defaultOpenSearch, organizations, cityShow, showDistrict, agents, cities } = props;
     const { showFull, show  } = props.mini_dialog;
     const router = useRouter();
@@ -105,7 +105,8 @@ const App = React.memo(props => {
                 subscriptionOrderRes &&
                 subscriptionOrderRes.data &&
                 subscriptionOrderRes.data.reloadOrder &&
-                profile._id !== subscriptionOrderRes.data.reloadOrder.who
+                profile._id !== subscriptionOrderRes.data.reloadOrder.who&&
+                (!city||subscriptionOrderRes.data.reloadOrder.invoice.city===city)
         ) {
             if (router.pathname === '/orders') {
                 if (subscriptionOrderRes.data.reloadOrder.type === 'ADD'&&!search.length&&!filter.length) {
