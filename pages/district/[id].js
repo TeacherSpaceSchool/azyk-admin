@@ -191,13 +191,7 @@ const District = React.memo((props) => {
         <App cityShow cities={router.query.id!=='new'&&data.district&&data.district.organization?data.district.organization.cities:null} searchShow={true} checkPagination={checkPagination} pageName={data.district?router.query.id==='new'?'Добавить':data.district.name:'Ничего не найдено'}>
             <Head>
                 <title>{data.district?router.query.id==='new'?'Добавить':data.district.name:'Ничего не найдено'}</title>
-                <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:title' content={data.district?router.query.id==='new'?'Добавить':data.district.name:'Ничего не найдено'} />
-                <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property="og:url" content={`${urlMain}/district/${router.query.id}`} />
-                <link rel='canonical' href={`${urlMain}/district/${router.query.id}`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={isMobileApp?classes.pageM:classes.pageD}>
                 {data.district?

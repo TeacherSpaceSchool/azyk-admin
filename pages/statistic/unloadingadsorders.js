@@ -50,13 +50,7 @@ const UnloadingAdsOrders = React.memo((props) => {
         <App cityShow pageName='Выгрузка акционных заказов'>
             <Head>
                 <title>Выгрузка акционных заказов</title>
-                <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:title' content='Выгрузка акционных заказов' />
-                <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property="og:url" content={`${urlMain}/unloadingadsorders`} />
-                <link rel='canonical' href={`${urlMain}/unloadingadsorders`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>

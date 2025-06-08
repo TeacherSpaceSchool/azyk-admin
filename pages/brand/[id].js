@@ -65,13 +65,7 @@ const Brand = React.memo((props) => {
         <App cityShow sorts={data.sortItem} checkPagination={checkPagination} searchShow={true} pageName={data.brands[0]?data.brands[0].organization.name:'Ничего не найдено'}>
             <Head>
                 <title>{data.brands[0]?data.brands[0].organization.name:'Ничего не найдено'}</title>
-                <meta name='description' content={data.brands[0]?data.brands[0].organization.info:'Ничего не найдено'} />
-                <meta property='og:title' content={data.brands[0]?data.brands[0].organization.name:'Ничего не найдено'} />
-                <meta property='og:description' content={data.brands[0]?data.brands[0].organization.info:'Ничего не найдено'} />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property="og:url" content={data.brands[0]?data.brands[0].organization.image:`${urlMain}/brand/${router.query.id}`} />
-                <link rel='canonical' href={`${urlMain}/brand/${router.query.id}`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className={classes.page}>
                 {list?list.map((element, idx)=> {

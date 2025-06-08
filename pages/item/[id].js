@@ -104,13 +104,7 @@ const Item = React.memo((props) => {
         <App pageName={data.item!==null?router.query.id==='new'?'Добавить':data.item.name:'Ничего не найдено'}>
             <Head>
                 <title>{data.item!==null?router.query.id==='new'?'Добавить':data.item.name:'Ничего не найдено'}</title>
-                <meta name='description' content={data.item!==null?data.item.info:'Ничего не найдено'} />
-                <meta property='og:title' content={data.item!==null?router.query.id==='new'?'Добавить':data.item.name:'Ничего не найдено'} />
-                <meta property='og:description' content={data.item!==null?data.item.info:'Ничего не найдено'} />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={preview} />
-                <meta property="og:url" content={`${urlMain}/item/${router.query.id}`} />
-                <link rel='canonical' href={`${urlMain}/item/${router.query.id}`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             {
                 (router.query.id!=='new'&&['client', 'admin'].includes(profile.role)&&data.item&&data.item.subCategory)?

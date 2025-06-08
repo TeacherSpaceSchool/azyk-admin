@@ -122,13 +122,7 @@ const Client = React.memo((props) => {
         <App filters={data.filterSubCategory} sorts={data.sortSubCategory} pageName={data.client?data.client.name:'Ничего не найдено'}>
             <Head>
                 <title>{router.query.id==='new'?'Добавить':data.client?data.client.name:'Ничего не найдено'}</title>
-                <meta name='description' content={info}/>
-                <meta property='og:title' content={data.client?data.client.name:'Ничего не найдено'} />
-                <meta property='og:description' content={info} />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={preview?preview:'/static/add.png'} />
-                <meta property="og:url" content={`${urlMain}/client/${router.query.id}`} />
-                <link rel='canonical' href={`${urlMain}/client/${router.query.id}`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={isMobileApp?classes.column:classes.row} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>

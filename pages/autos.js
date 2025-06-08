@@ -46,13 +46,7 @@ const Autos = React.memo((props) => {
         <App cityShow checkPagination={checkPagination} pageName='Транспорт'>
             <Head>
                 <title>Транспорт</title>
-                <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:title' content='Транспорт' />
-                <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property='og:url' content={`${urlMain}/autos`} />
-                <link rel='canonical' href={`${urlMain}/autos`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
                 {`Всего: ${list.length}`}

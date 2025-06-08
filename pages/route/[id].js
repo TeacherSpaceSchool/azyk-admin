@@ -169,13 +169,7 @@ const Route = React.memo((props) => {
         <App checkPagination={checkPagination} pageName={router.query.id==='new'?'Добавить':data.route?data.route.number:'Ничего не найдено'}>
             <Head>
                 <title>{router.query.id==='new'?'Добавить':data.route?data.route.number:'Ничего не найдено'}</title>
-                <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:title' content={router.query.id==='new'?'Добавить':data.route?data.route.number:'Ничего не найдено'} />
-                <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property='og:url' content={`${urlMain}/route/${router.query.id}`} />
-                <link rel='canonical' href={`${urlMain}/route/${router.query.id}`}/>
+                <meta name='robots' content='noindex, nofollow'/>
                 <link rel='stylesheet' href='https://unpkg.com/leaflet@1.2.0/dist/leaflet.css' />
                 <link rel='stylesheet' href='https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css' />
                 <link rel='stylesheet' href='https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css' />

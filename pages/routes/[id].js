@@ -69,13 +69,7 @@ const Routes = React.memo((props) => {
         <App checkPagination={checkPagination} getList={getList} searchShow={true} dates={true} filters={data.filterRoute} sorts={data.sortRoute} pageName='Маршруты экспедитора'>
             <Head>
                 <title>Маршруты экспедитора</title>
-                <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:title' content='Маршруты экспедитора' />
-                <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property="og:url" content={`${urlMain}/routes/${router.query.id}`} />
-                <link rel='canonical' href={`${urlMain}/routes/${router.query.id}`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
                 {`Всего: ${list.length}`}

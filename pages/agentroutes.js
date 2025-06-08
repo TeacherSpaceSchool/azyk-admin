@@ -45,13 +45,7 @@ const AgentRoutes = React.memo((props) => {
         <App cityShow checkPagination={checkPagination} pageName='Маршруты агентов'>
             <Head>
                 <title>Маршруты агентов</title>
-                <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:title' content='Маршруты агентов' />
-                <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property="og:url" content={`${urlMain}/agentroutes`} />
-                <link rel='canonical' href={`${urlMain}/agentroutes`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
                 {`Всего: ${list.length}`}

@@ -137,13 +137,7 @@ const Organization = React.memo((props) => {
         <App filters={data.filterSubCategory} sorts={data.sortSubCategory} pageName={data.organization!==null?router.query.id==='new'?'Добавить':data.organization.name:'Ничего не найдено'}>
             <Head>
                 <title>{data.organization!==null?router.query.id==='new'?'Добавить':data.organization.name:'Ничего не найдено'}</title>
-                <meta name='description' content={info} />
-                <meta property='og:title' content={data.organization!==null?router.query.id==='new'?'Добавить':data.organization.name:'Ничего не найдено'} />
-                <meta property='og:description' content={info} />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={preview} />
-                <meta property="og:url" content={`${urlMain}/organization/${router.query.id}`} />
-                <link rel='canonical' href={`${urlMain}/organization/${router.query.id}`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={isMobileApp?classes.column:classes.row} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>

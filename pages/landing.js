@@ -1,8 +1,14 @@
 import Router from 'next/router'
+import Head from "next/head";
+import React from "react";
 
 const Landing = () => {
     return (
         <div>
+            <Head>
+                <title>Бренды</title>
+                <meta name='robots' content='index, follow'/>
+            </Head>
             Landing
         </div>
     )

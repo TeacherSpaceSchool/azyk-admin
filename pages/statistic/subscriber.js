@@ -43,15 +43,7 @@ const Subscriber = React.memo((props) => {
         <App searchShow={true} checkPagination={checkPagination} pageName='Подписчики'>
             <Head>
                 <title>Подписчики</title>
-                <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:title' content='Подписчики' />
-                <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property='og:image:width' content='512' />
-                <meta property='og:image:height' content='512' />
-                <meta property='og:url' content={`${urlMain}/statistic/subscriber`} />
-                <link rel='canonical' href={`${urlMain}/statistic/subscriber`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count' onClick={()=>setShowStat(!showStat)}>
                 {`Всего: ${list.length}`}

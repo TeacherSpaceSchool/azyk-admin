@@ -104,13 +104,7 @@ const LotteryEdit = React.memo((props) => {
         <App pageName='Лотерея'>
             <Head>
                 <title>Лотерея</title>
-                <meta name='description' content={data.lottery?data.lottery.text:'Ничего не найдено'} />
-                <meta property='og:title' content='Лотерея' />
-                <meta property='og:description' content={data.lottery?data.lottery.text:'Ничего не найдено'} />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={data.lottery.image} />
-                <meta property='og:url' content={`${urlMain}/lottery/${router.query.id}`} />
-                <link rel='canonical' href={`${urlMain}/lottery/${router.query.id}`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                 {

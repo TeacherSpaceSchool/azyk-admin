@@ -7,29 +7,21 @@ import {getOrganization} from '../../src/gql/organization';
 import pageListStyle from '../../src/styleMUI/subcategory/subcategoryList'
 import CardPlanClient from '../../components/planClient/CardPlanClient'
 import { useRouter } from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import { forceCheck } from 'react-lazyload';
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import Router from 'next/router'
 import Fab from '@material-ui/core/Fab';
-import GroupIcon from '@material-ui/icons/Group';
-import SetDistrict from '../../components/dialog/SetDistrict';
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import {bindActionCreators} from 'redux';
-import {getDistricts} from '../../src/gql/district';
-import RemoveIcon from '@material-ui/icons/Clear';
-import Tooltip from '@material-ui/core/Tooltip';
-import SettingsIcon from "@material-ui/icons/Settings";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
+import SettingsIcon from '@material-ui/icons/Settings';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const Plan = React.memo((props) => {
     const classes = pageListStyle();
     const { data } = props;
-    const { profile } = props.user;
     const router = useRouter()
-    const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
     let [list, setList] = useState(data.planClients);
     let [count, setCount] = useState(data.planClientsCount);
     const { search, city, district } = props.app;
@@ -71,13 +63,7 @@ const Plan = React.memo((props) => {
         <App checkPagination={checkPagination} cityShow showDistrict cities={data.organization.cities} searchShow={true} pageName={data.organization.name}>
             <Head>
                 <title>{data.organization.name}</title>
-                <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:title' content={data.organization.name} />
-                <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property='og:url' content={`${urlMain}/statistic/planClients/${router.query.id}`} />
-                <link rel='canonical' href={`${urlMain}/statistic/planClients/${router.query.id}`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className={classes.page}>
                 <div className='count'>

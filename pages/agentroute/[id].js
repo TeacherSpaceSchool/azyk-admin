@@ -142,13 +142,7 @@ const AgentRoute = React.memo((props) => {
         <App cityShow={router.query.id==='new'} searchShow={true} checkPagination={checkPagination} pageName={data.agentRoute?router.query.id==='new'?'Добавить':data.agentRoute.name:'Ничего не найдено'}>
             <Head>
                 <title>{data.agentRoute?router.query.id==='new'?'Добавить':data.agentRoute.district.name:'Ничего не найдено'}</title>
-                <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:title' content={data.agentRoute?router.query.id==='new'?'Добавить':data.agentRoute.district.name:'Ничего не найдено'} />
-                <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property="og:url" content={`${urlMain}/agentroute/${router.query.id}`} />
-                <link rel='canonical' href={`${urlMain}/agentroute/${router.query.id}`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={isMobileApp?classes.pageM:classes.pageD}>
                 <CardContent className={classes.column}>

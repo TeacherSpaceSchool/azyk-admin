@@ -89,13 +89,7 @@ const LotteryEdit = React.memo((props) => {
         <App cityShow={screen==='tickets'} searchShow={screen==='tickets'} checkPagination={checkPagination}  pageName={data.lottery!==null?router.query.id==='new'?'Добавить':'Редактировать':'Ничего не найдено'}>
             <Head>
                 <title>{data.lottery!==null?router.query.id==='new'?'Добавить':'Редактировать':'Ничего не найдено'}</title>
-                <meta name='description' content={data.lottery!==null?'Редактировать':'Ничего не найдено'} />
-                <meta property='og:title' content={data.lottery!==null?router.query.id==='new'?'Добавить':'Редактировать':'Ничего не найдено'} />
-                <meta property='og:description' content={data.lottery!==null?'Редактировать':'Ничего не найдено'} />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={preview} />
-                <meta property="og:url" content={`${urlMain}/lottery/edit/${router.query.id}`} />
-                <link rel='canonical' href={`${urlMain}/lottery/edit/${router.query.id}`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                     <CardContent className={isMobileApp?classes.column:classes.row}>

@@ -66,13 +66,7 @@ const Subcategory = React.memo((props) => {
         <App checkPagination={checkPagination} searchShow={true} filters={data.filterSubCategory} sorts={data.sortSubCategory} pageName={router.query.id==='all'?'Все':data.category?data.category.name:'Ничего не найдено'}>
             <Head>
                 <title>{router.query.id==='all'?'Все':data.category?data.category.name:'Ничего не найдено'}</title>
-                <meta name='description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:title' content={router.query.id==='all'?'Все':data.category!==null?data.category.name:'Ничего не найдено'} />
-                <meta property='og:description' content='Азык – это онлайн платформа для заказа товаров оптом, разработанная специально для малого и среднего бизнеса.  Она объединяет производителей и торговые точки напрямую, сокращая расходы и повышая продажи. Азык предоставляет своим пользователям мощные технологии для масштабирования и развития своего бизнеса.' />
-                <meta property='og:type' content='website' />
-                <meta property='og:image' content={`${urlMain}/static/512x512.png`} />
-                <meta property="og:url" content={`${urlMain}/subcategory/${router.query.id}`} />
-                <link rel='canonical' href={`${urlMain}/subcategory/${router.query.id}`}/>
+                <meta name='robots' content='noindex, nofollow'/>
             </Head>
             {
                 ['client', 'admin'].includes(profile.role)?
