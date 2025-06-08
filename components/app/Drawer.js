@@ -100,7 +100,7 @@ const MyDrawer = React.memo((props) => {
                         :null
                 }
                 {
-                    ['экспедитор', 'суперорганизация', 'организация', 'менеджер', 'агент', 'суперагент', 'суперэкспедитор'].includes(profile.role)?
+                    ['агент', 'суперагент', /*'экспедитор', 'суперорганизация', 'организация', 'менеджер', 'суперэкспедитор'*/].includes(profile.role)?
                         <>
                         <Link href={'/catalog'} as={'/catalog'}>
                             <ListItem style={{background:router.pathname.includes('catalog')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{showDrawer(false)}}>
