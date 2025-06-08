@@ -337,14 +337,11 @@ const Client = React.memo((props) => {
                                             (router.query.id!=='new'&&['суперорганизация', 'организация', 'агент', 'экспедитор', 'admin', 'суперагент'].includes(profile.role))/*||(data.client.user&&profile._id===data.client.user._id)*/?
                                                 <>
                                                 <Button onClick={async()=>{
-                                                    let checkPhone = phone.length
-                                                    if(checkPhone) {
-                                                        checkPhone = true
-                                                        for(let i=0; i<phone.length; i++){
-                                                            checkPhone = validPhone(phone[i])
-                                                        }
+                                                    let checkPhone = true
+                                                    for(let i=0; i<phone.length; i++){
+                                                        checkPhone = validPhone(phone[i])
                                                     }
-                                                    if(name.length>0&&address.length>0&&address[0].length>0&&address[0][0]&&address[0][0].length>0&&address[0][2]&&address[0][2].length>0&&phone.length>0&&checkPhone) {
+                                                    if(name&&address&&address[0]&&address[0][0]&&address[0][2]&&checkPhone) {
                                                         let editElement = {_id: data.client._id}
                                                         if (image) editElement.image = image
                                                         if (name && name.length > 0 && name !== data.client.name) editElement.name = name
@@ -402,14 +399,11 @@ const Client = React.memo((props) => {
                                                 :
                                                 router.query.id==='new'&&(profile.role==='admin'||(profile.addedClient&&['суперорганизация', 'организация', 'агент'].includes(profile.role)))?
                                                     <Button onClick={async()=>{
-                                                        let checkPhone = phone.length
-                                                        if(checkPhone) {
-                                                            checkPhone = true
-                                                            for(let i=0; i<phone.length; i++){
-                                                                checkPhone = validPhone(phone[i])
-                                                            }
+                                                        let checkPhone = true
+                                                        for(let i=0; i<phone.length; i++){
+                                                            checkPhone = validPhone(phone[i])
                                                         }
-                                                        if(name.length>0&&login.length>0&&newPass.length>0&&address.length>0&&address[0][0].length>0&&address[0].length>0&&address[0][2].length>0&&city.length>0&&phone.length>0&&checkPhone){
+                                                        if(name&&login&&newPass&&address&&address[0]&&address[0][0]&&address[0][2]&&city&&checkPhone){
                                                             let editElement = {login: login, password: newPass, category: category}
                                                             if(image!==undefined)editElement.image = image
                                                             if(name.length>0)editElement.name = name
