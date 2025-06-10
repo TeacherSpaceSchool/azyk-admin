@@ -7,9 +7,6 @@ import * as userActions from '../../redux/actions/user'
 import { getNotificationStatistics } from '../../src/gql/notificationStatisticAzyk'
 import pageListStyle from '../../src/styleMUI/notificationStatistic/notificationStatisticList'
 import CardNotificationStatistic from '../../components/notificationStatistic/CardNotificationStatistic'
-import { urlMain } from '../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import CardNotificationStatisticPlaceholder from '../../components/notificationStatistic/CardNotificationStatisticPlaceholder'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import Router from 'next/router'
@@ -18,7 +15,6 @@ const NotificationStatistic = React.memo((props) => {
     const classes = pageListStyle();
     const { data } = props;
     let [list, setList] = useState(data.notificationStatistics);
-    const { profile } = props.user;
     const { search } = props.app;
     useEffect(()=>{
         (async()=>{
@@ -26,7 +22,6 @@ const NotificationStatistic = React.memo((props) => {
             setList((await getNotificationStatistics({search})).notificationStatistics)
         })()
     },[search])
-    let height = 214
     let [pagination, setPagination] = useState(100);
     const checkPagination = ()=>{
         if(pagination<list.length){
@@ -47,9 +42,7 @@ const NotificationStatistic = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                         if(idx<=pagination)
                             return(
-                                <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardNotificationStatisticPlaceholder height={height}/>}>
-                                    <CardNotificationStatistic key={element._id} setList={setList} element={element}/>
-                                </LazyLoad>
+                                <CardNotificationStatistic key={element._id} setList={setList} element={element}/>
                             )}
                 ):null}
             </div>

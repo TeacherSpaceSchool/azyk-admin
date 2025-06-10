@@ -23,16 +23,11 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Router from 'next/router'
 import dynamic from 'next/dynamic'
-import { urlMain } from '../../redux/constants/other'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
-import CardClientPlaceholder from '../../components/client/CardClientPlaceholder'
-import LazyLoad from 'react-lazyload';
 import VerticalAlignBottom from '@material-ui/icons/VerticalAlignBottom';
 import VerticalAlignTop from '@material-ui/icons/VerticalAlignTop';
 import GeoRouteAgent from '../../components/dialog/GeoRouteAgent'
-import { forceCheck } from 'react-lazyload';
-const height = 140
 
 const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
 
@@ -133,11 +128,6 @@ const AgentRoute = React.memo((props) => {
             }
         })()
     },[search, district])
-    useEffect(()=>{
-        (async()=>{
-            forceCheck()
-        })()
-    },[filtredClient])
     return (
         <App cityShow={router.query.id==='new'} searchShow={true} checkPagination={checkPagination} pageName={data.agentRoute?router.query.id==='new'?'Добавить':data.agentRoute.name:'Ничего не найдено'}>
             <Head>
@@ -275,14 +265,7 @@ const AgentRoute = React.memo((props) => {
                                                             null
                                                     }
                                                 </div>
-                                                <LazyLoad scrollContainer={'.App-body'} key={element._id}
-                                                          height={height} offset={[height, 0]} debounce={0}
-                                                          once={true}
-                                                          placeholder={<CardClientPlaceholder height={height}/>}>
-                                                    <div>
-                                                        <CardClient element={element} buy/>
-                                                    </div>
-                                                </LazyLoad>
+                                                <CardClient element={element} buy/>
                                             </div>
                                         )
                                     }

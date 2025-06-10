@@ -5,18 +5,13 @@ import CardDistrict from '../../components/district/CardDistrict'
 import pageListStyle from '../../src/styleMUI/district/districtList'
 import {getDistricts} from '../../src/gql/district'
 import { connect } from 'react-redux'
-import { urlMain } from '../../redux/constants/other'
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Link from 'next/link';
 import Router from 'next/router'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import { useRouter } from 'next/router'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardDistrictPlaceholder from '../../components/district/CardDistrictPlaceholder'
 import initialApp from '../../src/initialApp'
-const height = 210;
 
 const Districts = React.memo((props) => {
     const { profile } = props.user;
@@ -30,7 +25,6 @@ const Districts = React.memo((props) => {
     const getList = async ()=> {
         setList((await getDistricts({organization: router.query.id, search, sort})).districts)
         setPagination(100);
-        forceCheck();
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
     useEffect(()=>{
@@ -74,9 +68,7 @@ const Districts = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardDistrictPlaceholder/>}>
-                                <CardDistrict list={list} idx={idx} setList={setList} key={element._id} element={element}/>
-                            </LazyLoad>
+                            <CardDistrict list={list} idx={idx} setList={setList} key={element._id} element={element}/>
                         )}
                 ):null}
             </div>

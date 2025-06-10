@@ -6,10 +6,6 @@ import pageListStyle from '../src/styleMUI/orders/orderList'
 import {getOrders} from '../src/gql/order'
 import { connect } from 'react-redux'
 import Router from 'next/router'
-import { urlMain } from '../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardOrderPlaceholder from '../components/order/CardOrderPlaceholder'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import ClickNHold from 'react-click-n-hold';
@@ -24,8 +20,6 @@ import * as appActions from '../redux/actions/app'
 import { bindActionCreators } from 'redux'
 import Badge from '@material-ui/core/Badge';
 import CircularProgress from '@material-ui/core/CircularProgress';
-const height = 225
-
 
 const Orders = React.memo((props) => {
     const classes = pageListStyle();
@@ -57,7 +51,6 @@ const Orders = React.memo((props) => {
             setList(list)
             setSimpleStatistic(simpleStatistic);
             (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
-            forceCheck()
             paginationWork.current = true
         }
      }
@@ -153,24 +146,22 @@ const Orders = React.memo((props) => {
                         :
                         list?list.map((element, idx)=> {
                             return(
-                                <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardOrderPlaceholder/>}>
-                                    <ClickNHold
-                                        style={{background: selected.includes(element._id)?'rgba(255, 179, 0, 0.15)':null}}
-                                        time={3}
-                                        onClickNHold={()=>{
-                                            if(profile.role==='admin'&&(element.cancelClient||element.cancelForwarder))
-                                                if(selected.includes(element._id)) {
-                                                    selected = selected.filter((i)=>i!==element._id)
-                                                    setSelected([...selected])
-                                                }
-                                                else
-                                                    setSelected([...selected, element._id])
+                                <ClickNHold
+                                    style={{background: selected.includes(element._id)?'rgba(255, 179, 0, 0.15)':null}}
+                                    time={3}
+                                    onClickNHold={()=>{
+                                        if(profile.role==='admin'&&(element.cancelClient||element.cancelForwarder))
+                                            if(selected.includes(element._id)) {
+                                                selected = selected.filter((i)=>i!==element._id)
+                                                setSelected([...selected])
+                                            }
+                                            else
+                                                setSelected([...selected, element._id])
 
-                                        }}
-                                    >
-                                        <CardOrder list={list} idx={idx} setSelected={setSelected} selected={selected} setList={setList} key={element._id} element={element}/>
-                                    </ClickNHold>
-                                </LazyLoad>
+                                    }}
+                                >
+                                    <CardOrder list={list} idx={idx} setSelected={setSelected} selected={selected} setList={setList} key={element._id} element={element}/>
+                                </ClickNHold>
                             )}
                         ):null
                 }

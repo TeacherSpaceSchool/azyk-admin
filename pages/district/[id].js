@@ -12,7 +12,6 @@ import Card from '@material-ui/core/Card';
 import CardClient from '../../components/client/CardClient';
 import CardContent from '@material-ui/core/CardContent';
 import Checkbox from '@material-ui/core/Checkbox';
-import LazyLoad from 'react-lazyload';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
@@ -24,13 +23,9 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Router from 'next/router'
 import dynamic from 'next/dynamic'
-import { urlMain } from '../../redux/constants/other'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
-import CardClientPlaceholder from '../../components/client/CardClientPlaceholder'
-import { forceCheck } from 'react-lazyload';
 import {getWarehouses} from '../../src/gql/warehouse';
-const height = 140
 
 const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
 const GeoRouteAgent = dynamic(() => import('../../components/dialog/GeoRouteAgent'))
@@ -182,11 +177,6 @@ const District = React.memo((props) => {
             }
         })()
     },[search])
-    useEffect(()=>{
-        (async()=>{
-            forceCheck()
-        })()
-    },[filtredClient])
     return (
         <App cityShow cities={router.query.id!=='new'&&data.district&&data.district.organization?data.district.organization.cities:null} searchShow={true} checkPagination={checkPagination} pageName={data.district?router.query.id==='new'?'Добавить':data.district.name:'Ничего не найдено'}>
             <Head>
@@ -349,13 +339,8 @@ const District = React.memo((props) => {
                                                     :
                                                     null
                                                 }
-                                                    <LazyLoad scrollContainer={'.App-body'} key={element._id}
-                                                              height={height} offset={[height, 0]} debounce={0}
-                                                              once={true}
-                                                              placeholder={<CardClientPlaceholder height={height}/>}>
-                                                        <CardClient buy={client.includes(element)} list={filtredClient} element={element}/>
-                                                    </LazyLoad>
-                                                </div>
+                                                <CardClient buy={client.includes(element)} list={filtredClient} element={element}/>
+                                            </div>
                                         )
                                     else return null
                                 }):null}

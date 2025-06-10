@@ -4,7 +4,6 @@ import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import pageListStyle from '../../src/styleMUI/statistic/statistic'
-import { urlMain } from '../../redux/constants/other'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import Router from 'next/router'

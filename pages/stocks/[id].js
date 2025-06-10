@@ -6,16 +6,10 @@ import {getItemsForStocks, getStocks} from '../../src/gql/stock'
 import CardStock from '../../components/stock/CardStock'
 import { connect } from 'react-redux'
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardStockPlaceholder from '../../components/stock/CardStockPlaceholder'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
-import {getBrands, getItems} from "../../src/gql/items";
-import {getWarehouses} from "../../src/gql/warehouse";
-const height = 186
+import {getWarehouses} from '../../src/gql/warehouse';
 
 const Stock = React.memo((props) => {
     const { profile } = props.user;
@@ -29,7 +23,6 @@ const Stock = React.memo((props) => {
     const getList = async ()=>{
         setList((await getStocks({organization: router.query.id, search})).stocks)
         setPagination(100);
-        forceCheck();
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
     useEffect(()=>{
@@ -79,9 +72,7 @@ const Stock = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardStockPlaceholder height={height}/>}>
-                                <CardStock list={list} idx={idx} key={element._id} warehouses={data.warehouses}  items={data.itemsForStocks} organization={router.query.id} setList={setList} element={element}/>
-                            </LazyLoad>
+                            <CardStock list={list} idx={idx} key={element._id} warehouses={data.warehouses}  items={data.itemsForStocks} organization={router.query.id} setList={setList} element={element}/>
                         )}
                 ):null}
             </div>

@@ -6,20 +6,14 @@ import { getOrganizations } from '../../src/gql/organization'
 import pageListStyle from '../../src/styleMUI/organization/orgaizationsList'
 import CardOrganization from '../../components/organization/CardOrganization'
 import Link from 'next/link';
-import { urlMain } from '../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import CardOrganizationPlaceholder from '../../components/organization/CardOrganizationPlaceholder'
-import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import Router from 'next/router'
-import { forceCheck } from 'react-lazyload';
 
 const Integrates = React.memo((props) => {
     const classes = pageListStyle();
     const { data } = props;
     const { city } = props.app;
     let [list, setList] = useState(data.organizations);
-    let height = 80
     let [pagination, setPagination] = useState(100);
     const initialRender = useRef(true);
     useEffect(()=>{
@@ -34,7 +28,6 @@ const Integrates = React.memo((props) => {
     },[city])
     useEffect(()=>{
         setPagination(100)
-        forceCheck()
     },[list])
     const checkPagination = ()=>{
         if(pagination<list.length){
@@ -54,13 +47,11 @@ const Integrates = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardOrganizationPlaceholder height={height}/>}>
-                                <Link href='/statistic/receivedata/[id]' as={`/statistic/receivedata/${element._id}`}>
-                                    <a>
-                                        <CardOrganization key={element._id} setList={setList} element={element}/>
-                                    </a>
-                                </Link>
-                            </LazyLoad>
+                            <Link href='/statistic/receivedata/[id]' as={`/statistic/receivedata/${element._id}`}>
+                                <a>
+                                    <CardOrganization key={element._id} setList={setList} element={element}/>
+                                </a>
+                            </Link>
                         )}
                 ):null}
             </div>

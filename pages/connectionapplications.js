@@ -5,10 +5,6 @@ import { connect } from 'react-redux'
 import { getConnectionApplications, getConnectionApplicationsSimpleStatistic } from '../src/gql/connectionApplication'
 import pageListStyle from '../src/styleMUI/connectionApplication/connectionApplicationList'
 import CardConnectionApplications from '../components/connectionApplication/CardConnectionApplication'
-import { urlMain } from '../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardConnectionApplicationsPlaceholder from '../components/connectionApplication/CardConnectionApplicationPlaceholder'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
@@ -23,7 +19,6 @@ const ConnectionApplications = React.memo((props) => {
     let [list, setList] = useState(data.connectionApplications);
     let [simpleStatistic, setSimpleStatistic] = useState(data.connectionApplicationsSimpleStatistic);
     const { filter, isMobileApp } = props.app;
-    let height = 189
     let [paginationWork, setPaginationWork] = useState(true);
     const checkPagination = async()=>{
         if(paginationWork){
@@ -40,7 +35,6 @@ const ConnectionApplications = React.memo((props) => {
         setSimpleStatistic((await getConnectionApplicationsSimpleStatistic({filter: filter})).connectionApplicationsSimpleStatistic)
         setPaginationWork(true);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-        forceCheck()
     }
     useEffect(()=>{
         (async () => {
@@ -64,9 +58,7 @@ const ConnectionApplications = React.memo((props) => {
                 {
                     list?list.map((element, idx)=> {
                             return(
-                                <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardConnectionApplicationsPlaceholder height={height}/>}>
-                                    <CardConnectionApplications list={list} idx={idx} element={element} setList={setList}/>
-                                </LazyLoad>
+                                <CardConnectionApplications list={list} idx={idx} element={element} setList={setList}/>
                             )}
                     ):null
                 }

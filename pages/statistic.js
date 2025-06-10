@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import App from '../layouts/App';
 import { connect } from 'react-redux'
 import pageListStyle from '../src/styleMUI/statistic/statisticsList'
-import { urlMain } from '../redux/constants/other'
 import Link from 'next/link';
 import Router from 'next/router'
 import initialApp from '../src/initialApp'
@@ -197,11 +196,6 @@ const list = {
         {
             name: 'Сбои',
             link: '/statistic/error',
-            role: ['admin']
-        },
-        {
-            name: 'Себестоимость товара',
-            link: '/statistic/itemscostprice',
             role: ['admin']
         },
         {

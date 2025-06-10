@@ -14,7 +14,7 @@ import {deleteReceivedData, addReceivedDataClient} from '../../src/gql/receiveDa
 
 const CardReceiveData = React.memo((props) => {
     const classes = cardErrorStyle();
-    const { element, idx, list, setList, forceCheck } = props;
+    const { element, idx, list, setList } = props;
     const { isMobileApp } = props.app;
     const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
     const { showSnackBar } = props.snackbarActions;
@@ -113,7 +113,6 @@ const CardReceiveData = React.memo((props) => {
                         if(res.data==='OK') {
                             list.splice(idx, 1)
                             setList([...list])
-                            forceCheck()
                         }
                         else
                             showSnackBar('Ошибка')
@@ -128,7 +127,6 @@ const CardReceiveData = React.memo((props) => {
                         await deleteReceivedData([element._id])
                         list.splice(idx, 1)
                         setList([...list])
-                        forceCheck()
                     }
                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                     showMiniDialog(true)

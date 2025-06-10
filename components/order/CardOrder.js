@@ -198,15 +198,6 @@ const CardOrder = React.memo((props) => {
                                     :
                                     null
                             }
-                            {
-                                element.allSize?
-                                    <div className={classes.row}>
-                                        <div className={classes.nameField}>Кубатура:&nbsp;</div>
-                                        <div className={classes.value}>{element.allSize}&nbsp;см³</div>
-                                    </div>
-                                    :
-                                    null
-                            }
                             </>
                         :
                             null

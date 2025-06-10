@@ -11,15 +11,11 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import {getBrands} from '../../src/gql/items';
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import TextField from '@material-ui/core/TextField';
 import {getClients} from '../../src/gql/client'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { forceCheck } from 'react-lazyload';
 import Divider from '@material-ui/core/Divider';
-import LazyLoad from 'react-lazyload';
-import CardCatalogPlaceholder from '../../components/catalog/CardCatalogPlaceholder'
 import initialApp from '../../src/initialApp'
 import { getBrandOrganizations } from '../../src/gql/items'
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -104,7 +100,6 @@ const Catalog = React.memo((props) => {
     },[filter, search, organization])
     useEffect(()=>{
         setPagination(100)
-        forceCheck()
     },[list])
     let [client, setClient] = useState();
     let handleClient =  (client) => {
@@ -116,33 +111,30 @@ const Catalog = React.memo((props) => {
     let increment = (idx)=>{
         let id = list[idx]._id
         if(!items[id])
-            items[id] = {_id: id, item: list[idx].name, count: 0, allPrice: 0, allTonnage: 0, allSize: 0, weight: checkInt(list[idx].weight), price: list[idx].price, size: checkInt(list[idx].size)}
+            items[id] = {_id: id, item: list[idx].name, count: 0, allPrice: 0, allTonnage: 0, weight: checkInt(list[idx].weight), price: list[idx].price}
         items[id].count+=1
         items[id].allPrice = checkFloat(items[id].count*list[idx].price)
         items[id].allTonnage = checkFloat(items[id].count*items[id].weight)
-        items[id].allSize = checkFloat(items[id].count*items[id].size)
         setItems({...items})
     }
     let decrement = (idx)=>{
         let id = list[idx]._id
         if(!items[id])
-            items[id] = {_id: id, item: list[idx].name, count: 0, allPrice: 0, allTonnage: 0, allSize: 0, weight: checkInt(list[idx].weight), price: list[idx].price, size: checkInt(list[idx].size)}
+            items[id] = {_id: id, item: list[idx].name, count: 0, allPrice: 0, allTonnage: 0, weight: checkInt(list[idx].weight), price: list[idx].price, }
         if(items[id].count>0) {
             items[id].count -= 1
             items[id].allPrice = checkFloat(items[id].count*list[idx].price)
             items[id].allTonnage = checkFloat(items[id].count*items[id].weight)
-            items[id].allSize = checkFloat(items[id].count*items[id].size)
             setItems({...items})
         }
     }
     let setBasketChange= (idx, count)=>{
         let id = list[idx]._id
         if(!items[id])
-            items[id] = {_id: id, item: list[idx].name, count: 0, allPrice: 0, allTonnage: 0, allSize: 0, weight: checkInt(list[idx].weight), price: list[idx].price, size: checkInt(list[idx].size)}
+            items[id] = {_id: id, item: list[idx].name, count: 0, allPrice: 0, allTonnage: 0, weight: checkInt(list[idx].weight), price: list[idx].price}
         items[id].count = checkInt(count)
         items[id].allPrice = checkFloat(items[id].count*list[idx].price)
         items[id].allTonnage = checkFloat(items[id].count*items[id].weight)
-        items[id].allSize = checkFloat(items[id].count*items[id].size)
         setItems({...items})
     }
     useEffect(()=>{
@@ -224,42 +216,40 @@ const Catalog = React.memo((props) => {
                                 price = row.price
                             if(idx<pagination)
                                 return(
-                                    <LazyLoad scrollContainer={'.App-body'} key={row._id} offset={[186, 0]} debounce={0} once={true}  placeholder={<CardCatalogPlaceholder/>}>
-                                        <div>
-                                            <div className={classes.line}>
+                                    <div>
+                                        <div className={classes.line}>
+                                            <a href={`/item/${row._id}`} target='_blank'>
+                                                <img className={classes.media} src={row.image}/>
+                                            </a>
+                                            <div className={classes.column}>
                                                 <a href={`/item/${row._id}`} target='_blank'>
-                                                    <img className={classes.media} src={row.image}/>
+                                                    <div className={classes.value}>{row.name}</div>
                                                 </a>
-                                                <div className={classes.column}>
-                                                    <a href={`/item/${row._id}`} target='_blank'>
-                                                        <div className={classes.value}>{row.name}</div>
-                                                    </a>
-                                                    <b className={classes.value}>
-                                                        {`${price} сом`}
-                                                    </b>
-                                                    <div className={classes.line}>
-                                                        <div className={classes.counter}>
-                                                            <div className={classes.counterbtn} onClick={() => {
-                                                                decrement(idx)
-                                                            }}>–
-                                                            </div>
-                                                            <input readOnly={!row.apiece} type={isMobileApp?'number':'text'} className={classes.counternmbr}
-                                                                   value={items[row._id]?items[row._id].count:''} onChange={(event) => {
-                                                                setBasketChange(idx, event.target.value)
-                                                            }}/>
-                                                            <div className={classes.counterbtn} onClick={() => {
-                                                                increment(idx)
-                                                            }}>+
-                                                            </div>
+                                                <b className={classes.value}>
+                                                    {`${price} сом`}
+                                                </b>
+                                                <div className={classes.line}>
+                                                    <div className={classes.counter}>
+                                                        <div className={classes.counterbtn} onClick={() => {
+                                                            decrement(idx)
+                                                        }}>–
+                                                        </div>
+                                                        <input readOnly={!row.apiece} type={isMobileApp?'number':'text'} className={classes.counternmbr}
+                                                               value={items[row._id]?items[row._id].count:''} onChange={(event) => {
+                                                            setBasketChange(idx, event.target.value)
+                                                        }}/>
+                                                        <div className={classes.counterbtn} onClick={() => {
+                                                            increment(idx)
+                                                        }}>+
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <br/>
-                                            <Divider/>
-                                            <br/>
                                         </div>
-                                    </LazyLoad>
+                                        <br/>
+                                        <Divider/>
+                                        <br/>
+                                    </div>
                                 )
                             }
                         )

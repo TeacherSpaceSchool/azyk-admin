@@ -5,16 +5,11 @@ import CardRoute from '../../components/route/CardRoute'
 import pageListStyle from '../../src/styleMUI/route/routeList'
 import {getRoutes} from '../../src/gql/route'
 import { connect } from 'react-redux'
-import { urlMain } from '../../redux/constants/other'
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Link from 'next/link';
 import Router from 'next/router'
 import { getClientGqlSsr } from '../../src/getClientGQL'
-const height = 210
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardRoutePlaceholder from '../../components/route/CardRoutePlaceholder'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
 
@@ -39,7 +34,6 @@ const Routes = React.memo((props) => {
     }
     const getList = async ()=>{
         setList((await getRoutes({organization: router.query.id, search, sort, filter: filter, date: date, skip: 0})).routes)
-        forceCheck()
         setPaginationWork(true);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
@@ -77,9 +71,7 @@ const Routes = React.memo((props) => {
             <div className={classes.page}>
                 {list?list.map((element, idx)=> {
                     return(
-                        <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardRoutePlaceholder/>}>
-                            <CardRoute list={list} idx={idx} setList={setList} key={element._id} element={element}/>
-                        </LazyLoad>
+                        <CardRoute list={list} idx={idx} setList={setList} key={element._id} element={element}/>
                     )}
                 ):null}
             </div>

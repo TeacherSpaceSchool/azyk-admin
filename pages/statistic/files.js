@@ -2,17 +2,14 @@ import Head from 'next/head';
 import React, { useState, useEffect, useRef } from 'react';
 import App from '../../layouts/App';
 import CardFile from '../../components/file/CardFile';
-import CardFilePlaceholder from '../../components/file/CardFilePlaceholder';
 import { connect } from 'react-redux'
 import pageListStyle from '../../src/styleMUI/file/fileList'
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import initialApp from '../../src/initialApp'
 import { getFiles, clearAllDeactiveFiles } from '../../src/gql/files'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import * as appActions from '../../redux/actions/app'
 import { bindActionCreators } from 'redux'
-import LazyLoad from 'react-lazyload';
 import Fab from '@material-ui/core/Fab';
 import RemoveIcon from '@material-ui/icons/Clear';
 import Confirmation from '../../components/dialog/Confirmation'
@@ -24,7 +21,6 @@ const Files = React.memo((props) => {
     const classes = pageListStyle();
     const { filter } = props.app;
     const { showLoad } = props.appActions;
-    const height = 80
     const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
     const initialRender = useRef(true);
     let [list, setList] = useState(data.files);
@@ -67,9 +63,7 @@ const Files = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardFilePlaceholder height={height}/>}>
-                                <CardFile key={element._id} element={element}/>
-                            </LazyLoad>
+                            <CardFile key={element._id} element={element}/>
                         )}
                 ):null}
             </div>

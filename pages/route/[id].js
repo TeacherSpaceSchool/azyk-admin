@@ -26,7 +26,6 @@ import * as appActions from '../../redux/actions/app'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -99,7 +98,6 @@ const Route = React.memo((props) => {
     let [autos, setAutos] = React.useState([]);
     let [selectAuto, setSelectAuto] = React.useState(data.route?data.route.selectAuto:{});
     let [allPrice, setAllPrice] = useState(0);
-    let [allSize, setAllSize] = useState(0);
     let [allTonnage, setAllTonnage] = useState(0);
     let [allReturnedPrice, setAllReturnedPrice] = useState(0);
     let [dateDelivery, setDateDelivery] = useState(data.route?pdDatePicker(new Date(data.route.dateDelivery)):undefined);
@@ -146,7 +144,6 @@ const Route = React.memo((props) => {
     useEffect(()=>{
         (async ()=>{
             let tonnage = 0;
-            let size = 0;
             let price = 0;
             let returnedPrice = 0;
             for(let i=0; i<selectedOrders.length; i++){
@@ -154,13 +151,10 @@ const Route = React.memo((props) => {
                     price += selectedOrders[i].allPrice
                 if (selectedOrders[i].returnedPrice)
                     returnedPrice += selectedOrders[i].returnedPrice
-                if (selectedOrders[i].allSize)
-                    size += selectedOrders[i].allSize
                 if (selectedOrders[i].allTonnage)
                     tonnage += selectedOrders[i].allTonnage
             }
             setAllPrice(checkFloat(price))
-            setAllSize(checkFloat(size))
             setAllTonnage(checkFloat(tonnage))
             setAllReturnedPrice(checkFloat(returnedPrice))
         })()
@@ -591,16 +585,6 @@ const Route = React.memo((props) => {
                                                 <br/>
                                                 <br/>
                                                 {`Тоннаж: ${allTonnage} кг`}
-                                                </>
-                                                :
-                                                null
-                                        }
-                                        {
-                                            allSize?
-                                                <>
-                                                <br/>
-                                                <br/>
-                                                {`Кубатура: ${allSize} см³`}
                                                 </>
                                                 :
                                                 null

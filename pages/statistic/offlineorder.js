@@ -4,9 +4,6 @@ import App from '../../layouts/App';
 import CardOfflineOrder from '../../components/offlineorder/CardOfflineOrder';
 import pageListStyle from '../../src/styleMUI/offlineorder/offlineOrderList'
 import { connect } from 'react-redux'
-import { urlMain } from '../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import CardOfflineOrderPlaceholder from '../../components/offlineorder/CardOfflineOrderPlaceholder'
 import initialApp from '../../src/initialApp'
 import Router from 'next/router'
 import Fab from '@material-ui/core/Fab';
@@ -43,10 +40,7 @@ const OfflineOrder = React.memo((props) => {
                     </div>
                     {
                         list.map((element, idx) =>
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={120} offset={[120, 0]}
-                                      debounce={0} once={true} placeholder={<CardOfflineOrderPlaceholder/>}>
-                                <CardOfflineOrder idx={idx} element={element} list={list} setList={setList}/>
-                            </LazyLoad>
+                            <CardOfflineOrder idx={idx} element={element} list={list} setList={setList}/>
                         )
                     }
                     </>

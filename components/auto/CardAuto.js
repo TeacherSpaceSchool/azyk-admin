@@ -22,7 +22,6 @@ const CardAuto = React.memo((props) => {
     const { isMobileApp } = props.app;
     const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
     let [number, setNumber] = useState(element&&element.number?element.number:'');
-    let [size, setSize] = useState(element&&element.size?element.size:0);
     let [tonnage, setTonnage] = useState(element&&element.tonnage?element.tonnage:0);
     let [employment, setEmployment] = useState(element&&element.employment?element.employment:undefined);
     return (
@@ -44,16 +43,6 @@ const CardAuto = React.memo((props) => {
                             value={tonnage}
                             className={classes.input}
                             onChange={(event)=>{setTonnage(event.target.value)}}
-                            inputProps={{
-                                'aria-label': 'description',
-                            }}
-                        />
-                        <br/>
-                        <TextField
-                            label='Кубатура'
-                            value={size}
-                            className={classes.input}
-                            onChange={(event)=>{setSize(event.target.value)}}
                             inputProps={{
                                 'aria-label': 'description',
                             }}
@@ -81,7 +70,6 @@ const CardAuto = React.memo((props) => {
                                 if (number.length>0) {
                                     const action = async() => {
                                         let auto = {
-                                            size: checkFloat(size),
                                             tonnage: checkFloat(tonnage),
                                             number: number,
                                             organization: organization
@@ -89,7 +77,6 @@ const CardAuto = React.memo((props) => {
                                         if(employment)
                                             auto.employment = employment._id;
                                         setList([(await addAuto(auto)).addAuto, ...list])
-                                        setSize(0)
                                         setTonnage(0)
                                         setEmployment({})
                                         setNumber('')
@@ -106,7 +93,6 @@ const CardAuto = React.memo((props) => {
                             <>
                             <Button onClick={async()=>{
                                 let editElement = {_id: element._id}
-                                if(size.length>0&&size!=element.size)editElement.size = checkFloat(size)
                                 if(tonnage.length>0&&tonnage!=element.tonnage)editElement.tonnage = checkFloat(tonnage)
                                 if(number.length>0&&number!==element.number)editElement.number = number
                                 if(!element.employment||employment&&employment._id!==element.employment._id)editElement.employment = employment._id

@@ -4,10 +4,9 @@ import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import {getPlanClients, getPlanClientsCount} from '../../src/gql/planClient'
 import {getOrganization} from '../../src/gql/organization';
-import pageListStyle from '../../src/styleMUI/subcategory/subcategoryList'
+import pageListStyle from '../../src/styleMUI/subbrand/subbrandList'
 import CardPlanClient from '../../components/planClient/CardPlanClient'
 import { useRouter } from 'next/router'
-import { forceCheck } from 'react-lazyload';
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import Router from 'next/router'
@@ -42,7 +41,6 @@ const Plan = React.memo((props) => {
         setCount((await getPlanClientsCount({search, skip: 0, city: city, organization: router.query.id, ...district?{district}:{}})).planClientsCount)
         setPaginationWork(true);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-        forceCheck()
     }
     useEffect(()=>{
         if(searchTimeOut)

@@ -34,10 +34,10 @@ const BuyBasket =  React.memo(
         const { showMiniDialog } = props.mini_dialogActions;
         const { showSnackBar } = props.snackbarActions;
         const width = isMobileApp? (window.innerWidth-112) : 500
-        let [coment, setComent] = useState('');
+        let [info, setInfo] = useState('');
         let [inv, setInv] = useState(false);
-        let handleComent =  (event) => {
-            setComent(event.target.value)
+        let handleInfo =  (event) => {
+            setInfo(event.target.value)
         };
         let [paymentMethod, setPaymentMethod] = useState('Наличные');
         let [discount, setDiscount] = useState(undefined);
@@ -123,9 +123,9 @@ const BuyBasket =  React.memo(
                 <Input
                     style={{width: width}}
                     placeholder='Комментарий'
-                    value={coment}
+                    value={info}
                     className={isMobileApp?classes.inputM:classes.inputD}
-                    onChange={handleComent}
+                    onChange={handleInfo}
                     inputProps={{
                         'aria-label': 'description',
                     }}
@@ -206,7 +206,7 @@ const BuyBasket =  React.memo(
                                            inv: inv,
                                            priority: priority,
                                            unite: organization.unite,
-                                           info: coment,
+                                           info: info,
                                            paymentMethod: paymentMethod,
                                            organization: organization._id,
                                            client: client._id,
@@ -220,7 +220,7 @@ const BuyBasket =  React.memo(
                                            inv: inv,
                                            priority: priority,
                                            unite: organization.unite,
-                                           info: coment,
+                                           info: info,
                                            paymentMethod: paymentMethod,
                                            organization: organization._id,
                                            client: client._id,

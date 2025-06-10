@@ -2,18 +2,13 @@ import Head from 'next/head';
 import React, { useState, useEffect, useRef } from 'react';
 import App from '../layouts/App';
 import { connect } from 'react-redux'
-import { getBrandOrganizations/*, getPopularItems */} from '../src/gql/items'
+import { getBrandOrganizations} from '../src/gql/items'
 import pageListStyle from '../src/styleMUI/organization/orgaizationsList'
 import CardBrand from '../components/brand/CardBrand'
-import { urlMain } from '../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardBrandPlaceholder from '../components/brand/CardBrandPlaceholder'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
 import {isNotTestUser, isPWA} from '../src/lib';
-//import CardPopularItem from '../components/items/CardPopularItem'
 
 const Organization = React.memo((props) => {
     const classes = pageListStyle();
@@ -21,38 +16,6 @@ const Organization = React.memo((props) => {
      const { search, filter, sort, isMobileApp, city, device } = props.app;
     const { profile } = props.user;
     let [list, setList] = useState(data.brandOrganizations);
-    /*const popularItemsRef = useRef(null);
-    const widthPopularItemsRef = useRef(0);
-    const searchTimeOutRef = useRef(null);
-    let [widthPopularItem, setWidthPopularItem] = useState(0);
-    useEffect(()=>{
-        if(process.browser&&data.popularItems&&data.popularItems.length>0){
-            if(isMobileApp){
-                let width = document.getElementsByClassName('App-body')
-                width = (width[0].offsetWidth-60)/3
-                setWidthPopularItem(width)
-            }
-            else
-                setWidthPopularItem(100)
-        }
-    },[process.browser]);
-    useEffect(()=>{
-        searchTimeOutRef.current = setInterval(() => {
-            if(popularItemsRef.current){
-                widthPopularItemsRef.current+=(widthPopularItem+20)
-                if(widthPopularItemsRef.current>=(popularItemsRef.current.scrollWidth-popularItemsRef.current.offsetWidth+11))
-                    widthPopularItemsRef.current=0
-                popularItemsRef.current.scrollTo({
-                    top: 0,
-                    left: widthPopularItemsRef.current,
-                    behavior: 'smooth'
-                });
-            }
-        }, 10000)
-        return ()=>{
-            clearInterval(searchTimeOutRef.current)
-        }
-    }, []);*/
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     let [type, setType] = useState('👁');
     const initialRender = useRef(true);
@@ -60,7 +23,6 @@ const Organization = React.memo((props) => {
         setList((await getBrandOrganizations({search, sort, filter: filter, city: city})).brandOrganizations);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         setPagination(100);
-        forceCheck();
     }
     useEffect(()=>{
         (async()=>{
@@ -140,21 +102,11 @@ const Organization = React.memo((props) => {
                     :
                     null
             }
-            {/*
-                profile.role==='client'&&data.popularItems&&data.popularItems.length>0&&widthPopularItem?
-                    <div ref={popularItemsRef} className={classes.populars}>
-                        {data.popularItems.map((element)=> <CardPopularItem widthPopularItem={widthPopularItem} key={element._id} element={element}/>)}
-                    </div>
-                    :
-                    null
-            */}
             <div className={classes.page}>
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={data.height} offset={[data.height, 0]} debounce={0} once={true}  placeholder={<CardBrandPlaceholder height={data.height}/>}>
-                                <CardBrand key={element._id} element={element} idx={idx} list={list} setList={setList} type={type}/>
-                            </LazyLoad>
+                            <CardBrand key={element._id} element={element} idx={idx} list={list} setList={setList} type={type}/>
                         )
                 }):null}
             </div>
@@ -181,7 +133,6 @@ Organization.getInitialProps = async function(ctx) {
         data: {
             height: role==='admin'?149:80,
             ...await getBrandOrganizations({search: '', sort: ctx.store.getState().app.sort, filter: '', city: ctx.store.getState().app.city}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-            //...await getPopularItems(ctx.req?await getClientGqlSsr(ctx.req):undefined),
         }
     };
 };

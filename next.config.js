@@ -63,7 +63,6 @@ module.exports =
                             '/blog': { page: '/blog' },
                             '/organizations': { page: '/organizations' },
                             '/organization/[id]': { page: '/organization/[id]' },
-                            '/subcategory/[id]': { page: '/subcategory/[id]' },
                             '/client/[id]': { page: '/client/[id]' },
                             '/employment/[id]': { page: '/employment/[id]' },
                             '/item/[id]': { page: '/item/[id]' },

@@ -7,12 +7,9 @@ import pageListStyle from '../../src/styleMUI/statistic/statistic'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import initialApp from '../../src/initialApp'
 import CardOrder from '../../components/order/CardOrder'
 import CardReturned from '../../components/returned/CardReturned'
-import CardOrderPlaceholder from '../../components/order/CardOrderPlaceholder'
-import CardReturnedPlaceholder from '../../components/returned/CardReturnedPlaceholder'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import { getActiveOrganization } from '../../src/gql/statistic'
 import { checkInt } from '../../src/lib'
@@ -25,7 +22,6 @@ import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../redux/actions/app'
 import Checkbox from '@material-ui/core/Checkbox';
-import LazyLoad from 'react-lazyload';
 import Fab from '@material-ui/core/Fab';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Menu from '@material-ui/core/Menu';
@@ -33,7 +29,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import * as snackbarActions from '../../redux/actions/snackbar'
 import dynamic from 'next/dynamic'
 
-const height = 225
 const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
 
 const LogistiOorder = React.memo((props) => {
@@ -49,7 +44,6 @@ const LogistiOorder = React.memo((props) => {
     let [price, setPrice] = useState(0);
     let [track, setTrack] = useState(0);
     let [weight, setWeight] = useState(0);
-    let [size, setSize] = useState(0);
     let [lengthList, setLengthList] = useState(0);
     let [selectedOrders, setSelectedOrders] = useState([]);
     let [orders, setOrders] = useState([]);
@@ -121,7 +115,6 @@ const LogistiOorder = React.memo((props) => {
         (async()=>{
             price = 0
             weight = 0
-            size = 0
             lengthList = 0
             for(let i=0; i<orders.length; i++){
                 if(selectedOrders.includes(orders[i]._id)) {
@@ -132,8 +125,6 @@ const LogistiOorder = React.memo((props) => {
                     } else if (orders[i].allPrice) {
                         price += orders[i].allPrice
                     }
-                    if (orders[i].allSize)
-                        size += orders[i].allSize
                     lengthList += 1
                     if (orders[i].allTonnage)
                         weight += orders[i].allTonnage
@@ -141,7 +132,6 @@ const LogistiOorder = React.memo((props) => {
             }
             setPrice(price)
             setWeight(weight)
-            setSize(size)
             setLengthList(lengthList)
         })()
     },[selectedOrders])
@@ -243,20 +233,15 @@ const LogistiOorder = React.memo((props) => {
                                                       setSelectedOrders([...selectedOrders])
                                                   }}
                                         />
-                                        <LazyLoad scrollContainer={'.App-body'} key={element._id}
-                                                  height={height} offset={[height, 0]} debounce={0}
-                                                  once={true}
-                                                  placeholder={filter==='Заказы'?<CardOrderPlaceholder height={height}/>:<CardReturnedPlaceholder/>}>
-                                            {
-                                                type==='Заказы'?
-                                                    <CardOrder element={element}/>
-                                                    :
+                                        {
+                                            type==='Заказы'?
+                                                <CardOrder element={element}/>
+                                                :
                                                 type==='Возвраты'?
                                                     <CardReturned element={element}/>
                                                     :
                                                     null
-                                            }
-                                        </LazyLoad>
+                                        }
                                     </div>
                                 )
                             else return null
@@ -333,11 +318,6 @@ const LogistiOorder = React.memo((props) => {
                                 <br/>
                                 <br/>
                                 {`Тоннаж: ${weight} кг`}
-                                </>:null}
-                                {size?<>
-                                <br/>
-                                <br/>
-                                {`Кубатура: ${size} см³`}
                                 </>:null}
                                 </>
                                 :

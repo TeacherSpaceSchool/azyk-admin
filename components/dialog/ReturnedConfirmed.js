@@ -28,10 +28,10 @@ const ReturnedConfirmed =  React.memo(
         const { showMiniDialog } = props.mini_dialogActions;
         const { classes } = props;
         const width = isMobileApp? (window.innerWidth-112) : 500
-        let [coment, setComent] = useState('');
+        let [info, setInfo] = useState('');
         let [inv, setInv] = useState(false);
-        let handleComent =  (event) => {
-            setComent(event.target.value)
+        let handleInfo =  (event) => {
+            setInfo(event.target.value)
         };
         let [unlock, setUnlock] = useState(false);
         let [dateDelivery, setDateDelivery] = useState(undefined);
@@ -81,9 +81,9 @@ const ReturnedConfirmed =  React.memo(
                 <Input
                     style={{width: width}}
                     placeholder='Комментарий'
-                    value={coment}
+                    value={info}
                     className={isMobileApp?classes.inputM:classes.inputD}
-                    onChange={handleComent}
+                    onChange={handleInfo}
                     inputProps={{
                         'aria-label': 'description',
                     }}
@@ -128,7 +128,7 @@ const ReturnedConfirmed =  React.memo(
                         await addReturned({
                             inv,
                             unite: organization.unite,
-                            info: coment,
+                            info: info,
                             address: client.address[0],
                             organization: organization._id,
                             client: client._id,

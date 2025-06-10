@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
-import cardCategoryStyle from '../../src/styleMUI/subcategory/cardSubcategory'
+import cardStyle from '../../src/styleMUI/subbrand/cardSubbrand'
 import { connect } from 'react-redux'
 import Button from '@material-ui/core/Button';
 import CardActions from '@material-ui/core/CardActions';
@@ -19,7 +19,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import {cities} from "../../src/lib";
 
 const CardIntegrate = React.memo((props) => {
-    const classes = cardCategoryStyle();
+    const classes = cardStyle();
     const { element, setList, organization, items, clients, agents, ecspeditors, list, idx } = props;
     const { isMobileApp } = props.app;
     //addCard

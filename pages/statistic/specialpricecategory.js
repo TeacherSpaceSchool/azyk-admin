@@ -7,17 +7,14 @@ import pageListStyle from '../../src/styleMUI/statistic/statistic'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import initialApp from '../../src/initialApp'
 import CardSpecialPriceCategory from '../../components/specialpricecategory/CardSpecialPriceCategory'
-import CardSpecialPriceCategoryPlaceholder from '../../components/specialpricecategory/CardSpecialPriceCategoryPlaceholder'
 import { getActiveOrganization } from '../../src/gql/statistic'
 import { getItemsForSpecialPriceCategories, getSpecialPriceCategories } from '../../src/gql/specialPriceCategory'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../redux/actions/app'
-import LazyLoad from 'react-lazyload';
 import * as snackbarActions from '../../redux/actions/snackbar'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import FormControl from '@material-ui/core/FormControl';
@@ -25,7 +22,6 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 
-const height = 225
 const categorys = ['A','B','C','D','Horeca']
 
 const SpecialPriceCategory = React.memo((props) => {
@@ -128,19 +124,14 @@ const SpecialPriceCategory = React.memo((props) => {
                             list={specialPriceCategories}/>
                         {specialPriceCategories?specialPriceCategories.map((element, idx)=> {
                             return (
-                                <LazyLoad scrollContainer={'.App-body'} key={element._id}
-                                          height={height} offset={[height, 0]} debounce={0}
-                                          once={true}
-                                          placeholder={<CardSpecialPriceCategoryPlaceholder/>}>
-                                    <CardSpecialPriceCategory
-                                        idx={idx} key={element._id}
-                                        element={element}
-                                        setList={setSpecialPriceCategories}
-                                        organization={organization}
-                                        items={items}
-                                        category={category}
-                                        list={specialPriceCategories}/>
-                                </LazyLoad>
+                                <CardSpecialPriceCategory
+                                    idx={idx} key={element._id}
+                                    element={element}
+                                    setList={setSpecialPriceCategories}
+                                    organization={organization}
+                                    items={items}
+                                    category={category}
+                                    list={specialPriceCategories}/>
                             )
                         }):null}
                     </div>

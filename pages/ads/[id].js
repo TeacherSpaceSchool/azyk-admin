@@ -5,10 +5,6 @@ import CardAds from '../../components/ads/CardAds';
 import pageListStyle from '../../src/styleMUI/ads/adsList'
 import {getAdss} from '../../src/gql/ads'
 import { connect } from 'react-redux'
-import { urlMain } from '../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardAdsPlaceholder from '../../components/ads/CardAdsPlaceholder'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import { getOrganization } from '../../src/gql/organization'
@@ -34,7 +30,6 @@ const Ads = React.memo((props) => {
                 searchTimeOut = setTimeout(async()=>{
                     setList((await getAdss({search, organization: router.query.id})).adss)
                     setPagination(100);
-                    forceCheck();
                     (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
                 }, 500)
                 setSearchTimeOut(searchTimeOut)
@@ -48,7 +43,6 @@ const Ads = React.memo((props) => {
             setPagination(pagination+100)
         }
     }
-    let height = ['организация', 'admin'].includes(profile.role)?400:200
     const router = useRouter()
     return (
         <App checkPagination={checkPagination} searchShow={true} pageName={`Акции${data.organization?` ${data.organization.name}`:''}`}>
@@ -64,9 +58,7 @@ const Ads = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardAdsPlaceholder height={height}/>}>
-                                <CardAds edit={true} list={list} idx={idx}  items={data.brands} organization={router.query.id} setList={setList} key={element._id} element={element}/>
-                            </LazyLoad>
+                            <CardAds edit={true} list={list} idx={idx}  items={data.brands} organization={router.query.id} setList={setList} key={element._id} element={element}/>
                         )}
                 ):null}
             </div>

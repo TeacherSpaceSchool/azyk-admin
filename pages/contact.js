@@ -20,7 +20,6 @@ import TextField from '@material-ui/core/TextField';
 import Confirmation from '../components/dialog/Confirmation'
 import AddSocial from '../components/dialog/AddSocial'
 import Geo from '../components/dialog/Geo'
-import { urlMain } from '../redux/constants/other'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import PhoneIcon from '@material-ui/icons/Phone';
@@ -98,7 +97,7 @@ const Contact = React.memo((props) => {
     const { profile } = props.user;
     const { setMiniDialog, showMiniDialog, setFullDialog, showFullDialog } = props.mini_dialogActions;
     return (
-        <App filters={data.filterSubCategory} sorts={data.sortSubCategory} pageName='Контакты'>
+        <App pageName='Контакты'>
             <Head>
                 <title>Контакты</title>
                 <meta name='robots' content='index, follow'/>

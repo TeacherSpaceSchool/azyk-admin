@@ -9,14 +9,9 @@ import {getBrands} from '../../src/gql/items';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Link from 'next/link';
-import { urlMain } from '../../redux/constants/other'
 import initialApp from '../../src/initialApp'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardItemPlaceholder from '../../components/items/CardItemPlaceholder'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import Router from 'next/router'
-const height = 377;
 
 const Brand = React.memo((props) => {
     const classes = pageListStyle();
@@ -31,7 +26,6 @@ const Brand = React.memo((props) => {
         setList((await getBrands({city: city, organization: router.query.id, search, sort})).brands)
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-        forceCheck();
     }
     useEffect(()=>{
         (async()=>{
@@ -71,9 +65,7 @@ const Brand = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardItemPlaceholder/>}>
-                                <CardItem idx={idx} list={list} setList={setList} key={element._id} element={element}/>
-                            </LazyLoad>
+                            <CardItem idx={idx} list={list} setList={setList} key={element._id} element={element}/>
                         )}
                 ):null}
             </div>

@@ -3,7 +3,6 @@ import React, {useState, useEffect, useRef} from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import initialApp from '../../src/initialApp'
 import { getAgentMapGeos } from '../../src/gql/statistic'
 import Fab from '@material-ui/core/Fab';
@@ -26,7 +25,6 @@ const AgentMapGeoStatistic = React.memo((props) => {
 
     const classes = pageListStyle();
     const { isMobileApp, city, date, organization } = props.app;
-    const { profile } = props.user;
     const { showLoad } = props.appActions;
     const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
     const initialRender = useRef(true);

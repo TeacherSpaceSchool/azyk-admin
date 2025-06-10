@@ -6,7 +6,6 @@ import pageListStyle from '../../src/styleMUI/statistic/statistic'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import initialApp from '../../src/initialApp'
 import Table from '../../components/app/Table'
 import { getStatisticDevice } from '../../src/gql/statistic'
@@ -15,7 +14,6 @@ import * as appActions from '../../redux/actions/app'
 
 const DeviceStatistic = React.memo((props) => {
     const classes = pageListStyle();
-    const { data } = props;
     const { isMobileApp, filter } = props.app;
     let [statisticDevice, setStatisticDevice] = useState(undefined);
     const { showLoad } = props.appActions;

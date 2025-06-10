@@ -5,15 +5,10 @@ import pageListStyle from '../../../src/styleMUI/blog/blogList'
 import {outXMLAdsShoros, districtsOutXMLAdsShoros} from '../../../src/gql/outxmladsazyk'
 import CardOutXMLAds from '../../../components/outXmlAds/CardOutXMLAds'
 import { connect } from 'react-redux'
-import { urlMain } from '../../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardOutXMLAdsPlaceholder from '../../../components/outXmlAds/CardOutXMLAdsPlaceholder'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
 import { useRouter } from 'next/router'
-const height = 189
 
 const OutXMLAds = React.memo((props) => {
     const router = useRouter()
@@ -22,7 +17,6 @@ const OutXMLAds = React.memo((props) => {
     let [list, setList] = useState(data.outXMLAdsShoros);
     let [districts, setDistricts] = useState(data.districts);
     const { search, sort } = props.app;
-    const { profile } = props.user;
     useEffect(()=>{
         (async()=>{
             setList(await outXMLAdsShoros({organization: router.query.id, search}))
@@ -32,7 +26,6 @@ const OutXMLAds = React.memo((props) => {
         (async()=>{
             setDistricts(await districtsOutXMLAdsShoros({organization: router.query.id}))
             setPagination(100)
-            forceCheck()
         })()
     },[list])
     let [pagination, setPagination] = useState(100);
@@ -55,9 +48,7 @@ const OutXMLAds = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                         if(idx<pagination)
                             return(
-                                <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardOutXMLAdsPlaceholder height={height}/>}>
-                                    <CardOutXMLAds key={element._id} list={list} setList={setList}  districts={districts} idx={idx} element={element}/>
-                                </LazyLoad>
+                                <CardOutXMLAds key={element._id} list={list} setList={setList}  districts={districts} idx={idx} element={element}/>
                             )}
                 ):null}
             </div>

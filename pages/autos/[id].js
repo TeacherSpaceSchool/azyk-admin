@@ -6,10 +6,6 @@ import { getAutos } from '../../src/gql/auto'
 import { getEcspeditors } from '../../src/gql/employment'
 import pageListStyle from '../../src/styleMUI/auto/autoList'
 import CardAuto from '../../components/auto/CardAuto'
-import { urlMain } from '../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardAutoPlaceholder from '../../components/auto/CardAutoPlaceholder'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import Router from 'next/router'
 import initialApp from '../../src/initialApp'
@@ -20,15 +16,12 @@ const Autos = React.memo((props) => {
     const { data } = props;
     let [list, setList] = useState(data.autos);
     const { search, sort } = props.app;
-    const { profile } = props.user;
     const router = useRouter()
-    let height = ['организация', 'admin'].includes(profile.role)?213:167
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     const initialRender = useRef(true);
     const getList = async ()=>{
         setList((await getAutos({search, sort, organization: router.query.id})).autos)
         setPagination(100);
-        forceCheck();
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
     useEffect(()=>{
@@ -74,9 +67,7 @@ const Autos = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardAutoPlaceholder height={height}/>}>
-                                <CardAuto organization={router.query.id} list={list} employments={data.ecspeditors} idx={idx} key={element._id} setList={setList} element={element}/>
-                            </LazyLoad>
+                            <CardAuto organization={router.query.id} list={list} employments={data.ecspeditors} idx={idx} key={element._id} setList={setList} element={element}/>
                         )
                 }):null}
             </div>

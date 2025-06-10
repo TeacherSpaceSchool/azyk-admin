@@ -13,7 +13,6 @@ export const getAutos = async({search, sort, organization: organization}, client
                             _id
                             number
                             tonnage
-                            size
                             createdAt
                             employment 
                                 {_id name}
@@ -48,7 +47,6 @@ export const getAuto = async({_id: _id}, client)=> {
                             _id
                             number
                             tonnage
-                            size
                             createdAt
                             employment 
                                 {_id name}
@@ -85,8 +83,8 @@ export const setAuto = async(element)=>{
         await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($_id: ID!, $tonnage: Float, $size: Float, $number: String, $employment: ID) {
-                        setAuto(_id: $_id, tonnage: $tonnage, size: $size, number: $number, employment: $employment) {
+                    mutation ($_id: ID!, $tonnage: Float, $number: String, $employment: ID) {
+                        setAuto(_id: $_id, tonnage: $tonnage, number: $number, employment: $employment) {
                              data
                         }
                     }`})
@@ -101,12 +99,11 @@ export const addAuto = async(element)=>{
         let res = await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($tonnage: Float!, $size: Float!, $number: String!, $organization: ID, $employment: ID) {
-                        addAuto(tonnage: $tonnage, size: $size, number: $number, organization: $organization, employment: $employment) {
+                    mutation ($tonnage: Float!, $number: String!, $organization: ID, $employment: ID) {
+                        addAuto(tonnage: $tonnage, number: $number, organization: $organization, employment: $employment) {
                             _id
                             number
                             tonnage
-                            size
                             createdAt
                             employment 
                                 {_id name}

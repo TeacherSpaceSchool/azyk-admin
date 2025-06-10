@@ -3,17 +3,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import App from '../layouts/App';
 import { connect } from 'react-redux'
 import { getSubBrands } from '../src/gql/subBrand'
-import { getOrganizations } from '../src/gql/organization'
-import pageListStyle from '../src/styleMUI/category/categoryList'
+import {getOrganization, getOrganizations} from '../src/gql/organization'
+import pageListStyle from '../src/styleMUI/subbrand/subbrandList'
 import CardSubBrand from '../components/subBrand/CardSubBrand'
-import { urlMain } from '../redux/constants/other'
 import Router from 'next/router'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardSubBrandPlaceholder from '../components/subBrand/CardSubBrandPlaceholder'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
-const height = 300
 
 const SubBrands = React.memo((props) => {
     const classes = pageListStyle();
@@ -36,7 +31,6 @@ const SubBrands = React.memo((props) => {
         setList((await getSubBrands({search, organization, city})).subBrands);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         setPagination(100);
-        forceCheck();
     }
     useEffect(()=>{
         (async()=>{
@@ -76,15 +70,13 @@ const SubBrands = React.memo((props) => {
                 <div className='count'>
                     {`Всего: ${list.length}`}
                 </div>
-                <CardSubBrand list={list} organizations={organizations} setList={setList}/>
+                <CardSubBrand list={list} organization={data.organization} organizations={organizations} setList={setList}/>
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardSubBrandPlaceholder height={height}/>}>
-                                <CardSubBrand list={list} idx={idx}  key={element._id} setList={setList} element={element} organizations={organizations}/>
-                            </LazyLoad>
-                        )}
-                ):null}
+                            <CardSubBrand list={list} idx={idx}  key={element._id} setList={setList} element={element} organizations={organizations}/>
+                        )
+                }):null}
             </div>
         </App>
     )
@@ -93,8 +85,9 @@ const SubBrands = React.memo((props) => {
 SubBrands.getInitialProps = async function(ctx) {
     await initialApp(ctx)
     let role = ctx.store.getState().user.profile.role
+    let organization = ctx.store.getState().user.profile.organization
     let authenticated = ctx.store.getState().user.authenticated
-    if('admin'!==role)
+    if(!['admin', 'суперорганизация', 'организация'].includes(role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: ['суперагент','агент'].includes(role)?'/catalog':!authenticated?'/contact':'/items/all'
@@ -108,7 +101,8 @@ SubBrands.getInitialProps = async function(ctx) {
         data:
             {
                 ...await getSubBrands({search: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-                ...await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+                ...await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
+                ...organization?await getOrganization({_id: organization}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{}
             },
     };
 };

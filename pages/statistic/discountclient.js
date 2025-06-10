@@ -7,10 +7,8 @@ import pageListStyle from '../../src/styleMUI/statistic/statistic'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import initialApp from '../../src/initialApp'
 import CardClient from '../../components/client/CardClient'
-import CardClientPlaceholder from '../../components/client/CardClientPlaceholder'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import { getActiveOrganization } from '../../src/gql/statistic'
 import { getDistricts, getDistrict } from '../../src/gql/district'
@@ -20,7 +18,6 @@ import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../redux/actions/app'
 import Checkbox from '@material-ui/core/Checkbox';
-import LazyLoad from 'react-lazyload';
 import Fab from '@material-ui/core/Fab';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Menu from '@material-ui/core/Menu';
@@ -28,9 +25,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import * as snackbarActions from '../../redux/actions/snackbar'
 import dynamic from 'next/dynamic'
 import { checkInt } from '../../src/lib'
-import { forceCheck } from 'react-lazyload';
 
-const height = 225
 const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
 const SetDiscountClient = dynamic(() => import('../../components/dialog/SetDiscountClient'))
 
@@ -129,7 +124,6 @@ const DiscountClient = React.memo((props) => {
                         ((element.address.filter(addres=>addres[2]&&addres[2].toLowerCase().includes(search.toLowerCase()))).length>0)
                     )
                 setFiltredClients([...filtredClient])
-                forceCheck()
             }
         })()
     },[search, allClients])
@@ -229,12 +223,7 @@ const DiscountClient = React.memo((props) => {
                                         />
                                         <b style={{color: '#ffb300'}}>{discountClients[element._id]?discountClients[element._id].discount:0}%</b>
                                     </div>
-                                    <LazyLoad scrollContainer={'.App-body'} key={element._id}
-                                              height={height} offset={[height, 0]} debounce={0}
-                                              once={true}
-                                              placeholder={<CardClientPlaceholder/>}>
-                                        <CardClient idx={idx} key={element._id} element={element}/>
-                                    </LazyLoad>
+                                    <CardClient idx={idx} key={element._id} element={element}/>
                                 </div>
                             </div>
                         )

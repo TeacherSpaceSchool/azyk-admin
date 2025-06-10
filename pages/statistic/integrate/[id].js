@@ -4,13 +4,9 @@ import App from '../../../layouts/App';
 import { connect } from 'react-redux'
 import { getOrganization } from '../../../src/gql/organization'
 import { getIntegrate1Cs, getAgentsIntegrate1C, getClientsIntegrate1C, getEcspeditorsIntegrate1C, getItemsIntegrate1C, getIntegrate1CsSimpleStatistic } from '../../../src/gql/integrate1C'
-import pageListStyle from '../../../src/styleMUI/subcategory/subcategoryList'
+import pageListStyle from '../../../src/styleMUI/organization/orgaizationsList'
 import CardIntegrate from '../../../components/integrate/CardIntegrate'
 import { useRouter } from 'next/router'
-import { urlMain } from '../../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardIntegratePlaceholder from '../../../components/integrate/CardIntegratePlaceholder'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
@@ -27,7 +23,6 @@ const Integrate = React.memo((props) => {
     let [clients, setClients] = useState(data.clientsIntegrate1C);
     const { search, filter, city } = props.app;
     let [showStat, setShowStat] = useState(false);
-    let height = 189
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     let [paginationWork, setPaginationWork] = useState(true);
     const checkPagination = async()=>{
@@ -45,7 +40,6 @@ const Integrate = React.memo((props) => {
         setSimpleStatistic((await getIntegrate1CsSimpleStatistic({search, filter}, router.query.id)).integrate1CsSimpleStatistic[0])
         setPaginationWork(true);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-        forceCheck()
         setItems((await getItemsIntegrate1C({organization: router.query.id, city})).itemsIntegrate1C)
         setAgents((await getAgentsIntegrate1C(router.query.id)).agentsIntegrate1C)
         setEcspeditors((await getEcspeditorsIntegrate1C(router.query.id)).ecspeditorsIntegrate1C)
@@ -92,9 +86,7 @@ const Integrate = React.memo((props) => {
                 {
                     list?list.map((element, idx)=> {
                             return(
-                                <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardIntegratePlaceholder height={height}/>}>
-                                    <CardIntegrate list={list} idx={idx} element={element} organization={router.query.id} items={items} clients={clients} agents={agents} ecspeditors={ecspeditors} setList={setList}/>
-                                </LazyLoad>
+                                <CardIntegrate list={list} idx={idx} element={element} organization={router.query.id} items={items} clients={clients} agents={agents} ecspeditors={ecspeditors} setList={setList}/>
                             )}
                     ):null
                 }

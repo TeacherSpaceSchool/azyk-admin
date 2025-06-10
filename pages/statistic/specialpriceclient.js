@@ -7,23 +7,18 @@ import pageListStyle from '../../src/styleMUI/statistic/statistic'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import initialApp from '../../src/initialApp'
 import CardSpecialPriceClient from '../../components/specialpriceclient/CardSpecialPriceClient'
-import CardSpecialPriceClientPlaceholder from '../../components/specialpriceclient/CardSpecialPriceClientPlaceholder'
 import { getActiveOrganization } from '../../src/gql/statistic'
 import { getItemsForSpecialPriceClients, getSpecialPriceClients } from '../../src/gql/specialPrice'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../redux/actions/app'
-import LazyLoad from 'react-lazyload';
 import * as snackbarActions from '../../redux/actions/snackbar'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { getClients } from '../../src/gql/client'
-
-const height = 225
 
 const DiscountClient = React.memo((props) => {
     const classes = pageListStyle();
@@ -177,19 +172,14 @@ const DiscountClient = React.memo((props) => {
                             list={specialPriceClients}/>
                         {specialPriceClients?specialPriceClients.map((element, idx)=> {
                             return (
-                                <LazyLoad scrollContainer={'.App-body'} key={element._id}
-                                          height={height} offset={[height, 0]} debounce={0}
-                                          once={true}
-                                          placeholder={<CardSpecialPriceClientPlaceholder/>}>
-                                    <CardSpecialPriceClient
-                                        idx={idx} key={element._id}
-                                        element={element}
-                                        setList={setSpecialPriceClients}
-                                        organization={organization}
-                                        items={items}
-                                        client={client}
-                                        list={specialPriceClients}/>
-                                </LazyLoad>
+                                <CardSpecialPriceClient
+                                    idx={idx} key={element._id}
+                                    element={element}
+                                    setList={setSpecialPriceClients}
+                                    organization={organization}
+                                    items={items}
+                                    client={client}
+                                    list={specialPriceClients}/>
                             )
                         }):null}
                     </div>

@@ -38,71 +38,36 @@ export const getBrandOrganizations = async({search, filter, city}, client)=>{
     }
 }
 
-export const getPopularItems = async(client)=>{
+export const getItems = async({organization,  search,  sort}, client)=>{
     try{
         client = client? client : new SingletonApolloClient().getClient()
         let res = await client
             .query({
+                variables: {organization, search, sort},
                 query: gql`
-                    query {
-                        popularItems {
+                    query ($organization: ID, $search: String!, $sort: String!) {
+                        items(organization: $organization, search: $search, sort: $sort) {
                             _id
-                            name    
-                            image
-                            organization
-                                {_id}
-                            hit
-                            latest
-                          }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getItems = async({organization, subCategory,  search,  sort}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization, subCategory, search, sort},
-                query: gql`
-                    query ($organization: ID, $subCategory: ID!,$search: String!, $sort: String!) {
-                        items(organization: $organization, subCategory: $subCategory, search: $search, sort: $sort) {
-                            _id
-                            subCategory
-                                {_id name}
                             name
                             status
                             createdAt                  
                             image
-                            info
                             price
                             apiece
                             unit
                             priotiry
                             packaging
-                            reiting
                             subBrand
                                 {_id name}
                             organization
                                 {_id name consignation}
                             hit
                             latest
-                            costPrice
                         }
                         sortItem {
                             name
                             field
                         }
-                        subCategory(_id: $subCategory) {
-                           _id
-                           name
-                           category
-                                {_id name}
-                          }
                     }`,
             })
         return res.data
@@ -121,19 +86,15 @@ export const getItemsTrash = async({search}, client)=>{
                     query ($search: String!) {
                         itemsTrash( search: $search) {
                             _id
-                            subCategory
-                                {_id name}
                             name
                             status
                             createdAt                  
                             image
-                            info
                             price
                             apiece
                             unit
                             priotiry
                             packaging
-                            reiting
                             subBrand
                                 {_id name}
                             organization
@@ -160,8 +121,6 @@ export const getBrands = async({organization,  search,  sort, city}, client)=>{
                     query ($organization: ID!,$search: String!, $sort: String!, $city: String) {
                         brands(organization: $organization, search: $search, sort: $sort, city: $city) {
                             _id
-                            subCategory
-                                {_id name}
                             name
                             status
                             createdAt                  
@@ -172,14 +131,11 @@ export const getBrands = async({organization,  search,  sort, city}, client)=>{
                                 {_id name}
                             packaging
                             image
-                            info
                             price
-                            reiting
                             organization
                                 {_id name info image consignation}
                             hit
                             latest
-                            costPrice
                         }
                         sortItem {
                             name
@@ -207,13 +163,6 @@ export const getItem = async({_id}, client)=>{
                     query ($_id: ID!) {
                         item(_id: $_id) {
                             _id
-                            subCategory
-                                {
-                                    _id 
-                                    name 
-                                    category
-                                        {_id name}
-                                }
                             name
                             status
                             createdAt                  
@@ -222,20 +171,16 @@ export const getItem = async({_id}, client)=>{
                             priotiry
                             image
                             categorys
-                            info
                             price
                             city
-                            costPrice
                             subBrand
                                 {_id name}
-                            reiting
                             organization
                                 {_id name minimumOrder consignation}
                             hit
                             latest
                             packaging
                             weight
-                            size
                         }
                     }`,
             })
@@ -293,14 +238,14 @@ export const onoffItem = async(ids)=>{
     }
 }
 
-export const addItem = async(element, subCategory)=>{
+export const addItem = async(element)=>{
     try{
         const client = new SingletonApolloClient().getClient()
         await client.mutate({
-            variables: {...element, subCategory: subCategory},
+            variables: {...element},
             mutation : gql`
-                    mutation ($costPrice: Float, $subBrand: ID, $categorys: [String]!, $priotiry: Int, $city: String!, $unit: String, $apiece: Boolean, $weight: Float!, $size: Float!, $packaging: Int!, $name: String!, $image: Upload, $info: String!, $price: Float!, $subCategory: ID!, $organization: ID!, $hit: Boolean!, $latest: Boolean!) {
-                        addItem(costPrice: $costPrice, subBrand: $subBrand, categorys: $categorys, priotiry: $priotiry, city: $city, unit: $unit, apiece: $apiece, weight: $weight, size: $size, packaging: $packaging, name: $name, image: $image, info: $info, price: $price, subCategory: $subCategory, organization: $organization, hit: $hit, latest: $latest) {
+                    mutation ($subBrand: ID, $categorys: [String]!, $priotiry: Int, $city: String!, $unit: String, $apiece: Boolean, $weight: Float!, $packaging: Int!, $name: String!, $image: Upload, $price: Float!, $organization: ID!, $hit: Boolean!, $latest: Boolean!) {
+                        addItem(subBrand: $subBrand, categorys: $categorys, priotiry: $priotiry, city: $city, unit: $unit, apiece: $apiece, weight: $weight, packaging: $packaging, name: $name, image: $image, price: $price, organization: $organization, hit: $hit, latest: $latest) {
                              data
                         }
                     }`})
@@ -315,24 +260,8 @@ export const setItem = async(element)=>{
         await client.mutate({
             variables: {...element},
             mutation : gql`
-                    mutation ($costPrice: Float, $categorys: [String], $subBrand: ID, $_id: ID!, $city: String, $priotiry: Int, $unit: String, $apiece: Boolean, $weight: Float, $size: Float, $packaging: Int, $name: String, $image: Upload, $info: String, $price: Float, $subCategory: ID, $organization: ID, $hit: Boolean, $latest: Boolean) {
-                        setItem(costPrice: $costPrice, categorys: $categorys, subBrand: $subBrand, _id: $_id, city: $city, priotiry: $priotiry, unit: $unit, apiece: $apiece, weight: $weight, size: $size, packaging: $packaging, name: $name, image: $image, info: $info, price: $price, subCategory: $subCategory, organization: $organization, hit: $hit, latest: $latest) {
-                             data
-                        }
-                    }`})
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const setItemsCostPrice = async(element)=>{
-    try{
-        const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
-            mutation : gql`
-                    mutation ($itemsCostPrice: [InputItemCostPrice]!) {
-                        setItemsCostPrice(itemsCostPrice: $itemsCostPrice) {
+                    mutation ($categorys: [String], $subBrand: ID, $_id: ID!, $city: String, $priotiry: Int, $unit: String, $apiece: Boolean, $weight: Float, $packaging: Int, $name: String, $image: Upload, $price: Float, $organization: ID, $hit: Boolean, $latest: Boolean) {
+                        setItem(categorys: $categorys, subBrand: $subBrand, _id: $_id, city: $city, priotiry: $priotiry, unit: $unit, apiece: $apiece, weight: $weight, packaging: $packaging, name: $name, image: $image, price: $price, organization: $organization, hit: $hit, latest: $latest) {
                              data
                         }
                     }`})

@@ -5,10 +5,6 @@ import CardFaq from '../components/faq/CardFaq';
 import pageListStyle from '../src/styleMUI/ads/adsList'
 import {getFaqs} from '../src/gql/faq'
 import { connect } from 'react-redux'
-import { urlMain } from '../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardFaqPlaceholder from '../components/faq/CardFaqPlaceholder'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
@@ -31,7 +27,6 @@ const Faqs = React.memo((props) => {
                 searchTimeOut = setTimeout(async()=>{
                     setList((await getFaqs({search})).faqs)
                     setPagination(100);
-                    forceCheck();
                     (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
                 }, 500)
                 setSearchTimeOut(searchTimeOut)
@@ -39,7 +34,6 @@ const Faqs = React.memo((props) => {
             }
         })()
     },[search])
-    let height = profile.role==='admin'?244:125
     let [pagination, setPagination] = useState(100);
     const checkPagination = ()=>{
         if(pagination<list.length){
@@ -60,9 +54,7 @@ const Faqs = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                         if(idx<pagination)
                             return(
-                                <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardFaqPlaceholder height={height}/>}>
-                                    <CardFaq list={list} idx={idx} setList={setList} key={element._id} element={element}/>
-                                </LazyLoad>
+                                <CardFaq list={list} idx={idx} setList={setList} key={element._id} element={element}/>
                             )}
                 ):null}
             </div>

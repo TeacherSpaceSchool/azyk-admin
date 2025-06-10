@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
-import cardSubBrandStyle from '../../src/styleMUI/category/cardCategory'
+import cardSubBrandStyle from '../../src/styleMUI/subbrand/cardSubbrand'
 import { connect } from 'react-redux'
 import Button from '@material-ui/core/Button';
 import CardActions from '@material-ui/core/CardActions';
@@ -18,12 +18,12 @@ import { checkInt } from '../../src/lib'
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import * as lib from '../../src/lib'
 
 const CardSubBrand = React.memo((props) => {
     const classes = cardSubBrandStyle();
     const { element, setList, list, idx, organizations } = props;
     const { isMobileApp } = props.app;
+    const { profile } = props.user;
     //addCard
     let [preview, setPreview] = useState(element?element.image:'/static/add.png');
     let [image, setImage] = useState(undefined);
@@ -44,14 +44,15 @@ const CardSubBrand = React.memo((props) => {
     let handleName =  (event) => {
         setName(event.target.value)
     };
-    let [cities, setCities] = useState(element?element.cities?element.cities:[]:['Бишкек']);
+    let [cities, setCities] = useState(element?element.cities:[]);
     let handleCities =  (event) => {
         setCities(event.target.value)
     };
     let [priotiry, setPriotiry] = useState(element?element.priotiry:0);
     let [minimumOrder, setMinimumOrder] = useState(element?element.minimumOrder:0);
-    let [organization, setOrganization] = useState(element?element.organization:{});
+    let [organization, setOrganization] = useState(element?element.organization:props.organization?props.organization:{});
     let handleOrganization =  (event) => {
+        setCities([])
         setOrganization({_id: event.target.value, name: event.target.name})
     };
     const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
@@ -92,7 +93,7 @@ const CardSubBrand = React.memo((props) => {
                             {!element?
                                 <FormControl className={isMobileApp?classes.inputM:classes.input}>
                                     <InputLabel>Организация</InputLabel>
-                                    <Select value={organization._id} onChange={handleOrganization}>
+                                    <Select value={organization._id} onChange={handleOrganization} inputProps={{readOnly: !!profile.organization}}>
                                         {organizations.map((element)=>
                                             <MenuItem key={element._id} value={element._id} ola={element.name}>{element.name}</MenuItem>
                                         )}
@@ -110,8 +111,8 @@ const CardSubBrand = React.memo((props) => {
                                 />
                             }
                             <br/>
-                            <FormControl className={isMobileApp?classes.inputM:classes.input} variant='outlined'>
-                                <InputLabel>Город</InputLabel>
+                            {organization.cities?<><FormControl className={isMobileApp?classes.inputM:classes.input} variant='outlined'>
+                                <InputLabel>Города</InputLabel>
                                 <Select
                                     multiple
                                     value={cities}
@@ -126,14 +127,14 @@ const CardSubBrand = React.memo((props) => {
                                         }
                                     }}
                                 >
-                                    {lib.cities.map((city) => (
+                                    {organization.cities.map((city) => (
                                         <MenuItem key={city} value={city}>
                                             {city}
                                         </MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
-                            <br/>
+                            <br/></>:null}
                             <TextField
                                 type={ isMobileApp?'number':'text'}
                                 label='Приоритет'

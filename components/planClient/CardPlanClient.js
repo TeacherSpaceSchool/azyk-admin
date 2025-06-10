@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
-import cardCategoryStyle from '../../src/styleMUI/subcategory/cardSubcategory'
+import cardStyle from '../../src/styleMUI/subbrand/cardSubbrand'
 import { connect } from 'react-redux'
 import Button from '@material-ui/core/Button';
 import CardActions from '@material-ui/core/CardActions';
@@ -18,7 +18,7 @@ import * as snackbarActions from '../../redux/actions/snackbar';
 import {checkInt} from '../../redux/constants/other';
 
 const CardPlanClient = React.memo((props) => {
-    const classes = cardCategoryStyle();
+    const classes = cardStyle();
     const { element, setList, organization, list, idx, count, setCount, district } = props;
     const { isMobileApp, city } = props.app;
     const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;

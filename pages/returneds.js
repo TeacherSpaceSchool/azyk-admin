@@ -6,10 +6,6 @@ import pageListStyle from '../src/styleMUI/returned/returnedList'
 import {getReturneds} from '../src/gql/returned'
 import { connect } from 'react-redux'
 import Router from 'next/router'
-import { urlMain } from '../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardReturnedPlaceholder from '../components/returned/CardReturnedPlaceholder'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import ClickNHold from 'react-click-n-hold';
@@ -24,8 +20,6 @@ import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import { bindActionCreators } from 'redux'
 import Badge from '@material-ui/core/Badge';
 import Link from 'next/link';
-const height = 225
-
 
 const Returneds = React.memo((props) => {
     const classes = pageListStyle();
@@ -51,7 +45,6 @@ const Returneds = React.memo((props) => {
         setList((await getReturneds({search, sort, date: date, skip: 0, city})).returneds)
         setSimpleStatistic((await getReturnedsSimpleStatistic({search, date: date, city})).returnedsSimpleStatistic);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
-        forceCheck()
         setPaginationWork(true);
     }
     let [searchTimeOut, setSearchTimeOut] = useState(null);
@@ -138,7 +131,6 @@ const Returneds = React.memo((props) => {
             <div className={classes.page}>
                 {list?list.map((element, idx)=> {
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardReturnedPlaceholder/>}>
                         <ClickNHold
                             style={{background: selected.includes(element._id)?'rgba(255, 179, 0, 0.15)':null}}
                             time={3}
@@ -155,7 +147,6 @@ const Returneds = React.memo((props) => {
                         >
                             <CardReturned list={list} idx={idx} setSelected={setSelected} selected={selected} setList={setList} key={element._id} element={element}/>
                         </ClickNHold>
-                    </LazyLoad>
                         )}
                 ):null}
             </div>

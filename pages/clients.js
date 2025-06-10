@@ -6,17 +6,11 @@ import {getClients, getClientsSimpleStatistic} from '../src/gql/client'
 import CardClient from '../components/client/CardClient'
 import { connect } from 'react-redux'
 import Router from 'next/router'
-import { urlMain } from '../redux/constants/other'
-import { forceCheck } from 'react-lazyload';
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
-import CardClientPlaceholder from '../components/client/CardClientPlaceholder'
-import LazyLoad from 'react-lazyload';
 import Link from 'next/link';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
-const height = 140;
-
 
 const Client = React.memo((props) => {
     const classes = pageListStyle();
@@ -38,7 +32,6 @@ const Client = React.memo((props) => {
         setList((await getClients({search, sort, filter: filter, date: date, skip: 0, city: city})).clients);
         setSimpleStatistic((await getClientsSimpleStatistic({search, filter: filter, date: date, city: city})).clientsSimpleStatistic[0]);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
-        forceCheck();
         setPaginationWork(true);
     }
     const { search, filter, sort, date, city } = props.app;
@@ -78,10 +71,7 @@ const Client = React.memo((props) => {
             <div className={classes.page}>
                 {list?list.map((element, idx)=> {
                     return(
-                        <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]}
-                                  debounce={0} once={true} placeholder={<CardClientPlaceholder height={height}/>}>
-                            <CardClient buy list={list} idx={idx} key={element._id} setList={setList} element={element}/>
-                        </LazyLoad>
+                        <CardClient buy list={list} idx={idx} key={element._id} setList={setList} element={element}/>
                     )}
                 ):null}
             </div>

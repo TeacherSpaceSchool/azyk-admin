@@ -115,7 +115,7 @@ const CardItem = React.memo((props) => {
                         <img
                             className={classes.media}
                             src={element.image}
-                            alt={element.info}
+                            alt={element.name}
                         />
                     </a>
                 </Link>

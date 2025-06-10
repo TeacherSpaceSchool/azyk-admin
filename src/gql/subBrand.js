@@ -62,11 +62,11 @@ export const onoffSubBrand = async(ids)=>{
     }
 }
 
-export const addSubBrand = async(element, subCategory)=>{
+export const addSubBrand = async(element)=>{
     try{
         const client = new SingletonApolloClient().getClient()
         let res = await client.mutate({
-            variables: {...element, subCategory: subCategory},
+            variables: {...element},
             mutation : gql`
                     mutation ($minimumOrder: Int, $image: Upload!, $name: String!, $miniInfo: String!, $priotiry: Int, $organization: ID!, $cities: [String]!) {
                         addSubBrand(minimumOrder: $minimumOrder, image: $image, name: $name, miniInfo: $miniInfo, priotiry: $priotiry, organization: $organization, cities: $cities) {

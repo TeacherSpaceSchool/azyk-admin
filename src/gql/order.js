@@ -17,7 +17,6 @@ export const getOrders = async(args, client)=>{
                             createdAt
                             updatedAt
                             allTonnage
-                            allSize
                             client 
                                 { 
                                     _id
@@ -90,7 +89,6 @@ export const getOrdersFromDistrict = async(args, client)=>{
                             createdAt
                             updatedAt
                             allTonnage
-                            allSize
                             client 
                                 { 
                                     _id
@@ -161,7 +159,6 @@ export const getOrdersTrash = async(args, client)=>{
                             createdAt
                             updatedAt
                             allTonnage
-                            allSize
                             del
                             city
                             client 
@@ -297,7 +294,6 @@ export const getOrdersForRouting = async(arg)=>{
                             updatedAt
                             allTonnage
                             city
-                            allSize
                             client 
                                 { 
                                     _id
@@ -359,7 +355,6 @@ export const getOrder = async({_id})=>{
                             agent
                                 {_id name}
                             allTonnage
-                            allSize
                             city
                             orders 
                                 { 
@@ -367,7 +362,6 @@ export const getOrder = async({_id})=>{
                                     createdAt
                                     updatedAt
                                     allTonnage
-                                    allSize
                                     item
                                         {
                                             image
@@ -378,9 +372,7 @@ export const getOrder = async({_id})=>{
                                             priotiry
                                             packaging
                                             weight
-                                            size
                                             price
-                                            costPrice
                                         }
                                     count
                                     allPrice
@@ -564,7 +556,6 @@ export const setOrder = async(element)=>{
                             agent
                                 {_id name}
                             allTonnage
-                            allSize
                             client 
                                 { 
                                     _id
@@ -626,7 +617,6 @@ export const subscriptionOrder = gql`
                             createdAt
                             updatedAt
                             allTonnage
-                            allSize
                             client 
                                 { 
                                     _id

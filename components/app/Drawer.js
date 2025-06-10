@@ -19,10 +19,7 @@ import InfoIcon from '@material-ui/icons/Info';
 import SmsIcon from '@material-ui/icons/Sms';
 import GroupIcon from '@material-ui/icons/Group';
 import ReceiptIcon from '@material-ui/icons/Receipt';
-import LocalActivityIcon from '@material-ui/icons/LocalActivity';
-import BallotIcon from '@material-ui/icons/Ballot';
 import RateReview from '@material-ui/icons/RateReview';
-import LocalShipping from '@material-ui/icons/LocalShipping';
 import LocationCityIcon from '@material-ui/icons/LocationCity';
 import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
 import ArtTrackIcon from '@material-ui/icons/ArtTrack';
@@ -87,7 +84,38 @@ const MyDrawer = React.memo((props) => {
                         :null
                 }
                 {
-                    'admin'===profile.role?
+                    ['агент', 'суперагент', 'экспедитор', 'суперорганизация', 'организация', 'менеджер', 'суперэкспедитор'].includes(profile.role)?
+                        <>
+                            <Link href={'/catalog'} as={'/catalog'}>
+                                <ListItem style={{background:router.pathname.includes('catalog')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{showDrawer(false)}}>
+                                    <ListItemIcon><LocalGroceryStore color='inherit'/></ListItemIcon>
+                                    <ListItemText primary={'Каталог'} />
+                                </ListItem>
+                            </Link>
+                            <Divider/>
+                        </>
+                        :null
+                }
+                {
+                    ['суперорганизация', 'организация', 'менеджер'].includes(profile.role)?
+                        <>
+                            <Link href={'/items/[id]'} as={'/items/all'}>
+                                <ListItem style={{background:
+                                        (
+                                            router.pathname.includes('item')
+                                        )&&!router.pathname.includes('statistic')?
+                                            'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{showDrawer(false)}}>
+                                    <ListItemIcon><ReorderIcon color='inherit'/></ListItemIcon>
+                                    <ListItemText primary={'Товары'} />
+                                </ListItem>
+                            </Link>
+                            <Divider/>
+                        </>
+                            :
+                            null
+                }
+                {
+                    ['admin', 'суперорганизация', 'организация'].includes(profile.role)?
                         <>
                         <Link href='/subbrands'>
                             <ListItem style={{background: router.pathname.includes('subbrands')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
@@ -100,75 +128,12 @@ const MyDrawer = React.memo((props) => {
                         :null
                 }
                 {
-                    ['агент', 'суперагент', /*'экспедитор', 'суперорганизация', 'организация', 'менеджер', 'суперэкспедитор'*/].includes(profile.role)?
-                        <>
-                        <Link href={'/catalog'} as={'/catalog'}>
-                            <ListItem style={{background:router.pathname.includes('catalog')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{showDrawer(false)}}>
-                                <ListItemIcon><LocalGroceryStore color='inherit'/></ListItemIcon>
-                                <ListItemText primary={'Каталог'} />
-                            </ListItem>
-                        </Link>
-                        <Divider/>
-                        </>
-                        :null
-                }
-                {
-                    ['суперорганизация', 'организация', 'менеджер'].includes(profile.role)?
-                        <>
-                        <Link href={'/items/[id]'} as={'/items/all'}>
-                                <ListItem style={{background:
-                                    (
-                                        router.pathname===('/category')
-                                        ||
-                                        router.pathname.includes('subcategory')
-                                        ||
-                                        router.pathname.includes('item')
-                                    )&&!router.pathname.includes('statistic')?
-                                        'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{showDrawer(false)}}>
-                                    <ListItemIcon><ReorderIcon color='inherit'/></ListItemIcon>
-                                    <ListItemText primary={'Товары'} />
-                                </ListItem>
-                            </Link>
-                        <Divider/>
-                        </>
-                        :
-                        isNotTestUser(profile)&&['client', 'admin'].includes(profile.role)?
-                            <>
-                            <Link href='/category'>
-                                    <ListItem style={{background: (router.pathname===('/category')
-                                    ||
-                                    router.pathname.includes('subcategory')
-                                    ||
-                                    router.pathname.includes('item'))&&!router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{showDrawer(false)}}>
-                                        <ListItemIcon><ReorderIcon color='inherit'/></ListItemIcon>
-                                        <ListItemText primary='Категории' />
-                                    </ListItem>
-                                </Link>
-                            <Divider/>
-                            </>
-                            :
-                            null
-                }
-                {
                     ['admin', 'client', 'суперорганизация', 'организация', 'менеджер', 'агент', 'суперагент'].includes(profile.role)?
                         <>
                         <Link href={`/ads`} as={`/ads`}>
                             <ListItem style={{background: router.pathname.includes('ads')&&!router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
                                 <ListItemIcon><WhatshotIcon color='inherit'/></ListItemIcon>
                                 <ListItemText primary='Акции' />
-                            </ListItem>
-                        </Link>
-                        <Divider/>
-                        </>
-                        :null
-                }
-                {
-                    isNotTestUser(profile)&&['admin', 'client', 'суперорганизация', 'организация', 'менеджер', 'агент', 'суперагент'].includes(profile.role)?
-                        <>
-                        <Link href={`/lotterys`} as={`/lotterys`}>
-                            <ListItem style={{background: router.pathname.includes('lottery')&&!router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
-                                <ListItemIcon><LocalActivityIcon color='inherit'/></ListItemIcon>
-                                <ListItemText primary='Лотереи' />
                             </ListItem>
                         </Link>
                         <Divider/>
@@ -350,19 +315,6 @@ const MyDrawer = React.memo((props) => {
                             <ListItem style={{background: router.pathname==='/reviews'?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
                                 <ListItemIcon><RateReview color='inherit'/></ListItemIcon>
                                 <ListItemText primary='Отзывы' />
-                            </ListItem>
-                        </Link>
-                        <Divider/>
-                        </>
-                        :null
-                }
-                {
-                    isNotTestUser(profile)&&['admin', 'client', 'суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)?
-                        <>
-                        <Link href='/forms'>
-                            <ListItem style={{background: router.pathname.includes('form')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={()=>{setUncover(false);showDrawer(false)}}>
-                                <ListItemIcon><BallotIcon color='inherit'/></ListItemIcon>
-                                <ListItemText primary='Анкеты/Опросники' />
                             </ListItem>
                         </Link>
                         <Divider/>

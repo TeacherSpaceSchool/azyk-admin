@@ -7,10 +7,6 @@ import { getOrganization } from '../../../src/gql/organization'
 import pageListStyle from '../../../src/styleMUI/client/clientList'
 import CardClient from '../../../components/client/CardClient'
 import { useRouter } from 'next/router'
-import { urlMain } from '../../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardClientPlaceholder from '../../../components/client/CardClientPlaceholder'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
@@ -27,7 +23,6 @@ const ClientsSync = React.memo((props) => {
     const router = useRouter()
     let [list, setList] = useState(data.clientsSync);
     const { search, city } = props.app;
-    let height = 189
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     let [paginationWork, setPaginationWork] = useState(true);
     let [simpleStatistic, setSimpleStatistic] = useState(data.clientsSyncStatistic);
@@ -50,7 +45,6 @@ const ClientsSync = React.memo((props) => {
             setSimpleStatistic((await getClientsSyncStatistic({search, organization: router.query.id, city})).clientsSyncStatistic)
             setPaginationWork(true);
             (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-            forceCheck()
         }, 500)
         setSearchTimeOut(searchTimeOut)
     },[search, city])
@@ -67,9 +61,7 @@ const ClientsSync = React.memo((props) => {
                 {
                     list?list.map((element  )=> {
                             return(
-                                <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardClientPlaceholder height={height}/>}>
-                                    <CardClient element={element}/>
-                                </LazyLoad>
+                                <CardClient element={element}/>
                             )}
                     ):null
                 }

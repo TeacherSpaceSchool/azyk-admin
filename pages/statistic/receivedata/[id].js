@@ -5,9 +5,6 @@ import CardReceiveData from '../../../components/receiveData/CardReceiveData';
 import pageListStyle from '../../../src/styleMUI/error/errorList'
 import {getReceivedDatas, clearAllReceivedDatas} from '../../../src/gql/receiveData'
 import { connect } from 'react-redux'
-import { urlMain } from '../../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import CardReceiveDataPlaceholder from '../../../components/receiveData/CardReceiveDataPlaceholder'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
@@ -16,9 +13,7 @@ import RemoveIcon from '@material-ui/icons/Clear';
 import Confirmation from '../../../components/dialog/Confirmation'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
-import { forceCheck } from 'react-lazyload';
 import { useRouter } from 'next/router'
-const height = 308
 
 const ReceiveData = React.memo((props) => {
     const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
@@ -32,7 +27,6 @@ const ReceiveData = React.memo((props) => {
         (async()=>{
             setList((await getReceivedDatas({organization: router.query.id, search, filter: filter})).receivedDatas)
             setPagination(100)
-            forceCheck()
         })()
     },[search, filter])
     let [pagination, setPagination] = useState(100);
@@ -52,9 +46,7 @@ const ReceiveData = React.memo((props) => {
                     {`Всего: ${list.length}`}
                 </div>
                 {list?list.map((element, idx)=>
-                    <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardReceiveDataPlaceholder height={height}/>}>
-                        <CardReceiveData list={list} setList={setList} element={element} idx={idx} forceCheck={forceCheck}/>
-                    </LazyLoad>
+                    <CardReceiveData list={list} setList={setList} element={element} idx={idx}/>
                 ):null}
             </div>
             {

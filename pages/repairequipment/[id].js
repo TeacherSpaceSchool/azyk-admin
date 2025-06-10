@@ -16,7 +16,6 @@ import Router from 'next/router'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import TextField from '@material-ui/core/TextField';
 import Confirmation from '../../components/dialog/Confirmation'
-import { urlMain } from '../../redux/constants/other'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import initialApp from '../../src/initialApp'

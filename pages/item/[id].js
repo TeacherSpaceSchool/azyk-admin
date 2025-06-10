@@ -3,7 +3,6 @@ import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
-import { getSubCategorys } from '../../src/gql/subcategory'
 import { getSubBrands } from '../../src/gql/subBrand'
 import { getOrganizations } from '../../src/gql/organization'
 import { getItem, addItem, setItem, onoffItem, deleteItem } from '../../src/gql/items'
@@ -26,7 +25,6 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import TextField from '@material-ui/core/TextField';
 import Confirmation from '../../components/dialog/Confirmation'
-import { urlMain } from '../../redux/constants/other'
 import Typography from '@material-ui/core/Typography';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from 'next/link';
@@ -40,9 +38,7 @@ const Item = React.memo((props) => {
     const { profile } = props.user;
     let [unit, setUnit] = useState(data.item?data.item.unit:'');
     let [name, setName] = useState(data.item?data.item.name:'');
-    let [info, setInfo] = useState(data.item?data.item.info:'');
     let [price, setPrice] = useState(data.item?data.item.price:'');
-    let [subCategory, setSubCategory] = useState(data.item?data.item.subCategory:{});
     let [subBrand, setSubBrand] = useState(data.item&&data.item.subBrand?data.item.subBrand:{});
     let [subBrands, setSubBrands] = useState([]);
     let [city, setCity] = useState(data.item&&data.item.city?data.item.city:'Бишкек');
@@ -50,9 +46,6 @@ const Item = React.memo((props) => {
         setCity(event.target.value)
     };
     let [status, setStatus] = useState(data.item?data.item.status:'');
-    let handleSubCategory =  (event) => {
-        setSubCategory({_id: event.target.value, name: event.target.name})
-    };
     let handleSubBrand =  (event) => {
         setSubBrand({_id: event.target.value, name: event.target.name})
     };
@@ -62,8 +55,6 @@ const Item = React.memo((props) => {
         setCategorys(event.target.value)
     })
     let [weight, setWeight] = useState(data.item&&data.item.weight?data.item.weight:0);
-    let [costPrice, setCostPrice] = useState(data.item&&data.item.costPrice?data.item.costPrice:0);
-    let [size, setSize] = useState(data.item&&data.item.size?data.item.size:0);
     let [priotiry, setPriotiry] = useState(data.item&&data.item.priotiry?data.item.priotiry:0);
     let [organization, setOrganization] = useState(data.item!==null?data.item.organization:{});
     let handleOrganization =  (event) => {
@@ -106,35 +97,6 @@ const Item = React.memo((props) => {
                 <title>{data.item!==null?router.query.id==='new'?'Добавить':data.item.name:'Ничего не найдено'}</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            {
-                (router.query.id!=='new'&&['client', 'admin'].includes(profile.role)&&data.item&&data.item.subCategory)?
-                    <Breadcrumbs style={{margin: 20}} aria-label='breadcrumb'>
-                        <Link href='/category'>
-                            <a>
-                                Категории
-                            </a>
-                        </Link>
-                        <Link href='/subcategory/[id]' as={`/subcategory/${data.item.subCategory.category._id}`}>
-                            <a>
-                                {data.item.subCategory.category.name}
-                            </a>
-                        </Link>
-                        <Link href='/items/[id]' as={`/items/${data.item.subCategory._id}`}>
-                            <a>
-                                {data.item.subCategory.name}
-                            </a>
-                        </Link>
-                        {
-                            data.item?
-                                <Typography color='textPrimary'>
-                                    {data.item.name}
-                                </Typography>
-                                :
-                                null
-                        }
-                    </Breadcrumbs>
-                    :null
-            }
             <Card className={classes.page}>
                 <CardContent className={isMobileApp?classes.column:classes.row}>
                     {
@@ -292,20 +254,6 @@ const Item = React.memo((props) => {
                                         <div className={classes.price}>
                                             <TextField
                                                 type={ isMobileApp?'number':'text'}
-                                                label='Кубатура в см³'
-                                                value={size}
-                                                className={isMobileApp?classes.inputM:classes.inputD}
-                                                onChange={(event)=>{
-                                                    setSize(inputFloat(event.target.value))}
-                                                }
-                                                inputProps={{
-                                                    'aria-label': 'description',
-                                                }}
-                                            />
-                                        </div>
-                                        <div className={classes.price}>
-                                            <TextField
-                                                type={ isMobileApp?'number':'text'}
                                                 label='Упаковка'
                                                 value={packaging}
                                                 className={isMobileApp?classes.inputM:classes.inputD}
@@ -323,20 +271,6 @@ const Item = React.memo((props) => {
                                                 className={isMobileApp?classes.inputM:classes.inputD}
                                                 onChange={(event)=>{
                                                     setPrice(inputFloat(event.target.value))
-                                                }}
-                                                inputProps={{
-                                                    'aria-label': 'description',
-                                                }}
-                                            />
-                                        </div>
-                                        <div className={classes.price}>
-                                            <TextField
-                                                type={ isMobileApp?'number':'text'}
-                                                label='Себестоимость'
-                                                value={costPrice}
-                                                className={isMobileApp?classes.inputM:classes.inputD}
-                                                onChange={(event)=>{
-                                                    setCostPrice(inputFloat(event.target.value))
                                                 }}
                                                 inputProps={{
                                                     'aria-label': 'description',
@@ -362,16 +296,6 @@ const Item = React.memo((props) => {
                                                 }}
                                             />
                                         }
-                                        <br/>
-                                        <br/>
-                                        <FormControl className={isMobileApp?classes.inputM:classes.inputD}>
-                                            <InputLabel>Подкатегория</InputLabel>
-                                            <Select value={subCategory._id} onChange={handleSubCategory}>
-                                                {data.subCategorys.map((element)=>
-                                                    <MenuItem key={element._id} value={element._id} ola={element.name}>{element.name}</MenuItem>
-                                                )}
-                                            </Select>
-                                        </FormControl>
                                         <FormControl className={isMobileApp?classes.inputM:classes.inputD}>
                                             <InputLabel>Подбренд</InputLabel>
                                             <Select value={subBrand._id} onChange={handleSubBrand}>
@@ -380,44 +304,30 @@ const Item = React.memo((props) => {
                                                 )}
                                             </Select>
                                         </FormControl>
-                                        <TextField
-                                            multiline={true}
-                                            label='Информация'
-                                            value={info}
-                                            className={isMobileApp?classes.inputM:classes.inputD}
-                                            onChange={(event)=>{setInfo(event.target.value)}}
-                                            inputProps={{
-                                                'aria-label': 'description',
-                                            }}
-                                        />
                                         <br/>
                                         <div className={classes.row}>
                                             {
                                                 router.query.id==='new'?
                                                     <Button onClick={async()=>{
-                                                        if (categorys.length>0&&name.length>0&&price>0&&subCategory._id!=undefined&&organization._id!=undefined) {
+                                                        if (categorys.length>0&&name.length>0&&price>0&&organization._id!=undefined) {
                                                             const action = async() => {
                                                                 await addItem({
                                                                     packaging: checkInt(packaging)>0?checkInt(packaging):1,
                                                                     name: name,
-                                                                    categorys: categorys,
-                                                                    costPrice: checkFloat(costPrice),
+                                                                    categorys,
                                                                     image: image,
-                                                                    info: info,
                                                                     price: checkFloat(price),
-                                                                    subCategory: subCategory._id,
                                                                     subBrand: subBrand._id,
                                                                     hit: hit,
                                                                     latest: latest,
                                                                     organization: organization._id,
                                                                     weight: checkFloat(weight),
-                                                                    size: checkFloat(size),
                                                                     apiece: apiece,
                                                                     unit: unit,
                                                                     city: city,
                                                                     priotiry: checkInt(priotiry)
-                                                                }, subCategory._id)
-                                                                Router.push(`/brand/${organization._id}`)
+                                                                })
+                                                                await Router.push(`/brand/${organization._id}`)
                                                             }
                                                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                             showMiniDialog(true)
@@ -431,25 +341,21 @@ const Item = React.memo((props) => {
                                                     <>
                                                         <Button onClick={async()=>{
                                                             if (categorys.length>0){
-                                                                let editElement = {_id: data.item._id, categorys: categorys, subBrand: subBrand?subBrand._id:subBrand}
+                                                                let editElement = {_id: data.item._id, categorys, subBrand: subBrand?subBrand._id:subBrand}
                                                                 if(city!==data.item.city)editElement.city = city
                                                                 if(name.length>0&&name!==data.item.name)editElement.name = name
                                                                 if(packaging!==data.item.packaging&&checkInt(packaging)>0)editElement.packaging = checkInt(packaging)
                                                                 if(image!==undefined)editElement.image = image
-                                                                if(info.length>0&&info!==data.item.info)editElement.info = info
                                                                 if(price>0&&price!==data.item.price)editElement.price = checkFloat(price)
-                                                                if(costPrice!==data.item.costPrice)editElement.costPrice = checkFloat(costPrice)
                                                                 if(weight!==data.item.weight)editElement.weight = checkFloat(weight)
-                                                                if(size!==data.item.size)editElement.size = checkFloat(size)
                                                                 if(hit!==data.item.hit)editElement.hit = hit
                                                                 if(apiece!==data.item.apiece)editElement.apiece = apiece
                                                                 if(unit!==data.item.unit)editElement.unit = unit
                                                                 if(latest!==data.item.latest)editElement.latest = latest
                                                                 if(organization._id!==data.item.organization._id)editElement.organization = organization._id
-                                                                if(subCategory._id!==data.item.subCategory._id)editElement.subCategory = subCategory._id
                                                                 if(priotiry!==data.item.priotiry)editElement.priotiry = checkInt(priotiry)
                                                                 const action = async() => {
-                                                                    await setItem(editElement, subCategory._id)
+                                                                    await setItem(editElement)
                                                                 }
                                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                                 showMiniDialog(true)
@@ -473,8 +379,8 @@ const Item = React.memo((props) => {
                                                             profile.role==='admin'?
                                                                 <Button onClick={async()=>{
                                                                     const action = async() => {
-                                                                        await deleteItem([data.item._id], subCategory._id)
-                                                                        Router.push(`/items/${subCategory._id}`)
+                                                                        await deleteItem([data.item._id])
+                                                                        await Router.push(`/brand/${organization._id}`)
                                                                     }
                                                                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                                     showMiniDialog(true)
@@ -502,7 +408,7 @@ const Item = React.memo((props) => {
                                         <img
                                             className={classes.media}
                                             src={data.item.image}
-                                            alt={data.item.info}
+                                            alt={data.item.name}
                                         />
                                     </div>
                                     <div>
@@ -560,12 +466,9 @@ Item.getInitialProps = async function(ctx) {
                     priotiry: 0,
                     image: '/static/add.png',
                     packaging: 1,
-                    costPrice: 0,
                     name: '',
-                    info: '',
                     categorys: ['A','B','C','D','Horeca'],
                     price: 0,
-                    subCategory: {_id: undefined},
                     subBrand: {_id: undefined},
                     organization: {_id: undefined},
                     hit: false,
@@ -573,7 +476,6 @@ Item.getInitialProps = async function(ctx) {
                 }
             },
             ...await getOrganizations({search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-            ...await getSubCategorys({category: 'all', search: '', sort: 'name', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
         }
     };
 };

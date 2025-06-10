@@ -7,9 +7,6 @@ import * as userActions from '../../redux/actions/user'
 import { getSubscribers } from '../../src/gql/subscriber'
 import pageListStyle from '../../src/styleMUI/subscriber/subscriberList'
 import CardSubscriber from '../../components/subscriber/CardSubscriber'
-import { urlMain } from '../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import CardSubscriberPlaceholder from '../../components/subscriber/CardSubscriberPlaceholder'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import Router from 'next/router'
@@ -20,7 +17,6 @@ const Subscriber = React.memo((props) => {
     let [list, setList] = useState(data.subscribers);
     let [failed, setFailed] = useState(0);
     let [delivered, setDelivered] = useState(0);
-    let height = 214
     useEffect(()=>{
         for(let i=0; i<data.subscribers.length; i++){
             if(data.subscribers[i].status==='доставлено')
@@ -65,9 +61,7 @@ const Subscriber = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                         if(idx<pagination)
                             return(
-                                <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardSubscriberPlaceholder height={height}/>}>
-                                    <CardSubscriber key={element._id} setList={setList} element={element}/>
-                                </LazyLoad>
+                                <CardSubscriber key={element._id} setList={setList} element={element}/>
                             )}
                 ):null}
             </div>

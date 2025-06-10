@@ -26,7 +26,6 @@ const Returned =  React.memo(
         let [allPrice, setAllPrice] = useState(element.allPrice);
         let [items, setItems] = useState(element.items);
         let [allTonnage, setAllTonnage] = useState(element.allTonnage);
-        let [allSize, setAllSize] = useState(element.allSize);
         let [confirmationForwarder, setConfirmationForwarder] = useState(element.confirmationForwarder);
         let [cancelForwarder, setCancelForwarder] = useState(element.cancelForwarder!=undefined&&element.cancelForwarder);
         const width = isMobileApp? (window.innerWidth-112) : 500;
@@ -34,22 +33,18 @@ const Returned =  React.memo(
         const { showSnackBar } = props.snackbarActions;
         let canculateAllPrice = ()=>{
             allTonnage=0
-            allSize=0
             allPrice=0
             for(let i=0; i<items.length; i++){
                 allPrice+=items[i].allPrice
                 allTonnage+=items[i].allTonnage
-                allSize+=items[i].allSize
             }
             setAllPrice(checkFloat(allPrice))
             setAllTonnage(checkFloat(allTonnage))
-            setAllSize(checkFloat(allSize))
         }
         let increment = (idx)=>{
             items[idx].count+=1
             items[idx].allPrice = checkFloat(items[idx].price * items[idx].count)
             items[idx].allTonnage = checkFloat(items[idx].count * items[idx].weight)
-            items[idx].allSize = checkFloat(items[idx].count * items[idx].size)
             canculateAllPrice()
         }
         let decrement = (idx)=>{
@@ -57,7 +52,6 @@ const Returned =  React.memo(
                 items[idx].count -= 1
                 items[idx].allPrice = checkFloat(items[idx].price * items[idx].count)
                 items[idx].allTonnage = checkFloat(items[idx].count * items[idx].weight)
-                items[idx].allSize = checkFloat(items[idx].count * items[idx].size)
                 canculateAllPrice()
             }
         }
@@ -166,15 +160,6 @@ const Returned =  React.memo(
                                 <div className={classes.row}>
                                     <div className={classes.nameField}>Тоннаж:&nbsp;</div>
                                     <div className={classes.value}>{allTonnage}&nbsp;кг</div>
-                                </div>
-                                :
-                                null
-                        }
-                        {
-                            allSize?
-                                <div className={classes.row}>
-                                    <div className={classes.nameField}>Кубатура:&nbsp;</div>
-                                    <div className={classes.value}>{allSize}&nbsp;см³</div>
                                 </div>
                                 :
                                 null

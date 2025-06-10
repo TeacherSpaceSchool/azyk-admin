@@ -8,10 +8,6 @@ import CardOrganization from '../components/organization/CardOrganization'
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Link from 'next/link';
-import { urlMain } from '../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardOrganizationPlaceholder from '../components/organization/CardOrganizationPlaceholder'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
@@ -22,14 +18,12 @@ const Organization = React.memo((props) => {
     let [list, setList] = useState(data.organizations);
     const { search, filter, city } = props.app;
     const { profile } = props.user;
-    let height = 80
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     const initialRender = useRef(true);
     const getList = async ()=>{
         setList((await getOrganizations({search, filter: filter, city: city})).organizations);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         setPagination(100);
-        forceCheck();
     }
     useEffect(()=>{
         (async()=>{
@@ -71,13 +65,11 @@ const Organization = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardOrganizationPlaceholder height={height}/>}>
-                                <Link href='/organization/[id]' as={`/organization/${element._id}`}>
-                                    <a>
-                                        <CardOrganization organization key={element._id} setList={setList} element={element}/>
-                                    </a>
-                                </Link>
-                            </LazyLoad>
+                            <Link href='/organization/[id]' as={`/organization/${element._id}`}>
+                                <a>
+                                    <CardOrganization organization key={element._id} setList={setList} element={element}/>
+                                </a>
+                            </Link>
                         )}
                 ):null}
             </div>

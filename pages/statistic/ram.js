@@ -6,7 +6,6 @@ import pageListStyle from '../../src/styleMUI/statistic/statistic'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import initialApp from '../../src/initialApp'
 import {getStatisticRAM} from '../../src/gql/statistic'
 import { getClientGqlSsr } from '../../src/getClientGQL'

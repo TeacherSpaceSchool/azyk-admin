@@ -3,17 +3,15 @@ import React, {useState, useEffect, useRef} from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import initialApp from '../../src/initialApp'
 import { getClientGqlSsr } from '../../src/getClientGQL'
-import { getStatisticClientGeo, getActiveItem, getActiveOrganization } from '../../src/gql/statistic'
+import { getStatisticClientGeo, getActiveOrganization } from '../../src/gql/statistic'
 import { Map, YMaps, ObjectManager } from 'react-yandex-maps';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../redux/actions/app'
-import {setSearch} from '../../redux/actions/app';
 
 const ClientGeoStatistic = React.memo((props) => {
 

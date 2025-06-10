@@ -69,8 +69,6 @@ export const getDistrict = async({_id}, client)=>{
                                     name
                                     email
                                     address
-                                    info
-                                    reiting
                                     city
                                     category
                                     phone

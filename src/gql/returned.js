@@ -21,13 +21,10 @@ export const getReturnedsTrash = async(args, client)=>{
                                     count
                                     allPrice
                                     allTonnage
-                                    allSize
                                     weight
-                                    size
                                     price
                                 }
                             allTonnage
-                            allSize
                             client 
                                 { 
                                     _id
@@ -38,7 +35,6 @@ export const getReturnedsTrash = async(args, client)=>{
                                         {_id }
                                 }
                             allPrice
-                            info
                             address
                             editor
                             number
@@ -84,13 +80,10 @@ export const getReturneds = async(args, client)=>{
                                     count
                                     allPrice
                                     allTonnage
-                                    allSize
                                     weight
-                                    size
                                     price
                                 }
                             allTonnage
-                            allSize
                             client 
                                 { 
                                     _id
@@ -101,7 +94,6 @@ export const getReturneds = async(args, client)=>{
                                         {_id }
                                 }
                             allPrice
-                            info
                             address
                             editor
                             number
@@ -150,13 +142,10 @@ export const getReturnedsFromDistrict = async(args, client)=>{
                                     count
                                     allPrice
                                     allTonnage
-                                    allSize
                                     weight
-                                    size
                                     price
                                 }
                             allTonnage
-                            allSize
                             client 
                                 { 
                                     _id
@@ -167,7 +156,6 @@ export const getReturnedsFromDistrict = async(args, client)=>{
                                         {_id }
                                 }
                             allPrice
-                            info
                             address
                             editor
                             number
@@ -268,8 +256,8 @@ export const addReturned = async(element)=>{
         await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($dateDelivery: Date!, $unite: Boolean, $info: String, $inv: Boolean, $address: [[String]], $organization: ID!, $client: ID!, $items: [ReturnedItemsInput]) {
-                        addReturned(dateDelivery: $dateDelivery, unite: $unite, info: $info, inv: $inv, address: $address, organization: $organization, client: $client, items: $items) {
+                    mutation ($dateDelivery: Date!, $unite: Boolean, $inv: Boolean, $address: [[String]], $organization: ID!, $client: ID!, $items: [ReturnedItemsInput]) {
+                        addReturned(dateDelivery: $dateDelivery, unite: $unite, inv: $inv, address: $address, organization: $organization, client: $client, items: $items) {
                              data
                         }
                     }`})
@@ -329,13 +317,10 @@ export const setReturned = async(element)=>{
                                     count
                                     allPrice
                                     allTonnage
-                                    allSize
                                     weight
-                                    size
                                     price
                                 }
                             allTonnage
-                            allSize
                             client 
                                 { 
                                     _id
@@ -346,7 +331,6 @@ export const setReturned = async(element)=>{
                                         {_id }
                                 }
                             allPrice
-                            info
                             address
                             editor
                             number

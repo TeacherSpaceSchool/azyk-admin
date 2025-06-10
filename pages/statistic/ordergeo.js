@@ -3,7 +3,6 @@ import React, {useState, useEffect, useRef} from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import initialApp from '../../src/initialApp'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import { getStatisticGeoOrder, getActiveOrganization } from '../../src/gql/statistic'

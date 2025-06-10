@@ -9,14 +9,9 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Link from 'next/link';
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardEmploymentPlaceholder from '../../components/employment/CardEmploymentPlaceholder'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
-const height = 186
 
 const Employment = React.memo((props) => {
     const { profile } = props.user;
@@ -30,7 +25,6 @@ const Employment = React.memo((props) => {
     const getList = async ()=>{
         setList((await getEmployments({organization: router.query.id, search, sort, filter: filter})).employments)
         setPagination(100);
-        forceCheck();
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
     useEffect(()=>{
@@ -74,9 +68,7 @@ const Employment = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardEmploymentPlaceholder height={height}/>}>
-                                <CardEmployment list={list} idx={idx} key={element._id} setList={setList} element={element}/>
-                            </LazyLoad>
+                            <CardEmployment list={list} idx={idx} key={element._id} setList={setList} element={element}/>
                         )}
                 ):null}
             </div>

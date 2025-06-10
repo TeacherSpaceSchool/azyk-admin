@@ -20,7 +20,6 @@ export const getOrganization = async({_id: _id}, client)=>{
                             phone
                             info
                             miniInfo
-                            reiting
                             status
                             minimumOrder
                             agentHistory

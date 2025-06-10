@@ -3,7 +3,6 @@ import React from 'react';
 import App from '../../layouts/App';
 import pageListStyle from '../../src/styleMUI/blog/blogList'
 import { connect } from 'react-redux'
-import LazyLoad from 'react-lazyload';
 import initialApp from '../../src/initialApp'
 import { urlMain } from '../../redux/constants/other'
 

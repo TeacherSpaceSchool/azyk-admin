@@ -5,9 +5,6 @@ import CardError from '../../components/error/CardError';
 import pageListStyle from '../../src/styleMUI/error/errorList'
 import {getErrors, clearAllErrors} from '../../src/gql/error'
 import { connect } from 'react-redux'
-import { urlMain } from '../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import CardErrorPlaceholder from '../../components/error/CardErrorPlaceholder'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import Router from 'next/router'
@@ -33,9 +30,7 @@ const Error = React.memo((props) => {
                     {`Всего: ${list.length}`}
                 </div>
                 {list?list.map((element)=>
-                    <LazyLoad scrollContainer={'.App-body'} key={element._id} height={120} offset={[120, 0]} debounce={0} once={true}  placeholder={<CardErrorPlaceholder/>}>
-                        <CardError element={element}/>
-                    </LazyLoad>
+                    <CardError element={element}/>
                 ):null}
             </div>
             <Fab onClick={async()=>{

@@ -5,10 +5,6 @@ import { connect } from 'react-redux'
 import { getMerchandisings } from '../../src/gql/merchandising'
 import pageListStyle from '../../src/styleMUI/merchandising/merchandisingList'
 import CardMerchandising from '../../components/merchandising/CardMerchandising'
-import { urlMain } from '../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardMerchandisingsPlaceholder from '../../components/merchandising/CardMerchandisingPlaceholder'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import Router from 'next/router'
@@ -25,7 +21,6 @@ const Merchandisings = React.memo((props) => {
     let [list, setList] = useState(data.merchandisings);
     const { search, filter, sort, date, agent } = props.app;
     const initialRender = useRef(true);
-    let height = 70
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     let [paginationWork, setPaginationWork] = useState(true);
     const checkPagination = async()=>{
@@ -42,7 +37,6 @@ const Merchandisings = React.memo((props) => {
         setList((await getMerchandisings({...router.query.client?{client: router.query.client}:{}, agent, date: date, organization: router.query.id, sort, filter: filter, search, skip: 0})).merchandisings)
         setPaginationWork(true);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-        forceCheck()
     }
     useEffect(()=>{
         (async () => {
@@ -73,9 +67,7 @@ const Merchandisings = React.memo((props) => {
                 {
                     list?list.map((element)=> {
                             return(
-                                <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardMerchandisingsPlaceholder height={height}/>}>
-                                    <CardMerchandising templateMerchandising={router.query.id} element={element} />
-                                </LazyLoad>
+                                <CardMerchandising templateMerchandising={router.query.id} element={element} />
                             )}
                     ):null
                 }

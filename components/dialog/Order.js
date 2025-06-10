@@ -29,7 +29,6 @@ const Order =  React.memo(
         let [allPrice, setAllPrice] = useState(element.allPrice);
         let [consignmentPrice, setConsignmentPrice] = useState(element.consignmentPrice);
         let [allTonnage, setAllTonnage] = useState(element.allTonnage);
-        let [allSize, setAllSize] = useState(element.allSize);
         let [showCons, setShowCons] = useState({});
         let [showReturn, setShowReturn] = useState({});
         let [taken, setTaken] = useState(element.taken);
@@ -44,18 +43,15 @@ const Order =  React.memo(
         const { showSnackBar } = props.snackbarActions;
         let canculateAllPrice = ()=>{
             allTonnage=0
-            allSize=0
             allPrice=0
             consignmentPrice=0
             for(let i=0; i<orders.length; i++){
                 consignmentPrice+=orders[i].consignmentPrice
                 allPrice+=orders[i].allPrice
                 allTonnage+=orders[i].allTonnage
-                allSize+=orders[i].allSize
             }
             setAllPrice(checkFloat(allPrice))
             setAllTonnage(checkFloat(allTonnage))
-            setAllSize(checkFloat(allSize))
             setConsignmentPrice(consignmentPrice)
             setChangeOrders(true)
         }
@@ -67,7 +63,6 @@ const Order =  React.memo(
                 orders[idx].count+=orders[idx].item.packaging
             orders[idx].allPrice = checkFloat(orders[idx].count * price)
             orders[idx].allTonnage = orders[idx].count * orders[idx].item.weight
-            orders[idx].allSize = orders[idx].count * orders[idx].item.size
             setOrders([...orders])
             canculateAllPrice()
         }
@@ -78,7 +73,6 @@ const Order =  React.memo(
                     orders[idx].count -= 1
                     orders[idx].allPrice = checkFloat(orders[idx].count * price)
                     orders[idx].allTonnage = orders[idx].count * orders[idx].item.weight
-                    orders[idx].allSize = orders[idx].count * orders[idx].item.size
                     setOrders([...orders])
                     canculateAllPrice()
                 } else
@@ -89,7 +83,6 @@ const Order =  React.memo(
                     orders[idx].count -= orders[idx].item.packaging
                     orders[idx].allPrice = checkFloat(orders[idx].count * price)
                     orders[idx].allTonnage = orders[idx].count * orders[idx].item.weight
-                    orders[idx].allSize = orders[idx].count * orders[idx].item.size
                     setOrders([...orders])
                     canculateAllPrice()
                 } else
@@ -315,15 +308,6 @@ const Order =  React.memo(
                                     <div className={classes.row}>
                                         <div className={classes.nameField}>Тоннаж:&nbsp;</div>
                                         <div className={classes.value}>{allTonnage}&nbsp;кг</div>
-                                    </div>
-                                    :
-                                    null
-                            }
-                            {
-                                allSize?
-                                    <div className={classes.row}>
-                                        <div className={classes.nameField}>Кубатура:&nbsp;</div>
-                                        <div className={classes.value}>{allSize}&nbsp;см³</div>
                                     </div>
                                     :
                                     null
@@ -775,7 +759,6 @@ const Order =  React.memo(
                                                 count: order.count,
                                                 allPrice: order.allPrice,
                                                 allTonnage: order.allTonnage,
-                                                allSize: order.allSize,
                                                 status: order.status
                                             }
                                         })

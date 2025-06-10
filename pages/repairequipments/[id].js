@@ -5,10 +5,6 @@ import { connect } from 'react-redux'
 import { getRepairEquipments } from '../../src/gql/repairEquipment'
 import pageListStyle from '../../src/styleMUI/equipment/equipmentList'
 import CardRepairEquipment from '../../components/equipment/CardRepairEquipment'
-import { urlMain } from '../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardEquipmentPlaceholder from '../../components/equipment/CardEquipmentPlaceholder'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
@@ -24,13 +20,11 @@ const RepairEquipments = React.memo((props) => {
     const { search, filter } = props.app;
     const { profile } = props.user;
     const router = useRouter()
-    let height = ['суперорганизация', 'организация', 'admin'].includes(profile.role)?186:140
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     const initialRender = useRef(true);
     const getList = async ()=>{
         setList((await getRepairEquipments({organization: router.query.id, search, filter: filter})).repairEquipments)
         setPagination(100);
-        forceCheck();
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
     useEffect(()=>{
@@ -74,9 +68,7 @@ const RepairEquipments = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardEquipmentPlaceholder height={height}/>}>
-                                <CardRepairEquipment list={list} idx={idx} key={element._id} setList={setList} element={element}/>
-                            </LazyLoad>
+                            <CardRepairEquipment list={list} idx={idx} key={element._id} setList={setList} element={element}/>
                         )}
                 ):null}
             </div>

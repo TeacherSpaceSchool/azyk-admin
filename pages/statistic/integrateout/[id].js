@@ -1,15 +1,11 @@
 import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
 import App from '../../../layouts/App';
-import CardIntegrateOutShoroPlaceholder from '../../../components/IntegrateOutShoro/CardIntegrateOutShoroPlaceholder'
 import CardIntegrateOutShoro from '../../../components/IntegrateOutShoro/CardIntegrateOutShoro'
 import pageListStyle from '../../../src/styleMUI/orders/orderList'
 import {outXMLReturnedShoros, outXMLShoros, deleteOutXMLReturnedShoroAll, deleteOutXMLShoroAll, statisticOutXMLReturnedShoros, statisticOutXMLShoros} from '../../../src/gql/integrateOutShoro'
 import { connect } from 'react-redux'
 import Router from 'next/router'
-import { urlMain } from '../../../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import initialApp from '../../../src/initialApp'
 import Fab from '@material-ui/core/Fab';
@@ -20,7 +16,6 @@ import Confirmation from '../../../components/dialog/Confirmation'
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import { bindActionCreators } from 'redux'
 import { useRouter } from 'next/router'
-const height = 225
 
 const IntegrateOutShoro = React.memo((props) => {
     const classes = pageListStyle();
@@ -30,7 +25,6 @@ const IntegrateOutShoro = React.memo((props) => {
     const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
     const router = useRouter()
     const { search, filter } = props.app;
-    const { profile } = props.user;
     let [paginationWork, setPaginationWork] = useState(true);
     let [type, setType] = useState('Заказы');
     const checkPagination = async()=>{
@@ -67,7 +61,6 @@ const IntegrateOutShoro = React.memo((props) => {
             clearTimeout(searchTimeOut)
         searchTimeOut = setTimeout(async()=>{
             await getList()
-            forceCheck()
             setPaginationWork(true);
             (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         }, 500)
@@ -120,11 +113,9 @@ const IntegrateOutShoro = React.memo((props) => {
                     </div>
             <div className={classes.page}>
                 {list?list.map((element, idx)=> {
-                        return(
-                            <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardIntegrateOutShoroPlaceholder/>}>
+                    return(
                         <CardIntegrateOutShoro list={list} idx={idx} type={type} element={element} setList={setList} key={element._id}/>
-                    </LazyLoad>
-                        )}
+                    )}
                 ):null}
             </div>
             <Fab onClick={open} color='primary' aria-label='add' className={classes.fab}>

@@ -18,7 +18,6 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
-import { urlMain } from '../../redux/constants/other'
 import Confirmation from '../../components/dialog/Confirmation'
 import Geo from '../../components/dialog/Geo'
 import { useRouter } from 'next/router'
@@ -42,7 +41,7 @@ const Client = React.memo((props) => {
     let [name, setName] = useState(data.client&&data.client.name?data.client.name:'');
     let [inn, setInn] = useState(data.client&&data.client.inn?data.client.inn:'');
     let [email, setEmail] = useState(data.client&&data.client.email?data.client.email:'');
-    let [phone, setPhone] = useState(data.client&&data.client.phone&&data.client.phone.length>0?data.client.phone:['+996']);
+    let [phone, setPhone] = useState(data.client&&data.client.phone?data.client.phone:[]);
     let addPhone = ()=>{
         phone = [...phone, '+996']
         setPhone(phone)
@@ -93,7 +92,6 @@ const Client = React.memo((props) => {
         setAddress([...address])
     };
 
-    let [info, setInfo] = useState(data.client&&data.client.info?data.client.info:'');
     let [preview, setPreview] = useState(data.client&&data.client.image?data.client.image:'/static/add.png');
     let [image, setImage] = useState(undefined);
     let handleChangeImage = ((event) => {
@@ -119,7 +117,7 @@ const Client = React.memo((props) => {
         }
     },[])
     return (
-        <App filters={data.filterSubCategory} sorts={data.sortSubCategory} pageName={data.client?data.client.name:'Ничего не найдено'}>
+        <App pageName={data.client?data.client.name:'Ничего не найдено'}>
             <Head>
                 <title>{router.query.id==='new'?'Добавить':data.client?data.client.name:'Ничего не найдено'}</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -316,16 +314,6 @@ const Client = React.memo((props) => {
                                             'aria-label': 'description',
                                         }}
                                     />
-                                    <TextField
-                                        multiline={true}
-                                        label='Информация'
-                                        value={info}
-                                        className={classes.input}
-                                        onChange={(event)=>{setInfo(event.target.value)}}
-                                        inputProps={{
-                                            'aria-label': 'description',
-                                        }}
-                                    />
                                     <div className={classes.row}>
                                         {
                                             (router.query.id!=='new'&&['суперорганизация', 'организация', 'агент', 'экспедитор', 'admin', 'суперагент'].includes(profile.role))/*||(data.client.user&&profile._id===data.client.user._id)*/?
@@ -345,7 +333,6 @@ const Client = React.memo((props) => {
                                                         if (inn !== data.client.inn) editElement.inn = inn
                                                         if (login && login.length > 0 && data.client.user.login !== login) editElement.login = login
                                                         editElement.phone = phone
-                                                        if (info && info.length > 0 && info !== data.client.info) editElement.info = info
                                                         if (city && city.length > 0 && city !== data.client.city) editElement.city = city
                                                         if (newPass && newPass.length > 0) editElement.newPass = newPass
                                                        const action = async () => {
@@ -405,7 +392,6 @@ const Client = React.memo((props) => {
                                                             if(email.length>0)editElement.email = email
                                                             if(inn.length>0)editElement.inn = inn
                                                             editElement.phone = phone
-                                                            if(info.length>0)editElement.info = info
                                                             if(city.length>0)editElement.city = city
                                                             const action = async() => {
                                                                 await addClient(editElement)
@@ -506,9 +492,6 @@ const Client = React.memo((props) => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className={classes.info}>
-                                        {info}
-                                    </div>
                                 </div>
                                 </>
                             :
@@ -539,9 +522,7 @@ Client.getInitialProps = async function(ctx) {
                         inn: '',
                         phone: [],
                         address: [],
-                        info: '',
                         image: '/static/add.png',
-                        reiting: 0,
                         city: '',
                         type: '',
                         birthday: null,

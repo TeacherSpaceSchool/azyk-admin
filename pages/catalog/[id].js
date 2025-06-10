@@ -15,14 +15,10 @@ import Router from 'next/router'
 import BuyBasket from '../../components/dialog/BuyBasket'
 import Image from '../../components/dialog/Image'
 import { useRouter } from 'next/router'
-import { urlMain } from '../../redux/constants/other'
 import { getClient } from '../../src/gql/client'
 import { getClientGqlSsr } from '../../src/getClientGQL'
-import { forceCheck } from 'react-lazyload';
 import { deleteBasketAll } from '../../src/gql/basket';
 import Divider from '@material-ui/core/Divider';
-import LazyLoad from 'react-lazyload';
-import CardCatalogPlaceholder from '../../components/catalog/CardCatalogPlaceholder'
 import initialApp from '../../src/initialApp'
 import { getOrganization } from '../../src/gql/organization'
 import {getAdss} from '../../src/gql/ads'
@@ -59,7 +55,6 @@ const Catalog = React.memo((props) => {
         setList((await getBrands({organization: router.query.id, search, sort})).brands)
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-        forceCheck();
     }
     useEffect(()=>{
         (async()=>{
@@ -268,61 +263,60 @@ const Catalog = React.memo((props) => {
                                     price = row.price
                                 if(idx<pagination&&(isEmpty(data.stockClient[row._id])||data.stockClient[row._id]>0))
                                     return(
-                                        <LazyLoad scrollContainer={'.App-body'} key={row._id} offset={[186, 0]} debounce={0} once={true}  placeholder={<CardCatalogPlaceholder/>}>
-                                            <div style={{width: '100%'}}>
-                                                <div className={classes.line}>
-                                                    <img className={classes.media} style={{border: `solid ${row.hit? 'yellow': row.latest? 'green': 'transparent'} 1px`}} src={row.image} onClick={()=>{
-                                                        setFullDialog(row.name, <Image imgSrc={row.image}/>)
-                                                        showFullDialog(true)
-                                                    }}/>
-                                                    <div className={classes.column} style={{width: 'calc(100% - 142px)'}}>
-                                                        <div className={classes.value}>{row.name}</div>
-                                                        <b className={classes.value}>
-                                                            {`${price} сом`}
-                                                        </b>
-                                                        <div className={classes.line}>
-                                                            <div className={classes.counter}>
-                                                                <div className={classes.counterbtn} onClick={() => {
-                                                                    decrement(idx)
-                                                                }}>–
-                                                                </div>
-                                                                <input readOnly={!row.apiece} type={isMobileApp?'number':'text'} className={classes.counternmbr}
-                                                                       value={basket[row._id]?basket[row._id].count:''} onChange={(event) => {
-                                                                    setBasketChange(idx, event.target.value)
-                                                                }}/>
-                                                                <div className={classes.counterbtn} onClick={() => {
-                                                                    increment(idx)
-                                                                }}>+
-                                                                </div>
+                                        <div style={{width: '100%'}}>
+                                            <div className={classes.line}>
+                                                <img className={classes.media} style={{border: `solid ${row.hit? 'yellow': row.latest? 'green': 'transparent'} 1px`}} src={row.image} onClick={()=>{
+                                                    setFullDialog(row.name, <Image imgSrc={row.image}/>)
+                                                    showFullDialog(true)
+                                                }}/>
+                                                <div className={classes.column} style={{width: 'calc(100% - 142px)'}}>
+                                                    <div className={classes.value}>{row.name}</div>
+                                                    <b className={classes.value}>
+                                                        {`${price} сом`}
+                                                    </b>
+                                                    <div className={classes.line}>
+                                                        <div className={classes.counter}>
+                                                            <div className={classes.counterbtn} onClick={() => {
+                                                                decrement(idx)
+                                                            }}>–
                                                             </div>
-                                                            {
-                                                                row.organization.consignation?
-                                                                    <>
+                                                            <input readOnly={!row.apiece} type={isMobileApp?'number':'text'} className={classes.counternmbr}
+                                                                   value={basket[row._id]?basket[row._id].count:''} onChange={(event) => {
+                                                                setBasketChange(idx, event.target.value)
+                                                            }}/>
+                                                            <div className={classes.counterbtn} onClick={() => {
+                                                                increment(idx)
+                                                            }}>+
+                                                            </div>
+                                                        </div>
+                                                        {
+                                                            row.organization.consignation?
+                                                                <>
                                                                     &nbsp;&nbsp;&nbsp;
                                                                     <div className={classes.showCons} style={{color: basket[row._id]&&basket[row._id].showConsignment?'#ffb300':'#000'}} onClick={()=>{
                                                                         showConsignment(idx)
                                                                     }}>
                                                                         КОНС
                                                                     </div>
-                                                                    </>
-                                                                    :
-                                                                    null
-                                                            }
-                                                        </div>
-                                                        {row.apiece?
-                                                            <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
-                                                                addPackaging(idx)
-                                                            }}>
-                                                                Добавить упаковку
-                                                            </div>
-                                                            :
-                                                            <div className={classes.addPackaging} style={{color: '#ffb300'}}>
-                                                                Упаковок: {basket[row._id]?(basket[row._id].count/row.packaging).toFixed(1):0}
-                                                            </div>
+                                                                </>
+                                                                :
+                                                                null
                                                         }
-                                                        {
-                                                            basket[row._id]&&basket[row._id].showConsignment?
-                                                                <>
+                                                    </div>
+                                                    {row.apiece?
+                                                        <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
+                                                            addPackaging(idx)
+                                                        }}>
+                                                            Добавить упаковку
+                                                        </div>
+                                                        :
+                                                        <div className={classes.addPackaging} style={{color: '#ffb300'}}>
+                                                            Упаковок: {basket[row._id]?(basket[row._id].count/row.packaging).toFixed(1):0}
+                                                        </div>
+                                                    }
+                                                    {
+                                                        basket[row._id]&&basket[row._id].showConsignment?
+                                                            <>
                                                                 <br/>
                                                                 <div className={classes.row}>
                                                                     <div className={classes.valuecons}>Консигнация</div>
@@ -335,17 +329,16 @@ const Catalog = React.memo((props) => {
                                                                 }}>
                                                                     Добавить упаковку
                                                                 </div>
-                                                                </>
-                                                                :
-                                                                null
-                                                        }
-                                                    </div>
+                                                            </>
+                                                            :
+                                                            null
+                                                    }
                                                 </div>
-                                                <br/>
-                                                <Divider/>
-                                                <br/>
                                             </div>
-                                        </LazyLoad>
+                                            <br/>
+                                            <Divider/>
+                                            <br/>
+                                        </div>
                                     )
                             })
                             :

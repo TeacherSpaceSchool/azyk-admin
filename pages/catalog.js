@@ -12,17 +12,13 @@ import * as snackbarActions from '../redux/actions/snackbar'
 import Router from 'next/router'
 import BuyBasket from '../components/dialog/BuyBasket'
 import SetPackage from '../components/dialog/SetPackage'
-import { urlMain } from '../redux/constants/other'
 import { getClient, getClients } from '../src/gql/client'
 import TextField from '@material-ui/core/TextField';
 import { getClientGqlSsr } from '../src/getClientGQL'
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { forceCheck } from 'react-lazyload';
 import { deleteBasketAll } from '../src/gql/basket';
 import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
-import LazyLoad from 'react-lazyload';
-import CardCatalogPlaceholder from '../components/catalog/CardCatalogPlaceholder'
 import initialApp from '../src/initialApp'
 import { getBrandOrganizations, getBrands } from '../src/gql/items'
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -90,7 +86,6 @@ const Catalog = React.memo((props) => {
             setList([...list]);
             (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
             setPagination(100);
-            forceCheck();
         }
         setNormalPrices({...normalPrices})
     }
@@ -460,7 +455,6 @@ const Catalog = React.memo((props) => {
                                 price = row.price
                             if(idx<pagination)
                                 return(
-                                    <LazyLoad scrollContainer={'.App-body'} key={row._id} offset={[186, 0]} debounce={0} once={true}  placeholder={<CardCatalogPlaceholder/>}>
                                         <div>
                                             <div className={classes.line}>
                                                 <img className={classes.media} src={row.image}/>
@@ -539,7 +533,6 @@ const Catalog = React.memo((props) => {
                                             <Divider/>
                                             <br/>
                                         </div>
-                                    </LazyLoad>
                                 )
                             }
                         )
@@ -592,7 +585,7 @@ const Catalog = React.memo((props) => {
 
 Catalog.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['агент', 'суперагент', /*'экспедитор', 'суперорганизация', 'организация', 'менеджер', 'суперэкспедитор'*/].includes(ctx.store.getState().user.profile.role))
+    if(!['агент', 'суперагент', 'экспедитор', 'суперорганизация', 'организация', 'менеджер', 'суперэкспедитор'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'

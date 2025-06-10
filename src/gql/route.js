@@ -60,7 +60,6 @@ export const getRoute = async({_id}, client)=>{
                                     createdAt
                                     updatedAt
                                     allTonnage
-                                    allSize
                                     client 
                                         { 
                                             _id
@@ -73,7 +72,6 @@ export const getRoute = async({_id}, client)=>{
                                     allPrice
                                     consignmentPrice
                                     returnedPrice
-                                    info
                                     address
                                     paymentMethod
                                     discount
@@ -113,7 +111,6 @@ export const getRoute = async({_id}, client)=>{
                                     createdAt
                                     updatedAt
                                     allTonnage
-                                    allSize
                                     client 
                                         { 
                                             _id
@@ -126,7 +123,6 @@ export const getRoute = async({_id}, client)=>{
                                     allPrice
                                     consignmentPrice
                                     returnedPrice
-                                    info
                                     address
                                     paymentMethod
                                     discount
@@ -235,7 +231,6 @@ export const buildRoute = async({autoTonnage, orders, provider, length})=>{
                                 createdAt
                                 updatedAt
                                 allTonnage
-                                allSize
                                 client 
                                     { 
                                         _id
@@ -248,7 +243,6 @@ export const buildRoute = async({autoTonnage, orders, provider, length})=>{
                                 allPrice
                                 consignmentPrice
                                 returnedPrice
-                                info
                                 address
                                 paymentMethod
                                 discount

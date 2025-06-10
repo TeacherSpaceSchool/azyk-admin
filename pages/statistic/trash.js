@@ -11,11 +11,8 @@ import {getAdssTrash} from '../../src/gql/ads'
 import {getItemsTrash} from '../../src/gql/items'
 import { connect } from 'react-redux'
 import Router from 'next/router'
-import { urlMain } from '../../redux/constants/other'
-import { forceCheck } from 'react-lazyload';
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
-import CardClientPlaceholder from '../../components/client/CardClientPlaceholder'
 import CardClient from '../../components/client/CardClient'
 import CardOrder from '../../components/order/CardOrder'
 import CardReturned from '../../components/returned/CardReturned'
@@ -23,9 +20,6 @@ import CardAds from '../../components/ads/CardAds'
 import CardItem from '../../components/items/CardItem'
 import CardOrganization from '../../components/organization/CardOrganization'
 import CardEmployment from '../../components/employment/CardEmployment'
-import LazyLoad from 'react-lazyload';
-const height = 140;
-
 
 const Trash = React.memo((props) => {
     const classes = pageListStyle();
@@ -95,7 +89,6 @@ const Trash = React.memo((props) => {
                 setList(list)
                 setSimpleStatistic(simpleStatistic)
                 setType(filter)
-                forceCheck()
                 setPaginationWork(true);
                 setPagination(100);
                 (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
@@ -124,36 +117,31 @@ const Trash = React.memo((props) => {
             <div className={classes.page}>
                 {list?list.map((element, idx)=> {
                     return(
-                        <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]}
-                                  debounce={0} once={true} placeholder={<CardClientPlaceholder height={height}/>}>
-                            {
-                                type===filter?
-                                    type==='Клиенты'?
-                                        <CardClient list={list} idx={idx} key={element._id} setList={setList} element={element}/>
-                                        :
-                                    type==='Заказы'?
-                                        <CardOrder selected={[]} list={list} idx={idx} setList={setList} key={element._id} element={element}/>
-                                        :
+                        type===filter?
+                            type==='Клиенты'?
+                                <CardClient list={list} idx={idx} key={element._id} setList={setList} element={element}/>
+                                :
+                                type==='Заказы'?
+                                    <CardOrder selected={[]} list={list} idx={idx} setList={setList} key={element._id} element={element}/>
+                                    :
                                     type==='Возвраты'&&element.items?
                                         <CardReturned selected={[]} list={list} idx={idx} setList={setList} key={element._id} element={element}/>
                                         :
-                                    type==='Товары'?
-                                        <CardItem setList={setList} key={element._id} element={element} list={list}/>
-                                        :
-                                    type==='Организации'?
-                                        <CardOrganization list={list} key={element._id} setList={setList} element={element}/>
-                                        :
-                                    type==='Акции'?
-                                        <CardAds edit={true} list={list} key={element._id} setList={setList} element={element}/>
+                                        type==='Товары'?
+                                            <CardItem setList={setList} key={element._id} element={element} list={list}/>
                                             :
-                                    type==='Сотрудники'?
-                                        <CardEmployment list={list} key={element._id} setList={setList} element={element}/>
-                                        :
-                                        null
-                                :
-                                    null
-                            }
-                        </LazyLoad>
+                                            type==='Организации'?
+                                                <CardOrganization list={list} key={element._id} setList={setList} element={element}/>
+                                                :
+                                                type==='Акции'?
+                                                    <CardAds edit={true} list={list} key={element._id} setList={setList} element={element}/>
+                                                    :
+                                                    type==='Сотрудники'?
+                                                        <CardEmployment list={list} key={element._id} setList={setList} element={element}/>
+                                                        :
+                                                        null
+                            :
+                            null
                     )}
                 ):null}
             </div>

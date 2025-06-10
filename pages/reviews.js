@@ -6,10 +6,6 @@ import { getBrandOrganizations } from '../src/gql/items'
 import { getReviews } from '../src/gql/review'
 import pageListStyle from '../src/styleMUI/review/reviewList'
 import CardReviews from '../components/review/CardReview'
-import { urlMain } from '../redux/constants/other'
-import LazyLoad from 'react-lazyload';
-import { forceCheck } from 'react-lazyload';
-import CardReviewsPlaceholder from '../components/review/CardReviewPlaceholder'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
@@ -20,7 +16,6 @@ const Reviews = React.memo((props) => {
     const { data } = props;
     let [list, setList] = useState(data.reviews);
     const { filter, organization } = props.app;
-    let height = 189
     let [paginationWork, setPaginationWork] = useState(true);
     const checkPagination = async()=>{
         if(paginationWork){
@@ -36,7 +31,6 @@ const Reviews = React.memo((props) => {
         setList((await getReviews({organization: organization, filter: filter, skip: 0})).reviews)
         setPaginationWork(true);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-        forceCheck()
     }
     useEffect(()=>{
         (async () => {
@@ -59,9 +53,7 @@ const Reviews = React.memo((props) => {
                 {
                     list?list.map((element, idx)=> {
                             return(
-                                <LazyLoad scrollContainer={'.App-body'} key={element._id} height={height} offset={[height, 0]} debounce={0} once={true}  placeholder={<CardReviewsPlaceholder height={height}/>}>
-                                    <CardReviews list={list} idx={idx} element={element} organizations={data.brandOrganizations} setList={setList}/>
-                                </LazyLoad>
+                                <CardReviews list={list} idx={idx} element={element} organizations={data.brandOrganizations} setList={setList}/>
                             )}
                     ):null
                 }
