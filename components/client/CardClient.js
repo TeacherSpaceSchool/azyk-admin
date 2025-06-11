@@ -17,10 +17,11 @@ import Confirmation from '../../components/dialog/Confirmation'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import { addAgentHistoryGeo } from '../../src/gql/agentHistoryGeo'
 import {getGeoDistance} from '../../src/lib'
-import Router from 'next/router'
+import Router, {useRouter} from 'next/router'
 
 const CardOrganization = React.memo((props) => {
     const classes = cardOrganizationStyle();
+    const router = useRouter();
     const { element, setList, idx, list, buy } = props;
     const { isMobileApp } = props.app;
     const { profile } = props.user;
@@ -168,7 +169,7 @@ const CardOrganization = React.memo((props) => {
             </CardActionArea>
             <CardActions style={isMobileApp?{flexDirection: 'row-reverse'}:{}}>
                 {
-                    ['агент', 'суперагент'].includes(profile.role)&&buy ?
+                    ['агент', 'суперагент'].includes(profile.role)&&buy&&router.asPath.includes('agentroute') ?
                         <>
                         <Link href={{pathname: '/catalog', query: { client: element._id }}}>
                             <Button /*onClick={async()=>{
