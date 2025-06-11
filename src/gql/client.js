@@ -208,6 +208,7 @@ export const getClient = async({_id: _id}, client)=>{
                             inn
                             email
                             address
+                            info
                             city
                             category
                             phone
@@ -296,8 +297,8 @@ export const setClient = async(element, client)=>{
         await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($_id: ID!, $phone: [String], $login: String, $device: String, $category: String, $city: String, $image: Upload, $name: String, $inn: String, $email: String, $address: [[String]], $newPass: String) {
-                        setClient(_id: $_id, device: $device, phone: $phone, login: $login, category: $category, city: $city, image: $image, name: $name, inn: $inn, email: $email, address: $address, newPass: $newPass) {
+                    mutation ($_id: ID!, $phone: [String], $login: String, $device: String, $category: String, $city: String, $image: Upload, $name: String, $inn: String, $email: String, $address: [[String]], $info: String, $newPass: String) {
+                        setClient(_id: $_id, device: $device, phone: $phone, login: $login, category: $category, city: $city, image: $image, name: $name, inn: $inn, email: $email, address: $address, info: $info, newPass: $newPass) {
                              data
                         }
                     }`})
@@ -312,8 +313,8 @@ export const addClient = async(element)=>{
         await client.mutate({
             variables: element,
             mutation : gql`
-                    mutation ($image: Upload, $name: String!, $inn: String, $email: String, $category: String!, $city: String!, $address: [[String]]!, $phone: [String]!, $password: String!, $login: String!) {
-                        addClient(image: $image, name: $name, inn: $inn, email: $email, category: $category, city: $city, address: $address, phone: $phone, password: $password, login: $login) {
+                    mutation ($image: Upload, $name: String!, $inn: String, $email: String, $category: String!, $city: String!, $address: [[String]]!, $phone: [String]!, $password: String!, $info: String, $login: String!) {
+                        addClient(image: $image, name: $name, inn: $inn, email: $email, category: $category, city: $city, address: $address, phone: $phone, password: $password, info: $info, login: $login) {
                              data
                         }
                     }`})

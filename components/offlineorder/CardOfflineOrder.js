@@ -71,6 +71,7 @@ const CardOfflineOrder = React.memo((props) => {
                                 inv: element.inv,
                                 priority: element.priority,
                                 unite: element.unite,
+                                info: element.info,
                                 paymentMethod: element.paymentMethod,
                                 organization: element.organization,
                                 client: element.client,

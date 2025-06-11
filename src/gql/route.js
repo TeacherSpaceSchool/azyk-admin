@@ -72,6 +72,7 @@ export const getRoute = async({_id}, client)=>{
                                     allPrice
                                     consignmentPrice
                                     returnedPrice
+                                    info
                                     address
                                     paymentMethod
                                     discount
@@ -123,6 +124,7 @@ export const getRoute = async({_id}, client)=>{
                                     allPrice
                                     consignmentPrice
                                     returnedPrice
+                                    info
                                     address
                                     paymentMethod
                                     discount
@@ -243,6 +245,7 @@ export const buildRoute = async({autoTonnage, orders, provider, length})=>{
                                 allPrice
                                 consignmentPrice
                                 returnedPrice
+                                info
                                 address
                                 paymentMethod
                                 discount

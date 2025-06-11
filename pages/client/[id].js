@@ -92,6 +92,7 @@ const Client = React.memo((props) => {
         setAddress([...address])
     };
 
+    let [info, setInfo] = useState(data.client&&data.client.info?data.client.info:'');
     let [preview, setPreview] = useState(data.client&&data.client.image?data.client.image:'/static/add.png');
     let [image, setImage] = useState(undefined);
     let handleChangeImage = ((event) => {
@@ -314,6 +315,16 @@ const Client = React.memo((props) => {
                                             'aria-label': 'description',
                                         }}
                                     />
+                                    <TextField
+                                        multiline={true}
+                                        label='Информация'
+                                        value={info}
+                                        className={classes.input}
+                                        onChange={(event)=>{setInfo(event.target.value)}}
+                                        inputProps={{
+                                            'aria-label': 'description',
+                                        }}
+                                    />
                                     <div className={classes.row}>
                                         {
                                             (router.query.id!=='new'&&['суперорганизация', 'организация', 'агент', 'экспедитор', 'admin', 'суперагент'].includes(profile.role))/*||(data.client.user&&profile._id===data.client.user._id)*/?
@@ -333,6 +344,7 @@ const Client = React.memo((props) => {
                                                         if (inn !== data.client.inn) editElement.inn = inn
                                                         if (login && login.length > 0 && data.client.user.login !== login) editElement.login = login
                                                         editElement.phone = phone
+                                                        if (info && info.length > 0 && info !== data.client.info) editElement.info = info
                                                         if (city && city.length > 0 && city !== data.client.city) editElement.city = city
                                                         if (newPass && newPass.length > 0) editElement.newPass = newPass
                                                        const action = async () => {
@@ -392,6 +404,7 @@ const Client = React.memo((props) => {
                                                             if(email.length>0)editElement.email = email
                                                             if(inn.length>0)editElement.inn = inn
                                                             editElement.phone = phone
+                                                            if(info.length>0)editElement.info = info
                                                             if(city.length>0)editElement.city = city
                                                             const action = async() => {
                                                                 await addClient(editElement)
@@ -492,6 +505,9 @@ const Client = React.memo((props) => {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className={classes.info}>
+                                        {info}
+                                    </div>
                                 </div>
                                 </>
                             :
@@ -522,6 +538,7 @@ Client.getInitialProps = async function(ctx) {
                         inn: '',
                         phone: [],
                         address: [],
+                        info: '',
                         image: '/static/add.png',
                         city: '',
                         type: '',

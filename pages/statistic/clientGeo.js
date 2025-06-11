@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import Router from 'next/router'
 import initialApp from '../../src/initialApp'
 import { getClientGqlSsr } from '../../src/getClientGQL'
-import { getStatisticClientGeo, getActiveOrganization } from '../../src/gql/statistic'
+import { getStatisticClientGeo, getActiveItem, getActiveOrganization } from '../../src/gql/statistic'
 import { Map, YMaps, ObjectManager } from 'react-yandex-maps';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -35,7 +35,7 @@ const ClientGeoStatistic = React.memo((props) => {
     let [greenData, setGreenData] = useState([]);
     let [yellowData, setYellowData] = useState([]);
     let [redData, setRedData] = useState([]);
-    /*useEffect(()=>{
+    useEffect(()=>{
         (async()=>{
             if(profile.role==='admin') {
                 setItem(null)
@@ -46,7 +46,7 @@ const ClientGeoStatistic = React.memo((props) => {
                 //setStatisticClientGeo((await getStatisticClientGeo({organization: organization ? organization._id : null})).statisticClientGeo)
             }
         })()
-    },[organization])*/
+    },[organization])
     let [searchTimeOut, setSearchTimeOut] = useState(null);
     useEffect(()=>{
         (async()=>{
@@ -61,7 +61,7 @@ const ClientGeoStatistic = React.memo((props) => {
                 setSearchTimeOut(searchTimeOut)
             }
         })()
-    },[/*item, items, */search, organization, activeOrganization])
+    },[item, items, search, organization, activeOrganization])
     useEffect(()=>{
         (async()=>{
             if(initialRender.current) {
@@ -185,20 +185,18 @@ const ClientGeoStatistic = React.memo((props) => {
                                             null
                                     }
                                         {
-                                           /* statisticClientGeo?
+                                            statisticClientGeo?
                                                 (statisticClientGeo.slice(1)).map(
                                                         (element, idx) => {
                                                             return <Placemark
                                                                 onClick={()=>{window.open(`/client/${element.client}`,'_blank');}}
                                                                 key={idx}
                                                                 options={{iconColor: element.data[1]}}
-                                                                properties={{iconCaption: }}
                                                                 geometry={element.address[1].split(', ')}/>
                                                         }
                                                     )
                                                 :
                                                 null
-                                                */
                                         }
                                 </Map>
                             </div>
