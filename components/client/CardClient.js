@@ -169,7 +169,7 @@ const CardOrganization = React.memo((props) => {
             </CardActionArea>
             <CardActions style={isMobileApp?{flexDirection: 'row-reverse'}:{}}>
                 {
-                    ['агент', 'суперагент'].includes(profile.role)&&buy&&router.asPath.includes('agentroute') ?
+                    ['агент', 'суперагент'].includes(profile.role)&&buy ?
                         <>
                         <Link href={{pathname: '/catalog', query: { client: element._id }}}>
                             <Button /*onClick={async()=>{
