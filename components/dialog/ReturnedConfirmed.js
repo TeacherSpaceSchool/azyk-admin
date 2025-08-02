@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
@@ -27,6 +27,7 @@ const ReturnedConfirmed =  React.memo(
         const {client, allPrice, organization, items, geo} = props;
         const {showMiniDialog} = props.mini_dialogActions;
         const {classes} = props;
+        const unlock = useRef(true);
         const width = isMobileApp? (window.innerWidth-112) : 500
         let [info, setInfo] = useState('');
         let [inv, setInv] = useState(false);
@@ -40,27 +41,31 @@ const ReturnedConfirmed =  React.memo(
         let [dateDeliverys, setDateDeliverys] = useState([true, true, true, true, true, true, false]);
         let [week, setWeek] = useState([]);
         useEffect(() => {
-            (async () => {
-                const deliveryDate = await getDeliveryDate({client: client._id, organization: organization._id})
-                if(deliveryDate) {
-                    dateDeliverys = deliveryDate.days
-                    setDateDeliverys([...dateDeliverys])
-                }
-                for (let i = 0; i < 7; i++) {
-                    let day = new Date()
-                    if(day.getHours()>=3)
-                        day.setDate(day.getDate()+1)
-                    day.setDate(day.getDate()+i)
-                    day.setHours(3, 0, 0, 0)
-                    let dayWeek = day.getDay() === 0 ? 6 : (day.getDay() - 1)
-                    week[dayWeek] = day
-                    if(!dateDelivery&&dateDeliverys[dayWeek]) {
-                        dateDelivery = day
-                        setDateDelivery(dateDelivery)
+            if(unlock.current) {
+                unlock.current = false;
+                (async () => {
+                    const deliveryDate = await getDeliveryDate({client: client._id, organization: organization._id})
+                    if(deliveryDate) {
+                        dateDeliverys = deliveryDate.days
+                        setDateDeliverys([...dateDeliverys])
                     }
-                }
-                setWeek([...week])
-            })()
+                    for (let i = 0; i < 7; i++) {
+                        let day = new Date()
+                        if(day.getHours()>=3)
+                            day.setDate(day.getDate()+1)
+                        day.setDate(day.getDate()+i)
+                        day.setHours(3, 0, 0, 0)
+                        let dayWeek = day.getDay() === 0 ? 6 : (day.getDay() - 1)
+                        week[dayWeek] = day
+                        if(!dateDelivery&&dateDeliverys[dayWeek]) {
+                            dateDelivery = day
+                            setDateDelivery(dateDelivery)
+                        }
+                    }
+                    setWeek([...week])
+                })()
+                unlock.current = true;
+            }
         }, [])
         return (
             <div className={classes.main}>
@@ -107,24 +112,30 @@ const ReturnedConfirmed =  React.memo(
                 <br/>
                 <div>
                     <Button variant='contained' color='primary' onClick={async () => {
-                        if(geo&&client.address[0][1].includes(', ')) {
-                            let distance = getGeoDistance(geo.coords.latitude, geo.coords.longitude, ...(client.address[0][1].split(', ')))
-                            if(distance<1000) {
-                                unawaited(() => addAgentHistoryGeo({client: client._id, geo: `${geo.coords.latitude}, ${geo.coords.longitude}`}))
+                        if(unlock.current) {
+                            unlock.current = false
+                            if (geo && client.address[0][1].includes(', ')) {
+                                let distance = getGeoDistance(geo.coords.latitude, geo.coords.longitude, ...(client.address[0][1].split(', ')))
+                                if (distance < 1000) {
+                                    unawaited(() => addAgentHistoryGeo({
+                                        client: client._id,
+                                        geo: `${geo.coords.latitude}, ${geo.coords.longitude}`
+                                    }))
+                                }
                             }
+                            await addReturned({
+                                inv,
+                                unite: organization.unite,
+                                info: info,
+                                address: client.address[0],
+                                organization: organization._id,
+                                client: client._id,
+                                items: Object.values(items),
+                                dateDelivery
+                            })
+                            Router.push('/returneds')
+                            showMiniDialog(false);
                         }
-                        await addReturned({
-                            inv,
-                            unite: organization.unite,
-                            info: info,
-                            address: client.address[0],
-                            organization: organization._id,
-                            client: client._id,
-                            items: Object.values(items),
-                            dateDelivery
-                        })
-                        Router.push('/returneds')
-                        showMiniDialog(false);
                     }} className={classes.button}>
                         Добавить
                     </Button>
