@@ -20,16 +20,17 @@ const Client = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [list, setList] = useState(data.clients);
-    let [simpleStatistic, setSimpleStatistic] = useState(data.clientsSimpleStatistic);
+    let [simpleStatistic, setSimpleStatistic] = useState();
+    const getSimpleStatistic = async () => {
+        // eslint-disable-next-line no-undef
+        setSimpleStatistic(await getClientsSimpleStatistic({search, filter, date, city}))
+    }
     const paginationWork = useRef(true);
     const getList = async () => {
+        unawaited(getSimpleStatistic)
         // eslint-disable-next-line no-undef
-        const [clients, clientsSimpleStatistic] = await Promise.all([
-            getClients({search, sort, filter, date, skip: 0, city}),
-            getClientsSimpleStatistic({search, filter, date, city})
-        ])
+        const clients = await getClients({search, sort, filter, date, skip: 0, city})
         setList(clients);
-        setSimpleStatistic(clientsSimpleStatistic);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
         paginationWork.current = true;
     }
@@ -41,8 +42,10 @@ const Client = React.memo((props) => {
         if(!initialRender.current) unawaited(getList)
     }, [filter, sort, date, city])
     useEffect(() => {
-            if(initialRender.current) 
+            if(initialRender.current) {
                 initialRender.current = false;
+                unawaited(getSimpleStatistic)
+            }
             else {
                 if(searchTimeOut.current)
                     clearTimeout(searchTimeOut.current)
@@ -100,15 +103,9 @@ Client.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
-    // eslint-disable-next-line no-undef
-    const [clients, clientsSimpleStatistic] = await Promise.all([
-        getClients({search: '', sort: '-createdAt', filter: '', skip: 0, city: ctx.store.getState().app.city}, getClientGqlSsr(ctx.req)),
-        getClientsSimpleStatistic({search: '', sort: '-createdAt', filter: '', city: ctx.store.getState().app.city}, getClientGqlSsr(ctx.req))
-    ])
     return {
         data: {
-            clients,
-            clientsSimpleStatistic
+            clients: getClients({search: '', sort: '-createdAt', filter: '', skip: 0, city: ctx.store.getState().app.city}, getClientGqlSsr(ctx.req)),
         }
     };
 };
