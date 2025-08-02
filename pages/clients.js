@@ -105,7 +105,7 @@ Client.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            clients: getClients({search: '', sort: '-createdAt', filter: '', skip: 0, city: ctx.store.getState().app.city}, getClientGqlSsr(ctx.req)),
+            clients: await getClients({search: '', sort: '-createdAt', filter: '', skip: 0, city: ctx.store.getState().app.city}, getClientGqlSsr(ctx.req)),
         }
     };
 };
