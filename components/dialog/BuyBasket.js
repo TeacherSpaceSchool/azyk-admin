@@ -26,7 +26,6 @@ import { getDeliveryDate } from '../../src/gql/deliveryDate';
 import { pdDDMMYYYYWW } from '../../src/lib';
 import { putOfflineOrders } from '../../src/service/idb/offlineOrders';
 
-/*test*/
 const BuyBasket =  React.memo(
     (props) =>{
         const {isMobileApp} = props.app;
