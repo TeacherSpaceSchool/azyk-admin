@@ -7,8 +7,8 @@ import * as snackbarActions from '../../redux/actions/snackbar'
 
 const MyDialog =  React.memo(
     (props) =>{
-        const { title, show } = props.snackbar;
-        const { closeSnackBar } = props.snackbarActions;
+        const {title, show} = props.snackbar;
+        const {closeSnackBar} = props.snackbarActions;
         return (
             <Snackbar
                 anchorOrigin={{

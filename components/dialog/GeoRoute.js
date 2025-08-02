@@ -18,39 +18,39 @@ import {getOrder} from '../../src/gql/order'
 
 const Geo =  React.memo(
     (props) =>{
-        const { showFullDialog, setMiniDialog, showMiniDialog } = props.mini_dialogActions;
-        const { showSnackBar } = props.snackbarActions;
-        const { classes, legs, invoices, setList  } = props;
+        const {showFullDialog, setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+        const {showSnackBar} = props.snackbarActions;
+        const {classes, legs, invoices, setList} = props;
         let [_list, _setList] = useState(invoices);
-        let _setList_ = (list)=>{
+        let _setList_ = (list) => {
             setList([...list])
             _setList([...list])
         }
         let [load, setLoad] = useState(true);
-        const searchTimeOutRef = useRef(null);
+        const geolocationTimeOut = useRef(null);
         let [geo, setGeo] = useState(null);
         let [follow, setFollow] = useState(false);
         let [navigation, setNavigation] = useState(false);
         let [unacceptedIdx, setUnacceptedIdx] = useState(0);
-        useEffect(()=>{
-            if (navigator.geolocation) {
-                searchTimeOutRef.current = setInterval(() => {
+        useEffect(() => {
+            if(navigator.geolocation) {
+                geolocationTimeOut.current = setInterval(() => {
                     navigator.geolocation.getCurrentPosition((position) => {
                         setGeo([position.coords.latitude, position.coords.longitude])
                     });
                 }, 1000)
-                return ()=>{
-                    clearInterval(searchTimeOutRef.current)
+                return () => {
+                    clearInterval(geolocationTimeOut.current)
                 }
             } else {
                 showSnackBar('Геолокация не поддерживается')
             }
         }, []);
-        useEffect(()=>{
+        useEffect(() => {
             if(navigation) {
                 unacceptedIdx = -1
-                for(let i=0; i<_list.length; i++){
-                    if(unacceptedIdx===-1&&!_list[i].confirmationForwarder){
+                for(let i=0; i<_list.length; i++) {
+                    if(unacceptedIdx===-1&&!_list[i].confirmationForwarder) {
                         unacceptedIdx = i
                     }
                 }
@@ -67,7 +67,7 @@ const Geo =  React.memo(
                         }
                         {geo&&follow?
                             <div style={{display: load?'none':'block'}}>
-                                <Map onLoad={()=>{setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48} defaultState={{ center: ['42.8700000', '74.5900000'], zoom: 12 }}
+                                <Map onLoad={() => {setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48} defaultState={{ center: ['42.8700000', '74.5900000'], zoom: 12 }}
                                      state={{ center: geo, zoom: 18 }}>
                                     <TrafficControl options={{ float: 'right' }} />
                                     {legs.map((leg, idx)=> {
@@ -111,10 +111,10 @@ const Geo =  React.memo(
                                             return(
                                                 <Placemark
                                                     key={invoice._id}
-                                                    onClick={async() => {
-                                                        let _elemenet = (await getOrder({_id: invoice._id})).invoice
+                                                    onClick={async () => {
+                                                        let _elemenet = await getOrder(invoice._id)
                                                         if(_elemenet) {
-                                                            if(geo){
+                                                            if(geo) {
                                                                 setMiniDialog('Заказ', <OpenOrderRoute idx={idx} _list={_list}
                                                                                               _setList_={_setList_}
                                                                                               route={false}
@@ -145,7 +145,7 @@ const Geo =  React.memo(
                             </div>
                             :
                             <div style={{display: load?'none':'block'}}>
-                                <Map onLoad={()=>{setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48} defaultState={{ center: ['42.8700000', '74.5900000'], zoom: 12 }} >
+                                <Map onLoad={() => {setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48} defaultState={{ center: ['42.8700000', '74.5900000'], zoom: 12 }} >
                                     <TrafficControl options={{ float: 'right' }} />
                                     {legs.map((leg, idx)=> {
                                         if(!navigation||idx===unacceptedIdx||(unacceptedIdx===-1&&idx===legs.length-1))
@@ -196,9 +196,9 @@ const Geo =  React.memo(
                                                         iconColor: invoice.confirmationForwarder?'#ffb300':'#ff0000'
                                                     }}
                                                     onClick={async () => {
-                                                        let _elemenet = (await getOrder({_id: invoice._id})).invoice
+                                                        let _elemenet = await getOrder(invoice._id)
                                                         if(_elemenet) {
-                                                            if(geo){
+                                                            if(geo) {
                                                                 setMiniDialog('Заказ', <OpenOrderRoute idx={idx}
                                                                                                        _list={_list}
                                                                                                        _setList_={_setList_}
@@ -227,14 +227,14 @@ const Geo =  React.memo(
                         }
                     </div>
                     <center>
-                        <Button variant='contained' color='secondary' onClick={()=>{showFullDialog(false);}} className={classes.button}>
+                        <Button variant='contained' color='secondary' onClick={() => {showFullDialog(false);}} className={classes.button}>
                             Закрыть
                         </Button>
                     </center>
-                    <Fab color={navigation?'primary':'secondary'} aria-label='Начать маршрут' className={classes.fabNavigation} onClick={()=>setNavigation(!navigation)}>
+                    <Fab color={navigation?'primary':'secondary'} className={classes.fabNavigation} onClick={()=>setNavigation(!navigation)}>
                         <Navigation/>
                     </Fab>
-                    <Fab color={follow?'primary':'secondary'} aria-label='Найти геолокацию' className={classes.fabGeo} onClick={()=>setFollow(!follow)}>
+                    <Fab color={follow?'primary':'secondary'} className={classes.fabGeo} onClick={()=>setFollow(!follow)}>
                         <GpsFixed/>
                     </Fab>
                 </div>

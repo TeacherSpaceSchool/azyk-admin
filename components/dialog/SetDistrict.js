@@ -11,10 +11,10 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const SetDistrict =  React.memo(
     (props) =>{
-        const { classes, districts, setDistrict } = props;
-        let [districtChange, setDistrictChange] = useState(undefined);
-        const { isMobileApp } = props.app;
-        const { showMiniDialog } = props.mini_dialogActions;
+        const {classes, districts, setDistrict} = props;
+        let [districtChange, setDistrictChange] = useState(null);
+        const {isMobileApp} = props.app;
+        const {showMiniDialog} = props.mini_dialogActions;
         const width = isMobileApp? (window.innerWidth-112) : 500
         return (
             <div className={classes.main}>
@@ -31,8 +31,8 @@ const SetDistrict =  React.memo(
                     renderInput={params => (
                         <TextField {...params} label='Район' fullWidth
                                    onKeyPress={async event => {
-                                       if (event.key === 'Enter') {
-                                           await setDistrict(districtChange?._id)
+                                       if(event.key === 'Enter'&&districtChange) {
+                                           await setDistrict(districtChange._id)
                                            showMiniDialog(false);
                                        }
                                    }}/>
@@ -40,13 +40,15 @@ const SetDistrict =  React.memo(
                 />
                 <br/>
                 <div>
-                    <Button variant="contained" color="primary" onClick={async()=>{
-                        await setDistrict(districtChange?._id)
-                       showMiniDialog(false);
+                    <Button variant="contained" color='primary' onClick={async () => {
+                        if(districtChange) {
+                            await setDistrict(districtChange._id)
+                            showMiniDialog(false);
+                        }
                     }} className={classes.button}>
                         Сохранить
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant="contained" color="secondary" onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </div>

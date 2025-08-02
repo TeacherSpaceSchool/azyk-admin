@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import { getOrganizations } from '../../src/gql/organization'
@@ -7,7 +7,7 @@ import { getAgentRoute, setAgentRoute, deleteAgentRoute, addAgentRoute, getDistr
 import agentRouteStyle from '../../src/styleMUI/agentRoute/agentRoute'
 import { useRouter } from 'next/router'
 import Card from '@material-ui/core/Card';
-import CardClient from '../../components/client/CardClient';
+import CardClient from '../../components/card/CardClient';
 import CardContent from '@material-ui/core/CardContent';
 import Checkbox from '@material-ui/core/Checkbox';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -28,122 +28,110 @@ import initialApp from '../../src/initialApp'
 import VerticalAlignBottom from '@material-ui/icons/VerticalAlignBottom';
 import VerticalAlignTop from '@material-ui/icons/VerticalAlignTop';
 import GeoRouteAgent from '../../components/dialog/GeoRouteAgent'
+import {getDistrict} from '../../src/gql/district';
 
 const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
 
 const AgentRoute = React.memo((props) => {
-    const { profile } = props.user;
+    const {profile} = props.user;
     const classes = agentRouteStyle();
-    const { data } = props;
+    const {data} = props;
     const router = useRouter()
-    const {search, isMobileApp, city } = props.app;
-    let [pagination, setPagination] = useState(100);
+    const {search, isMobileApp, city} = props.app;
+    const [pagination, setPagination] = useState(100);
     const initialRender = useRef(true);
     let [organizations, setOrganizations] = useState(data.organizations);
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
-                initialRender.current = false;
-            } else {
-                setOrganizations((await getOrganizations({search: '', filter: '', city: city})).organizations)
-                setOrganization({})
-            }
-        })()
-    },[city])
-    const checkPagination = ()=>{
-        if(pagination<filtredClient.length){
-            setPagination(pagination+100)
-        }
-    }
     let [districts, setDistricts] = useState([]);
-    let [district, setDistrict] = useState(data.agentRoute&&data.agentRoute.district?data.agentRoute.district:{})
-    let handleDistrict =  (event) => {
-        let district = (districts.filter(district=>district._id===event.target.value))[0]
+    let [district, setDistrict] = useState(data.agentRoute?data.agentRoute.district:null)
+    let handleDistrict = async (event) => {
+        district = await getDistrict(event.target.value)
         setDistrict(district)
         setClients([[],[],[],[],[],[],[]])
     };
-    let [organization, setOrganization] = useState(router.query.id==='new'||!data.agentRoute?{}:data.agentRoute.organization?{_id: data.agentRoute.organization._id, name: data.agentRoute.organization.name}:{name: 'AZYK.STORE', _id: 'super'});
-    let handleOrganization =  (event) => {
-        setOrganization({_id: event.target.value, name: event.target.name})
+    let [organization, setOrganization] = useState(router.query.id==='new'||!data.agentRoute?null:data.agentRoute.organization?data.agentRoute.organization:{name: 'AZYK.STORE', _id: 'super'});
+    let handleOrganization = (event) => {
+        setOrganization({_id: event.target.value})
         setClients([[],[],[],[],[],[],[]])
     };
     let [clients, setClients] = useState(data.agentRoute?data.agentRoute.clients:[[],[],[],[],[],[],[]]);
     let [allClient, setAllClient] = useState([]);
-    let [selectType, setSelectType] = useState(['агент', 'суперагент'].includes(profile.role)?'Выбраные':'Все');
+    let [selectType, setSelectType] = useState(['агент', 'суперагент'].includes(profile.role)?'Выбранные':'Все');
     let [filtredClient, setFiltredClient] = useState([]);
-    let [dayWeek, setDayWeek] = useState(0);
-    const { setMiniDialog, showMiniDialog, showFullDialog, setFullDialog } = props.mini_dialogActions;
-    const { showSnackBar } = props.snackbarActions;
-    useEffect(()=>{
-        (async()=>{
-            if(router.query.id==='new'&&profile.organization){
-                let organzation = organizations.filter(organization=>organization._id===profile.organization)
-                setOrganization(organzation[0])
-            }
-        })()
-    },[profile])
-    useEffect(()=>{
-        (async()=>{
-            if(router.query.id==='new'&&data.agentRoute&&organization._id) {
-                setDistricts((await getDistrictsWithoutAgentRoutes({organization: organization._id})).districtsWithoutAgentRoutes)
-                setDistrict({})
-            }
-        })()
-    },[organization])
-    useEffect(()=>{
-        (async()=>{
-            if(data.agentRoute&&district.client) {
-                setPagination(100)
-                let allClient= []
-                if (selectType == 'Все')
-                    allClient=[...district.client]
-                else if (selectType == 'Свободные')
-                    allClient=district.client.filter(client=>!clients[dayWeek].includes(client._id))
-                else if (selectType == 'Выбраные')
-                    allClient = clients[dayWeek].map(client=>district.client.find(client1=>client1._id===client))
-                let filtredClient = [...allClient]
-                if(search.length>0)
-                    filtredClient = filtredClient.filter(element=>
-                        ((element.phone.filter(phone => phone.toLowerCase().includes(search.toLowerCase()))).length > 0) ||
-                        (element.name.toLowerCase()).includes(search.toLowerCase())||
-                        ((element.address.filter(addres=>addres[0]&&addres[0].toLowerCase().includes(search.toLowerCase()))).length>0)||
-                        ((element.address.filter(addres=>addres[2]&&addres[2].toLowerCase().includes(search.toLowerCase()))).length>0)
-                    )
-                setFiltredClient([...filtredClient])
-                setAllClient(allClient)
-            }
-        })()
-    },[selectType, clients, district, dayWeek])
-    useEffect(()=>{
-        (async()=>{
-            if(data.agentRoute&&district.client&&allClient.length>0) {
-                let filtredClient = [...allClient]
-                if(search.length>0)
-                    filtredClient = filtredClient.filter(element=>
-                        (element.name.toLowerCase()).includes(search.toLowerCase())||
-                        ((element.address.filter(addres=>addres[0]&&addres[0].toLowerCase().includes(search.toLowerCase()))).length>0)||
-                        ((element.address.filter(addres=>addres[2]&&addres[2].toLowerCase().includes(search.toLowerCase()))).length>0)
-                    )
-                setFiltredClient([...filtredClient])
-            }
-        })()
-    },[search, district])
+    const checkPagination = useCallback(() => {
+        if(pagination<filtredClient.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, filtredClient])
+    let [dayWeek, setDayWeek] = useState(() => (new Date().getDay() + 6) % 7);
+    const {setMiniDialog, showMiniDialog, showFullDialog, setFullDialog} = props.mini_dialogActions;
+    const {showSnackBar} = props.snackbarActions;
+    useEffect(() => {
+        if(router.query.id==='new'&&profile.organization)
+            setOrganization(organizations.find(organization=>organization._id===profile.organization))
+    }, [profile])
+    useEffect(() => {(async () => {
+        if(!initialRender.current&&router.query.id==='new'&&organization) {
+            setDistricts(await getDistrictsWithoutAgentRoutes({organization: organization._id}))
+            setDistrict(null)
+        }
+    })()}, [organization])
+    useEffect(() => {
+        if(district) {
+            setPagination(100)
+            let allClient= []
+            if(selectType == 'Все')
+                allClient=[...district.client]
+            else if(selectType == 'Свободные')
+                allClient=district.client.filter(client=>!clients[dayWeek].includes(client._id))
+            else if(selectType == 'Выбранные')
+                allClient = clients[dayWeek].map(client=>district.client.find(client1=>client1._id===client))
+            let filtredClient = [...allClient]
+            if(search)
+                filtredClient = filtredClient.filter(element=>
+                    ((element.phone.filter(phone => phone.toLowerCase().includes(search.toLowerCase()))).length) ||
+                    (element.name.toLowerCase()).includes(search.toLowerCase())||
+                    ((element.address.filter(addres=>addres[0]&&addres[0].toLowerCase().includes(search.toLowerCase()))).length)||
+                    ((element.address.filter(addres=>addres[2]&&addres[2].toLowerCase().includes(search.toLowerCase()))).length)
+                )
+            setFiltredClient([...filtredClient])
+            setAllClient(allClient)
+        }
+    }, [selectType, clients, district, dayWeek])
+    useEffect(() => {
+        if(district&&allClient.length) {
+            let filtredClient = [...allClient]
+            if(search)
+                filtredClient = filtredClient.filter(element=>
+                    (element.name.toLowerCase()).includes(search.toLowerCase())||
+                    ((element.address.filter(addres=>addres[0]&&addres[0].toLowerCase().includes(search.toLowerCase()))).length)||
+                    ((element.address.filter(addres=>addres[2]&&addres[2].toLowerCase().includes(search.toLowerCase()))).length)
+                )
+            setFiltredClient([...filtredClient])
+        }
+    }, [search, district])
+    useEffect(() => {(async () => {
+        if(initialRender.current)
+            initialRender.current = false;
+        else {
+            setOrganizations(await getOrganizations({search: '', filter: '', city}))
+            setOrganization(null)
+        }
+    })()}, [city])
     return (
-        <App cityShow={router.query.id==='new'} searchShow={true} checkPagination={checkPagination} pageName={data.agentRoute?router.query.id==='new'?'Добавить':data.agentRoute.name:'Ничего не найдено'}>
+        <App cityShow={router.query.id==='new'} searchShow checkPagination={checkPagination} pageName={router.query.id==='new'?'Добавить':data.agentRoute?data.agentRoute.district.name:'Ничего не найдено'}>
             <Head>
-                <title>{data.agentRoute?router.query.id==='new'?'Добавить':data.agentRoute.district.name:'Ничего не найдено'}</title>
+                <title>{router.query.id==='new'?'Добавить':data.agentRoute?data.agentRoute.district.name:'Ничего не найдено'}</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={isMobileApp?classes.pageM:classes.pageD}>
                 <CardContent className={classes.column}>
-                    {data.agentRoute?
+                    {router.query.id==='new'||data.agentRoute?
                         <>
                         {router.query.id==='new'&&profile.role==='admin'?
-                            <FormControl className={isMobileApp?classes.inputM:classes.inputDF}>
+                            <FormControl error={!organization} className={isMobileApp?classes.inputM:classes.inputDF}>
                                 <InputLabel>Организация</InputLabel>
-                                <Select value={organization._id}onChange={handleOrganization}>
+                                <Select value={organization&&organization._id} onChange={handleOrganization}>
                                     {organizations.map((element)=>
-                                        <MenuItem key={element._id} value={element._id} ola={element.name}>{element.name}</MenuItem>
+                                        <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                     )}
                                 </Select>
                             </FormControl>
@@ -151,65 +139,62 @@ const AgentRoute = React.memo((props) => {
                             null
                         }
                         {router.query.id==='new'?
-                            <FormControl className={isMobileApp?classes.inputM:classes.inputDF}>
+                            <FormControl error={!district} className={isMobileApp?classes.inputM:classes.inputDF}>
                                 <InputLabel>Район</InputLabel>
-                                <Select value={district._id} onChange={handleDistrict}>
+                                <Select value={district&&district._id} onChange={handleDistrict}>
                                     {districts.map((element)=>
-                                        <MenuItem key={element._id} value={element._id} ola={element.name}>{element.name}</MenuItem>
+                                        <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                     )}
                                 </Select>
                             </FormControl>
                             :
                             <TextField
                                 label='Район'
-                                value={district.name}
+                                value={district&&district.name}
                                 className={isMobileApp?classes.inputM:classes.inputDF}
-                                inputProps={{
-                                    'aria-label': 'description',
-                                    readOnly: true
-                                }}
+                                inputProps={{readOnly: true}}
                             />
                         }
                         <br/>
                         <div style={{ justifyContent: 'center' }} className={classes.row}>
-                            <div style={{background: selectType==='Все'?'#ffb300':'#ffffff'}} onClick={()=>{setSelectType('Все')}} className={classes.selectType}>
+                            <div style={{background: selectType==='Все'?'#ffb300':'#ffffff'}} onClick={() => setSelectType('Все')} className={classes.selectType}>
                                 Все
                             </div>
-                            <div style={{background: selectType==='Свободные'?'#ffb300':'#ffffff'}} onClick={()=>{setSelectType('Свободные')}} className={classes.selectType}>
+                            <div style={{background: selectType==='Свободные'?'#ffb300':'#ffffff'}} onClick={() => setSelectType('Свободные')} className={classes.selectType}>
                                 Своб
                             </div>
-                            <div style={{background: selectType==='Выбраные'?'#ffb300':'#ffffff'}} onClick={()=>{setSelectType('Выбраные')}} className={classes.selectType}>
+                            <div style={{background: selectType==='Выбранные'?'#ffb300':'#ffffff'}} onClick={() => setSelectType('Выбранные')} className={classes.selectType}>
                                 Выбр
                             </div>
                         </div>
                         <br/>
                             <div style={{ justifyContent: 'center' }} className={classes.row}>
-                                <div style={{background: dayWeek===0?'#ffb300':'#ffffff'}} onClick={()=>{setDayWeek(0)}} className={classes.selectType}>
+                                <div style={{background: dayWeek===0?'#ffb300':'#ffffff'}} onClick={() => {setDayWeek(0)}} className={classes.selectType}>
                                     {`ПН ${clients[0].length}`}
                                 </div>
-                                <div style={{background: dayWeek===1?'#ffb300':'#ffffff'}} onClick={()=>{setDayWeek(1)}} className={classes.selectType}>
+                                <div style={{background: dayWeek===1?'#ffb300':'#ffffff'}} onClick={() => {setDayWeek(1)}} className={classes.selectType}>
                                     {`ВТ ${clients[1].length}`}
                                 </div>
-                                <div style={{background: dayWeek===2?'#ffb300':'#ffffff'}} onClick={()=>{setDayWeek(2)}} className={classes.selectType}>
+                                <div style={{background: dayWeek===2?'#ffb300':'#ffffff'}} onClick={() => {setDayWeek(2)}} className={classes.selectType}>
                                     {`СР ${clients[2].length}`}
                                 </div>
-                                <div style={{background: dayWeek===3?'#ffb300':'#ffffff'}} onClick={()=>{setDayWeek(3)}} className={classes.selectType}>
+                                <div style={{background: dayWeek===3?'#ffb300':'#ffffff'}} onClick={() => {setDayWeek(3)}} className={classes.selectType}>
                                     {`ЧТ ${clients[3].length}`}
                                 </div>
-                                <div style={{background: dayWeek===4?'#ffb300':'#ffffff'}} onClick={()=>{setDayWeek(4)}} className={classes.selectType}>
+                                <div style={{background: dayWeek===4?'#ffb300':'#ffffff'}} onClick={() => {setDayWeek(4)}} className={classes.selectType}>
                                     {`ПТ ${clients[4].length}`}
                                 </div>
-                                <div style={{background: dayWeek===5?'#ffb300':'#ffffff'}} onClick={()=>{setDayWeek(5)}} className={classes.selectType}>
+                                <div style={{background: dayWeek===5?'#ffb300':'#ffffff'}} onClick={() => {setDayWeek(5)}} className={classes.selectType}>
                                     {`СБ ${clients[5].length}`}
                                 </div>
-                                <div style={{background: dayWeek===6?'#ffb300':'#ffffff'}} onClick={()=>{setDayWeek(6)}} className={classes.selectType}>
+                                <div style={{background: dayWeek===6?'#ffb300':'#ffffff'}} onClick={() => {setDayWeek(6)}} className={classes.selectType}>
                                     {`ВС ${clients[6].length}`}
                                 </div>
                             </div>
                             <br/>
                             <div className={classes.listInvoices}>
                                 {filtredClient?filtredClient.map((element, idx)=> {
-                                    if (idx <= pagination && element) {
+                                    if(idx<pagination && element) {
                                         let selected = clients[dayWeek].includes(element._id)
                                         return (
                                             <div key={element._id} style={isMobileApp ? {alignItems: 'baseline'} : {}}
@@ -217,7 +202,7 @@ const AgentRoute = React.memo((props) => {
                                                 <div className={isMobileApp ? classes.row : classes.column}>
                                                     <Checkbox checked={selected}
                                                               onChange={() => {
-                                                                  if (!selected) {
+                                                                  if(!selected) {
                                                                       clients[dayWeek].push(element._id)
                                                                   } else {
                                                                       clients[dayWeek].splice(clients[dayWeek].indexOf(element._id), 1)
@@ -226,13 +211,13 @@ const AgentRoute = React.memo((props) => {
                                                               }}
                                                     />
                                                     {
-                                                        selectType==='Выбраные'?
+                                                        selectType==='Выбранные'?
                                                             <>
                                                             {
                                                                 filtredClient[idx-1]?
                                                                     <Tooltip title='Вверх'>
                                                                         <IconButton
-                                                                            onClick={()=>{
+                                                                            onClick={() => {
                                                                                 clients[dayWeek][idx] = filtredClient[idx - 1]._id
                                                                                 clients[dayWeek][idx - 1] = filtredClient[idx]._id
                                                                                 setClients([...clients])
@@ -248,7 +233,7 @@ const AgentRoute = React.memo((props) => {
                                                                 filtredClient[idx+1]?
                                                                     <Tooltip title='Вниз'>
                                                                         <IconButton
-                                                                            onClick={()=>{
+                                                                            onClick={() => {
                                                                                 clients[dayWeek][idx] = filtredClient[idx + 1]._id
                                                                                 clients[dayWeek][idx + 1] = filtredClient[idx]._id
                                                                                 setClients([...clients])
@@ -273,7 +258,7 @@ const AgentRoute = React.memo((props) => {
                                 }):null}
                             </div>
                         <div className={isMobileApp?classes.bottomRouteM:classes.bottomRouteD}>
-                            <Button onClick={async()=>{
+                            <Button onClick={() => {
                                 let map = district.client.filter(client => clients[dayWeek].includes(client._id))
                                 setFullDialog('Маршрут', <GeoRouteAgent clients={map}/>)
                                 showFullDialog(true)
@@ -282,15 +267,16 @@ const AgentRoute = React.memo((props) => {
                             </Button>
                             {
                                 router.query.id==='new'?
-                                    <Button onClick={async()=>{
-                                        if (district._id&&organization._id) {
-                                            const action = async() => {
-                                                await addAgentRoute({
+                                    <Button onClick={() => {
+                                        if(district&&organization) {
+                                            const action = async () => {
+                                                const res = await addAgentRoute({
                                                     organization: organization._id,
                                                     clients: clients,
                                                     district: district._id,
                                                 })
-                                                Router.push(`/agentroutes/${organization._id}`)
+                                                if(res)
+                                                    Router.push(`/agentroute/${res}`)
                                             }
                                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                             showMiniDialog(true)
@@ -302,11 +288,8 @@ const AgentRoute = React.memo((props) => {
                                     </Button>
                                     :
                                     <>
-                                    <Button onClick={async()=>{
-                                        const action = async() => {
-                                            let editElement = {_id: data.agentRoute._id, clients: clients}
-                                            await setAgentRoute(editElement)
-                                        }
+                                    <Button onClick={() => {
+                                        const action = async () => await setAgentRoute({_id: data.agentRoute._id, clients})
                                         setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                         showMiniDialog(true)
                                     }} size='small' color='primary'>
@@ -314,9 +297,9 @@ const AgentRoute = React.memo((props) => {
                                     </Button>
                                     {['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
                                         <>
-                                        <Button onClick={async()=>{
-                                            const action = async() => {
-                                                await deleteAgentRoute([data.agentRoute._id], data.agentRoute.organization._id)
+                                        <Button onClick={() => {
+                                            const action = async () => {
+                                                await deleteAgentRoute(data.agentRoute._id)
                                                 Router.push(`/agentroutes/${data.agentRoute.organization._id}`)
                                             }
                                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
@@ -349,10 +332,15 @@ AgentRoute.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
                 Router.push('/contact')
+    // eslint-disable-next-line no-undef
+    const [agentRoute, organizations] = await Promise.all([
+        ctx.query.id!=='new'?getAgentRoute(ctx.query.id, getClientGqlSsr(ctx.req)):null,
+        ctx.query.id==='new'?getOrganizations({search: '', filter: ''}, getClientGqlSsr(ctx.req)):null
+    ])
     return {
         data: {
-            ...ctx.query.id!=='new'?await getAgentRoute({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined): {agentRoute: {organization: {}, clients: [[],[],[],[],[],[],[]], district: {}}},
-            organizations: [{name: 'AZYK.STORE', _id: 'super'}, ...(await getOrganizations({search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)).organizations]
+            agentRoute,
+            ...organizations?{organizations: [{name: 'AZYK.STORE', _id: 'super'}, ...organizations]}:{}
         }
     };
 };

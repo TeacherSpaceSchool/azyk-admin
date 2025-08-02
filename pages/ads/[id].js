@@ -1,7 +1,7 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../layouts/App';
-import CardAds from '../../components/ads/CardAds';
+import CardAds from '../../components/card/CardAds';
 import pageListStyle from '../../src/styleMUI/ads/adsList'
 import {getAdss} from '../../src/gql/ads'
 import { connect } from 'react-redux'
@@ -15,37 +15,32 @@ import {getBrands} from '../../src/gql/items';
 const Ads = React.memo((props) => {
     const initialRender = useRef(true);
     const classes = pageListStyle();
-    const { data } = props;
+    const {data} = props;
     let [list, setList] = useState(data.adss);
-    const { search } = props.app;
-    const { profile } = props.user;
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
+    const {search} = props.app;
+    const {profile} = props.user;
+    const searchTimeOut = useRef(null);
+    useEffect(() => {
+            if(initialRender.current) 
                 initialRender.current = false;
-            } else {
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    setList((await getAdss({search, organization: router.query.id})).adss)
+            else {
+                if(searchTimeOut.current)
+                    clearTimeout(searchTimeOut.current)
+                searchTimeOut.current = setTimeout(async () => {
+                    setList(await getAdss({search, organization: router.query.id}))
                     setPagination(100);
                     (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
                 }, 500)
-                setSearchTimeOut(searchTimeOut)
-
             }
-        })()
-    },[search])
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
-        }
-    }
+    }, [search])
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [list, pagination])
     const router = useRouter()
     return (
-        <App checkPagination={checkPagination} searchShow={true} pageName={`Акции${data.organization?` ${data.organization.name}`:''}`}>
+        <App checkPagination={checkPagination} searchShow pageName={`Акции${data.organization?` ${data.organization.name}`:''}`}>
             <Head>
                 <title>Акции{data.organization?` ${data.organization.name}`:''}</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -54,11 +49,11 @@ const Ads = React.memo((props) => {
                 <div className='count'>
                     {`Всего: ${list.length}`}
                 </div>
-                {['организация', 'admin'].includes(profile.role)?<CardAds list={list} edit={true} items={data.brands} organization={router.query.id} setList={setList}/>:null}
+                {['суперорганизация', 'организация', 'admin'].includes(profile.role)?<CardAds edit items={data.brands} organization={router.query.id} list={list} setList={setList}/>:null}
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <CardAds edit={true} list={list} idx={idx}  items={data.brands} organization={router.query.id} setList={setList} key={element._id} element={element}/>
+                            <CardAds edit idx={idx}  items={data.brands} organization={router.query.id} list={list} setList={setList} key={element._id} element={element}/>
                         )}
                 ):null}
             </div>
@@ -76,12 +71,14 @@ Ads.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
+    // eslint-disable-next-line no-undef
+    const [adss, organization, brands] = await Promise.all([
+        getAdss({search: '', organization: ctx.query.id}, getClientGqlSsr(ctx.req)),
+        getOrganization(ctx.query.id, getClientGqlSsr(ctx.req)),
+        getBrands({organization: ctx.query.id, search: '', sort: '-priotiry'}, getClientGqlSsr(ctx.req))
+    ])
     return {
-        data: {
-            ...await getAdss({search: '', organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-            ...await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-            ...await getBrands({organization: ctx.query.id, search: '', sort: '-priotiry'}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
-        },
+        data: {adss, organization, brands},
     };
 };
 

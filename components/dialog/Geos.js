@@ -11,8 +11,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 const Geos =  React.memo(
     (props) =>{
-        const { showFullDialog } = props.mini_dialogActions;
-        const { classes, geos } = props;
+        const {showFullDialog} = props.mini_dialogActions;
+        const {classes, geos} = props;
         let [load, setLoad] = useState(true);
         return (
             <YMaps>
@@ -22,7 +22,7 @@ const Geos =  React.memo(
                             load?<CircularProgress/>:null
                         }
                         <div style={{display: load?'none':'block'}}>
-                            <Map onLoad={()=>{setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48}
+                            <Map onLoad={() => {setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48}
                                  state={{ center: geos[0].geo.split(', '), zoom: 12 }}
                             >
                                 {
@@ -38,7 +38,7 @@ const Geos =  React.memo(
                         </div>
                     </div>
                     <center>
-                        <Button variant='contained' color='secondary' onClick={()=>{showFullDialog(false);}} className={classes.button}>
+                        <Button variant='contained' color='secondary' onClick={() => {showFullDialog(false);}} className={classes.button}>
                             Закрыть
                         </Button>
                     </center>

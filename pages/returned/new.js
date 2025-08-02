@@ -1,11 +1,11 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import pageListStyle from '../../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat} from '../../src/lib';
+import {checkInt, checkFloat, unawaited} from '../../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
@@ -23,92 +23,94 @@ import ReturnedConfirmed from '../../components/dialog/ReturnedConfirmed'
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
-    const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
-    const { showSnackBar } = props.snackbarActions;
-    const { profile } = props.user;
-    const { data } = props;
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    const {showSnackBar} = props.snackbarActions;
+    const {profile} = props.user;
+    const {data} = props;
     const [clients, setClients] = useState([]);
-    const { search, filter } = props.app;
-    const [inputValue, setInputValue] = React.useState('');
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const {search, filter, isMobileApp} = props.app;
+    /*autocomlete*/
+    const [inputValue, setInputValue] = useState('');
+    const searchTimeOut = useRef(null);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
-        (async()=>{
-            if (inputValue.length<3) {
-                setClients([]);
-                if(open)
-                    setOpen(false)
-                if(loading)
-                    setLoading(false)
-            }
-            else {
-                if(!loading)
-                    setLoading(true)
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    setClients((await getClients({search: inputValue, sort: '-name', filter: 'all'})).clients)
-                    if(!open)
-                        setOpen(true)
-                    setLoading(false)
-                }, 500)
-                setSearchTimeOut(searchTimeOut)
-            }
-        })()
-    }, [inputValue]);
-    const handleChange = event => {
-        setInputValue(event.target.value);
-    };
-    const [list, setList] = useState(data.brands);
-    const [items, setItems] = useState({});
-    let [organization, setOrganization] = useState({});
-    let [geo, setGeo] = useState(undefined);
-    let handleOrganization = async (organization) => {
-        setItems({})
-        setOrganization(organization)
-    };
-    const searchTimeOutRef = useRef(null);
-    useEffect(()=>{
-        if (navigator.geolocation){
-            searchTimeOutRef.current = setInterval(() => {
-                navigator.geolocation.getCurrentPosition((position)=>{
-                    setGeo(position)
-                })
-            }, 1000)
-            return ()=>{
-                clearInterval(searchTimeOutRef.current)
-            }
-        } else {
-            showSnackBar('Геолокация не поддерживается')
+        if(inputValue.length<3) {
+            setClients([]);
+            if(open)
+                setOpen(false)
+            if(loading)
+                setLoading(false)
         }
-    },[])
-    useEffect(()=>{
-        (async()=>{
-            if(profile.organization){
-                organization = data.brandOrganizations.filter(elem=>elem._id===profile.organization)[0]
-                setOrganization({...organization})
-            }
-        })()
-    },[])
-    useEffect(()=>{
-        (async()=>{
-            if(organization._id){
-                setList((await getBrands({organization: organization._id, search, sort: '-priotiry'})).brands)
-            }
-        })()
-    },[filter, search, organization])
-    useEffect(()=>{
-        setPagination(100)
-    },[list])
-    let [client, setClient] = useState();
-    let handleClient =  (client) => {
+        else {
+            if(!loading)
+                setLoading(true)
+            if(searchTimeOut.current)
+                clearTimeout(searchTimeOut.current)
+            searchTimeOut.current = setTimeout(async () => {
+                setClients(await getClients({search: inputValue, sort: '-name', filter: 'all'}))
+                if(!open) setOpen(true)
+                setLoading(false)
+            }, 500)
+        }
+    }, [inputValue]);
+    const handleChange = event => setInputValue(event.target.value);
+    const [client, setClient] = useState(null);
+    const handleClient =  (client) => {
         setClient(client)
         setOpen(false)
     };
+    /*autocomlete*/
+    //товары
+    const [list, setList] = useState([]);
+    const getList = async () => {
+        setList(await getBrands({organization: organization._id, search, sort: '-priotiry'}));
+        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        setPagination(100)
+    }
+    //возврат
+    const [items, setItems] = useState({});
+    //организация
+    let [organization, setOrganization] = useState(null);
+    let handleOrganization = (organization) => {
+        setItems({})
+        setOrganization(organization)
+    };
+    useEffect(() => {
+        if(profile.organization)
+            setOrganization(data.brandOrganizations.find(elem=>elem._id===profile.organization))
+    }, [])
+    //геолокация
+    const geo = useRef(null);
+    const searchTimeOutGeo = useRef(null);
+    useEffect(() => {
+        if(navigator.geolocation) {
+            searchTimeOutGeo.current = setInterval(() => navigator.geolocation.getCurrentPosition((position) => geo.current = position), 10000)
+            return () => clearInterval(searchTimeOutGeo.current)
+        } else
+            showSnackBar('Геолокация не поддерживается')
+    }, [])
+    const searchTimeOutBrands = useRef(null);
+    const initialRender = useRef(true);
+    //смена фильтра или организации обновляет список товаров
+    useEffect(() => {
+        if(!initialRender.current&&organization)
+            unawaited(getList)
+    }, [filter, organization])
+    //поиск товаров
+    useEffect(() => {
+        if(initialRender.current)
+            initialRender.current = false;
+        else if(organization._id) {
+            if(searchTimeOutBrands.current)
+                clearTimeout(searchTimeOutBrands.current)
+            searchTimeOutBrands.current = setTimeout(() => unawaited(getList), 500)
+        }
+    }, [search])
+    //общая цена
     let [allPrice, setAllPrice] = useState(0);
-    const { isMobileApp } = props.app;
-    let increment = (idx)=>{
+    //количество
+    let increment = (idx) => {
         let id = list[idx]._id
         if(!items[id])
             items[id] = {_id: id, item: list[idx].name, count: 0, allPrice: 0, allTonnage: 0, weight: checkInt(list[idx].weight), price: list[idx].price}
@@ -117,7 +119,7 @@ const Catalog = React.memo((props) => {
         items[id].allTonnage = checkFloat(items[id].count*items[id].weight)
         setItems({...items})
     }
-    let decrement = (idx)=>{
+    let decrement = (idx) => {
         let id = list[idx]._id
         if(!items[id])
             items[id] = {_id: id, item: list[idx].name, count: 0, allPrice: 0, allTonnage: 0, weight: checkInt(list[idx].weight), price: list[idx].price, }
@@ -128,7 +130,7 @@ const Catalog = React.memo((props) => {
             setItems({...items})
         }
     }
-    let setBasketChange= (idx, count)=>{
+    let setBasketChange= (idx, count) => {
         let id = list[idx]._id
         if(!items[id])
             items[id] = {_id: id, item: list[idx].name, count: 0, allPrice: 0, allTonnage: 0, weight: checkInt(list[idx].weight), price: list[idx].price}
@@ -137,22 +139,22 @@ const Catalog = React.memo((props) => {
         items[id].allTonnage = checkFloat(items[id].count*items[id].weight)
         setItems({...items})
     }
-    useEffect(()=>{
+    useEffect(() => {
         let keys = Object.keys(items)
         allPrice = 0
-        for(let i=0; i<keys.length; i++){
+        for(let i=0; i<keys.length; i++)
             allPrice += items[keys[i]].allPrice
-        }
         setAllPrice(checkFloat(allPrice))
-    },[items])
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
-        }
-    }
+    }, [items])
+    //пагинация
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, list])
+   //рендер
     return (
-        <App checkPagination={checkPagination} searchShow={true} pageName='Каталог возврата'>
+        <App checkPagination={checkPagination} searchShow pageName='Каталог возврата'>
             <Head>
                 <title>Каталог возврата</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -173,15 +175,15 @@ const Catalog = React.memo((props) => {
                         renderInput={params => (
                             <TextField {...params} label='Выберите клиента' variant='outlined' fullWidth
                                        onChange={handleChange}
-                                               InputProps={{
-                                                   ...params.InputProps,
-                                                   endAdornment: (
-                                                       <React.Fragment>
-                                                           {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                                                           {params.InputProps.endAdornment}
-                                                       </React.Fragment>
-                                                   ),
-                                               }}
+                                       InputProps={{
+                                           ...params.InputProps,
+                                           endAdornment: (
+                                               <React.Fragment>
+                                                   {loading ? <CircularProgress color='inherit' size={20} /> : null}
+                                                   {params.InputProps.endAdornment}
+                                               </React.Fragment>
+                                           ),
+                                       }}
                             />
                         )}
                     />
@@ -190,67 +192,63 @@ const Catalog = React.memo((props) => {
                     {
                         !profile.organization?
                             <>
-                            <Autocomplete
-                                className={classes.input}
-                                options={data.brandOrganizations}
-                                getOptionLabel={option => option.name}
-                                onChange={(event, newValue) => {
-                                    handleOrganization(newValue)
-                                }}
-                                noOptionsText='Ничего не найдено'
-                                renderInput={params => (
-                                    <TextField {...params} label='Выберите организацию' variant='outlined' fullWidth />
-                                )}
-                            />
-                            <br/>
+                                <Autocomplete
+                                    className={classes.input}
+                                    options={data.brandOrganizations}
+                                    getOptionLabel={option => option.name}
+                                    onChange={(event, newValue) => handleOrganization(newValue)}
+                                    noOptionsText='Ничего не найдено'
+                                    renderInput={params => (
+                                        <TextField {...params} label='Выберите организацию' fullWidth />
+                                    )}
+                                />
+                                <br/>
                             </>
                             :null
 
                     }
                     {
                         list.map((row, idx) => {
-                            let price
-                            if(items[row._id]&&items[row._id].allPrice)
-                                price = items[row._id].allPrice
-                            else
-                                price = row.price
-                            if(idx<pagination)
-                                return(
-                                    <div>
-                                        <div className={classes.line}>
-                                            <a href={`/item/${row._id}`} target='_blank'>
-                                                <img className={classes.media} src={row.image}/>
-                                            </a>
-                                            <div className={classes.column}>
+                                let price
+                                if(items[row._id]&&items[row._id].allPrice)
+                                    price = items[row._id].allPrice
+                                else
+                                    price = row.price
+                                if(idx<pagination)
+                                    return(
+                                        <div key={row._id}>
+                                            <div className={classes.line}>
                                                 <a href={`/item/${row._id}`} target='_blank'>
-                                                    <div className={classes.value}>{row.name}</div>
+                                                    <img className={classes.media} src={row.image}/>
                                                 </a>
-                                                <b className={classes.value}>
-                                                    {`${price} сом`}
-                                                </b>
-                                                <div className={classes.line}>
-                                                    <div className={classes.counter}>
-                                                        <div className={classes.counterbtn} onClick={() => {
-                                                            decrement(idx)
-                                                        }}>–
-                                                        </div>
-                                                        <input readOnly={!row.apiece} type={isMobileApp?'number':'text'} className={classes.counternmbr}
-                                                               value={items[row._id]?items[row._id].count:''} onChange={(event) => {
-                                                            setBasketChange(idx, event.target.value)
-                                                        }}/>
-                                                        <div className={classes.counterbtn} onClick={() => {
-                                                            increment(idx)
-                                                        }}>+
+                                                <div className={classes.column}>
+                                                    <a href={`/item/${row._id}`} target='_blank'>
+                                                        <div className={classes.value}>{row.name}</div>
+                                                    </a>
+                                                    <b className={classes.value}>
+                                                        {`${price} сом`}
+                                                    </b>
+                                                    <div className={classes.line}>
+                                                        <div className={classes.counter}>
+                                                            <div className={classes.counterbtn} onClick={() => decrement(idx)}>
+                                                                –
+                                                            </div>
+                                                            <input readOnly={!row.apiece} type={isMobileApp?'number':'text'} className={classes.counternmbr}
+                                                                   value={items[row._id]?items[row._id].count:''} onChange={(event) => {
+                                                                setBasketChange(idx, event.target.value)
+                                                            }}/>
+                                                            <div className={classes.counterbtn} onClick={() => increment(idx)}>
+                                                                +
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <br/>
+                                            <Divider/>
+                                            <br/>
                                         </div>
-                                        <br/>
-                                        <Divider/>
-                                        <br/>
-                                    </div>
-                                )
+                                    )
                             }
                         )
                     }
@@ -262,24 +260,11 @@ const Catalog = React.memo((props) => {
                     <div className={isMobileApp?classes.value:classes.priceAllText}>Общая стоимость</div>
                     <div className={isMobileApp?classes.nameM:classes.priceAll}>{`${allPrice} сом`}</div>
                 </div>
-                <div className={isMobileApp?classes.buyM:classes.buyD} onClick={()=>{
+                <div className={isMobileApp?classes.buyM:classes.buyD} onClick={() => {
                     if(allPrice>0) {
-                        if(client&&client._id) {
-                            let proofeAddress = client.address[0]&&client.address[0][0].length > 0
-                            if (
-                                proofeAddress && client.name.length > 0 && client.phone.length > 0
-                            ) {
-                                setMiniDialog('Оформление возврата',
-                                    <ReturnedConfirmed items={items}
-                                                       client={client}
-                                                       geo={geo}
-                                                       allPrice={allPrice}
-                                                       organization={organization}/>
-                                )
-                                showMiniDialog(true)
-                            }
-                            else
-                                showSnackBar('Пожалуйста уточните адрес')
+                        if(client) {
+                            setMiniDialog('Оформление возврата', <ReturnedConfirmed items={items} client={client} geo={geo.current} allPrice={allPrice} organization={organization}/>)
+                            showMiniDialog(true)
                         }
                         else
                             showSnackBar('Пожалуйста выберите клиента')
@@ -306,9 +291,7 @@ Catalog.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            brands: [],
-            organization: {},
-            ...await getBrandOrganizations({search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+            brandOrganizations: await getBrandOrganizations({search: '', filter: ''}, getClientGqlSsr(ctx.req))
         }
     };
 };

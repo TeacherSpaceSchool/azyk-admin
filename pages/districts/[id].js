@@ -1,7 +1,7 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../layouts/App';
-import CardDistrict from '../../components/district/CardDistrict'
+import CardDistrict from '../../components/card/CardDistrict'
 import pageListStyle from '../../src/styleMUI/district/districtList'
 import {getDistricts} from '../../src/gql/district'
 import { connect } from 'react-redux'
@@ -12,51 +12,42 @@ import Router from 'next/router'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import { useRouter } from 'next/router'
 import initialApp from '../../src/initialApp'
+import {unawaited} from '../../src/lib';
 
 const Districts = React.memo((props) => {
-    const { profile } = props.user;
+    const {profile} = props.user;
     const classes = pageListStyle();
     const router = useRouter()
-    const { data } = props;
+    const {data} = props;
     let [list, setList] = useState(data.districts);
-    const { search, sort } = props.app;
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const {search, sort} = props.app;
+    const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
     const getList = async ()=> {
-        setList((await getDistricts({organization: router.query.id, search, sort})).districts)
+        setList(await getDistricts({organization: router.query.id, search, sort}))
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
-    useEffect(()=>{
-        (async()=>{
-            if(!initialRender.current) {
-                await getList()
-            }
-        })()
-    },[sort])
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
-                initialRender.current = false;
-            } else {
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    await getList()
-                }, 500)
-                setSearchTimeOut(searchTimeOut)
-
-            }
-        })()
-    },[search])
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
+    useEffect(() => {
+        if(!initialRender.current)
+            unawaited(getList)
+    }, [sort])
+    useEffect(() => {
+        if(initialRender.current)
+            initialRender.current = false;
+        else {
+            if(searchTimeOut.current)
+                clearTimeout(searchTimeOut.current)
+            searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
-    }
+    }, [search])
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [list, pagination])
     return (
-        <App checkPagination={checkPagination} searchShow={true} sorts={data.sortDistrict} pageName='Районы'>
+        <App checkPagination={checkPagination} searchShow pageName='Районы'>
             <Head>
                 <title>Районы</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -67,14 +58,12 @@ const Districts = React.memo((props) => {
             <div className={classes.page}>
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
-                        return(
-                            <CardDistrict list={list} idx={idx} setList={setList} key={element._id} element={element}/>
-                        )}
-                ):null}
+                        return <CardDistrict idx={idx} list={list} setList={setList} key={element._id} element={element}/>
+                }):null}
             </div>
             {['admin', 'суперорганизация', 'организация'].includes(profile.role)?
                 <Link href='/district/[id]' as={`/district/new`}>
-                    <Fab color='primary' aria-label='add' className={classes.fab}>
+                    <Fab color='primary' className={classes.fab}>
                         <AddIcon />
                     </Fab>
                 </Link>
@@ -97,8 +86,8 @@ Districts.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            ...(await getDistricts({organization: ctx.query.id, search: '', sort: '-createdAt', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined))
-            }
+            districts: await getDistricts({organization: ctx.query.id, search: '', sort: '-createdAt', filter: ''}, getClientGqlSsr(ctx.req))
+        }
     };
 };
 

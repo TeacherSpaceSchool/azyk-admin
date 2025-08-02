@@ -1,32 +1,39 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 
-export const getUnloadPlanClients = async({organization, city, district}, client)=>{
+const PlanClient = `
+    _id
+    createdAt
+    client {_id name address}
+    current
+    month
+    visit
+`
+
+export const getUnloadPlanClients = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {organization, city, district},
+                variables,
                 query: gql`
                     query ($organization: ID!, $city: String, $district: ID) {
-                        unloadPlanClients(organization: $organization, city: $city, district: $district)  {
-                             data
-                        }
+                        unloadPlanClients(organization: $organization, city: $city, district: $district)
                     }`,
             })
-        return res.data
+        return res.data.unloadPlanClients
     }
-    catch(err){
+    catch(err) {
         console.error(err)
     }
 }
 
-export const getClientsForPlanClients = async({search, organization, city, district}, client)=>{
+export const getClientsForPlanClients = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {search, organization, city, district},
+                variables,
                 query: gql`
                     query ($search: String!, $organization: ID!, $city: String, $district: ID) {
                         clientsForPlanClients(search: $search, organization: $organization, city: $city, district: $district) {
@@ -37,125 +44,105 @@ export const getClientsForPlanClients = async({search, organization, city, distr
                           }
                     }`,
             })
-        return res.data
+        return res.data.clientsForPlanClients
     }
-    catch(err){
+    catch(err) {
         console.error(err)
     }
 }
 
-export const getPlanClients = async({search, district, city, organization, skip}, client)=>{
+export const getPlanClients = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {search, district, city, organization, skip},
+                variables,
                 query: gql`
                     query ($search: String!, $city: String, $organization: ID!, $district: ID, $skip: Int!) {
-                        planClients (search: $search, city: $city, organization: $organization, district: $district, skip: $skip) {
-                            _id
-                            createdAt
-                            client {_id name address}
-                            current
-                            month
-                            visit
-                        }
+                        planClients (search: $search, city: $city, organization: $organization, district: $district, skip: $skip) {${PlanClient}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.planClients
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getPlanClientsCount = async({search, district, city, organization}, client)=>{
+export const getPlanClientsCount = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {search, district, city, organization},
+                variables,
                 query: gql`
                     query ($search: String!, $city: String, $organization: ID!, $district: ID) {
                         planClientsCount (search: $search, city: $city, organization: $organization, district: $district)
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.planClientsCount
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getPlanClient = async({client, organization}, client_)=>{
+export const getPlanClient = async (variables, client) => {
     try{
-        client_ = client_? client_ : new SingletonApolloClient().getClient()
-        let res = await client_
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
             .query({
-                variables: {client, organization},
+                variables,
                 query: gql`
                     query ($client: ID!, $organization: ID!) {
-                        planClient(client: $client, organization: $organization) {
-                            _id
-                            createdAt
-                            client {_id name address}
-                            current
-                            month
-                            visit
-                        }
+                        planClient(client: $client, organization: $organization) {${PlanClient}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.planClient
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const setPlanClient = async(element)=>{
+export const setPlanClient = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
         const res = await client.mutate({
-            variables: {...element},
+            variables,
             mutation : gql`
                     mutation ($client: ID!, $organization: ID!, $month: Int!, $visit: Int!) {
-                        setPlanClient(client: $client, organization: $organization, month: $month, visit: $visit) {
-                            data
-                        }
+                        setPlanClient(client: $client, organization: $organization, month: $month, visit: $visit)
                     }`})
-        return res.data
-    } catch(err){
+        return res.data.setPlanClient
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const deletePlanClient = async(element)=>{
+export const deletePlanClient = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
         const res = await client.mutate({
-            variables: {...element},
+            variables,
             mutation : gql`
                     mutation ($_id: ID!) {
-                        deletePlanClient(_id: $_id) {
-                             data
-                        }
+                        deletePlanClient(_id: $_id)
                     }`})
-        return res.data
-    } catch(err){
+        return res.data.deletePlanClient
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const uploadPlanClients = async(element)=>{
+export const uploadPlanClients = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
         const res = await client.mutate({
-            variables: {...element},
+            variables,
             mutation : gql`
                     mutation ($document: Upload!, $organization: ID!) {
-                        uploadPlanClients(document: $document, organization: $organization) {
-                             data
-                        }
+                        uploadPlanClients(document: $document, organization: $organization)
                     }`})
-        return res.data
-    } catch(err){
+        return res.data.uploadPlanClients
+    } catch(err) {
         console.error(err)
     }
 }

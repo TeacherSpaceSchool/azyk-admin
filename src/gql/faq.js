@@ -1,80 +1,73 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 
-export const getFaqs = async({search}, client)=>{
+const Faq = `
+    _id
+    url
+    title
+    video
+    createdAt
+    typex
+`
+
+export const getFaqs = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {search},
+                variables,
                 query: gql`
                     query ($search: String!) {
-                        faqs(search: $search) {
-                            _id
-                            url
-                            title
-                            video
-                            createdAt
-                            typex
-                        }
+                        faqs(search: $search) {${Faq}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.faqs
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const deleteFaq = async(ids)=>{
+export const deleteFaq = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {_id: ids},
+        const res = await client.mutate({
+            variables: {_id},
             mutation : gql`
-                    mutation ($_id: [ID]!) {
-                        deleteFaq(_id: $_id) {
-                             data
-                        }
+                    mutation ($_id: ID!) {
+                        deleteFaq(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.deleteFaq
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const addFaq = async(element)=>{
+export const addFaq = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        let res = await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($file: Upload, $title: String!, $video: String, $typex: String!) {
-                        addFaq(file: $file, title: $title, video: $video, typex: $typex) {
-                            _id
-                            url
-                            title
-                            video
-                            createdAt
-                            typex
-                        }
+                        addFaq(file: $file, title: $title, video: $video, typex: $typex) {${Faq}}
                     }`})
-        return res.data
-    } catch(err){
+        return res.data.addFaq
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const setFaq = async(element)=>{
+export const setFaq = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($_id: ID!, $file: Upload, $title: String, $video: String, $typex: String) {
-                        setFaq(_id: $_id, file: $file, title: $title, video: $video, typex: $typex) {
-                             data
-                        }
+                        setFaq(_id: $_id, file: $file, title: $title, video: $video, typex: $typex)
                     }`})
-    } catch(err){
+        return res.data.setFaq
+    } catch(err) {
         console.error(err)
     }
 }

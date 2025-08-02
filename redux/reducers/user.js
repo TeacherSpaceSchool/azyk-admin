@@ -7,7 +7,7 @@ import {
 } from '../constants/user'
 
 const initialState = {
-    authenticated: undefined,
+    authenticated: null,
     profile: {},
     error: false,
 }

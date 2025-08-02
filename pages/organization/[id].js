@@ -2,7 +2,7 @@ import Head from 'next/head';
 import React, { useState, useRef } from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
-import { getOrganization } from '../../src/gql/organization'
+import {deleteOrganization, getOrganization} from '../../src/gql/organization'
 import organizationStyle from '../../src/styleMUI/organization/organization'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -15,13 +15,13 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
-import { onoffOrganization, addOrganization, setOrganization, deleteOrganization } from '../../src/gql/organization'
+import { onoffOrganization, addOrganization, setOrganization } from '../../src/gql/organization'
 import Remove from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Confirmation from '../../components/dialog/Confirmation'
-import { checkInt, inputInt } from '../../src/lib'
+import {checkInt, inputInt, maxFileSize, maxImageSize} from '../../src/lib'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -33,22 +33,20 @@ import * as lib from '../../src/lib'
 
 const Organization = React.memo((props) => {
     const classes = organizationStyle();
-    const { data } = props;
-    const { isMobileApp } = props.app;
+    const {data} = props;
+    const {isMobileApp} = props.app;
     const router = useRouter()
-    const { showSnackBar } = props.snackbarActions;
+    const {showSnackBar} = props.snackbarActions;
     let [statusO, setStatusO] = useState(data.organization?data.organization.status:'');
     let [name, setName] = useState(data.organization?data.organization.name:'');
-    let [accessToClient, setAccessToClient] = useState(data.organization&&data.organization.accessToClient!==null?data.organization.accessToClient:false);
     let [onlyDistrict, setOnlyDistrict] = useState(data.organization&&data.organization.onlyDistrict!==null?data.organization.onlyDistrict:false);
-    let [unite, setUnite] = useState(data.organization&&data.organization.unite!=null?data.organization.unite:true);
+    let [unite, setUnite] = useState(data.organization&&data.organization.unite!=null?data.organization.unite:false);
     let [pass, setPass] = useState(data.organization&&data.organization.pass?data.organization.pass:'');
-    let [superagent, setSuperagent] = useState(data.organization&&data.organization.superagent!=null?data.organization.superagent:true);
+    let [superagent, setSuperagent] = useState(data.organization&&data.organization.superagent!=null?data.organization.superagent:false);
     let [onlyIntegrate, setOnlyIntegrate] = useState(data.organization&&data.organization.onlyIntegrate!==null?data.organization.onlyIntegrate:false);
     let [addedClient, setAddedClient] = useState(data.organization&&data.organization.addedClient!==null?data.organization.addedClient:false);
     let [agentSubBrand, setAgentSubBrand] = useState(data.organization&&data.organization.agentSubBrand!==null?data.organization.agentSubBrand:false);
     let [clientSubBrand, setClientSubBrand] = useState(data.organization&&data.organization.clientSubBrand!==null?data.organization.clientSubBrand:false);
-    let [autoIntegrate, setAutoIntegrate] = useState(data.organization&&data.organization.autoIntegrate!==null?data.organization.autoIntegrate:false);
     let [calculateStock, setCalculateStock] = useState(data.organization&&data.organization.calculateStock!==null?data.organization.calculateStock:false);
     let [autoAcceptAgent, setAutoAcceptAgent] = useState(data.organization&&data.organization.autoAcceptAgent!==null?data.organization.autoAcceptAgent:false);
     let [autoAcceptNight, setAutoAcceptNight] = useState(data.organization&&data.organization.autoAcceptNight!==null?data.organization.autoAcceptNight:false);
@@ -56,7 +54,6 @@ const Organization = React.memo((props) => {
     let [divideBySubBrand, setDivideBySubBrand] = useState(data.organization&&data.organization.divideBySubBrand!==null?data.organization.divideBySubBrand:false);
     let [dateDelivery, setDateDelivery] = useState(data.organization&&data.organization.dateDelivery!==null?data.organization.dateDelivery:false);
     let [warehouse, setWarehouse] = useState(data.organization&&data.organization.warehouse!==null?data.organization.warehouse:'');
-    let [consignation, setConsignation] = useState(data.organization&&data.organization.consignation!==null?data.organization.consignation:false);
     let [refusal, setRefusal] = useState(data.organization&&data.organization.refusal!==null?data.organization.refusal:false);
     let [minimumOrder, setMinimumOrder] = useState(data.organization!==null?data.organization.minimumOrder:0);
     let [agentHistory, setAgentHistory] = useState(data.organization!==null?data.organization.agentHistory:100);
@@ -64,90 +61,88 @@ const Organization = React.memo((props) => {
     let [address, setAddress] = useState(data.organization?data.organization.address:[]);
     let [cities, setCities] = useState(data.organization&&data.organization.cities?data.organization.cities:['Бишкек']);
     let handleCities =  (event) => {
-        setCities(event.target.value)
+        setCities([event.target.value])
     };
     let [newAddress, setNewAddress] = useState('');
-    let addAddress = ()=>{
+    let addAddress = () => {
         address = [...address, newAddress]
         setAddress(address)
         setNewAddress('')
     };
-    let editAddress = (event, idx)=>{
+    let editAddress = (event, idx) => {
         address[idx] = event.target.value
         setAddress([...address])
     };
-    let deleteAddress = (idx)=>{
+    let deleteAddress = (idx) => {
         address.splice(idx, 1);
         setAddress([...address])
     };
     let [email, setEmail] = useState(data.organization!==null?data.organization.email:[]);
     let [newEmail, setNewEmail] = useState('');
-    let addEmail = ()=>{
+    let addEmail = () => {
         email = [...email, newEmail]
         setEmail(email)
         setNewEmail('')
     };
-    let editEmail = (event, idx)=>{
+    let editEmail = (event, idx) => {
         email[idx] = event.target.value
         setEmail([...email])
     };
-    let deleteEmail = (idx)=>{
+    let deleteEmail = (idx) => {
         email.splice(idx, 1);
         setEmail([...email])
     };
     let [phone, setPhone] = useState(data.organization!==null?data.organization.phone:[]);
     let [newPhone, setNewPhone] = useState('');
-    let addPhone = ()=>{
+    let addPhone = () => {
         phone = [...phone, newPhone]
         setPhone(phone)
         setNewPhone('')
     };
-    let editPhone = (event, idx)=>{
+    let editPhone = (event, idx) => {
         phone[idx] = event.target.value
         setPhone([...phone])
     };
-    let deletePhone = (idx)=>{
+    let deletePhone = (idx) => {
         phone.splice(idx, 1);
         setPhone([...phone])
     };
     let [info, setInfo] = useState(data.organization!==null?data.organization.info:'');
     let [miniInfo, setMiniInfo] = useState(data.organization&&data.organization.miniInfo?data.organization.miniInfo:'');
-    let [catalog, setCatalog] = useState(undefined);
+    let [catalog, setCatalog] = useState(null);
     const catalogInput = useRef(true);
     let handleChangeCatalog = ((event) => {
-        if(event.target.files[0].size/1024/1024<50)
+        if(event.target.files[0].size/1024/1024<maxFileSize)
             setCatalog(event.target.files[0])
-        else
-            showSnackBar('Файл слишком большой')
+        else showSnackBar('Файл слишком большой')
     })
-    let [preview, setPreview] = useState(data.organization!==null?data.organization.image:'');
-    let [image, setImage] = useState(undefined);
+    let [preview, setPreview] = useState(data.organization!==null?data.organization.image:'/static/add.png');
+    let [image, setImage] = useState(null);
     let handleChangeImage = ((event) => {
-        if(event.target.files[0].size/1024/1024<50){
+        if(event.target.files[0].size/1024/1024<maxImageSize) {
             setImage(event.target.files[0])
             setPreview(URL.createObjectURL(event.target.files[0]))
-        } else {
-            showSnackBar('Файл слишком большой')
-        }
+        } else showSnackBar('Файл слишком большой')
     })
-    const { profile } = props.user;
-    const { setMiniDialog, showMiniDialog, setFullDialog, showFullDialog } = props.mini_dialogActions;
+    const {profile} = props.user;
+    const {setMiniDialog, showMiniDialog, setFullDialog, showFullDialog} = props.mini_dialogActions;
     return (
-        <App pageName={data.organization!==null?router.query.id==='new'?'Добавить':data.organization.name:'Ничего не найдено'}>
+        <App pageName={router.query.id==='new'?'Добавить':data.organization!==null?data.organization.name:'Ничего не найдено'}>
             <Head>
-                <title>{data.organization!==null?router.query.id==='new'?'Добавить':data.organization.name:'Ничего не найдено'}</title>
+                <title>{router.query.id==='new'?'Добавить':data.organization!==null?data.organization.name:'Ничего не найдено'}</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={isMobileApp?classes.column:classes.row} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     {
-                        data.organization!==null?
+                        router.query.id==='new'||data.organization?
                             profile.role==='admin'||(['суперорганизация', 'организация'].includes(profile.role)&&profile.organization===data.organization._id)?
                                 <>
                                 <div className={classes.column}>
                                     <label htmlFor='contained-button-file'>
                                         <img
                                             className={classes.media}
+                                            style={preview==='/static/add.png'?{border: '1px red solid'}:null}
                                             src={preview}
                                             alt={'Добавить'}
                                         />
@@ -158,31 +153,9 @@ const Organization = React.memo((props) => {
                                             <FormControlLabel
                                                 control={
                                                     <Switch
-                                                        checked={accessToClient}
-                                                        onChange={()=>{setAccessToClient(!accessToClient)}}
-                                                        color="primary"
-                                                        inputProps={{ 'aria-label': 'primary checkbox' }}
-                                                    />
-                                                }
-                                                label='Доступ к клиентам'
-                                            />
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
-                                                        checked={consignation}
-                                                        onChange={()=>{setConsignation(!consignation)}}
-                                                        color="primary"
-                                                        inputProps={{ 'aria-label': 'primary checkbox' }}
-                                                    />
-                                                }
-                                                label='Консигнации'
-                                            />
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
                                                         checked={refusal}
-                                                        onChange={()=>{setRefusal(!refusal)}}
-                                                        color="primary"
+                                                        onChange={() => setRefusal(!refusal)}
+                                                        color='primary'
                                                         inputProps={{ 'aria-label': 'primary checkbox' }}
                                                     />
                                                 }
@@ -192,8 +165,8 @@ const Organization = React.memo((props) => {
                                                 control={
                                                     <Switch
                                                         checked={onlyDistrict}
-                                                        onChange={()=>{setOnlyDistrict(!onlyDistrict)}}
-                                                        color="primary"
+                                                        onChange={() => setOnlyDistrict(!onlyDistrict)}
+                                                        color='primary'
                                                         inputProps={{ 'aria-label': 'primary checkbox' }}
                                                     />
                                                 }
@@ -203,8 +176,8 @@ const Organization = React.memo((props) => {
                                                 control={
                                                     <Switch
                                                         checked={unite}
-                                                        onChange={()=>{setUnite(!unite)}}
-                                                        color="primary"
+                                                        onChange={() => setUnite(!unite)}
+                                                        color='primary'
                                                         inputProps={{ 'aria-label': 'primary checkbox' }}
                                                     />
                                                 }
@@ -214,8 +187,8 @@ const Organization = React.memo((props) => {
                                                 control={
                                                     <Switch
                                                         checked={superagent}
-                                                        onChange={()=>{setSuperagent(!superagent)}}
-                                                        color="primary"
+                                                        onChange={() => {setSuperagent(!superagent)}}
+                                                        color='primary'
                                                         inputProps={{ 'aria-label': 'primary checkbox' }}
                                                     />
                                                 }
@@ -225,8 +198,8 @@ const Organization = React.memo((props) => {
                                                 control={
                                                     <Switch
                                                         checked={onlyIntegrate}
-                                                        onChange={()=>{setOnlyIntegrate(!onlyIntegrate)}}
-                                                        color="primary"
+                                                        onChange={() => {setOnlyIntegrate(!onlyIntegrate)}}
+                                                        color='primary'
                                                         inputProps={{ 'aria-label': 'primary checkbox' }}
                                                     />
                                                 }
@@ -236,8 +209,8 @@ const Organization = React.memo((props) => {
                                                 control={
                                                     <Switch
                                                         checked={dateDelivery}
-                                                        onChange={()=>{setDateDelivery(!dateDelivery)}}
-                                                        color="primary"
+                                                        onChange={() => {setDateDelivery(!dateDelivery)}}
+                                                        color='primary'
                                                         inputProps={{ 'aria-label': 'primary checkbox' }}
                                                     />
                                                 }
@@ -247,7 +220,7 @@ const Organization = React.memo((props) => {
                                                 control={
                                                     <Switch
                                                         checked={addedClient}
-                                                        onChange={()=>{setAddedClient(!addedClient)}}
+                                                        onChange={() => {setAddedClient(!addedClient)}}
                                                         color='primary'
                                                         inputProps={{ 'aria-label': 'primary checkbox' }}
                                                     />
@@ -258,7 +231,7 @@ const Organization = React.memo((props) => {
                                                 control={
                                                     <Switch
                                                         checked={agentSubBrand}
-                                                        onChange={()=>{setAgentSubBrand(!agentSubBrand)}}
+                                                        onChange={() => {setAgentSubBrand(!agentSubBrand)}}
                                                         color='primary'
                                                         inputProps={{ 'aria-label': 'primary checkbox' }}
                                                     />
@@ -269,7 +242,7 @@ const Organization = React.memo((props) => {
                                                 control={
                                                     <Switch
                                                         checked={clientSubBrand}
-                                                        onChange={()=>{setClientSubBrand(!clientSubBrand)}}
+                                                        onChange={() => {setClientSubBrand(!clientSubBrand)}}
                                                         color='primary'
                                                         inputProps={{ 'aria-label': 'primary checkbox' }}
                                                     />
@@ -280,8 +253,8 @@ const Organization = React.memo((props) => {
                                                     control={
                                                         <Switch
                                                             checked={autoAcceptAgent}
-                                                            onChange={()=>{setAutoAcceptAgent(!autoAcceptAgent)}}
-                                                            color="primary"
+                                                            onChange={() => {setAutoAcceptAgent(!autoAcceptAgent)}}
+                                                            color='primary'
                                                             inputProps={{ 'aria-label': 'primary checkbox' }}
                                                         />
                                                     }
@@ -291,8 +264,8 @@ const Organization = React.memo((props) => {
                                                     control={
                                                         <Switch
                                                             checked={autoAcceptNight}
-                                                            onChange={()=>{setAutoAcceptNight(!autoAcceptNight)}}
-                                                            color="primary"
+                                                            onChange={() => {setAutoAcceptNight(!autoAcceptNight)}}
+                                                            color='primary'
                                                             inputProps={{ 'aria-label': 'primary checkbox' }}
                                                         />
                                                     }
@@ -302,8 +275,8 @@ const Organization = React.memo((props) => {
                                                     control={
                                                         <Switch
                                                             checked={clientDuplicate}
-                                                            onChange={()=>{setClientDuplicate(!clientDuplicate)}}
-                                                            color="primary"
+                                                            onChange={() => {setClientDuplicate(!clientDuplicate)}}
+                                                            color='primary'
                                                             inputProps={{ 'aria-label': 'primary checkbox' }}
                                                         />
                                                     }
@@ -313,10 +286,10 @@ const Organization = React.memo((props) => {
                                                     control={
                                                         <Switch
                                                             checked={divideBySubBrand}
-                                                            onChange={()=>{
+                                                            onChange={() => {
                                                                 setDivideBySubBrand(!divideBySubBrand)
                                                             }}
-                                                            color="primary"
+                                                            color='primary'
                                                             inputProps={{ 'aria-label': 'primary checkbox' }}
                                                         />
                                                     }
@@ -325,19 +298,8 @@ const Organization = React.memo((props) => {
                                             <FormControlLabel
                                                 control={
                                                     <Switch
-                                                        checked={autoIntegrate}
-                                                        onChange={()=>{setAutoIntegrate(!autoIntegrate)}}
-                                                        color='primary'
-                                                        inputProps={{ 'aria-label': 'primary checkbox' }}
-                                                    />
-                                                }
-                                                label='Автоприем интеграции'
-                                            />
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
                                                         checked={calculateStock}
-                                                        onChange={()=>{setCalculateStock(!calculateStock)}}
+                                                        onChange={() => {setCalculateStock(!calculateStock)}}
                                                         color='primary'
                                                         inputProps={{ 'aria-label': 'primary checkbox' }}
                                                     />
@@ -345,16 +307,16 @@ const Organization = React.memo((props) => {
                                                 label='Подсчет остатков'
                                             />
                                             <br/>
-                                            <div className={classes.geo} style={{color: warehouse&&warehouse.length>0?'#ffb300':'red'}} onClick={()=>{
-                                                setFullDialog('Геолокация', <Geo change={true} geo={warehouse} setAddressGeo={setWarehouse}/>)
+                                            <div className={classes.geo} style={{color: warehouse&&warehouse.length?'#ffb300':'red'}} onClick={() => {
+                                                setFullDialog('Геолокация', <Geo change geo={warehouse} setAddressGeo={setWarehouse}/>)
                                                 showFullDialog(true)
                                             }}>
                                                 Склад
                                             </div>
                                             <div className={classes.row}>
                                                 {
-                                                    data.organization.catalog?
-                                                        <Button onClick={async()=> {
+                                                    data.organization&&data.organization.catalog?
+                                                        <Button onClick={()=> {
                                                             window.open(data.organization.catalog, '_blank');
                                                         }} size='small' color='primary'>
                                                             Открыть каталог
@@ -362,7 +324,7 @@ const Organization = React.memo((props) => {
                                                         :
                                                         null
                                                 }
-                                                <Button onClick={async()=> {
+                                                <Button onClick={()=> {
                                                     catalogInput.current.click()
                                                 }} size='small' color={catalog?'primary':'secondary'}>
                                                     Загрузить каталог
@@ -376,20 +338,18 @@ const Organization = React.memo((props) => {
                                 <div>
                                     <TextField
                                         label='Имя'
+                                        error={!name}
                                         value={name}
                                         className={isMobileApp?classes.inputM:classes.inputD}
-                                        onChange={(event)=>{setName(event.target.value)}}
-                                        inputProps={{
-                                            'aria-label': 'description',
-                                        }}
+                                        onChange={(event) => {setName(event.target.value)}}
                                     />
-                                    <FormControl className={isMobileApp?classes.inputM:classes.inputD} variant='outlined'>
+                                    <FormControl error={!cities.length} className={isMobileApp?classes.inputM:classes.inputD}>
                                         <InputLabel>Город</InputLabel>
                                         <Select
-                                            multiple
                                             value={cities}
                                             onChange={handleCities}
                                             input={<Input />}
+                                            inputProps={{readOnly: profile.role!=='admin',}}
                                             MenuProps={{
                                                 PaperProps: {
                                                     style: {
@@ -408,22 +368,17 @@ const Organization = React.memo((props) => {
                                     </FormControl>
                                     <TextField
                                         label='Профиль'
+                                        error={!miniInfo}
                                         value={miniInfo}
                                         className={isMobileApp?classes.inputM:classes.inputD}
-                                        onChange={(event)=>{setMiniInfo(event.target.value)}}
-                                        inputProps={{
-                                            'aria-label': 'description',
-                                        }}
+                                        onChange={(event) => {setMiniInfo(event.target.value)}}
                                     />
                                     <FormControl className={isMobileApp?classes.inputM:classes.inputD}>
                                         <InputLabel>Минимальный заказ</InputLabel>
                                         <Input
                                             type={ isMobileApp?'number':'text'}
                                             value={minimumOrder}
-                                            onChange={(event)=>{setMinimumOrder(inputInt(event.target.value))}}
-                                            inputProps={{
-                                                'aria-label': 'description',
-                                            }}
+                                            onChange={(event) => {setMinimumOrder(inputInt(event.target.value))}}
                                         />
                                     </FormControl>
                                     <FormControl className={isMobileApp?classes.inputM:classes.inputD}>
@@ -431,32 +386,23 @@ const Organization = React.memo((props) => {
                                         <Input
                                             type={ isMobileApp?'number':'text'}
                                             value={agentHistory}
-                                            onChange={(event)=>{setAgentHistory(inputInt(event.target.value))}}
-                                            inputProps={{
-                                                'aria-label': 'description',
-                                            }}
+                                            onChange={(event) => {setAgentHistory(inputInt(event.target.value))}}
                                         />
                                     </FormControl>
-                                    <FormControl className={isMobileApp?classes.inputM:classes.inputD}>
-                                        <InputLabel>Приоритет</InputLabel>
-                                        <Input
-                                            type={ isMobileApp?'number':'text'}
-                                            value={priotiry}
-                                            onChange={(event)=>{setPriotiry(inputInt(event.target.value))}}
-                                            inputProps={{
-                                                'aria-label': 'description',
-                                            }}
-                                        />
-                                    </FormControl>
+                                    <TextField
+                                        label='Приоритет'
+                                        value={priotiry}
+                                        type={ isMobileApp?'number':'text'}
+                                        className={isMobileApp?classes.inputM:classes.inputD}
+                                        onChange={(event) => {setPriotiry(inputInt(event.target.value))}}
+                                        inputProps={{readOnly: profile.role!=='admin',}}
+                                    />
                                     <TextField
                                         label='Интеграция'
                                         value={pass}
                                         className={isMobileApp?classes.inputM:classes.inputD}
-                                        onChange={(event)=>{setPass(event.target.value)}}
-                                        inputProps={{
-                                            'aria-label': 'description',
-                                            readOnly: profile.role!=='admin',
-                                        }}
+                                        onChange={(event) => {setPass(event.target.value)}}
+                                        inputProps={{readOnly: profile.role!=='admin',}}
                                     />
                                     {address.map((element, idx)=>
                                         <FormControl  key={`address${idx}`} className={isMobileApp?classes.inputM:classes.inputD}>
@@ -464,18 +410,10 @@ const Organization = React.memo((props) => {
                                             <Input
                                                 placeholder='Адрес'
                                                 value={element}
-                                                onChange={(event)=>{editAddress(event, idx)}}
-                                                inputProps={{
-                                                    'aria-label': 'description',
-                                                }}
+                                                onChange={(event) => {editAddress(event, idx)}}
                                                 endAdornment={
-                                                    <InputAdornment position="end">
-                                                        <IconButton
-                                                            onClick={()=>{
-                                                                deleteAddress(idx)
-                                                            }}
-                                                            aria-label='toggle password visibility'
-                                                        >
+                                                    <InputAdornment position='end'>
+                                                        <IconButton onClick={() => deleteAddress(idx)}>
                                                             <Remove/>
                                                         </IconButton>
                                                     </InputAdornment>
@@ -484,30 +422,24 @@ const Organization = React.memo((props) => {
                                         </FormControl>
                                     )}
                                     <br/>
-                                    <Button onClick={async()=>{
+                                    <Button onClick={() => {
                                         addAddress()
-                                    }} size='small' color='primary'>
+                                    }} size='small' color={address[0]?'primary':'secondary'}>
                                         Добавить адрес
                                     </Button>
-                                    <br/>
-                                    <br/>
                                     {email.map((element, idx)=>
                                         <FormControl  key={`email${idx}`} className={isMobileApp?classes.inputM:classes.inputD}>
                                             <InputLabel>Email{idx+1}</InputLabel>
                                             <Input
                                                 value={element}
-                                                onChange={(event)=>{editEmail(event, idx)}}
-                                                inputProps={{
-                                                    'aria-label': 'description',
-                                                }}
+                                                onChange={(event) => {editEmail(event, idx)}}
                                                 endAdornment={
-                                                    <InputAdornment position="end">
+                                                    <InputAdornment position='end'>
                                                         <IconButton
-                                                            onClick={()=>{
+                                                            onClick={() => {
                                                                 deleteEmail(idx)
                                                             }}
-                                                            aria-label='toggle password visibility'
-                                                        >
+                                                                                                                    >
                                                             <Remove/>
                                                         </IconButton>
                                                     </InputAdornment>
@@ -516,30 +448,24 @@ const Organization = React.memo((props) => {
                                         </FormControl>
                                     )}
                                     <br/>
-                                    <Button onClick={async()=>{
+                                    <Button onClick={() => {
                                         addEmail()
                                     }} size='small' color='primary'>
                                         Добавить email
                                     </Button>
-                                    <br/>
-                                    <br/>
                                     {phone.map((element, idx)=>
                                         <FormControl  key={`phone${idx}`} className={isMobileApp?classes.inputM:classes.inputD}>
                                             <InputLabel>Телефон{idx+1}</InputLabel>
                                             <Input
                                                 value={element}
-                                                onChange={(event)=>{editPhone(event, idx)}}
-                                                inputProps={{
-                                                    'aria-label': 'description',
-                                                }}
+                                                onChange={(event) => {editPhone(event, idx)}}
                                                 endAdornment={
-                                                    <InputAdornment position="end">
+                                                    <InputAdornment position='end'>
                                                         <IconButton
-                                                            onClick={()=>{
+                                                            onClick={() => {
                                                                 deletePhone(idx)
                                                             }}
-                                                            aria-label='toggle password visibility'
-                                                        >
+                                                                                                                    >
                                                             <Remove/>
                                                         </IconButton>
                                                     </InputAdornment>
@@ -548,36 +474,31 @@ const Organization = React.memo((props) => {
                                         </FormControl>
                                     )}
                                     <br/>
-                                    <Button onClick={async()=>{
+                                    <Button onClick={() => {
                                         addPhone()
-                                    }} size='small' color='primary'>
+                                    }} size='small' color={'primary'}>
                                         Добавить телефон
                                     </Button>
-                                    <br/>
-                                    <br/>
                                     <TextField
-                                        multiline={true}
+                                        multiline
                                         label='Информация'
+                                        error={!info}
                                         value={info}
                                         className={isMobileApp?classes.inputM:classes.inputD}
-                                        onChange={(event)=>{setInfo(event.target.value)}}
-                                        inputProps={{
-                                            'aria-label': 'description',
-                                        }}
+                                        onChange={(event) => {setInfo(event.target.value)}}
                                     />
                                     <div className={classes.row}>
                                         {
                                             router.query.id==='new'?
-                                                <Button onClick={async()=>{
-                                                    if (cities.length>0&&image!==undefined&&name.length>0&&email.length>0&&address.length>0&&phone.length>0&&info.length>0) {
-                                                        const action = async() => {
-                                                            await addOrganization({
+                                                <Button onClick={() => {
+                                                    if(cities.length&&miniInfo&&image&&name&&address[0]&&info) {
+                                                        const action = async () => {
+                                                            const res = await addOrganization({
                                                                 catalog,
                                                                 cities,
                                                                 pass,
                                                                 miniInfo,
                                                                 priotiry: checkInt(priotiry),
-                                                                consignation,
                                                                 refusal,
                                                                 onlyDistrict,
                                                                 unite,
@@ -586,7 +507,6 @@ const Organization = React.memo((props) => {
                                                                 addedClient,
                                                                 agentSubBrand,
                                                                 clientSubBrand,
-                                                                autoIntegrate,
                                                                 calculateStock,
                                                                 autoAcceptAgent,
                                                                 autoAcceptNight,
@@ -594,7 +514,6 @@ const Organization = React.memo((props) => {
                                                                 divideBySubBrand,
                                                                 dateDelivery,
                                                                 warehouse,
-                                                                accessToClient,
                                                                 image,
                                                                 name,
                                                                 address,
@@ -604,7 +523,8 @@ const Organization = React.memo((props) => {
                                                                 minimumOrder: checkInt(minimumOrder),
                                                                 agentHistory: checkInt(agentHistory)
                                                             })
-                                                            Router.push('/organizations')
+                                                            if(res)
+                                                                Router.push(`/organization/${res}`)
                                                         }
                                                         setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                         showMiniDialog(true)
@@ -616,18 +536,17 @@ const Organization = React.memo((props) => {
                                                 </Button>
                                                 :
                                                 <>
-                                                <Button onClick={async()=>{
+                                                <Button onClick={() => {
                                                     let editElement = {_id: data.organization._id}
-                                                    if(image!==undefined)editElement.image = image
+                                                    if(image)editElement.image = image
                                                     if(pass!==data.organization.pass)editElement.pass = pass
-                                                    if(name.length>0&&name!==data.organization.name)editElement.name = name
-                                                    if(cities.length>0)editElement.cities = cities
-                                                    if(address.length>0&&address!==data.organization.address)editElement.address = address
-                                                    if(email.length>0&&email!==data.organization.email)editElement.email = email
-                                                    if(phone.length>0&&phone!==data.organization.phone)editElement.phone = phone
-                                                    if(info.length>0&&info!==data.organization.info)editElement.info = info
-                                                    if(miniInfo.length>0&&miniInfo!==data.organization.miniInfo)editElement.miniInfo = miniInfo
-                                                    if(accessToClient!==data.organization.accessToClient)editElement.accessToClient = accessToClient
+                                                    if(name.length&&name!==data.organization.name)editElement.name = name
+                                                    if(cities.length&&JSON.stringify(cities)!==JSON.stringify(data.organization.cities)) editElement.cities = cities
+                                                    if(address.length&&address!==data.organization.address)editElement.address = address
+                                                    if(email.length&&email!==data.organization.email)editElement.email = email
+                                                    if(phone.length&&phone!==data.organization.phone)editElement.phone = phone
+                                                    if(info.length&&info!==data.organization.info)editElement.info = info
+                                                    if(miniInfo.length&&miniInfo!==data.organization.miniInfo)editElement.miniInfo = miniInfo
                                                     if(onlyDistrict!==data.organization.onlyDistrict)editElement.onlyDistrict = onlyDistrict
                                                     if(unite!==data.organization.unite)editElement.unite = unite
                                                     if(superagent!==data.organization.superagent)editElement.superagent = superagent
@@ -635,7 +554,6 @@ const Organization = React.memo((props) => {
                                                     if(addedClient!==data.organization.addedClient)editElement.addedClient = addedClient
                                                     if(agentSubBrand!==data.organization.agentSubBrand)editElement.agentSubBrand = agentSubBrand
                                                     if(clientSubBrand!==data.organization.clientSubBrand)editElement.clientSubBrand = clientSubBrand
-                                                    if(autoIntegrate!==data.organization.autoIntegrate)editElement.autoIntegrate = autoIntegrate
                                                     if(calculateStock!==data.organization.calculateStock)editElement.calculateStock = calculateStock
                                                     if(autoAcceptAgent!==data.organization.autoAcceptAgent)editElement.autoAcceptAgent = autoAcceptAgent
                                                     if(autoAcceptNight!==data.organization.autoAcceptNight)editElement.autoAcceptNight = autoAcceptNight
@@ -643,15 +561,12 @@ const Organization = React.memo((props) => {
                                                     if(divideBySubBrand!==data.organization.divideBySubBrand)editElement.divideBySubBrand = divideBySubBrand
                                                     if(dateDelivery!==data.organization.dateDelivery)editElement.dateDelivery = dateDelivery
                                                     if(warehouse!==data.organization.warehouse)editElement.warehouse = warehouse
-                                                    if(consignation!==data.organization.consignation)editElement.consignation = consignation
                                                     if(refusal!==data.organization.refusal)editElement.refusal = refusal
                                                     if(minimumOrder!==data.organization.minimumOrder)editElement.minimumOrder = checkInt(minimumOrder)
                                                     if(agentHistory!==data.organization.agentHistory)editElement.agentHistory = checkInt(agentHistory)
                                                     if(catalog&&catalog!==data.organization.catalog)editElement.catalog = catalog
                                                     if(priotiry!==data.organization.priotiry)editElement.priotiry = checkInt(priotiry)
-                                                    const action = async() => {
-                                                        await setOrganization(editElement)
-                                                    }
+                                                    const action = async () => await setOrganization(editElement)
                                                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                     showMiniDialog(true)
                                                 }} size='small' color='primary'>
@@ -659,9 +574,9 @@ const Organization = React.memo((props) => {
                                                 </Button>
                                                 {profile.role==='admin'?
                                                     <>
-                                                    <Button onClick={async()=>{
-                                                        const action = async() => {
-                                                            await onoffOrganization([data.organization._id])
+                                                    <Button onClick={() => {
+                                                        const action = async () => {
+                                                            await onoffOrganization(data.organization._id)
                                                             setStatusO(statusO==='active'?'deactive':'active')
                                                         }
                                                         setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
@@ -669,9 +584,9 @@ const Organization = React.memo((props) => {
                                                     }} size='small'  color={statusO==='active'?'primary':'secondary'}>
                                                         {statusO==='active'?'Отключить':'Включить'}
                                                     </Button>
-                                                    <Button onClick={async()=>{
-                                                        const action = async() => {
-                                                            await deleteOrganization([data.organization._id])
+                                                    <Button onClick={() => {
+                                                        const action = async () => {
+                                                            await deleteOrganization(data.organization._id)
                                                             Router.push('/organizations')
                                                         }
                                                         setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
@@ -689,10 +604,7 @@ const Organization = React.memo((props) => {
                                 </div>
                                 </>
                                 :
-                                router.query.id==='new'?
-                                    'Ничего не найдено'
-                                    :
-                                    <>
+                                <>
                                     <img
                                         className={classes.media}
                                         src={preview}
@@ -757,7 +669,7 @@ const Organization = React.memo((props) => {
                                             {info}
                                         </div>
                                     </div>
-                                    </>
+                                </>
                             :
                             'Ничего не найдено'
                     }
@@ -792,7 +704,7 @@ Organization.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            ...ctx.query.id!=='new'?await getOrganization({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{organization:{name: '',image: '/static/add.png',address: [],email: [],phone: [],info: '',miniInfo: '',priotiry: 0,minimumOrder: 0,agentHistory: 100, consignation: false,refusal: false,accessToClient: false, onlyDistrict: false, onlyIntegrate: false, addedClient: false, agentSubBrand: false, clientSubBrand: false, autoIntegrate: false, autoAcceptNight: false, clientDuplicate: false, divideBySubBrand: false, autoAcceptAgent: false, dateDelivery: false, warehouse: ''}}
+            organization: ctx.query.id!=='new'?await getOrganization(ctx.query.id, getClientGqlSsr(ctx.req)):null
         }
 
     };

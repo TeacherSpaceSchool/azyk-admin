@@ -14,11 +14,11 @@ import * as lib from '../../src/lib'
 
 const SetCities =  React.memo(
     (props) =>{
-        const { classes, cities } = props;
-        const { isMobileApp, city } = props.app;
+        const {classes, cities} = props;
+        const {isMobileApp, city} = props.app;
         let [cityChange, setCityChange] = useState(city);
-        const { showMiniDialog } = props.mini_dialogActions;
-        const { setCity } = props.appActions;
+        const {showMiniDialog} = props.mini_dialogActions;
+        const {setCity, setOrganization} = props.appActions;
         const width = isMobileApp? (window.innerWidth-112) : 500
         const _cities = cities?cities:lib.cities
         return (
@@ -35,9 +35,9 @@ const SetCities =  React.memo(
                     noOptionsText='Ничего не найдено'
                     renderInput={params => (
                         <TextField {...params} label='Город' fullWidth
-                                   onKeyPress={async event => {
-                                       if (event.key === 'Enter'&&cityChange) {
-                                           await setCity(cityChange)
+                                   onKeyPress={ event => {
+                                       if(event.key === 'Enter'&&cityChange) {
+                                           setCity(cityChange)
                                            setCityCookie(cityChange?cityChange:'')
                                            showMiniDialog(false);
                                        }
@@ -46,14 +46,15 @@ const SetCities =  React.memo(
                 />
                 <br/>
                 <div>
-                    <Button variant="contained" color="primary" onClick={async()=>{
-                        await setCity(cityChange)
+                    <Button variant="contained" color='primary' onClick={ () => {
+                        setOrganization(null)
+                        setCity(cityChange)
                         setCityCookie(cityChange?cityChange:'')
                         showMiniDialog(false);
                     }} className={classes.button}>
                         Сохранить
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant="contained" color="secondary" onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </div>

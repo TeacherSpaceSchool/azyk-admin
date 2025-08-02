@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { getSubBrands } from '../../src/gql/subBrand'
 import { getOrganizations } from '../../src/gql/organization'
 import { getItem, addItem, setItem, onoffItem, deleteItem } from '../../src/gql/items'
-import {checkInt, checkFloat, inputInt, inputFloat, cities} from '../../src/lib'
+import {checkInt, checkFloat, inputInt, inputFloat, maxImageSize} from '../../src/lib'
 import itemStyle from '../../src/styleMUI/item/item'
 import { useRouter } from 'next/router'
 import Card from '@material-ui/core/Card';
@@ -25,88 +25,88 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import TextField from '@material-ui/core/TextField';
 import Confirmation from '../../components/dialog/Confirmation'
-import Typography from '@material-ui/core/Typography';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from 'next/link';
 import { getClientGqlSsr } from '../../src/getClientGQL'
 
+const withoutSubBrand = {name: 'Без подбренда', _id: null}
+
 const Item = React.memo((props) => {
     const classes = itemStyle();
-    const { data } = props;
+    const {data} = props;
     const router = useRouter()
-    const { isMobileApp } = props.app;
-    const { profile } = props.user;
-    let [unit, setUnit] = useState(data.item?data.item.unit:'');
+    const {isMobileApp} = props.app;
+    const {profile} = props.user;
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    const {showSnackBar} = props.snackbarActions;
+    let [unit, setUnit] = useState(data.item?data.item.unit:'шт');
     let [name, setName] = useState(data.item?data.item.name:'');
     let [price, setPrice] = useState(data.item?data.item.price:'');
-    let [subBrand, setSubBrand] = useState(data.item&&data.item.subBrand?data.item.subBrand:{});
-    let [subBrands, setSubBrands] = useState([]);
-    let [city, setCity] = useState(data.item&&data.item.city?data.item.city:'Бишкек');
-    let handleCity =  (event) => {
-        setCity(event.target.value)
-    };
+    let [city, setCity] = useState(data.item&&data.item.city?data.item.city:'');
     let [status, setStatus] = useState(data.item?data.item.status:'');
-    let handleSubBrand =  (event) => {
-        setSubBrand({_id: event.target.value, name: event.target.name})
-    };
-    const _categorys = ['A','B','C','D','Horeca']
-    let [categorys, setCategorys] = useState(data.item?data.item.categorys:['A','B','C','D','Horeca']);
+    let [hit, setHit] = useState(data.item?data.item.hit:false);
+    let [latest, setLatest] = useState(data.item?data.item.latest:false);
+    let [apiece, setApiece] = useState(data.item?data.item.apiece:false);
+    let [packaging, setPackaging] = useState(data.item&&data.item.packaging?data.item.packaging:1);
+    let [weight, setWeight] = useState(data.item&&data.item.weight?data.item.weight:0);
+    let [priotiry, setPriotiry] = useState(data.item&&data.item.priotiry?data.item.priotiry:0);
+    //categorys
+    const defaultCategorys = ['A','B','C','D','Horeca']
+    let [categorys, setCategorys] = useState(data.item?data.item.categorys:defaultCategorys);
     let handleCategorys = (async (event) => {
         setCategorys(event.target.value)
     })
-    let [weight, setWeight] = useState(data.item&&data.item.weight?data.item.weight:0);
-    let [priotiry, setPriotiry] = useState(data.item&&data.item.priotiry?data.item.priotiry:0);
-    let [organization, setOrganization] = useState(data.item!==null?data.item.organization:{});
+    //organization
+    let [organization, setOrganization] = useState(data.item?data.item.organization:profile.organization?{_id: profile.organization}:null);
     let handleOrganization =  (event) => {
-        setOrganization({_id: event.target.value, name: event.target.name})
+        setOrganization({_id: event.target.value})
+        const organization = data.organizations.find(organization => organization._id === event.target.value)
+        setCity(organization?organization.cities[0]:null)
     };
-    let [hit, setHit] = useState(data.item!==null?data.item.hit:false);
-    let [latest, setLatest] = useState(data.item!==null?data.item.latest:false);
-    let [apiece, setApiece] = useState(data.item!==null?data.item.apiece:false);
-    let [packaging, setPackaging] = useState(data.item&&data.item.packaging?data.item.packaging:1);
-    let [preview, setPreview] = useState(data.item!==null?data.item.image:'');
-    let [image, setImage] = useState(undefined);
+    useEffect(() => {
+        if(!data.item&&profile.organization) {
+            organization = data.organizations.find(organization => organization._id === profile.organization)
+            if(organization)
+                handleOrganization({target: {value: organization._id}})
+        }
+    }, [])
+    //subBrands
+    let [subBrands, setSubBrands] = useState([withoutSubBrand]);
+    let [subBrand, setSubBrand] = useState(data.item&&data.item.subBrand?data.item.subBrand:withoutSubBrand);
+    let handleSubBrand =  (event) => setSubBrand({_id: event.target.value});
+    useEffect(() => {(async () => {
+        subBrands = [withoutSubBrand]
+        if(organization)
+            subBrands = [...subBrands, ...await getSubBrands({search: '', organization: organization._id})]
+        setSubBrands(subBrands)
+        if(router.query.id==='new')
+            setSubBrand(withoutSubBrand)
+    })()}, [organization])
+    //image
+    let [preview, setPreview] = useState(data.item?data.item.image:'/static/add.png');
+    let [image, setImage] = useState(null);
     let handleChangeImage = ((event) => {
-        if(event.target.files[0].size/1024/1024<50){
+        if(event.target.files[0].size/1024/1024<maxImageSize) {
             setImage(event.target.files[0])
             setPreview(URL.createObjectURL(event.target.files[0]))
-        } else {
-            showSnackBar('Файл слишком большой')
-        }
+        } else showSnackBar('Файл слишком большой')
     })
-    useEffect(()=>{
-        (async()=>{
-            if(!organization._id&&['суперорганизация', 'организация', 'экспедитор'].includes(profile.role)){
-                let organzation = data.organizations.filter(organization=>organization._id===profile.organization)
-                setOrganization(organzation[0])
-            }
-        })()
-    },[])
-    useEffect(()=>{
-        (async()=>{
-            if(organization&&organization._id){
-                setSubBrands([{name: 'Без подбренда', _id: undefined}, ...(await getSubBrands({search: '', organization: organization._id})).subBrands])
-            }
-        })()
-    },[organization])
-    const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
-    const { showSnackBar } = props.snackbarActions;
     return (
-        <App pageName={data.item!==null?router.query.id==='new'?'Добавить':data.item.name:'Ничего не найдено'}>
+        <App pageName={router.query.id==='new'?'Добавить':data.item?data.item.name:'Ничего не найдено'}>
             <Head>
-                <title>{data.item!==null?router.query.id==='new'?'Добавить':data.item.name:'Ничего не найдено'}</title>
+                <title>{router.query.id==='new'?'Добавить':data.item?data.item.name:'Ничего не найдено'}</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={isMobileApp?classes.column:classes.row}>
                     {
-                        profile.role==='admin'||(['суперорганизация', 'организация'].includes(profile.role)&&organization._id===profile.organization)?
-                            data.item!==null||router.query.id==='new'?
+                        profile.role==='admin'||(organization&&['суперорганизация', 'организация'].includes(profile.role)&&organization._id===profile.organization)?
+                            data.item||router.query.id==='new'?
                                 <>
                                     <div className={classes.column}>
                                         <label htmlFor='contained-button-file'>
                                             <img
                                                 className={classes.media}
+                                                style={preview==='/static/add.png'?{border: '1px red solid'}:null}
                                                 src={preview}
                                                 alt={'Добавить'}
                                             />
@@ -121,8 +121,8 @@ const Item = React.memo((props) => {
                                                         control={
                                                             <Switch
                                                                 checked={hit}
-                                                                onChange={()=>{setHit(!hit)}}
-                                                                color="primary"
+                                                                onChange={() => setHit(!hit)}
+                                                                color='primary'
                                                                 inputProps={{ 'aria-label': 'primary checkbox' }}
                                                             />
                                                         }
@@ -139,8 +139,8 @@ const Item = React.memo((props) => {
                                                         control={
                                                             <Switch
                                                                 checked={latest}
-                                                                onChange={()=>{setLatest(!latest)}}
-                                                                color="primary"
+                                                                onChange={() => setLatest(!latest)}
+                                                                color='primary'
                                                                 inputProps={{ 'aria-label': 'primary checkbox' }}
                                                             />
                                                         }
@@ -155,8 +155,8 @@ const Item = React.memo((props) => {
                                                 control={
                                                     <Switch
                                                         checked={apiece}
-                                                        onChange={()=>{setApiece(!apiece)}}
-                                                        color="primary"
+                                                        onChange={() => setApiece(!apiece)}
+                                                        color='primary'
                                                         inputProps={{ 'aria-label': 'primary checkbox' }}
                                                     />
                                                 }
@@ -169,24 +169,20 @@ const Item = React.memo((props) => {
                                         <h1 className={classes.name}>
                                             <TextField
                                                 label='Имя'
+                                                error={!name}
                                                 value={name}
                                                 className={isMobileApp?classes.inputM:classes.inputD}
-                                                onChange={(event)=>{setName(event.target.value)}}
-                                                inputProps={{
-                                                    'aria-label': 'description',
-                                                }}
+                                                onChange={(event) => {setName(event.target.value)}}
                                             />
                                         </h1>
-                                        <FormControl className={isMobileApp?classes.inputM:classes.inputD}>
-                                            <InputLabel>Город</InputLabel>
-                                            <Select value={city} onChange={handleCity}>
-                                                {cities.map((element)=>
-                                                    <MenuItem key={element} value={element} ola={element}>{element}</MenuItem>
-                                                )}
-                                            </Select>
-                                        </FormControl>
+                                        <TextField
+                                            label='Город'
+                                            value={city}
+                                            className={isMobileApp?classes.inputM:classes.inputD}
+                                            inputProps={{readOnly: true}}
+                                        />
                                         <div className={classes.price}>
-                                            <FormControl className={isMobileApp?classes.inputM:classes.inputD} variant='outlined'>
+                                            <FormControl error={!categorys.length} className={isMobileApp?classes.inputM:classes.inputD}>
                                                 <InputLabel>Категории</InputLabel>
                                                 <Select
                                                     multiple
@@ -202,7 +198,7 @@ const Item = React.memo((props) => {
                                                         }
                                                     }}
                                                 >
-                                                    {_categorys.map((category) => (
+                                                    {defaultCategorys.map((category) => (
                                                         <MenuItem key={category} value={category}>
                                                             {category}
                                                         </MenuItem>
@@ -216,12 +212,9 @@ const Item = React.memo((props) => {
                                                 label='Приоритет'
                                                 value={priotiry}
                                                 className={isMobileApp?classes.inputM:classes.inputD}
-                                                onChange={(event)=>{
+                                                onChange={(event) => {
                                                     setPriotiry(inputInt(event.target.value))}
                                                 }
-                                                inputProps={{
-                                                    'aria-label': 'description',
-                                                }}
                                             />
                                         </div>
                                         <div className={classes.price}>
@@ -229,12 +222,9 @@ const Item = React.memo((props) => {
                                                 label='Единица измерения'
                                                 value={unit}
                                                 className={isMobileApp?classes.inputM:classes.inputD}
-                                                onChange={(event)=>{
+                                                onChange={(event) => {
                                                     setUnit(event.target.value)}
                                                 }
-                                                inputProps={{
-                                                    'aria-label': 'description',
-                                                }}
                                             />
                                         </div>
                                         <div className={classes.price}>
@@ -243,12 +233,9 @@ const Item = React.memo((props) => {
                                                 label='Вес в килограммах'
                                                 value={weight}
                                                 className={isMobileApp?classes.inputM:classes.inputD}
-                                                onChange={(event)=>{
+                                                onChange={(event) => {
                                                     setWeight(inputFloat(event.target.value))}
                                                 }
-                                                inputProps={{
-                                                    'aria-label': 'description',
-                                                }}
                                             />
                                         </div>
                                         <div className={classes.price}>
@@ -257,50 +244,43 @@ const Item = React.memo((props) => {
                                                 label='Упаковка'
                                                 value={packaging}
                                                 className={isMobileApp?classes.inputM:classes.inputD}
-                                                onChange={(event)=>{setPackaging(inputInt(event.target.value))}}
-                                                inputProps={{
-                                                    'aria-label': 'description',
-                                                }}
+                                                onChange={(event) => {setPackaging(inputInt(event.target.value))}}
                                             />
                                         </div>
                                         <div className={classes.price}>
                                             <TextField
                                                 type={ isMobileApp?'number':'text'}
                                                 label='Цена'
+                                                error={!price}
                                                 value={price}
                                                 className={isMobileApp?classes.inputM:classes.inputD}
-                                                onChange={(event)=>{
+                                                onChange={(event) => {
                                                     setPrice(inputFloat(event.target.value))
-                                                }}
-                                                inputProps={{
-                                                    'aria-label': 'description',
                                                 }}
                                             />
                                         </div>
                                         {profile.role==='admin'?
-                                            <FormControl className={isMobileApp?classes.inputM:classes.inputD}>
+                                            router.query.id==='new'?<FormControl error={!organization} className={isMobileApp?classes.inputM:classes.inputD}>
                                                 <InputLabel>Организация</InputLabel>
-                                                <Select value={organization._id}onChange={handleOrganization}>
+                                                <Select value={organization&&organization._id} onChange={handleOrganization}>
                                                     {data.organizations.map((element)=>
-                                                        <MenuItem key={element._id} value={element._id} ola={element.name}>{element.name}</MenuItem>
+                                                        <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                                     )}
                                                 </Select>
                                             </FormControl>
                                             :
-                                            <Input
+                                            <TextField
+                                                label='Организация'
                                                 value={organization.name}
                                                 className={isMobileApp?classes.inputM:classes.inputD}
-                                                inputProps={{
-                                                    'aria-label': 'description',
-                                                    readOnly: true,
-                                                }}
+                                                inputProps={{readOnly: true}}
                                             />
-                                        }
+                                        :null}
                                         <FormControl className={isMobileApp?classes.inputM:classes.inputD}>
                                             <InputLabel>Подбренд</InputLabel>
-                                            <Select value={subBrand._id} onChange={handleSubBrand}>
+                                            <Select value={subBrand&&subBrand._id} onChange={handleSubBrand}>
                                                 {subBrands.map((element)=>
-                                                    <MenuItem key={element._id} value={element._id} ola={element.name}>{element.name}</MenuItem>
+                                                    <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                                 )}
                                             </Select>
                                         </FormControl>
@@ -308,26 +288,20 @@ const Item = React.memo((props) => {
                                         <div className={classes.row}>
                                             {
                                                 router.query.id==='new'?
-                                                    <Button onClick={async()=>{
-                                                        if (categorys.length>0&&name.length>0&&price>0&&organization._id!=undefined) {
-                                                            const action = async() => {
-                                                                await addItem({
-                                                                    packaging: checkInt(packaging)>0?checkInt(packaging):1,
-                                                                    name: name,
-                                                                    categorys,
-                                                                    image: image,
-                                                                    price: checkFloat(price),
-                                                                    subBrand: subBrand._id,
-                                                                    hit: hit,
-                                                                    latest: latest,
-                                                                    organization: organization._id,
-                                                                    weight: checkFloat(weight),
-                                                                    apiece: apiece,
-                                                                    unit: unit,
-                                                                    city: city,
-                                                                    priotiry: checkInt(priotiry)
+                                                    <Button onClick={() => {
+                                                        price = checkFloat(price)
+                                                        packaging = checkInt(packaging)
+                                                        weight = checkFloat(weight)
+                                                        priotiry = checkInt(priotiry)
+                                                        if(image&&categorys.length&&name&&price&&organization) {
+                                                            const action = async () => {
+                                                                const res = await addItem({
+                                                                    hit, latest, apiece,
+                                                                    price, weight, priotiry, packaging: packaging||1,
+                                                                    name, categorys, image, unit, city,
+                                                                    ...subBrand?{subBrand: subBrand._id}:{}, organization: organization._id
                                                                 })
-                                                                await Router.push(`/brand/${organization._id}`)
+                                                                if(res) Router.push(`/item/${res}`)
                                                             }
                                                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                             showMiniDialog(true)
@@ -339,13 +313,14 @@ const Item = React.memo((props) => {
                                                     </Button>
                                                     :
                                                     <>
-                                                        <Button onClick={async()=>{
-                                                            if (categorys.length>0){
-                                                                let editElement = {_id: data.item._id, categorys, subBrand: subBrand?subBrand._id:subBrand}
+                                                        <Button onClick={() => {
+                                                            if(categorys.length) {
+                                                                let editElement = {_id: data.item._id, subBrand: subBrand?subBrand._id:subBrand}
+                                                                if(JSON.stringify(categorys)!==JSON.stringify(data.item.categorys))editElement.categorys = categorys
                                                                 if(city!==data.item.city)editElement.city = city
-                                                                if(name.length>0&&name!==data.item.name)editElement.name = name
+                                                                if(name.length&&name!==data.item.name)editElement.name = name
                                                                 if(packaging!==data.item.packaging&&checkInt(packaging)>0)editElement.packaging = checkInt(packaging)
-                                                                if(image!==undefined)editElement.image = image
+                                                                if(image)editElement.image = image
                                                                 if(price>0&&price!==data.item.price)editElement.price = checkFloat(price)
                                                                 if(weight!==data.item.weight)editElement.weight = checkFloat(weight)
                                                                 if(hit!==data.item.hit)editElement.hit = hit
@@ -354,9 +329,7 @@ const Item = React.memo((props) => {
                                                                 if(latest!==data.item.latest)editElement.latest = latest
                                                                 if(organization._id!==data.item.organization._id)editElement.organization = organization._id
                                                                 if(priotiry!==data.item.priotiry)editElement.priotiry = checkInt(priotiry)
-                                                                const action = async() => {
-                                                                    await setItem(editElement)
-                                                                }
+                                                                const action = async () => await setItem(editElement)
                                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                                 showMiniDialog(true)
                                                             } else {
@@ -365,9 +338,9 @@ const Item = React.memo((props) => {
                                                         }} size='small' color='primary'>
                                                             Сохранить
                                                         </Button>
-                                                        <Button onClick={async()=>{
-                                                            const action = async() => {
-                                                                await onoffItem([data.item._id])
+                                                        <Button onClick={() => {
+                                                            const action = async () => {
+                                                                await onoffItem(data.item._id)
                                                                 setStatus(status==='active'?'deactive':'active')
                                                             }
                                                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
@@ -377,10 +350,10 @@ const Item = React.memo((props) => {
                                                         </Button>
                                                         {
                                                             profile.role==='admin'?
-                                                                <Button onClick={async()=>{
-                                                                    const action = async() => {
-                                                                        await deleteItem([data.item._id])
-                                                                        await Router.push(`/brand/${organization._id}`)
+                                                                <Button onClick={() => {
+                                                                    const action = async () => {
+                                                                        await deleteItem(data.item._id)
+                                                                        Router.push(`/brand/${organization._id}`)
                                                                     }
                                                                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                                     showMiniDialog(true)
@@ -459,23 +432,15 @@ Item.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
+    // eslint-disable-next-line no-undef
+    const [item, organizations] = await Promise.all([
+        ctx.query.id!=='new'?getItem(ctx.query.id, getClientGqlSsr(ctx.req)):null,
+        ctx.query.id==='new'?getOrganizations({search: '', filter: ''}, getClientGqlSsr(ctx.req)):null
+    ])
     return {
         data: {
-            ...ctx.query.id!=='new'?await getItem({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{
-                item:{
-                    priotiry: 0,
-                    image: '/static/add.png',
-                    packaging: 1,
-                    name: '',
-                    categorys: ['A','B','C','D','Horeca'],
-                    price: 0,
-                    subBrand: {_id: undefined},
-                    organization: {_id: undefined},
-                    hit: false,
-                    latest: false
-                }
-            },
-            ...await getOrganizations({search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
+            item,
+            organizations
         }
     };
 };

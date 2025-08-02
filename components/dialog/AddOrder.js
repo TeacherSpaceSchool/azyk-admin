@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -7,7 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import { getOrdersForRouting } from '../../src/gql/order'
 import { useBottomScrollListener } from 'react-bottom-scroll-listener';
 import Checkbox from '@material-ui/core/Checkbox';
-import CardOrder from '../../components/order/CardOrder';
+import CardOrder from '../../components/card/CardOrder';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
@@ -21,11 +21,11 @@ import routeStyle from '../../src/styleMUI/route/route'
 const AddOrder =  React.memo(
     (props) =>{
         const classes = routeStyle();
-        const { districts, produsers, mainSelectedOrders, setMainSelectedOrders, mainOrders, setMainOrders} = props;
-        const { showFullDialog } = props.mini_dialogActions;
+        const {districts, produsers, mainSelectedOrders, setMainSelectedOrders, mainOrders, setMainOrders} = props;
+        const {showFullDialog} = props.mini_dialogActions;
         let [screen, setScreen] = useState('setting');
-        let [dateStart, setDateStart] = useState();
-        let [dateEnd, setDateEnd] = useState();
+        let [dateStart, setDateStart] = useState(null);
+        let [dateEnd, setDateEnd] = useState(null);
         let [selectProdusers, setSelectProdusers] = useState([]);
         let handleSelectProdusers = (async (event) => {
             setSelectProdusers(event.target.value)
@@ -35,27 +35,27 @@ const AddOrder =  React.memo(
             setSelectDistricts(event.target.value)
         })
         let [orders, setOrders] = React.useState([]);
-        let [pagination, setPagination] = useState(100);
-        const containerRef = useBottomScrollListener(async()=>{
-            if(pagination<orders.length){
-                setPagination(pagination+100)
+        const [pagination, setPagination] = useState(100);
+        const containerRef = useBottomScrollListener(async () => {
+            if(pagination<orders.length) {
+                setPagination(pagination => pagination+100)
             }
         });
         let [selectedOrders, setSelectedOrders] = useState([]);
-        useEffect(()=>{
-            (async ()=>{
-                if(selectProdusers.length>0&&selectDistricts.length>0&&dateStart) {
+        useEffect(() => {
+            (async () => {
+                if(selectProdusers.length&&selectDistricts.length&&dateStart) {
                     let clients = []
-                    for(let i=0;i<selectDistricts.length;i++){
+                    for(let i=0;i<selectDistricts.length;i++) {
                         clients = [...clients, ...selectDistricts[i].client.map(element=>element._id)]
                     }
-                    orders = (await getOrdersForRouting({produsers: selectProdusers.map(element=>element._id), clients: clients, dateStart: dateStart, dateEnd: dateEnd})).invoicesForRouting
+                    orders = await getOrdersForRouting({produsers: selectProdusers.map(element=>element._id), clients: clients, dateStart: dateStart, dateEnd: dateEnd})
                     orders = orders.filter(order=>mainOrders.findIndex(element1=>element1._id===order._id)===-1)
                     setOrders(orders)
                 }
             })()
-        },[selectProdusers, selectDistricts, dateStart])
-        const { isMobileApp } = props.app;
+        }, [selectProdusers, selectDistricts, dateStart])
+        const {isMobileApp} = props.app;
         let [anchorEl, setAnchorEl] = useState(null);
         let open = event => {
             setAnchorEl(event.currentTarget);
@@ -66,17 +66,17 @@ const AddOrder =  React.memo(
         return (
             <div ref={containerRef} className={classes.column}>
                 <div style={{ justifyContent: 'center' }} className={classes.row}>
-                    <div style={{background: screen==='setting'?'#ffb300':'#ffffff'}} onClick={()=>{setPagination(100);setScreen('setting')}} className={classes.selectType}>
+                    <div style={{background: screen==='setting'?'#ffb300':'#ffffff'}} onClick={() => {setPagination(100);setScreen('setting')}} className={classes.selectType}>
                         Настройки
                     </div>
-                    <div style={{background: screen==='invoices'?'#ffb300':'#ffffff'}} onClick={()=>{setPagination(100);setScreen('invoices')}} className={classes.selectType}>
+                    <div style={{background: screen==='invoices'?'#ffb300':'#ffffff'}} onClick={() => {setPagination(100);setScreen('invoices')}} className={classes.selectType}>
                         Заказы {orders.length}
                     </div>
                 </div>
                 {
                     screen==='setting'?
                         <>
-                        <FormControl className={classes.input} variant='outlined'>
+                        <FormControl className={classes.input}>
                             <InputLabel>Производители</InputLabel>
                             <Select
                                 multiple
@@ -99,7 +99,7 @@ const AddOrder =  React.memo(
                                 ))}
                             </Select>
                         </FormControl>
-                        <FormControl className={classes.input} variant='outlined'>
+                        <FormControl className={classes.input}>
                             <InputLabel>Районы</InputLabel>
                             <Select
                                 multiple
@@ -126,14 +126,9 @@ const AddOrder =  React.memo(
                             className={classes.input}
                             label='Начало'
                             type='date'
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
+                            InputLabelProps={{shrink: true}}
                             format='MM/dd/yy'
                             value={dateStart}
-                            inputProps={{
-                                'aria-label': 'description',
-                            }}
                             onChange={ event => setDateStart(event.target.value) }
                         />
                         <TextField
@@ -144,9 +139,6 @@ const AddOrder =  React.memo(
                                 shrink: true,
                             }}
                             value={dateEnd}
-                            inputProps={{
-                                'aria-label': 'description',
-                            }}
                             format='MM/dd/yy'
                             onChange={ event => setDateEnd(event.target.value) }
                         />
@@ -160,7 +152,7 @@ const AddOrder =  React.memo(
                                              className={isMobileApp ? classes.column1 : classes.row1}>
                                             <Checkbox checked={selectedOrders.findIndex(element1=>element1._id===element._id)!==-1}
                                                       onChange={() => {
-                                                          if (selectedOrders.findIndex(element1=>element1._id===element._id)===-1) {
+                                                          if(selectedOrders.findIndex(element1=>element1._id===element._id)===-1) {
                                                               selectedOrders.push(element)
                                                           } else {
                                                               selectedOrders.splice(selectedOrders.findIndex(element1=>element1._id===element._id), 1)
@@ -174,7 +166,7 @@ const AddOrder =  React.memo(
                             ):null}
                         </div>
                 }
-                <Fab onClick={open} color='primary' aria-label='add' className={classes.fab}>
+                <Fab onClick={open} color='primary' className={classes.fab}>
                     <SettingsIcon />
                 </Fab>
                 <Menu
@@ -191,15 +183,15 @@ const AddOrder =  React.memo(
                         horizontal: 'left',
                     }}
                 >
-                    <MenuItem onClick={async()=>{
+                    <MenuItem onClick={async () => {
                         setSelectedOrders([...orders])
                         close()
                     }}>Выбрать все</MenuItem>
-                    <MenuItem onClick={async()=>{
+                    <MenuItem onClick={async () => {
                         setSelectedOrders([])
                         close()
                     }}>Отменить выбор</MenuItem>
-                    <MenuItem onClick={async()=>{
+                    <MenuItem onClick={async () => {
                         selectedOrders = selectedOrders.filter(element=>mainOrders.findIndex(element1=>element1._id===element._id)===-1)
                         setMainOrders([...selectedOrders, ...mainOrders])
                         setMainSelectedOrders([...selectedOrders, ...mainSelectedOrders])

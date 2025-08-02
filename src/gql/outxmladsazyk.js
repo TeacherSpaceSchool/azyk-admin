@@ -1,103 +1,92 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
-import { SingletonStore } from '../singleton/store';
 
-export const districtsOutXMLAdsShoros = async({organization}, client)=>{
+const OutXMLAdsShoro = `
+    _id
+    createdAt
+    guid
+    district {_id name}
+    organization {_id name}
+`
+
+export const districtsOutXMLAdsShoros = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {organization: organization},
+                variables,
                 query: gql`
                     query($organization: ID!) {
-                        districtsOutXMLAdsShoros(organization: $organization){
+                        districtsOutXMLAdsShoros(organization: $organization) {
                             _id
                             name
                           }
                     }`,
             })
         return res.data.districtsOutXMLAdsShoros
-    } catch(err){
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const outXMLAdsShoros = async({search, sort, organization}, client)=>{
+export const outXMLAdsShoros = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {search, sort, organization: organization},
+                variables,
                 query: gql`
                     query ($organization: ID!, $search: String!) {
-                        outXMLAdsShoros(organization: $organization, search: $search) {
-                            _id
-                            guid
-                            district
-                                {_id name}
-                            organization
-                                {_id name}
-                            createdAt
-                          }
+                        outXMLAdsShoros(organization: $organization, search: $search) {${OutXMLAdsShoro}}
                     }`,
             })
         return res.data.outXMLAdsShoros
-    } catch(err){
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const deleteOutXMLAdsShoro = async(ids)=>{
+export const deleteOutXMLAdsShoro = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {_id: ids},
+        const res = await client.mutate({
+            variables: {_id},
             mutation : gql`
-                    mutation ($_id: [ID]!) {
-                        deleteOutXMLAdsShoro(_id: $_id) {
-                             data
-                        }
+                    mutation ($_id: ID!) {
+                        deleteOutXMLAdsShoro(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.deleteOutXMLAdsShoro
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const addOutXMLAdsShoro = async(element)=>{
+export const addOutXMLAdsShoro = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        let res = await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($organization: ID!, $district: ID!, $guid: String!) {
-                        addOutXMLAdsShoro(organization: $organization, district: $district, guid: $guid) {
-                            _id
-                            guid
-                            district
-                                {_id name}
-                            organization
-                                {_id name}
-                            createdAt
-                        }
+                        addOutXMLAdsShoro(organization: $organization, district: $district, guid: $guid) {${OutXMLAdsShoro}}
                     }`})
-        return res.data
-    } catch(err){
+        return res.data.addOutXMLAdsShoro
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const setOutXMLAdsShoro = async(element)=>{
+export const setOutXMLAdsShoro = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
-                    mutation ($_id: ID!, $district: ID, $guid: String) {
-                        setOutXMLAdsShoro(_id: $_id, district: $district, guid: $guid) {
-                             data
-                        }
+                    mutation ($_id: ID!, $guid: String) {
+                        setOutXMLAdsShoro(_id: $_id, guid: $guid)
                     }`})
-    } catch(err){
+        return res.data.setOutXMLAdsShoro
+    } catch(err) {
         console.error(err)
     }
 }

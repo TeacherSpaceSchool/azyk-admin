@@ -1,7 +1,7 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../layouts/App';
-import CardAgentRoute from '../../components/agentRoute/CardAgentRoute'
+import CardAgentRoute from '../../components/card/CardAgentRoute'
 import pageListStyle from '../../src/styleMUI/agentRoute/agentRouteList'
 import {getAgentRoutes} from '../../src/gql/agentRoute'
 import { connect } from 'react-redux'
@@ -14,39 +14,34 @@ import { useRouter } from 'next/router'
 import initialApp from '../../src/initialApp'
 
 const AgentRoutes = React.memo((props) => {
-    const { profile } = props.user;
+    const {profile} = props.user;
     const classes = pageListStyle();
     const router = useRouter()
-    const { data } = props;
+    const {data} = props;
     let [list, setList] = useState(data.agentRoutes);
-    const { search } = props.app;
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const {search} = props.app;
+    const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
-                initialRender.current = false;
-            } else {
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    setList((await getAgentRoutes({organization: router.query.id, search})).agentRoutes)
-                    setPagination(100);
-                    (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-                }, 500)
-                setSearchTimeOut(searchTimeOut)
-
-            }
-        })()
-    },[search])
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
+    useEffect(() => {
+        if(initialRender.current)
+            initialRender.current = false;
+        else {
+            if(searchTimeOut.current)
+                clearTimeout(searchTimeOut.current)
+            searchTimeOut.current = setTimeout(async () => {
+                setList(await getAgentRoutes({organization: router.query.id, search}))
+                setPagination(100);
+                (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+            }, 500)
         }
-    }
+    }, [search])
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, list])
     return (
-        <App checkPagination={checkPagination} searchShow={true} pageName='Маршруты агентов'>
+        <App checkPagination={checkPagination} searchShow pageName='Маршруты агентов'>
             <Head>
                 <title>Маршруты агентов</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -57,14 +52,12 @@ const AgentRoutes = React.memo((props) => {
             <div className={classes.page}>
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
-                        return(
-                            <CardAgentRoute list={list} idx={idx} setList={setList} key={element._id} element={element}/>
-                        )}
-                ):null}
+                        return <CardAgentRoute idx={idx} list={list} setList={setList} key={element._id} element={element}/>
+                }):null}
             </div>
             {['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role)?
                 <Link href='/agentroute/[id]' as={`/agentroute/new`}>
-                    <Fab color='primary' aria-label='add' className={classes.fab}>
+                    <Fab color='primary' className={classes.fab}>
                         <AddIcon />
                     </Fab>
                 </Link>
@@ -87,8 +80,8 @@ AgentRoutes.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            ...(await getAgentRoutes({organization: ctx.query.id, search: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined))
-            }
+            agentRoutes: await getAgentRoutes({organization: ctx.query.id, search: ''}, getClientGqlSsr(ctx.req))
+        }
     };
 };
 

@@ -1,44 +1,51 @@
 import Head from 'next/head';
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../layouts/App';
 import { connect } from 'react-redux'
-import { getBrandOrganizations } from '../src/gql/items'
 import { getReviews } from '../src/gql/review'
 import pageListStyle from '../src/styleMUI/review/reviewList'
-import CardReviews from '../components/review/CardReview'
+import CardReviews from '../components/card/CardReview'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
+import {getOrganizations} from '../src/gql/organization';
+import {unawaited} from '../src/lib';
+
+const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value: 'обработка'}]
 
 const Reviews = React.memo((props) => {
     const classes = pageListStyle();
-    const { profile } = props.user;
-    const { data } = props;
+    const initialRender = useRef(true);
+    const {profile} = props.user;
+    const {data} = props;
     let [list, setList] = useState(data.reviews);
-    const { filter, organization } = props.app;
-    let [paginationWork, setPaginationWork] = useState(true);
-    const checkPagination = async()=>{
-        if(paginationWork){
-            let addedList = (await getReviews({organization: organization, filter: filter, skip: list.length})).reviews
-            if(addedList.length>0){
+    const {filter, organization} = props.app;
+    const paginationWork = useRef(true);
+    const checkPagination = useCallback(async () => {
+        if(paginationWork.current) {
+            paginationWork.current = false
+            let addedList = await getReviews({organization, filter, skip: list.length})
+            if(addedList.length) {
                 setList([...list, ...addedList])
+                paginationWork.current = true
             }
-            else
-                setPaginationWork(false)
         }
-    }
-    const getList = async()=>{
-        setList((await getReviews({organization: organization, filter: filter, skip: 0})).reviews)
-        setPaginationWork(true);
+    }, [organization, filter, list])
+    const getList = async () => {
+        setList(await getReviews({organization, filter, skip: 0}))
+        paginationWork.current = true;
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
-    useEffect(()=>{
-        (async () => {
-            await getList()
-        })()
-    },[filter, organization])
+    useEffect(() => {
+        if(initialRender.current) {
+            initialRender.current = false;
+        }
+        else {
+            unawaited(getList)
+        }
+    }, [filter, organization])
     return (
-        <App organizations checkPagination={checkPagination} setList={setList} list={list} filters={data.filterReview} pageName='Отзывы'>
+        <App organizations checkPagination={checkPagination} list={list} setList={setList} filters={filters} pageName='Отзывы'>
             <Head>
                 <title>Отзывы</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -46,14 +53,14 @@ const Reviews = React.memo((props) => {
             <div className={classes.page}>
                 {
                     profile.role==='client'?
-                        <CardReviews list={list} organizations={data.brandOrganizations} setList={setList}/>
+                        <CardReviews organizations={data.organizations} list={list} setList={setList}/>
                         :
                         null
                 }
                 {
                     list?list.map((element, idx)=> {
                             return(
-                                <CardReviews list={list} idx={idx} element={element} organizations={data.brandOrganizations} setList={setList}/>
+                                <CardReviews key={element._id} idx={idx} element={element} organizations={data.organizations} list={list} setList={setList}/>
                             )}
                     ):null
                 }
@@ -72,10 +79,15 @@ Reviews.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
+    // eslint-disable-next-line no-undef
+    const [organizations, reviews] = await Promise.all([
+        getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, getClientGqlSsr(ctx.req)),
+        getReviews({skip: 0, filter: ''}, getClientGqlSsr(ctx.req))
+    ])
     return {
         data: {
-            ...await getBrandOrganizations({search: '', sort: 'name', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-            ...await getReviews({skip: 0, filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
+            organizations,
+            reviews
         }
     };
 };

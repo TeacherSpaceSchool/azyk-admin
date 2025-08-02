@@ -1,9 +1,9 @@
 const regexpUA = /(Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|iOS|Mobile)/
 
-export const checkMobile = (ua)=>{
+export const checkMobile = (ua) => {
     return regexpUA.exec(ua)!==null
 }
-export const getJWT = (cookie)=>{
+export const getJWT = (cookie) => {
     let name = 'jwt=';
     let decodedCookie = decodeURIComponent(cookie);
     let ca = decodedCookie.split(';');
@@ -12,7 +12,7 @@ export const getJWT = (cookie)=>{
         while (c.charAt(0) === ' ') {
             c = c.substring(1);
         }
-        if (c.indexOf(name) === 0) {
+        if(c.indexOf(name) === 0) {
             let jwt = c.substring(name.length, c.length)
             if(process.browser) {
                 const now = new Date()
@@ -30,9 +30,9 @@ export const getJWT = (cookie)=>{
             return jwt;
         }
     }
-    return undefined;
+    return null;
 }
-export const getCityCookie = (cookie)=>{
+export const getCityCookie = (cookie) => {
     let name = 'city=';
     let decodedCookie = decodeURIComponent(cookie);
     let ca = decodedCookie.split(';');
@@ -41,11 +41,11 @@ export const getCityCookie = (cookie)=>{
         while (c.charAt(0) === ' ') {
             c = c.substring(1);
         }
-        if (c.indexOf(name) === 0) {
+        if(c.indexOf(name) === 0) {
             return c.substring(name.length, c.length);
         }
     }
-    return undefined;
+    return null;
 }
 export const isNotTestUser = (profile) => {
     return !profile||!profile.login||!profile.login.toLowerCase().includes('test')
@@ -53,7 +53,7 @@ export const isNotTestUser = (profile) => {
 export const isTestUser = (profile) => {
     return profile&&profile.login&&profile.login.toLowerCase().includes('test')
 }
-export const setCityCookie = (city)=>{
+export const setCityCookie = (city) => {
     let date = new Date(Date.now() + 10000*24*60*60*1000);
     date = date.toUTCString();
     document.cookie = `city=${encodeURI(city)}; expires=` + date;
@@ -197,4 +197,50 @@ export const isEmpty = (value) => {
     return value === undefined || value === null;
 }
 
+export const maxImageSize = 25
+export const maxFileSize = 50
+
+export const unawaited = (func) => setTimeout(async () => await func())
+
+export const getQueryParam = (url, param) => new URLSearchParams(url.split('?')[1] || '').get(param);
+
 export const cities = ['Бишкек', 'Баткен', 'Балыкчы', 'Боконбаева', 'Жалал-Абад', 'Кара-Балта', 'Каракол', 'Казарман', 'Кочкор', 'Кызыл-Кия', 'Нарын', 'Ош', 'Раззаков', 'Талас', 'Токмок', 'Чолпон-Ата', 'Москва'];
+
+export const checkDate = (date) => {
+    const parsed = new Date(date);
+    return Number.isNaN(parsed) ? new Date() : parsed;
+};
+
+export const handleDateRange = ({type, value, setDateRange,  maxMonthPeriod = 12}) => {
+    setDateRange(dateRange => {
+        let start = dateRange.start;
+        let end = dateRange.end;
+
+        if(type === 'start') {
+            start = value || pdDatePicker(new Date());
+        } else {
+            end = value;
+        }
+
+        if(end) {
+            let startDate = new Date(start);
+            let endDate = new Date(end);
+
+            /*if(endDate < startDate) {
+                endDate = new Date(startDate)
+                endDate.setDate(endDate.getDate() + 1);
+                end = pdDatePicker(endDate);
+            } else {*/
+                const maxEnd = new Date(startDate);
+                maxEnd.setMonth(maxEnd.getMonth() + maxMonthPeriod);
+                if(endDate > maxEnd) {
+                    end = pdDatePicker(maxEnd);
+                }
+            /*}*/
+        }
+
+        return { start, end };
+    });
+
+
+};

@@ -8,16 +8,16 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 
 const MyDialog =  React.memo(
     (props) =>{
-        const { titleFull, childFull, showFull } = props.mini_dialog;
-        const { showFullDialog } = props.mini_dialogActions;
+        const {titleFull, childFull, showFull} = props.mini_dialog;
+        const {showFullDialog} = props.mini_dialogActions;
         return (
                 <Dialog
-                    fullScreen={true}
+                    fullScreen
                     open={showFull}
-                    onClose={()=>{showFullDialog(false)}}
+                    onClose={() => {showFullDialog(false)}}
                     aria-labelledby='alert-dialog-title'
                     aria-describedby='alert-dialog-description'>
-                    <DialogTitle onClose={()=>{showFullDialog(false)}}>{titleFull}</DialogTitle>
+                    <DialogTitle style={!titleFull?{height: 0, padding: 0}:{}} onClose={() => {showFullDialog(false)}}>{titleFull}</DialogTitle>
                     <DialogContent>
                         {childFull}
                     </DialogContent>

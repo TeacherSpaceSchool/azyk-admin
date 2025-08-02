@@ -1,9 +1,9 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import pageListStyle from '../../src/styleMUI/item/itemList'
-import CardItem from '../../components/items/CardItem'
+import CardItem from '../../components/card/CardItem'
 import { useRouter } from 'next/router'
 import {getBrands} from '../../src/gql/items';
 import Fab from '@material-ui/core/Fab';
@@ -12,53 +12,45 @@ import Link from 'next/link';
 import initialApp from '../../src/initialApp'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import Router from 'next/router'
+import {unawaited} from '../../src/lib';
+import {getOrganization} from '../../src/gql/organization';
 
 const Brand = React.memo((props) => {
     const classes = pageListStyle();
-    const { data } = props;
+    const {data} = props;
     const router = useRouter()
     let [list, setList] = useState(data.brands);
-    const { search, filter, sort, city } = props.app;
-    const { profile } = props.user;
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const {search, filter, city} = props.app;
+    const {profile} = props.user;
+    const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
-    const getList = async ()=>{
-        setList((await getBrands({city: city, organization: router.query.id, search, sort})).brands)
+    const getList = async () => {
+        setList(await getBrands({city, organization: router.query.id, search}))
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
-    useEffect(()=>{
-        (async()=>{
-            if(!initialRender.current) {
-                getList()
-            }
-        })()
-    },[filter, sort, city])
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
-                initialRender.current = false;
-            } else {
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    getList()
-                }, 500)
-                setSearchTimeOut(searchTimeOut)
-
-            }
-        })()
-    },[search])
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
+    useEffect(() => {
+        if(!initialRender.current)
+            unawaited(getList)
+    }, [filter, city])
+    useEffect(() => {
+        if(initialRender.current)
+            initialRender.current = false;
+        else {
+            if(searchTimeOut.current)
+                clearTimeout(searchTimeOut.current)
+            searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
-    }
+    }, [search])
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, list])
     return (
-        <App cityShow sorts={data.sortItem} checkPagination={checkPagination} searchShow={true} pageName={data.brands[0]?data.brands[0].organization.name:'Ничего не найдено'}>
+        <App cityShow checkPagination={checkPagination} searchShow pageName={data.organization?data.organization.name:'Ничего не найдено'}>
             <Head>
-                <title>{data.brands[0]?data.brands[0].organization.name:'Ничего не найдено'}</title>
+                <title>{data.organization?data.organization.name:'Ничего не найдено'}</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className={classes.page}>
@@ -71,7 +63,7 @@ const Brand = React.memo((props) => {
             </div>
             {['admin', 'суперорганизация', 'организация'].includes(profile.role)?
                 <Link href='/item/[id]' as={`/item/new`}>
-                    <Fab color='primary' aria-label='add' className={classes.fab}>
+                    <Fab color='primary' className={classes.fab}>
                         <AddIcon />
                     </Fab>
                 </Link>
@@ -98,9 +90,12 @@ Brand.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     ctx.store.getState().app.sort = '-priotiry'
-    return {
-        data: await getBrands({city: ctx.store.getState().app.city, organization: ctx.query.id, search: '', sort: ctx.store.getState().app.sort}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-    };
+    // eslint-disable-next-line no-undef
+    const [brands, organization] = await Promise.all([
+        getBrands({city: ctx.store.getState().app.city, organization: ctx.query.id, search: ''}, getClientGqlSsr(ctx.req)),
+        getOrganization(ctx.query.id, getClientGqlSsr(ctx.req))
+    ])
+    return {data: {brands, organization}};
 };
 
 function mapStateToProps (state) {

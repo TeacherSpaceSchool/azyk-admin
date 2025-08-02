@@ -1,8 +1,8 @@
 import Head from 'next/head';
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
-import { getActiveOrganization } from '../../src/gql/statistic'
+import { getOrganizations } from '../../src/gql/organization'
 import { getOrdersForRouting } from '../../src/gql/order'
 import { getRoute, addRoute, buildRoute, listDownload, getUnloadingInvoicesFromRouting, setRoute } from '../../src/gql/route'
 import { getDistricts } from '../../src/gql/district'
@@ -13,7 +13,7 @@ import { useRouter } from 'next/router'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Checkbox from '@material-ui/core/Checkbox';
-import CardOrder from '../../components/order/CardOrder';
+import CardOrder from '../../components/card/CardOrder';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
@@ -46,32 +46,32 @@ import RemoveIcon from '@material-ui/icons/Remove';
 
 const Route = React.memo((props) => {
     const classes = routeStyle();
-    const { data } = props;
+    const {data} = props;
     const router = useRouter()
-    const { isMobileApp } = props.app;
-    const { profile } = props.user;
-    const { setMiniDialog, showMiniDialog, showFullDialog, setFullDialog } = props.mini_dialogActions;
-    const { showSnackBar } = props.snackbarActions;
-    const { showLoad } = props.appActions;
+    const {isMobileApp} = props.app;
+    const {profile} = props.user;
+    const {setMiniDialog, showMiniDialog, showFullDialog, setFullDialog} = props.mini_dialogActions;
+    const {showSnackBar} = props.snackbarActions;
+    const {showLoad} = props.appActions;
     let [screen, setScreen] = useState('setting');
-    let [provider, setProvider] = useState(data.route?data.route.provider?data.route.provider:{name: 'AZYK.STORE', _id: 'super'}:{});
+    let [provider, setProvider] = useState(data.route?data.route.provider?data.route.provider:{name: 'AZYK.STORE', _id: 'super'}:null);
     let handleProvider = (async (provider) => {
         setSelectDistricts([])
         setSelectProdusers([])
-        setSelectEcspeditor({})
-        setSelectAuto({})
+        setSelectEcspeditor(null)
+        setSelectAuto(null)
         setOrders([])
         setSelectedOrders([])
-        if(provider){
+        if(provider) {
             produsers = [...provider._id!=='super'?[provider]:[]]
             setProdusers([...produsers])
-            ecspeditors = (await getEcspeditors({_id: provider._id})).ecspeditors
+            ecspeditors = await getEcspeditors(provider._id)
             if(ecspeditors)
                 setEcspeditors([...ecspeditors])
-            autos = (await getAutos({search: '', sort: 'name', organization: provider._id})).autos
+            autos = await getAutos({search: '', sort: 'name', organization: provider._id})
             if(autos)
                 setAutos([...autos])
-            setDistricts([{name: 'Все', _id: 'super', client: [] }, ...(await getDistricts({search: '', sort: 'name', organization: provider._id})).districts])
+            setDistricts([{name: 'Все', _id: 'super', client: [] }, ...await getDistricts({search: '', sort: 'name', organization: provider._id})])
         }
         else {
             setProdusers([])
@@ -93,23 +93,22 @@ const Route = React.memo((props) => {
         setSelectDistricts(event.target.value)
     })
     let [ecspeditors, setEcspeditors] = React.useState([]);
-    let [selectEcspeditor, setSelectEcspeditor] = React.useState(data.route?data.route.selectEcspeditor:{});
+    let [selectEcspeditor, setSelectEcspeditor] = React.useState(data.route?data.route.selectEcspeditor:null);
     let [orders, setOrders] = React.useState(data.route?data.route.selectedOrders:[]);
     let [autos, setAutos] = React.useState([]);
-    let [selectAuto, setSelectAuto] = React.useState(data.route?data.route.selectAuto:{});
+    let [selectAuto, setSelectAuto] = React.useState(data.route?data.route.selectAuto:null);
     let [allPrice, setAllPrice] = useState(0);
     let [allTonnage, setAllTonnage] = useState(0);
     let [allReturnedPrice, setAllReturnedPrice] = useState(0);
-    let [dateDelivery, setDateDelivery] = useState(data.route?pdDatePicker(new Date(data.route.dateDelivery)):undefined);
+    let [dateDelivery, setDateDelivery] = useState(data.route?pdDatePicker(new Date(data.route.dateDelivery)):null);
     let [showStat, setShowStat] = useState(false);
     let [deliverys, setDeliverys] = useState(data.route?data.route.deliverys:[]);
-    let [pagination, setPagination] = useState(100);
+    const [pagination, setPagination] = useState(100);
     let [length, setLength] = useState('');
-    const checkPagination = ()=>{
-        if(pagination<orders.length){
-            setPagination(pagination+100)
-        }
-    }
+    const checkPagination = useCallback(() => {
+        if(pagination<orders.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, orders])
     let [selectedOrders, setSelectedOrders] = useState(data.route?data.route.selectedOrders:[]);
     let [anchorEl, setAnchorEl] = useState(null);
     let open = event => {
@@ -118,47 +117,43 @@ const Route = React.memo((props) => {
     let close = () => {
         setAnchorEl(null);
     };
-    useEffect(()=>{
-        (async ()=>{
+    useEffect(() => {
             if(router.query.id==='new'&&profile.organization) {
-                for(let i=0;i<data.organizations.length;i++){
+                for(let i=0;i<data.organizations.length;i++) {
                     if(data.organizations[i]._id===profile.organization)
                         handleProvider(data.organizations[i])
                 }
             }
-        })()
-    },[])
-    useEffect(()=>{
-        (async ()=>{
-            if(router.query.id==='new'&&selectProdusers.length>0&&provider&&provider._id&&selectDistricts.length>0&&dateDelivery) {
-                await showLoad(true)
+    }, [])
+    useEffect(() => {
+        (async () => {
+            if(router.query.id==='new'&&selectProdusers.length&&provider&&provider._id&&selectDistricts.length&&dateDelivery) {
+                showLoad(true)
                 let clients = []
-                for(let i=0;i<selectDistricts.length;i++){
+                for(let i=0;i<selectDistricts.length;i++) {
                     clients = [...clients, ...selectDistricts[i].client.map(element=>element._id)]
                 }
-                setOrders((await getOrdersForRouting({produsers: selectProdusers.map(element=>element._id), clients: clients, dateDelivery:dateDelivery})).invoicesForRouting)
-                await showLoad(false)
+                setOrders(await getOrdersForRouting({produsers: selectProdusers.map(element=>element._id), clients: clients, dateDelivery:dateDelivery}))
+                showLoad(false)
             }
         })()
-    },[selectProdusers, provider, selectDistricts, dateDelivery])
-    useEffect(()=>{
-        (async ()=>{
+    }, [selectProdusers, provider, selectDistricts, dateDelivery])
+    useEffect(() => {
             let tonnage = 0;
             let price = 0;
             let returnedPrice = 0;
-            for(let i=0; i<selectedOrders.length; i++){
-                if (selectedOrders[i].allPrice)
+            for(let i=0; i<selectedOrders.length; i++) {
+                if(selectedOrders[i].allPrice)
                     price += selectedOrders[i].allPrice
-                if (selectedOrders[i].returnedPrice)
+                if(selectedOrders[i].returnedPrice)
                     returnedPrice += selectedOrders[i].returnedPrice
-                if (selectedOrders[i].allTonnage)
+                if(selectedOrders[i].allTonnage)
                     tonnage += selectedOrders[i].allTonnage
             }
             setAllPrice(checkFloat(price))
             setAllTonnage(checkFloat(tonnage))
             setAllReturnedPrice(checkFloat(returnedPrice))
-        })()
-    },[selectedOrders])
+    }, [selectedOrders])
     return (
         <App checkPagination={checkPagination} pageName={router.query.id==='new'?'Добавить':data.route?data.route.number:'Ничего не найдено'}>
             <Head>
@@ -174,10 +169,10 @@ const Route = React.memo((props) => {
                     <Card className={isMobileApp?classes.pageM:classes.pageD}>
                         <CardContent className={classes.column}>
                             <div style={{ justifyContent: 'center' }} className={classes.row}>
-                                <div style={{background: screen==='setting'?'#ffb300':'#ffffff'}} onClick={()=>{setPagination(100);setScreen('setting')}} className={classes.selectType}>
+                                <div style={{background: screen==='setting'?'#ffb300':'#ffffff'}} onClick={() => {setPagination(100);setScreen('setting')}} className={classes.selectType}>
                                     Настройки
                                 </div>
-                                <div style={{background: screen==='invoices'?'#ffb300':'#ffffff'}} onClick={()=>{setPagination(100);setScreen('invoices')}} className={classes.selectType}>
+                                <div style={{background: screen==='invoices'?'#ffb300':'#ffffff'}} onClick={() => {setPagination(100);setScreen('invoices')}} className={classes.selectType}>
                                     Заказы {selectedOrders.length}/{orders.length}
                                 </div>
                             </div>
@@ -196,10 +191,10 @@ const Route = React.memo((props) => {
                                             disabled={router.query.id!=='new'}
                                             noOptionsText='Ничего не найдено'
                                             renderInput={params => (
-                                                <TextField {...params} label='Поставщик' variant='outlined' fullWidth />
+                                                <TextField {...params} label='Поставщик' fullWidth />
                                             )}
                                         />
-                                        <FormControl className={classes.inputHalf} variant='outlined'>
+                                        <FormControl className={classes.inputHalf}>
                                             <InputLabel>Производители</InputLabel>
                                             <Select
                                                 disabled={router.query.id!=='new'}
@@ -236,7 +231,7 @@ const Route = React.memo((props) => {
                                             }}
                                             noOptionsText='Ничего не найдено'
                                             renderInput={params => (
-                                                <TextField {...params} label='Экспедитор' variant='outlined' fullWidth />
+                                                <TextField {...params} label='Экспедитор' fullWidth />
                                             )}
                                         />
                                         <Autocomplete
@@ -250,14 +245,14 @@ const Route = React.memo((props) => {
                                             }}
                                             noOptionsText='Ничего не найдено'
                                             renderInput={params => (
-                                                <TextField {...params} label='Транспорт' variant='outlined' fullWidth />
+                                                <TextField {...params} label='Транспорт' fullWidth />
                                             )}
                                         />
                                     </div>
                                     <div className={classes.row}>
                                         <FormControl
                                             className={classes.inputThird}
-                                            variant='outlined'>
+                                           >
                                             <InputLabel>Районы</InputLabel>
                                             <Select
                                                 multiple
@@ -299,11 +294,8 @@ const Route = React.memo((props) => {
                                             label='Максимально заказов'
                                             value={length}
                                             className={classes.inputThird}
-                                            onChange={(event)=>{setLength(inputInt(event.target.value))}}
-                                            inputProps={{
-                                                'aria-label': 'description',
-                                            }}
-                                        />
+                                            onChange={(event) => {setLength(inputInt(event.target.value))}}
+                                         />
                                     </div>
                                     <br/>
                                     {
@@ -350,41 +342,41 @@ const Route = React.memo((props) => {
                                                                 {element.lengthInMeters/1000} км
                                                             </div>
                                                         </div>
-                                                        <Button onClick={async()=>{
-                                                            await showLoad(true)
-                                                            window.open(((await getUnloadingInvoicesFromRouting({
+                                                        <Button onClick={async () => {
+                                                            showLoad(true)
+                                                            window.open(await getUnloadingInvoicesFromRouting({
                                                                 organization: provider._id,
                                                                 orders: element.orders.map(order=>order._id)
-                                                            })).unloadingInvoicesFromRouting).data, '_blank');
-                                                            await showLoad(false)
+                                                            }), '_blank');
+                                                            showLoad(false)
                                                         }} size='small' color='primary'>
                                                             Скачать накладные
                                                         </Button>
-                                                        <Button onClick={async()=>{
-                                                            let items = (await listDownload(element.orders.map(order=>order._id))).listDownload
+                                                        <Button onClick={async () => {
+                                                            let items = await listDownload(element.orders.map(order=>order._id))
                                                             setMiniDialog('Лист загрузки', <ItemList items={items}/>)
                                                             showMiniDialog(true)
                                                         }} size='small' color='primary'>
                                                             Лист загрузки
                                                         </Button>
-                                                        {/*<Button onClick={async()=>{
-                                                            let items = (await listUnload(element.orders.map(order=>order._id))).listUnload
+                                                        {/*<Button onClick={async () => {
+                                                            let items = await listUnload(element.orders.map(order=>order._id))
                                                             setMiniDialog('Лист выгрузки', <ItemList items={items}/>)
                                                             showMiniDialog(true)
                                                         }} size='small' color='primary'>
                                                             Лист выгрузки
                                                         </Button>*/}
-                                                        <Button onClick={async()=>{
+                                                        <Button onClick={() => {
                                                             setFullDialog('Список магазинов', <ListOrder
-                                                                setList={(list)=>{deliverys[idx].orders = list; setDeliverys([...deliverys])}}
+                                                                setList={(list) => {deliverys[idx].orders = list; setDeliverys([...deliverys])}}
                                                                 invoices={element.orders}
                                                             />)
                                                             showFullDialog(true)
                                                         }} size='small' color='primary'>
                                                             Список магазинов
                                                         </Button>
-                                                        <Button onClick={async()=>{
-                                                            setFullDialog('Маршрут', <GeoRoute legs={element.legs} setList={(list)=>{deliverys[idx].orders = list; setDeliverys([...deliverys])}} invoices={element.orders}/>)
+                                                        <Button onClick={() => {
+                                                            setFullDialog('Маршрут', <GeoRoute legs={element.legs} setList={(list) => {deliverys[idx].orders = list; setDeliverys([...deliverys])}} invoices={element.orders}/>)
                                                             showFullDialog(true)
                                                         }} size='small' color='primary'>
                                                             Карта
@@ -407,7 +399,7 @@ const Route = React.memo((props) => {
                                                             router.query.id==='new'?
                                                                 <Checkbox checked={selectedOrders.findIndex(element1=>element1._id===element._id)!==-1}
                                                                           onChange={() => {
-                                                                              if (selectedOrders.findIndex(element1=>element1._id===element._id)===-1) {
+                                                                              if(selectedOrders.findIndex(element1=>element1._id===element._id)===-1) {
                                                                                   selectedOrders.push(element)
                                                                               } else {
                                                                                   selectedOrders.splice(selectedOrders.findIndex(element1=>element1._id===element._id), 1)
@@ -418,13 +410,12 @@ const Route = React.memo((props) => {
                                                                 />
                                                                 :
                                                                 <IconButton
-                                                                    onClick={()=>{
+                                                                    onClick={() => {
                                                                         deletedOrders.push(orders[idx])
                                                                         setDeletedOrders([...deletedOrders])
                                                                         orders.splice(idx, 1);
                                                                         setOrders([...orders])
                                                                     }}
-                                                                    aria-label='toggle password visibility'
                                                                 >
                                                                     <RemoveIcon/>
                                                                 </IconButton>
@@ -439,7 +430,7 @@ const Route = React.memo((props) => {
                         {
                             router.query.id==='new'||deletedOrders.length?
                                 <>
-                                <Fab onClick={open} color='primary' aria-label='add' className={classes.fab}>
+                                <Fab onClick={open} color='primary' className={classes.fab}>
                                     <SettingsIcon />
                                 </Fab>
                                 <Menu
@@ -461,22 +452,22 @@ const Route = React.memo((props) => {
                                             screen==='setting'?
                                                 <>
                                                 {
-                                                    selectedOrders.length>0&&selectAuto&&selectAuto._id?
-                                                        <MenuItem onClick={async()=>{
+                                                    selectedOrders.length&&selectAuto?
+                                                        <MenuItem onClick={async () => {
                                                             close()
-                                                            await showLoad(true)
+                                                            showLoad(true)
                                                             let tonnageError = selectedOrders.find(element=>element.allTonnage>selectAuto.tonnage)
                                                             if(!tonnageError) {
                                                                 let geoError = selectedOrders.find(element=>!element.address[1])
                                                                 if(!geoError) {
-                                                                    let deliverys = (await buildRoute({
+                                                                    let deliverys = await buildRoute({
                                                                         provider: provider._id,
                                                                         autoTonnage: selectAuto.tonnage,
                                                                         length: checkInt(length),
                                                                         orders: selectedOrders.map(element => element._id)
-                                                                    })).buildRoute
+                                                                    })
                                                                     let resultSelectedOrders = []
-                                                                    for(let i=0; i<deliverys.length; i++){
+                                                                    for(let i=0; i<deliverys.length; i++) {
                                                                         for(let i1=0; i1<deliverys[i].orders.length; i1++) {
                                                                             resultSelectedOrders.push(deliverys[i].orders[i1]._id)
                                                                         }
@@ -490,16 +481,16 @@ const Route = React.memo((props) => {
                                                             }
                                                             else
                                                                 showSnackBar(`Заказ №${tonnageError.number} слишком большой`)
-                                                            await showLoad(false)
+                                                            showLoad(false)
                                                         }}>Построить маршрут</MenuItem>
                                                         :
                                                         null
                                                 }
                                                 {
-                                                    deliverys.length>0&&selectEcspeditor&&selectEcspeditor._id?
-                                                        <MenuItem onClick={async()=>{
+                                                    deliverys.length&&selectEcspeditor&&selectEcspeditor._id?
+                                                        <MenuItem onClick={async () => {
                                                             close()
-                                                            await showLoad(true)
+                                                            showLoad(true)
                                                             for(let i=0; i<deliverys.length; i++) {
                                                                 deliverys[i].orders = deliverys[i].orders.map(element=>element._id)
                                                                 deliverys[i] = {
@@ -511,7 +502,7 @@ const Route = React.memo((props) => {
                                                             }
                                                             await addRoute({provider: provider._id, deliverys: deliverys, selectedOrders: selectedOrders.map(element=>element._id), selectDistricts: selectDistricts.map(element=>element._id), selectEcspeditor: selectEcspeditor._id, selectAuto: selectAuto._id, dateDelivery: dateDelivery, allTonnage: parseInt(allTonnage), selectProdusers: selectProdusers.map(element=>element._id)})
                                                             Router.push(`/routes/${provider._id}`)
-                                                            await showLoad(false)
+                                                            showLoad(false)
                                                         }}>Сохранить маршрут</MenuItem>
                                                         :
                                                         null
@@ -520,14 +511,14 @@ const Route = React.memo((props) => {
                                                 :
                                                 <>
                                                 {
-                                                    orders.length>0?
+                                                    orders.length?
                                                     <>
-                                                    <MenuItem onClick={async()=>{
+                                                    <MenuItem onClick={() => {
                                                         setSelectedOrders([...orders])
                                                         setDeliverys([])
                                                         close()
                                                     }}>Выбрать все</MenuItem>
-                                                    <MenuItem onClick={async()=>{
+                                                    <MenuItem onClick={() => {
                                                         setSelectedOrders([])
                                                         setDeliverys([])
                                                         close()
@@ -536,7 +527,7 @@ const Route = React.memo((props) => {
                                                     :
                                                     null
                                                 }
-                                                <MenuItem onClick={async()=>{
+                                                <MenuItem onClick={() => {
                                                     setDeliverys([])
                                                     setFullDialog('Добавить заказ', <AddOrder districts={districts} produsers={produsers} dateDelivery={dateDelivery} mainSelectedOrders={selectedOrders} setMainSelectedOrders={setSelectedOrders} mainOrders={orders} setMainOrders={setOrders}/>)
                                                     showFullDialog(true)
@@ -544,10 +535,10 @@ const Route = React.memo((props) => {
                                                 }}>Добавить заказ</MenuItem>
                                                 </>
                                             :
-                                            <MenuItem onClick={async()=>{
-                                                await showLoad(true)
+                                            <MenuItem onClick={async () => {
+                                                showLoad(true)
                                                 await setRoute({route: router.query.id, deletedOrders: deletedOrders.map(element=>element._id)})
-                                                await showLoad(false)
+                                                showLoad(false)
                                                 close()
                                             }}>
                                                 Сохранить
@@ -617,8 +608,11 @@ Route.getInitialProps = async function(ctx) {
                 Router.push('/contact')
     return {
         data: {
-            route: (await getRoute({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)).route,
-            organizations: ctx.query.id==='new'?[...ctx.store.getState().user.profile.role==='admin'?[{name: 'AZYK.STORE', _id: 'super'}]:[], ...(await getActiveOrganization('Бишкек', ctx.req?await getClientGqlSsr(ctx.req):undefined)).activeOrganization]:[]
+            route: await getRoute(ctx.query.id, getClientGqlSsr(ctx.req)),
+            organizations: ctx.query.id==='new'?[
+                ...ctx.store.getState().user.profile.role==='admin'?[{name: 'AZYK.STORE', _id: 'super'}]:[],
+                ...await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, getClientGqlSsr(ctx.req))
+            ]:[]
         }
     };
 };

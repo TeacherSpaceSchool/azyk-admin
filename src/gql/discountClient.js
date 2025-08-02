@@ -3,32 +3,35 @@ import { SingletonApolloClient } from '../singleton/client';
 import { SingletonStore } from '../singleton/store';
 import { getReceiveDataByIndex, putReceiveDataByIndex } from '../service/idb/receiveData';
 
-export const getDiscountClients = async({clients, organization}, client)=>{
+const DiscountClient = `
+    client
+    discount
+    organization
+`
+
+export const getDiscountClients = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: { clients: clients, organization: organization },
+                variables,
                 query: gql`
                      query ($clients: [ID]!, $organization: ID!) {
-                        discountClients(clients: $clients, organization: $organization) {
-                            client
-                            discount
-                            organization
-                         }
+                        discountClients(clients: $clients, organization: $organization) {${DiscountClient}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.discountClients
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getDiscountClient = async({client, organization})=>{
+export const getDiscountClient = async (variables, client) => {
     try{
-        let res = await (new SingletonApolloClient().getClient())
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
             .query({
-                variables: { client: client, organization: organization },
+                variables,
                 query: gql`
                      query ($client: ID!, $organization: ID!) {
                         discountClient(client: $client, organization: $organization) {
@@ -38,28 +41,27 @@ export const getDiscountClient = async({client, organization})=>{
                          }
                     }`,
             })
-        if(new SingletonStore().getStore()&&new SingletonStore().getStore().getState().user.profile.role.includes('агент'))
-            await putReceiveDataByIndex(`discountClient(client: ${client}, organization: ${organization})`, res.data)
-        return res.data
-    } catch(err){
+        if(new SingletonStore().getStore()&&new SingletonStore().getStore().getState().user.profile.role&&new SingletonStore().getStore().getState().user.profile.role.includes('агент'))
+            await putReceiveDataByIndex(`discountClient(client: ${variables.client}, organization: ${variables.organization})`, res.data.discountClient)
+        return res.data.discountClient
+    } catch(err) {
         console.error(err)
-        if(new SingletonStore().getStore()&&new SingletonStore().getStore().getState().user.profile.role.includes('агент'))
-            return await getReceiveDataByIndex(`discountClient(client: ${client}, organization: ${organization})`)
+        if(new SingletonStore().getStore()&&new SingletonStore().getStore().getState().user.profile.role&&new SingletonStore().getStore().getState().user.profile.role.includes('агент'))
+            return await getReceiveDataByIndex(`discountClient(client: ${variables.client}, organization: ${variables.organization})`)
     }
 }
 
-export const saveDiscountClients = async(clients, organization, discount)=>{
+export const saveDiscountClients = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: { clients: clients, organization: organization, discount: discount },
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($clients: [ID]!, $organization: ID!, $discount: Int!) {
-                        setDiscountClients(clients: $clients, organization: $organization, discount: $discount) {
-                             data
-                        }
+                        setDiscountClients(clients: $clients, organization: $organization, discount: $discount)
                     }`})
-    } catch(err){
+        return res.data.setDiscountClients
+    } catch(err) {
         console.error(err)
     }
 }

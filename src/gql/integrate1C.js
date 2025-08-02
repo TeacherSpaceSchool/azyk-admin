@@ -1,249 +1,191 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
-import { SingletonStore } from '../singleton/store';
 
-export const getIntegrate1Cs = async(arg, organization, client)=>{
+const Integrate = `
+    _id
+    createdAt
+    guid
+    ecspeditor {_id name}
+    organization {_id name}
+    client {_id name city}
+    agent {_id name}
+    item {_id name city}
+`
+
+export const getIntegrate1Cs = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {...arg, organization: organization},
+                variables,
                 query: gql`
                     query ($search: String!, $organization: ID!, $filter: String!, $skip: Int) {
-                        integrate1Cs(search: $search, organization: $organization, filter: $filter, skip: $skip) {
-                            _id
-                            createdAt
-                            ecspeditor
-                                {_id name}
-                            guid
-                            organization
-                                {_id name}
-                            client
-                                {_id name city}
-                            agent
-                                {_id name}
-                            item
-                                {_id name city}
-                          }
-                          filterIntegrate1C {
-                           name
-                           value
-                          }
+                        integrate1Cs(search: $search, organization: $organization, filter: $filter, skip: $skip) {${Integrate}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.integrate1Cs
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getIntegrate1CsSimpleStatistic = async(arg, organization, client)=>{
+export const getIntegrate1CsSimpleStatistic = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {...arg, organization: organization},
+                variables,
                 query: gql`
                     query ($search: String!, $organization: ID!, $filter: String!) {
                         integrate1CsSimpleStatistic(search: $search, organization: $organization, filter: $filter)
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.integrate1CsSimpleStatistic
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getEcspeditorsIntegrate1C = async(organization, client)=>{
+export const getEcspeditorsIntegrate1C = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {organization: organization},
+                variables,
                 query: gql`
-                    query ($organization: ID!) {
-                        ecspeditorsIntegrate1C(organization: $organization) {
+                    query ($search: String!, $organization: ID!) {
+                        ecspeditorsIntegrate1C(search: $search, organization: $organization) {
                             _id 
                             name
                         }
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.ecspeditorsIntegrate1C
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const unloadingIntegrate1C = async({document, organization}, client)=>{
+export const unloadingIntegrate1C = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .mutate({
-                variables: {document: document, organization: organization},
+                variables,
                 mutation: gql`
                     mutation ($document: Upload!, $organization: ID!) {
-                        unloadingIntegrate1C(document: $document, organization: $organization) {
-                            data
-                        }
+                        unloadingIntegrate1C(document: $document, organization: $organization)
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.unloadingIntegrate1C
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getAgentsIntegrate1C = async(organization, client)=>{
+export const getAgentsIntegrate1C = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {organization: organization},
+                variables,
                 query: gql`
-                    query ($organization: ID!) {
-                        agentsIntegrate1C(organization: $organization) {
+                    query ($search: String!, $organization: ID!) {
+                        agentsIntegrate1C(search: $search, organization: $organization) {
                             _id 
                             name
                         }
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.agentsIntegrate1C
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getItemsIntegrate1C = async({organization, city}, client)=>{
+export const getItemsIntegrate1C = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {organization, city},
+                variables,
                 query: gql`
-                    query ($organization: ID!, $city: String) {
-                        itemsIntegrate1C(organization: $organization, city: $city) {
-                            _id 
-                            name
-                            city
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getClientsIntegrate1C = async({organization, city}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization, city},
-                query: gql`
-                    query ($organization: ID!, $city: String) {
-                        clientsIntegrate1C(organization: $organization, city: $city) {
+                    query ($search: String!, $organization: ID!) {
+                        itemsIntegrate1C(search: $search, organization: $organization) {
                             _id 
                             name
                             city
                         }
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.itemsIntegrate1C
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getIntegrate1C = async(_id, client)=>{
+export const getClientsIntegrate1C = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {_id: _id},
+                variables,
                 query: gql`
-                    query ($_id: ID!) {
-                        integrate1C(_id: $_id) {
-                            _id
-                            createdAt
-                            ecspeditor
-                                {_id name}
-                            guid
-                            organization
-                                {_id name}
-                            client
-                                {_id name}
-                            agent
-                                {_id name}
-                            item
-                                {_id name}
+                    query ($search: String!, $organization: ID!) {
+                        clientsIntegrate1C(search: $search, organization: $organization) {
+                            _id 
+                            name
+                            city
                         }
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.clientsIntegrate1C
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const deleteIntegrate1C = async(ids)=>{
+export const deleteIntegrate1C = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {_id: ids},
+        const res = await client.mutate({
+            variables: {_id},
             mutation : gql`
-                    mutation ($_id: [ID]!) {
-                        deleteIntegrate1C(_id: $_id) {
-                             data
-                        }
+                    mutation ($_id: ID!) {
+                        deleteIntegrate1C(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.deleteIntegrate1C
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const addIntegrate1C = async(element)=>{
+export const addIntegrate1C = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        let res = await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($organization: ID!, $item: ID, $client: ID, $guid: String, $agent: ID, $ecspeditor: ID) {
-                        addIntegrate1C(organization: $organization, item: $item, client: $client, guid: $guid, agent: $agent, ecspeditor: $ecspeditor) {
-                            _id
-                            createdAt
-                            ecspeditor
-                                {_id name}
-                            guid
-                            organization
-                                {_id name}
-                            client
-                                {_id name}
-                            agent
-                                {_id name}
-                            item
-                                {_id name}
-                        }
+                        addIntegrate1C(organization: $organization, item: $item, client: $client, guid: $guid, agent: $agent, ecspeditor: $ecspeditor) {${Integrate}}
                     }`})
         return res.data.addIntegrate1C
-    } catch(err){
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const setIntegrate1C = async(element)=>{
+export const setIntegrate1C = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        let res = await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
-                    mutation ($_id: ID!, $item: ID, $client: ID, $guid: String, $agent: ID, $ecspeditor: ID) {
-                        setIntegrate1C(_id: $_id, item: $item, client: $client, guid: $guid, agent: $agent, ecspeditor: $ecspeditor) {
-                             data
-                       }
+                    mutation ($_id: ID!, $guid: String) {
+                        setIntegrate1C(_id: $_id, guid: $guid)
                     }`})
         return res.data.setIntegrate1C
-    } catch(err){
+    } catch(err) {
         console.error(err)
     }
 }

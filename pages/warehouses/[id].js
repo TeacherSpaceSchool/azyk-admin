@@ -1,58 +1,49 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../layouts/App';
 import pageListStyle from '../../src/styleMUI/statistic/statisticsList'
 import {getWarehouses} from '../../src/gql/warehouse'
-import CardWarehouse from '../../components/warehouse/CardWarehouse'
+import CardWarehouse from '../../components/card/CardWarehouse'
 import { connect } from 'react-redux'
 import Router from 'next/router'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
+import {unawaited} from '../../src/lib';
 
 const Warehouse = React.memo((props) => {
     const classes = pageListStyle();
-    const { data } = props;
+    const {data} = props;
     let [list, setList] = useState(data.warehouses);
-    const { search } = props.app;
+    const {search} = props.app;
     const router = useRouter()
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
-    const getList = async ()=>{
+    const getList = async () => {
         setList(await getWarehouses({organization: router.query.id, search}))
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
-    useEffect(()=>{
-        (async()=>{
-            if(!initialRender.current) {
-                await getList()
-            }
-        })()
-    },[])
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
-                initialRender.current = false;
-            } else {
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    await getList()
-                }, 500)
-                setSearchTimeOut(searchTimeOut)
-
-            }
-        })()
-    },[search])
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
+    useEffect(() => {
+        if(!initialRender.current)
+            unawaited(getList)
+    }, [])
+    useEffect(() => {
+        if(initialRender.current)
+            initialRender.current = false;
+        else {
+            if(searchTimeOut.current)
+                clearTimeout(searchTimeOut.current)
+            searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
-    }
+    }, [search])
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, list])
     return (
-        <App checkPagination={checkPagination} searchShow={true} pageName='Склады'>
+        <App checkPagination={checkPagination} searchShow pageName='Склады'>
             <Head>
                 <title>Склады</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -64,10 +55,8 @@ const Warehouse = React.memo((props) => {
                 <CardWarehouse list={list} setList={setList} organization={router.query.id}/>
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
-                        return(
-                            <CardWarehouse list={list} idx={idx} key={element._id} items={data.itemsForWarehouses} organization={router.query.id} setList={setList} element={element}/>
-                        )}
-                ):null}
+                        return <CardWarehouse idx={idx} key={element._id} organization={router.query.id} list={list} setList={setList} element={element}/>
+                }):null}
             </div>
         </App>
     )
@@ -85,7 +74,7 @@ Warehouse.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            warehouses: await getWarehouses({organization: ctx.query.id, search: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+            warehouses: await getWarehouses({organization: ctx.query.id, search: ''}, getClientGqlSsr(ctx.req))
         }
     };
 };

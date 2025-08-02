@@ -2,10 +2,10 @@ import { openDB, deleteDB } from 'idb';
 import { initReceiveData } from './idb/receiveData';
 import { initOfflineOrders } from './idb/offlineOrders';
 import { SingletonStore } from '../singleton/store';
-export let db = undefined
+export let db = null
 export let start = async () => {
     try {
-        if (window.indexedDB) {
+        if(window.indexedDB) {
             if(
                 new SingletonStore().getStore()
                 &&
@@ -39,7 +39,7 @@ export let start = async () => {
             }
         }
     }
-    catch (error){
+    catch (error) {
         console.error(error)
     }
 }

@@ -1,97 +1,91 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
-import { SingletonStore } from '../singleton/store';
 
-export const getConnectionApplications = async(element, client)=>{
+const ConnectionApplication = `
+    _id
+    createdAt
+    name
+    phone
+    address
+    whereKnow
+    taken
+`
+
+export const getConnectionApplications = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: element,
+                variables,
                 query: gql`
                     query ($skip: Int, $filter: String) {
-                        connectionApplications(skip: $skip, filter: $filter) {
-                            _id
-                            createdAt
-                            name
-                            phone
-                            address
-                            whereKnow
-                            taken
-                        }
-                        filterConnectionApplication {
-                           name
-                           value
-                        }
+                        connectionApplications(skip: $skip, filter: $filter) {${ConnectionApplication}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.connectionApplications
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getConnectionApplicationsSimpleStatistic = async(element, client)=>{
+export const getConnectionApplicationsSimpleStatistic = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: element,
+                variables,
                 query: gql`
                     query ($filter: String) {
                         connectionApplicationsSimpleStatistic(filter: $filter) 
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.connectionApplicationsSimpleStatistic
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const addConnectionApplication = async(element)=>{
+export const addConnectionApplication = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($name: String!, $phone: String!, $address: String!, $whereKnow: String!) {
-                        addConnectionApplication(name: $name, phone: $phone, address: $address, whereKnow: $whereKnow) {
-                            data
-                        }
+                        addConnectionApplication(name: $name, phone: $phone, address: $address, whereKnow: $whereKnow) {${ConnectionApplication}}
                     }`})
-    } catch(err){
+        return res.data.addConnectionApplication
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const acceptConnectionApplication = async(element)=>{
+export const acceptConnectionApplication = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($_id: ID!) {
-                        acceptConnectionApplication(_id: $_id) {
-                             data
-                        }
+                        acceptConnectionApplication(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.acceptConnectionApplication
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const deleteConnectionApplication = async(ids)=>{
+export const deleteConnectionApplication = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {_id: ids},
+        const res = await client.mutate({
+            variables: {_id},
             mutation : gql`
-                    mutation ($_id: [ID]!) {
-                        deleteConnectionApplication(_id: $_id) {
-                             data
-                        }
+                    mutation ($_id: ID!) {
+                        deleteConnectionApplication(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.deleteConnectionApplication
+    } catch(err) {
         console.error(err)
     }
 }

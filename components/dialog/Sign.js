@@ -27,15 +27,13 @@ const Sign =  React.memo(
         let handleLoginEnter =  (event) => {
             setLoginEnter(event.target.value)
         };
-        let [hide, setHide] = useState('password');
-        let handleHide =  () => {
-            setHide(!hide)
-        };
-        const { error } = props.user;
-        const { isMobileApp } = props.app;
-        const { showMiniDialog } = props.mini_dialogActions;
-        const { signin } = props.userActions;
-        const { classes } = props;
+        let [hide, setHide] = useState(true);
+        let handleHide =  () => setHide(hide => !hide);
+        const {error} = props.user;
+        const {isMobileApp} = props.app;
+        const {showMiniDialog} = props.mini_dialogActions;
+        const {signin} = props.userActions;
+        const {classes} = props;
         const width = isMobileApp? (window.innerWidth-112) : 500
         return (
             <div className={classes.main}>
@@ -49,7 +47,7 @@ const Sign =  React.memo(
                     value={loginEnter}
                     onChange={handleLoginEnter}
                     onKeyPress={event => {
-                        if (event.key === 'Enter'&&loginEnter.length>0&&passEnter.length>0)
+                        if(event.key === 'Enter'&&loginEnter.length&&passEnter.length)
                             signin({login: loginEnter, password: passEnter})
                     }}
                 />
@@ -62,12 +60,12 @@ const Sign =  React.memo(
                         value={passEnter}
                         onChange={handlePassEnter}
                         onKeyPress={event => {
-                            if (event.key === 'Enter'&&loginEnter.length>0&&passEnter.length>0)
+                            if(event.key === 'Enter'&&loginEnter.length&&passEnter.length)
                                 signin({login: loginEnter, password: passEnter})
                         }}
                         endAdornment={
                             <InputAdornment position='end'>
-                                <IconButton aria-label='Показать пароль' onClick={handleHide}>
+                                <IconButton onClick={handleHide}>
                                     {hide ? <VisibilityOff />:<Visibility />  }
                                 </IconButton>
                             </InputAdornment>
@@ -81,18 +79,18 @@ const Sign =  React.memo(
                     null
                 }
                 <div>
-                    {/*<div style={{width: width}} className={classes.message} onClick={()=>{setType('reg')}}>Зарегистрироваться</div>*/}
+                    {/*<div style={{width: width}} className={classes.message} onClick={() => {setType('reg')}}>Зарегистрироваться</div>*/}
                     <div style={{width: width}}>Если забыли пароль или хотите зарегестрироваться, то перейдите в разде "Контакты" свяжитесь с нашими специалистами.</div>
                 </div>
                 <br/>
                 <div>
-                    <Button variant="contained" color="primary" onClick={()=>{
-                        if(loginEnter.length>0&&passEnter.length>0)
+                    <Button variant="contained" color='primary' onClick={() => {
+                        if(loginEnter&&passEnter)
                             signin({login: loginEnter, password: passEnter})
                     }} className={classes.button}>
                         Войти
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant="contained" color="secondary" onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </div>

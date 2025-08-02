@@ -1,87 +1,74 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
-import { SingletonStore } from '../singleton/store';
 
-export const getReviews = async(element, client)=>{
+const Review = `
+    _id
+    createdAt
+    organization {_id name}
+    client {_id name}
+    taken
+    type
+    text
+`
+
+export const getReviews = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: element,
+                variables,
                 query: gql`
                     query ($organization: ID, $skip: Int, $filter: String) {
-                        reviews(organization: $organization, skip: $skip, filter: $filter) {
-                            _id
-                            createdAt
-                            organization {_id name}
-                            client {_id name}
-                            taken
-                            type
-                            text
-                        }
-                        filterReview {
-                           name
-                           value
-                        }
+                        reviews(organization: $organization, skip: $skip, filter: $filter) {${Review}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.reviews
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const addReview = async(element)=>{
+export const addReview = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        let res = await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($organization: ID!, $text: String!, $type: String!) {
-                        addReview(organization: $organization, text: $text, type: $type) {
-                            _id
-                            createdAt
-                            organization {_id name}
-                            client {_id name}
-                            taken
-                            type
-                            text
-                        }
+                        addReview(organization: $organization, text: $text, type: $type) {${Review}}
                     }`})
         return res.data.addReview
-    } catch(err){
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const acceptReview = async(element)=>{
+export const acceptReview = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($_id: ID!) {
-                        acceptReview(_id: $_id) {
-                             data
-                        }
+                        acceptReview(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.acceptReview
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const deleteReview = async(ids)=>{
+export const deleteReview = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {_id: ids},
+        const res = await client.mutate({
+            variables: {_id},
             mutation : gql`
-                    mutation ($_id: [ID]!) {
-                        deleteReview(_id: $_id) {
-                             data
-                        }
+                    mutation ($_id: ID!) {
+                        deleteReview(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.deleteReview
+    } catch(err) {
         console.error(err)
     }
 }

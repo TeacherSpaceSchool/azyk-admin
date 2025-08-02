@@ -1,183 +1,131 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 
-export const getOrganization = async({_id: _id}, client)=>{
+const Organization = `
+    _id
+    createdAt
+    name
+    dateDelivery
+    image
+    address
+    email
+    phone
+    info
+    miniInfo
+    status
+    minimumOrder
+    agentHistory
+    refusal
+    catalog
+    priotiry
+    unite
+    superagent
+    onlyDistrict
+    addedClient
+    agentSubBrand
+    clientSubBrand
+    onlyIntegrate
+    dateDelivery
+    autoAcceptAgent
+    autoAcceptNight
+    calculateStock
+    clientDuplicate
+    divideBySubBrand
+    warehouse
+    pass
+    cities
+`
+
+export const getOrganization = async (_id, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {_id: _id},
+                variables: {_id},
                 query: gql`
                     query ($_id: ID!) {
-                        organization(_id: $_id) {
-                            _id
-                            createdAt
-                            name
-                            dateDelivery
-                            image
-                            address
-                            email
-                            phone
-                            info
-                            miniInfo
-                            status
-                            minimumOrder
-                            agentHistory
-                            accessToClient
-                            consignation
-                            refusal
-                            catalog
-                            priotiry
-                            unite
-                            superagent
-                            onlyDistrict
-                            addedClient
-                            agentSubBrand
-                            clientSubBrand
-                            autoIntegrate
-                            onlyIntegrate
-                            dateDelivery
-                            autoAcceptAgent
-                            autoAcceptNight
-                            calculateStock
-                            clientDuplicate
-                            divideBySubBrand
-                            warehouse
-                            pass
-                            cities
-                          }
+                        organization(_id: $_id) {${Organization}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.organization
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getOrganizations = async({search, filter, city}, client)=>{
+export const getOrganizations = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {search, filter, city},
+                variables,
                 query: gql`
                     query ($search: String!, $filter: String!, $city: String) {
-                        organizations(search: $search, filter: $filter, city: $city) {
-                            name
-                            _id
-                            image
-                            miniInfo
-                          }
-                          filterOrganization {
-                           name
-                           value
-                          }
+                        organizations(search: $search, filter: $filter, city: $city) {${Organization}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.organizations
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getOrganizationsTrash = async({search}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {search},
-                query: gql`
-                    query ($search: String!) {
-                        organizationsTrash(search: $search) {
-                            name
-                            _id
-                            image
-                            miniInfo
-                          }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const deleteOrganization = async(ids)=>{
+export const deleteOrganization = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {_id: ids},
+        const res = await client.mutate({
+            variables: {_id},
             mutation : gql`
-                    mutation ($_id: [ID]!) {
-                        deleteOrganization(_id: $_id) {
-                             data
-                        }
+                    mutation ($_id: ID!) {
+                        deleteOrganization(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.deleteOrganization
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const restoreOrganization = async(ids)=>{
+export const onoffOrganization = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {_id: ids},
+        const res = await client.mutate({
+            variables: {_id},
             mutation : gql`
-                    mutation ($_id: [ID]!) {
-                        restoreOrganization(_id: $_id) {
-                             data
-                        }
+                    mutation ($_id: ID!) {
+                        onoffOrganization(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.onoffOrganization
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const onoffOrganization = async(ids)=>{
+export const addOrganization = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {_id: ids},
+        const res = await client.mutate({
+            variables,
             mutation : gql`
-                    mutation ($_id: [ID]!) {
-                        onoffOrganization(_id: $_id) {
-                             data
-                        }
+                    mutation ($cities: [String]!, $catalog: Upload, $miniInfo: String!, $image: Upload!, $priotiry: Int, $minimumOrder: Int, $agentHistory: Int, $name: String!, $address: [String]!, $email: [String]!, $phone: [String]!, $info: String!, $refusal: Boolean!, $unite: Boolean!, $superagent: Boolean!, $onlyDistrict: Boolean!, $addedClient: Boolean!, $agentSubBrand: Boolean!, $clientSubBrand: Boolean!, $onlyIntegrate: Boolean!, $autoAcceptAgent: Boolean!, $autoAcceptNight: Boolean!, $calculateStock: Boolean!, $clientDuplicate: Boolean!, $divideBySubBrand: Boolean!, $dateDelivery: Boolean!, $warehouse: String!, $pass: String) {
+                        addOrganization(cities: $cities, catalog: $catalog, miniInfo: $miniInfo, image: $image, priotiry: $priotiry, minimumOrder: $minimumOrder,  agentHistory: $agentHistory, name: $name, address: $address, email: $email, phone: $phone, info: $info, refusal: $refusal, unite: $unite, superagent: $superagent, onlyDistrict: $onlyDistrict, addedClient: $addedClient, agentSubBrand: $agentSubBrand, clientSubBrand: $clientSubBrand, onlyIntegrate: $onlyIntegrate, autoAcceptAgent: $autoAcceptAgent, autoAcceptNight: $autoAcceptNight, calculateStock: $calculateStock, clientDuplicate: $clientDuplicate, divideBySubBrand: $divideBySubBrand, dateDelivery: $dateDelivery, warehouse: $warehouse, pass: $pass)
                     }`})
-    } catch(err){
+        return res.data.addOrganization
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const addOrganization = async(element)=>{
+export const setOrganization = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
-                    mutation ($cities: [String]!, $catalog: Upload, $miniInfo: String!, $image: Upload!, $priotiry: Int, $minimumOrder: Int, $agentHistory: Int, $name: String!, $address: [String]!, $email: [String]!, $phone: [String]!, $info: String!, $consignation: Boolean!, $refusal: Boolean!, $accessToClient: Boolean!, $unite: Boolean!, $superagent: Boolean!, $onlyDistrict: Boolean!, $addedClient: Boolean!, $agentSubBrand: Boolean!, $clientSubBrand: Boolean!, $autoIntegrate: Boolean!, $onlyIntegrate: Boolean!, $autoAcceptAgent: Boolean!, $autoAcceptNight: Boolean!, $calculateStock: Boolean!, $clientDuplicate: Boolean!, $divideBySubBrand: Boolean!, $dateDelivery: Boolean!, $warehouse: String!, $pass: String) {
-                        addOrganization(cities: $cities, catalog: $catalog, miniInfo: $miniInfo, image: $image, priotiry: $priotiry, minimumOrder: $minimumOrder,  agentHistory: $agentHistory, name: $name, address: $address, email: $email, phone: $phone, info: $info, consignation: $consignation, refusal: $refusal, unite: $unite, superagent: $superagent, accessToClient: $accessToClient, onlyDistrict: $onlyDistrict, addedClient: $addedClient, agentSubBrand: $agentSubBrand, clientSubBrand: $clientSubBrand, autoIntegrate: $autoIntegrate, onlyIntegrate: $onlyIntegrate, autoAcceptAgent: $autoAcceptAgent, autoAcceptNight: $autoAcceptNight, calculateStock: $calculateStock, clientDuplicate: $clientDuplicate, divideBySubBrand: $divideBySubBrand, dateDelivery: $dateDelivery, warehouse: $warehouse, pass: $pass) {
-                             data
-                        }
+                    mutation ($cities: [String], $catalog: Upload, $miniInfo: String, $_id: ID!, $refusal: Boolean, $priotiry: Int, $image: Upload, $minimumOrder: Int, $agentHistory: Int, $name: String, $address: [String], $email: [String], $phone: [String], $info: String, $unite: Boolean, $superagent: Boolean, $onlyDistrict: Boolean, $addedClient: Boolean, $agentSubBrand: Boolean, $clientSubBrand: Boolean, $onlyIntegrate: Boolean, $autoAcceptAgent: Boolean, $autoAcceptNight: Boolean, $calculateStock: Boolean, $clientDuplicate: Boolean, $divideBySubBrand: Boolean, $dateDelivery: Boolean, $warehouse: String, $pass: String) {
+                        setOrganization(cities: $cities, catalog: $catalog, miniInfo: $miniInfo, _id: $_id, priotiry: $priotiry, refusal: $refusal, image: $image, minimumOrder: $minimumOrder, agentHistory: $agentHistory, name: $name, address: $address, unite: $unite, superagent: $superagent, email: $email, phone: $phone, info: $info, addedClient: $addedClient, agentSubBrand: $agentSubBrand, clientSubBrand: $clientSubBrand, onlyDistrict: $onlyDistrict, onlyIntegrate: $onlyIntegrate, divideBySubBrand: $divideBySubBrand, autoAcceptAgent: $autoAcceptAgent, autoAcceptNight: $autoAcceptNight, calculateStock: $calculateStock, clientDuplicate: $clientDuplicate, dateDelivery: $dateDelivery, warehouse: $warehouse, pass: $pass) 
                     }`})
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const setOrganization = async(element)=>{
-    try{
-        const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
-            mutation : gql`
-                    mutation ($cities: [String], $catalog: Upload, $miniInfo: String, $_id: ID!, $consignation: Boolean, $refusal: Boolean, $priotiry: Int, $accessToClient: Boolean, $image: Upload, $minimumOrder: Int, $agentHistory: Int, $name: String, $address: [String], $email: [String], $phone: [String], $info: String, $unite: Boolean, $superagent: Boolean, $onlyDistrict: Boolean, $addedClient: Boolean, $agentSubBrand: Boolean, $clientSubBrand: Boolean, $autoIntegrate: Boolean, $onlyIntegrate: Boolean, $autoAcceptAgent: Boolean, $autoAcceptNight: Boolean, $calculateStock: Boolean, $clientDuplicate: Boolean, $divideBySubBrand: Boolean, $dateDelivery: Boolean, $warehouse: String, $pass: String) {
-                        setOrganization(cities: $cities, catalog: $catalog, miniInfo: $miniInfo, _id: $_id, priotiry: $priotiry, consignation: $consignation, refusal: $refusal, accessToClient: $accessToClient, image: $image, minimumOrder: $minimumOrder, agentHistory: $agentHistory, name: $name, address: $address, unite: $unite, superagent: $superagent, email: $email, phone: $phone, info: $info, addedClient: $addedClient, agentSubBrand: $agentSubBrand, clientSubBrand: $clientSubBrand, autoIntegrate: $autoIntegrate, onlyDistrict: $onlyDistrict, onlyIntegrate: $onlyIntegrate, divideBySubBrand: $divideBySubBrand, autoAcceptAgent: $autoAcceptAgent, autoAcceptNight: $autoAcceptNight, calculateStock: $calculateStock, clientDuplicate: $clientDuplicate, dateDelivery: $dateDelivery, warehouse: $warehouse, pass: $pass) {
-                             data
-                        }
-                    }`})
-    } catch(err){
+        return res.data.setOrganization
+    } catch(err) {
         console.error(err)
     }
 }

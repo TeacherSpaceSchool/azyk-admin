@@ -1,5 +1,5 @@
-@import "lib";
-@import "value";
+@import 'lib';
+@import 'value';
 
 h3{
   margin: 0
@@ -24,7 +24,7 @@ html{
   background: #fff;
   position: fixed;
   left: 10px;
-  z-index: 1500;
+  z-index: 1200;
   @media screen and (min-width: $break-small) {
     left: 310px;
   }

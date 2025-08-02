@@ -1,49 +1,61 @@
 import Head from 'next/head';
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../layouts/App';
 import { connect } from 'react-redux'
 import { getConnectionApplications, getConnectionApplicationsSimpleStatistic } from '../src/gql/connectionApplication'
 import pageListStyle from '../src/styleMUI/connectionApplication/connectionApplicationList'
-import CardConnectionApplications from '../components/connectionApplication/CardConnectionApplication'
+import CardConnectionApplications from '../components/card/CardConnectionApplication'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
 import Sign from '../components/dialog/Sign';
 import {bindActionCreators} from 'redux';
 import * as mini_dialogActions from '../redux/actions/mini_dialog';
+import {unawaited} from '../src/lib';
+
+const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value: 'обработка'}]
 
 const ConnectionApplications = React.memo((props) => {
     const classes = pageListStyle();
-    const { profile } = props.user;
-    const { data } = props;
+    const {profile} = props.user;
+    const {data} = props;
+    const initialRender = useRef(true);
     let [list, setList] = useState(data.connectionApplications);
     let [simpleStatistic, setSimpleStatistic] = useState(data.connectionApplicationsSimpleStatistic);
-    const { filter, isMobileApp } = props.app;
-    let [paginationWork, setPaginationWork] = useState(true);
-    const checkPagination = async()=>{
-        if(paginationWork){
-            let addedList = (await getConnectionApplications({filter: filter, skip: list.length})).connectionApplications
-            if(addedList.length>0){
+    const {filter, isMobileApp} = props.app;
+    const paginationWork = useRef(true);
+    const checkPagination = useCallback(async () => {
+        if(paginationWork.current) {
+            paginationWork.current = false
+            let addedList = await getConnectionApplications({filter, skip: list.length})
+            if(addedList.length) {
                 setList([...list, ...addedList])
+                paginationWork.current = true
             }
-            else
-                setPaginationWork(false)
         }
-    }
-    const getList = async()=>{
-        setList((await getConnectionApplications({filter: filter, skip: 0})).connectionApplications)
-        setSimpleStatistic((await getConnectionApplicationsSimpleStatistic({filter: filter})).connectionApplicationsSimpleStatistic)
-        setPaginationWork(true);
+    }, [filter, list])
+    const getList = async () => {
+        // eslint-disable-next-line no-undef
+        const [connectionApplications, connectionApplicationsSimpleStatistic] = await Promise.all([
+            getConnectionApplications({filter, skip: 0}),
+            getConnectionApplicationsSimpleStatistic({filter})
+        ])
+        setList(connectionApplications)
+        setSimpleStatistic(connectionApplicationsSimpleStatistic)
+        paginationWork.current = true;
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
-    useEffect(()=>{
-        (async () => {
-            await getList()
-        })()
-    },[filter])
-    const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
+    useEffect(() => {
+        if(initialRender.current) {
+            initialRender.current = false;
+        }
+        else {
+            unawaited(getList)
+        }
+    }, [filter])
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     return (
-        <App checkPagination={checkPagination} setList={setList} list={list} filters={data.filterConnectionApplication} pageName='Заявка на подключение'>
+        <App checkPagination={checkPagination} list={list} setList={setList} filters={'admin'===profile.role?filters:null} pageName='Заявка на подключение'>
             <Head>
                 <title>Заявка на подключение</title>
                 <meta name='robots' content='index, follow'/>
@@ -58,7 +70,7 @@ const ConnectionApplications = React.memo((props) => {
                 {
                     list?list.map((element, idx)=> {
                             return(
-                                <CardConnectionApplications list={list} idx={idx} element={element} setList={setList}/>
+                                <CardConnectionApplications key={element._id} idx={idx} element={element} list={list} setList={setList}/>
                             )}
                     ):null
                 }
@@ -70,7 +82,7 @@ const ConnectionApplications = React.memo((props) => {
                     </div>
                     :
                     !profile.role?
-                        <div className={classes.scrollDown} onClick={()=>{
+                        <div className={classes.scrollDown} onClick={() => {
                             setMiniDialog('Вход', <Sign isMobileApp={isMobileApp}/>)
                             showMiniDialog(true)
                         }}>
@@ -96,10 +108,15 @@ ConnectionApplications.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
+    // eslint-disable-next-line no-undef
+    const [connectionApplications, connectionApplicationsSimpleStatistic] = await Promise.all([
+        getConnectionApplications({skip: 0, filter: ''}, getClientGqlSsr(ctx.req)),
+        getConnectionApplicationsSimpleStatistic({filter: ''}, getClientGqlSsr(ctx.req))
+    ])
     return {
         data: {
-            ...await getConnectionApplications({skip: 0, filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-            ...await getConnectionApplicationsSimpleStatistic({filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
+            connectionApplications,
+            connectionApplicationsSimpleStatistic,
         }
     };
 };

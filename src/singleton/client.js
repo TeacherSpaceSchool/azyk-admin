@@ -18,7 +18,7 @@ import {
 
 export class SingletonApolloClient {
     constructor(req) {
-        if (!!SingletonApolloClient.instance) {
+        if(!!SingletonApolloClient.instance) {
             return SingletonApolloClient.instance;
         }
         SingletonApolloClient.instance = this;
@@ -37,7 +37,7 @@ export class SingletonApolloClient {
             }
         });
         const linkError = onError((ctx) => {
-            if (ctx.graphQLErrors)
+            if(ctx.graphQLErrors)
                 ctx.graphQLErrors.map(({ message, locations, path }) =>{
                     let snackBarMsg = 'Ошибка'
                     if(message&&message.includes('Error, expected `login` to be unique')) {
@@ -46,7 +46,7 @@ export class SingletonApolloClient {
                     new SingletonStore().getStore().dispatch(showSnackBar(snackBarMsg))
                     console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
                 });
-            if (ctx.networkError) console.log(`[Network error]: ${ctx.networkError}`);
+            if(ctx.networkError) console.log(`[Network error]: ${ctx.networkError}`);
         });
         let mainLink;
         if(this.jwt) {

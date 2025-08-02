@@ -31,16 +31,19 @@ self.addEventListener('notificationclick', function (event) {
     })
 
     event.waitUntil(
+        // eslint-disable-next-line no-undef
         clients.matchAll({
             type: 'window'
         })
             .then(function (clientList) {
                 for (let i = 0; i < clientList.length; i++) {
                     let client = clientList[i];
-                    if (client.url == '/' && 'focus' in client)
+                    if(client.url == '/' && 'focus' in client)
                         return client.focus();
                 }
-                if (clients.openWindow) {
+                // eslint-disable-next-line no-undef
+                if(clients.openWindow) {
+                    // eslint-disable-next-line no-undef
                     return clients.openWindow(event.notification.data?event.notification.data.url:notificationUrl);
                 }
             })

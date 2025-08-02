@@ -45,6 +45,10 @@ export default makeStyles({
         flexDirection: 'column',
     },
     input: {
+        width: 'calc(100% - 5px)',
+        margin: 5
+    },
+    inputHalf: {
         width: 'calc(50% - 10px)',
         margin: 5
     },

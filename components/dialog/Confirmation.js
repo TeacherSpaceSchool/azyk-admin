@@ -13,28 +13,28 @@ import dialogContentStyle from '../../src/styleMUI/dialogContent'
 
 const Confirmation =  React.memo(
     (props) =>{
-        const { showMiniDialog } = props.mini_dialogActions;
-        const { showSnackBar } = props.snackbarActions;
-        const { showLoad } = props.appActions;
-        const { classes, action } = props;
+        const {showMiniDialog} = props.mini_dialogActions;
+        const {showSnackBar} = props.snackbarActions;
+        const {showLoad} = props.appActions;
+        const {classes, action} = props;
         return (
             <div className={classes.line}>
-                <IconButton onClick={async()=>{
+                <IconButton onClick={async () => {
                     await showMiniDialog(false)
-                    await showLoad(true)
+                    showLoad(true)
                     try {
                         await action()
                     }  catch (err) {
                         console.error(err)
                         showSnackBar('Ошибка')
                     }
-                    await showLoad(false)
-                }} aria-label='Delete'>
+                    showLoad(false)
+                }}>
                     <Done className={classes.button} />
                 </IconButton>
-                <IconButton onClick={async()=>{
+                <IconButton onClick={async () => {
                     showMiniDialog(false)
-                }} aria-label='Cancel'>
+                }}>
                     <Clear className={classes.button}/>
                 </IconButton>
             </div>

@@ -20,15 +20,10 @@ const initialState = {
     search: '',
     filter: '',
     sort: '-createdAt',
-    isMobileApp: undefined,
-    device: undefined,
     load: false,
     countBasket: 0,
     date: '',
     city: 'Бишкек',
-    agent: undefined,
-    organization: undefined,
-    district: undefined,
 }
 
 export default function mini_dialog(state = initialState, action) {

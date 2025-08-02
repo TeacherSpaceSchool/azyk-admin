@@ -1,7 +1,7 @@
 /* eslint-disable no-extra-boolean-cast */
 export class SingletonApp {
     constructor(mobile, auth) {
-        if (!!SingletonApp.instance) {
+        if(!!SingletonApp.instance) {
             return SingletonApp.instance;
         }
         SingletonApp.instance = this;

@@ -37,7 +37,7 @@ import SetDate from '../dialog/SetDate'
 import SetOrganizations from '../dialog/SetOrganizations'
 import SetAgent from '../dialog/SetAgent'
 import SetCities from '../dialog/SetCities'
-import { getActiveOrganization } from '../../src/gql/statistic'
+import { getOrganizations } from '../../src/gql/organization'
 import { getAgents } from '../../src/gql/employment'
 import {isNotTestUser, setCityCookie} from '../../src/lib'
 import {pdDDMMYY} from '../../src/lib'
@@ -48,12 +48,12 @@ const MyAppBar = React.memo((props) => {
     //props
     const initialRender = useRef(true);
     const classes = appbarStyle();
-    const { filters, sorts, pageName, dates, searchShow, unread, defaultOpenSearch, organizations, cityShow, agents, showDistrict, cities } = props
-    const { drawer, search, filter, sort, isMobileApp, date, organization, agent, district, city } = props.app;
-    const { showDrawer, setSearch, setFilter, setSort, setDate, setOrganization, setAgent, setDistrict, setCity } = props.appActions;
-    const { authenticated, profile } = props.user;
-    const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
-    const { logout } = props.userActions;
+    const {filters, sorts, pageName, dates, searchShow, unread, defaultOpenSearch, organizations, cityShow, agents, showDistrict, cities} = props
+    const {drawer, search, filter, sort, isMobileApp, date, organization, agent, district, city} = props.app;
+    const {showDrawer, setSearch, setFilter, setSort, setDate, setOrganization, setAgent, setDistrict, setCity} = props.appActions;
+    const {authenticated, profile} = props.user;
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    const {logout} = props.userActions;
     //state
     const [anchorElMobileMenu, setAnchorElMobileMenu] = React.useState(null);
     const openMobileMenu = Boolean(anchorElMobileMenu);
@@ -131,14 +131,14 @@ const MyAppBar = React.memo((props) => {
     let handleSearch = (event) => {
         setSearch(event.target.value)
     };
-    useEffect(()=>{
+    useEffect(() => {
         if(initialRender.current) {
             initialRender.current = false;
         } else {
-            if (document.getElementById('search'))
+            if(document.getElementById('search'))
                 document.getElementById('search').focus();
         }
-    },[openSearch])
+    }, [openSearch])
     return (
         <div className={classes.root}>
             <AppBar position='fixed' className='appBar'>
@@ -167,7 +167,7 @@ const MyAppBar = React.memo((props) => {
                                        onChange={handleSearch}
                                        endAdornment={
                                            <InputAdornment position='end'>
-                                               <IconButton aria-label='Search' onClick={()=>{setSearch('');setOpenSearch(false)}}>
+                                               <IconButton onClick={() => {setSearch('');setOpenSearch(false)}}>
                                                    <Cancel />
                                                </IconButton>
                                            </InputAdornment>
@@ -179,7 +179,7 @@ const MyAppBar = React.memo((props) => {
                                 cityShow||dates||searchShow||filters||sorts?
                                     <IconButton
                                         style={{background: date||organization||agent||showDistrict||city||filter?'rgba(51, 143, 255, 0.29)': 'transparent'}}
-                                        aria-owns={openMobileMenu ? 'menu-appbar' : undefined}
+                                        aria-owns={openMobileMenu ? 'menu-appbar' : null}
                                         aria-haspopup='true'
                                         onClick={handleMobileMenu}
                                         color='inherit'
@@ -205,7 +205,7 @@ const MyAppBar = React.memo((props) => {
                             >
                                 {
                                     searchShow?
-                                        <MenuItem key='search' onClick={()=>{
+                                        <MenuItem key='search' onClick={() => {
                                             setOpenSearch(true);handleCloseMobileMenu()
                                         }}>
                                             <div style={{display: 'flex', color: '#606060'}}>
@@ -215,7 +215,7 @@ const MyAppBar = React.memo((props) => {
                                         :
                                         null
                                 }
-                                {filters&&filters.length>0?
+                                {filters&&filters.length?
                                     [
                                         <MenuItem key='filterMenu' onClick={handleMenuFilter} style={{background: filter?'rgba(255, 179, 0, 0.15)': '#fff'}}>
                                             <div style={{display: 'flex', color: '#606060'}}>
@@ -237,12 +237,12 @@ const MyAppBar = React.memo((props) => {
                                             open={openFilter}
                                             onClose={handleCloseFilter}
                                         >
-                                            {filters.map((elem, idx)=><MenuItem key={'filter'+idx} style={{background: filter===elem.value?'rgba(255, 179, 0, 0.15)': '#fff'}}  onClick={()=>{setFilter(elem.value);handleCloseFilter();handleCloseMobileMenu();}}>{elem.name}</MenuItem>)}
+                                            {filters.map((elem, idx)=><MenuItem key={'filter'+idx} style={{background: filter===elem.value?'rgba(255, 179, 0, 0.15)': '#fff'}}  onClick={() => {setFilter(elem.value);handleCloseFilter();handleCloseMobileMenu();}}>{elem.name}</MenuItem>)}
                                         </Menu>
                                     ]
                                     :null
                                 }
-                                {sorts&&sorts.length>0?
+                                {sorts&&sorts.length?
                                     [
                                         <MenuItem key='sortMenu' onClick={handleMenuSort} style={{background: sort?'rgba(255, 179, 0, 0.15)': '#fff'}}>
                                             <div style={{display: 'flex', color: '#606060'}}>
@@ -284,7 +284,7 @@ const MyAppBar = React.memo((props) => {
                                             open={openSort}
                                             onClose={handleCloseSort}
                                         >
-                                            {sorts.map((elem, idx)=><MenuItem style={{background: sort===elem.field||`-${elem.field}`===sort?'rgba(255, 179, 0, 0.15)': '#fff'}} key={'sort'+idx} onClick={()=>{sort===`-${elem.field}`?setSort(elem.field):setSort(`-${elem.field}`);handleCloseSort();handleCloseMobileMenu()}}>{sort===`-${elem.field}`?<ArrowDownward />:sort===elem.field?<ArrowUpward />:<div style={{width: '24px'}}/>}{elem.name}</MenuItem>)}
+                                            {sorts.map((elem, idx)=><MenuItem style={{background: sort===elem.field||`-${elem.field}`===sort?'rgba(255, 179, 0, 0.15)': '#fff'}} key={'sort'+idx} onClick={() => {sort===`-${elem.field}`?setSort(elem.field):setSort(`-${elem.field}`);handleCloseSort();handleCloseMobileMenu()}}>{sort===`-${elem.field}`?<ArrowDownward />:sort===elem.field?<ArrowUpward />:<div style={{width: '24px'}}/>}{elem.name}</MenuItem>)}
                                         </Menu>
                                     ]
                                     :null
@@ -311,10 +311,10 @@ const MyAppBar = React.memo((props) => {
                                             open={openDate}
                                             onClose={handleCloseDate}
                                         >
-                                            <MenuItem key='onDate' style={{background: date?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setMiniDialog('Дата', <SetDate/>);showMiniDialog(true);handleCloseDate();handleCloseMobileMenu();}}>
+                                            <MenuItem key='onDate' style={{background: date?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setMiniDialog('Дата', <SetDate/>);showMiniDialog(true);handleCloseDate();handleCloseMobileMenu();}}>
                                                 По дате
                                             </MenuItem>
-                                            <MenuItem key='allDate' style={{background: !date?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setDate('');handleCloseDate();handleCloseMobileMenu();}}>
+                                            <MenuItem key='allDate' style={{background: !date?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setDate('');handleCloseDate();handleCloseMobileMenu();}}>
                                                 Все
                                             </MenuItem>
                                         </Menu>
@@ -343,10 +343,10 @@ const MyAppBar = React.memo((props) => {
                                             open={openOrganizations}
                                             onClose={handleCloseOrganizations}
                                         >
-                                            <MenuItem key='onOrganizations' style={{background: organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async ()=>{let activeOrganization = (await getActiveOrganization(city)).activeOrganization;setMiniDialog('Организации', <SetOrganizations activeOrganization={activeOrganization}/>);showMiniDialog(true);handleCloseOrganizations();handleCloseMobileMenu();}}>
+                                            <MenuItem key='onOrganizations' style={{background: organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let organizations = await getOrganizations({search: '', filter: '', city});setMiniDialog('Организации', <SetOrganizations organizations={organizations}/>);showMiniDialog(true);handleCloseOrganizations();handleCloseMobileMenu();}}>
                                                 По организации
                                             </MenuItem>
-                                            <MenuItem key='allOrganizations' style={{background: !organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setOrganization(undefined);handleCloseOrganizations();handleCloseMobileMenu();}}>
+                                            <MenuItem key='allOrganizations' style={{background: !organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setOrganization(null);handleCloseOrganizations();handleCloseMobileMenu();}}>
                                                 Все
                                             </MenuItem>
                                         </Menu>
@@ -375,10 +375,10 @@ const MyAppBar = React.memo((props) => {
                                             open={openAgents}
                                             onClose={handleCloseAgents}
                                         >
-                                            <MenuItem key='onAgents' style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async ()=>{let agents = (await getAgents({_id: organization})).agents;let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();handleCloseMobileMenu();}}>
+                                            <MenuItem key='onAgents' style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let agents = await getAgents(organization);let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();handleCloseMobileMenu();}}>
                                                 По агенту
                                             </MenuItem>
-                                            <MenuItem key='allAgents' style={{background: !agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setAgent(undefined);handleCloseAgents();handleCloseMobileMenu();}}>
+                                            <MenuItem key='allAgents' style={{background: !agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setAgent(null);handleCloseAgents();handleCloseMobileMenu();}}>
                                                 Все
                                             </MenuItem>
                                         </Menu>
@@ -407,10 +407,10 @@ const MyAppBar = React.memo((props) => {
                                             open={openDistricts}
                                             onClose={handleCloseDistricts}
                                         >
-                                            <MenuItem key='onDistrict' style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async ()=>{let districts = (await getDistricts({_id: organization, search: '', sort: '-createdAt'})).districts;setMiniDialog('Район', <SetDistrict setDistrict={setDistrict} districts={districts}/>);showMiniDialog(true);handleCloseDistricts();handleCloseMobileMenu();}}>
+                                            <MenuItem key='onDistrict' style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let districts = await getDistricts({_id: organization, search: '', sort: '-createdAt'});setMiniDialog('Район', <SetDistrict setDistrict={setDistrict} districts={districts}/>);showMiniDialog(true);handleCloseDistricts();handleCloseMobileMenu();}}>
                                                 По району
                                             </MenuItem>
-                                            <MenuItem key='allDistricts' style={{background: !district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setDistrict(undefined);handleCloseDistricts();handleCloseMobileMenu();}}>
+                                            <MenuItem key='allDistricts' style={{background: !district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setDistrict(null);handleCloseDistricts();handleCloseMobileMenu();}}>
                                                 Все
                                             </MenuItem>
                                         </Menu>
@@ -439,10 +439,10 @@ const MyAppBar = React.memo((props) => {
                                             open={openCities}
                                             onClose={handleCloseCities}
                                         >
-                                            <MenuItem key='onCity' style={{background: city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async ()=>{setMiniDialog('Город', <SetCities cities={cities}/>);showMiniDialog(true);handleCloseCities();handleCloseMobileMenu();}}>
+                                            <MenuItem key='onCity' style={{background: city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {setMiniDialog('Город', <SetCities cities={cities}/>);showMiniDialog(true);handleCloseCities();handleCloseMobileMenu();}}>
                                                 По городу
                                             </MenuItem>
-                                            <MenuItem key='allCity' style={{background: !city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setCity(undefined);setCityCookie('');handleCloseCities();handleCloseMobileMenu();}}>
+                                            <MenuItem key='allCity' style={{background: !city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setCity(null);setCityCookie('');handleCloseCities();handleCloseMobileMenu();}}>
                                                 Все
                                             </MenuItem>
                                         </Menu>
@@ -488,11 +488,9 @@ const MyAppBar = React.memo((props) => {
                                 }
                                 {
                                     authenticated?
-                                        <MenuItem key='outProfile' onClick={()=>{
+                                        <MenuItem key='outProfile' onClick={() => {
                                             handleCloseProfile()
-                                            const action = async() => {
-                                                logout(true)
-                                            }
+                                            const action = async () => logout(true)
                                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                             showMiniDialog(true)
                                         }}>
@@ -501,7 +499,7 @@ const MyAppBar = React.memo((props) => {
                                             </div>
                                         </MenuItem>
                                         :
-                                        <MenuItem key='enterProfile' onClick={()=>{
+                                        <MenuItem key='enterProfile' onClick={() => {
                                             handleCloseProfile()
                                             setMiniDialog('Вход', <Sign isMobileApp={isMobileApp}/>)
                                             showMiniDialog(true)
@@ -524,7 +522,7 @@ const MyAppBar = React.memo((props) => {
                                        onChange={handleSearch}
                                        endAdornment={
                                            <InputAdornment position='end'>
-                                               <IconButton aria-label='Search' onClick={()=>{setSearch('');setOpenSearch(false)}}>
+                                               <IconButton onClick={() => {setSearch('');setOpenSearch(false)}}>
                                                    <Cancel />
                                                </IconButton>
                                            </InputAdornment>
@@ -537,7 +535,7 @@ const MyAppBar = React.memo((props) => {
                                 <Tooltip title='Город'>
                                     <IconButton
                                         style={{background: city?'rgba(51, 143, 255, 0.29)': 'transparent'}}
-                                        aria-owns={openCities ? 'menu-appbar' : undefined}
+                                        aria-owns={openCities ? 'menu-appbar' : null}
                                         aria-haspopup='true'
                                         onClick={handleMenuCities}
                                         color='inherit'
@@ -560,10 +558,10 @@ const MyAppBar = React.memo((props) => {
                                     open={openCities}
                                     onClose={handleCloseCities}
                                 >
-                                    <MenuItem style={{background: city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async ()=>{setMiniDialog('Город', <SetCities cities={cities}/>);showMiniDialog(true);handleCloseCities();}}>
+                                    <MenuItem style={{background: city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {setMiniDialog('Город', <SetCities cities={cities}/>);showMiniDialog(true);handleCloseCities();}}>
                                         По городу
                                     </MenuItem>
-                                    <MenuItem style={{background: !city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setCity(undefined);setCityCookie('');handleCloseCities();}}>
+                                    <MenuItem style={{background: !city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setCity(null);setCityCookie('');handleCloseCities();}}>
                                         Все
                                     </MenuItem>
                                 </Menu>
@@ -576,7 +574,7 @@ const MyAppBar = React.memo((props) => {
                                 <Tooltip title='Организации'>
                                     <IconButton
                                         style={{background: organization?'rgba(51, 143, 255, 0.29)': 'transparent'}}
-                                        aria-owns={openOrganizations ? 'menu-appbar' : undefined}
+                                        aria-owns={openOrganizations ? 'menu-appbar' : null}
                                         aria-haspopup='true'
                                         onClick={handleMenuOrganizations}
                                         color='inherit'
@@ -599,10 +597,10 @@ const MyAppBar = React.memo((props) => {
                                     open={openOrganizations}
                                     onClose={handleCloseOrganizations}
                                 >
-                                    <MenuItem style={{background: organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async ()=>{let activeOrganization = (await getActiveOrganization(city)).activeOrganization;setMiniDialog('Организация', <SetOrganizations activeOrganization={activeOrganization}/>);showMiniDialog(true);handleCloseOrganizations();}}>
+                                    <MenuItem style={{background: organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let organizations = await getOrganizations({search: '', filter: '', city});setMiniDialog('Организация', <SetOrganizations organizations={organizations}/>);showMiniDialog(true);handleCloseOrganizations();}}>
                                         По организации
                                     </MenuItem>
-                                    <MenuItem style={{background: !organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setOrganization(undefined);handleCloseOrganizations();}}>
+                                    <MenuItem style={{background: !organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setOrganization(null);handleCloseOrganizations();}}>
                                         Все
                                     </MenuItem>
                                 </Menu>
@@ -615,7 +613,7 @@ const MyAppBar = React.memo((props) => {
                                         <Tooltip title='Агенты'>
                                             <IconButton
                                                 style={{background: agent?'rgba(51, 143, 255, 0.29)': 'transparent'}}
-                                                aria-owns={openAgents ? 'menu-appbar' : undefined}
+                                                aria-owns={openAgents ? 'menu-appbar' : null}
                                                 aria-haspopup='true'
                                                 onClick={handleMenuAgents}
                                                 color='inherit'
@@ -638,10 +636,10 @@ const MyAppBar = React.memo((props) => {
                                             open={openAgents}
                                             onClose={handleCloseAgents}
                                         >
-                                            <MenuItem style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async ()=>{let agents = (await getAgents({_id: organization})).agents;let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();}}>
+                                            <MenuItem style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let agents = await getAgents(organization);let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();}}>
                                                 По агенту
                                             </MenuItem>
-                                            <MenuItem style={{background: !agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setAgent(undefined);handleCloseAgents();}}>
+                                            <MenuItem style={{background: !agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setAgent(null);handleCloseAgents();}}>
                                                 Все
                                             </MenuItem>
                                         </Menu>
@@ -654,7 +652,7 @@ const MyAppBar = React.memo((props) => {
                                         <Tooltip title='Районы'>
                                             <IconButton
                                                 style={{background: district?'rgba(51, 143, 255, 0.29)': 'transparent'}}
-                                                aria-owns={openDistricts ? 'menu-appbar' : undefined}
+                                                aria-owns={openDistricts ? 'menu-appbar' : null}
                                                 aria-haspopup='true'
                                                 onClick={handleMenuDistricts}
                                                 color='inherit'
@@ -677,10 +675,10 @@ const MyAppBar = React.memo((props) => {
                                             open={openDistricts}
                                             onClose={handleCloseDistricts}
                                         >
-                                            <MenuItem style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async ()=>{let districts = (await getDistricts({_id: organization, search: '', sort: '-createdAt'})).districts;setMiniDialog('Район', <SetDistrict setDistrict={setDistrict} districts={districts}/>);showMiniDialog(true);handleCloseDistricts();}}>
+                                            <MenuItem style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let districts = await getDistricts({_id: organization, search: '', sort: '-createdAt'});setMiniDialog('Район', <SetDistrict setDistrict={setDistrict} districts={districts}/>);showMiniDialog(true);handleCloseDistricts();}}>
                                                 По району
                                             </MenuItem>
-                                            <MenuItem style={{background: !district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setDistrict(undefined);handleCloseDistricts();}}>
+                                            <MenuItem style={{background: !district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setDistrict(null);handleCloseDistricts();}}>
                                                 Все
                                             </MenuItem>
                                         </Menu>
@@ -693,7 +691,7 @@ const MyAppBar = React.memo((props) => {
                                 <Tooltip title='Дата'>
                                     <IconButton
                                         style={{background: date?'rgba(51, 143, 255, 0.29)': 'transparent'}}
-                                        aria-owns={openDate ? 'menu-appbar' : undefined}
+                                        aria-owns={openDate ? 'menu-appbar' : null}
                                         aria-haspopup='true'
                                         onClick={handleMenuDate}
                                         color='inherit'
@@ -716,10 +714,10 @@ const MyAppBar = React.memo((props) => {
                                     open={openDate}
                                     onClose={handleCloseDate}
                                 >
-                                    <MenuItem style={{background: date!==''?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setMiniDialog('Дата', <SetDate/>);showMiniDialog(true);handleCloseDate();}}>
+                                    <MenuItem style={{background: date!==''?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setMiniDialog('Дата', <SetDate/>);showMiniDialog(true);handleCloseDate();}}>
                                         По дате
                                     </MenuItem>
-                                    <MenuItem style={{background: date===''?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setDate('');handleCloseDate();}}>
+                                    <MenuItem style={{background: date===''?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setDate('');handleCloseDate();}}>
                                         Все
                                     </MenuItem>
                                 </Menu>
@@ -727,12 +725,12 @@ const MyAppBar = React.memo((props) => {
                                 </>
                                 :null
                             }
-                            {filters&&filters.length>0?
+                            {filters&&filters.length?
                                 <>
                                 <Tooltip title='Фильтр'>
                                     <IconButton
                                         style={{background: filter?'rgba(51, 143, 255, 0.29)': 'transparent'}}
-                                        aria-owns={openFilter ? 'menu-appbar' : undefined}
+                                        aria-owns={openFilter ? 'menu-appbar' : null}
                                         aria-haspopup='true'
                                         onClick={handleMenuFilter}
                                         color='inherit'
@@ -755,17 +753,17 @@ const MyAppBar = React.memo((props) => {
                                     open={openFilter}
                                     onClose={handleCloseFilter}
                                 >
-                                    {filters.map((elem, idx)=><MenuItem key={'filter'+idx} style={{background: filter===elem.value?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={()=>{setFilter(elem.value);handleCloseFilter();}}>{elem.name}</MenuItem>)}
+                                    {filters.map((elem, idx)=><MenuItem key={'filter'+idx} style={{background: filter===elem.value?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setFilter(elem.value);handleCloseFilter();}}>{elem.name}</MenuItem>)}
                                 </Menu>
                                 &nbsp;
                                 </>
                                 :null
                             }
-                            {sorts&&sorts.length>0?
+                            {sorts&&sorts.length?
                                 <>
                                 <Tooltip title='Сортировка'>
                                     <IconButton
-                                        aria-owns={openSort ? 'menu-appbar' : undefined}
+                                        aria-owns={openSort ? 'menu-appbar' : null}
                                         aria-haspopup='true'
                                         onClick={handleMenuSort}
                                         color='inherit'
@@ -788,7 +786,7 @@ const MyAppBar = React.memo((props) => {
                                     onClose={handleCloseSort}
                                     key='sort'
                                 >
-                                    {sorts.map((elem, idx)=><MenuItem key={'sort'+idx} onClick={()=>{sort===`-${elem.field}`?setSort(elem.field):setSort(`-${elem.field}`);handleCloseSort();}}>{sort===`-${elem.field}`?<ArrowDownward />:sort===elem.field?<ArrowUpward />:<div style={{width: '24px'}}/>}{elem.name}</MenuItem>)}
+                                    {sorts.map((elem, idx)=><MenuItem key={'sort'+idx} onClick={() => {sort===`-${elem.field}`?setSort(elem.field):setSort(`-${elem.field}`);handleCloseSort();}}>{sort===`-${elem.field}`?<ArrowDownward />:sort===elem.field?<ArrowUpward />:<div style={{width: '24px'}}/>}{elem.name}</MenuItem>)}
                                 </Menu>
                                 &nbsp;
                                 </>
@@ -798,9 +796,9 @@ const MyAppBar = React.memo((props) => {
                                 searchShow?
                                     <Tooltip title='Поиск'>
                                         <IconButton
-                                            aria-owns={openSearch ? 'menu-appbar' : undefined}
+                                            aria-owns={openSearch ? 'menu-appbar' : null}
                                             aria-haspopup='true'
-                                            onClick={()=>{
+                                            onClick={() => {
                                                 setOpenSearch(true)}}
                                             color='inherit'
                                         >
@@ -848,11 +846,9 @@ const MyAppBar = React.memo((props) => {
                                 }
                                 {
                                     authenticated?
-                                        <MenuItem onClick={()=>{
+                                        <MenuItem onClick={() => {
                                             handleCloseProfile()
-                                            const action = async() => {
-                                                logout(true)
-                                            }
+                                            const action = async () => logout(true)
                                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                             showMiniDialog(true)
                                         }}>
@@ -861,7 +857,7 @@ const MyAppBar = React.memo((props) => {
                                             </div>
                                         </MenuItem>
                                         :
-                                        <MenuItem onClick={()=>{
+                                        <MenuItem onClick={() => {
                                             handleCloseProfile()
                                             setMiniDialog('Вход', <Sign isMobileApp={isMobileApp}/>)
                                             showMiniDialog(true)

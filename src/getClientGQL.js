@@ -10,47 +10,50 @@ import { createUploadLink } from 'apollo-upload-client'
 //import { urlGQL, urlGQLws } from '../redux/constants/other';
 
 export const getClientGqlSsr = (req) => {
-    const uploadLink = createUploadLink({
-        uri: urlGQLSSR,
-        fetch: fetch,
-        credentials: 'include'
-    });
-    const authLink = setContext((_, { headers }) => {
-        let jwt = getJWT(req.headers.cookie)
-        return {
-            headers: {
-                ...headers,
-                authorization: jwt ? `Bearer ${jwt}` : '',
+    if(req) {
+        const uploadLink = createUploadLink({
+            uri: urlGQLSSR,
+            fetch: fetch,
+            credentials: 'include'
+        });
+        const authLink = setContext((_, {headers}) => {
+            let jwt = getJWT(req.headers.cookie)
+            return {
+                headers: {
+                    ...headers,
+                    authorization: jwt ? `Bearer ${jwt}` : '',
+                }
             }
-        }
-    });
-    const link = ApolloLink.from([
-        authLink,
-        uploadLink
-    ]);
-    return new ApolloClient({
-        ssrMode: true,
-        link: link,
-        cache: new InMemoryCache(),
-        defaultOptions: {
-            watchQuery: {
-                fetchPolicy: 'cache-and-network',
-                errorPolicy: 'ignore',
+        });
+        const link = ApolloLink.from([
+            authLink,
+            uploadLink
+        ]);
+        return new ApolloClient({
+            ssrMode: true,
+            link: link,
+            cache: new InMemoryCache(),
+            defaultOptions: {
+                watchQuery: {
+                    fetchPolicy: 'cache-and-network',
+                    errorPolicy: 'ignore',
+                },
+                query: {
+                    fetchPolicy: 'network-only',
+                    errorPolicy: 'all',
+                },
+                mutate: {
+                    errorPolicy: 'all',
+                },
             },
-            query: {
-                fetchPolicy: 'network-only',
-                errorPolicy: 'all',
-            },
-            mutate: {
-                errorPolicy: 'all',
-            },
-        },
 
-    })
+        })
+    }
+    else return null
 }
 /*
 export const getClientGqlWs = () => {
-    if(document&&document.cookie){
+    if(document&&document.cookie) {
         let jwt = getJWT(document.cookie)
         const wsLink = new WebSocketLink({
             uri: urlGQLws,

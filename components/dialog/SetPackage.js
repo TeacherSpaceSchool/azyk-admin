@@ -11,8 +11,8 @@ import { checkInt } from '../../src/lib'
 
 const SetPackage =  React.memo(
     (props) =>{
-        const { action, classes, idx } = props;
-        const { showMiniDialog } = props.mini_dialogActions;
+        const {action, classes, idx} = props;
+        const {showMiniDialog} = props.mini_dialogActions;
         let [count, setCount] = useState('');
         let handleCount =  (event) => {
             setCount(checkInt(event.target.value))
@@ -23,11 +23,8 @@ const SetPackage =  React.memo(
                     value={count}
                     className={classes.input}
                     onChange={handleCount}
-                    inputProps={{
-                        'aria-label': 'description',
-                    }}
                     onKeyPress={event => {
-                        if (event.key === 'Enter') {
+                        if(event.key === 'Enter') {
                             action(idx, count);
                             showMiniDialog(false);
                         }
@@ -36,13 +33,13 @@ const SetPackage =  React.memo(
                 <br/>
                 <br/>
                 <div>
-                    <Button variant='contained' color='primary' onClick={async()=>{
+                    <Button variant='contained' color='primary' onClick={async () => {
                         action(idx, count);
                         showMiniDialog(false);
                     }} className={classes.button}>
                         Сохранить
                     </Button>
-                    <Button variant='contained' color='secondary' onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant='contained' color='secondary' onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </div>

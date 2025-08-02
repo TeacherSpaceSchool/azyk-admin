@@ -1,59 +1,52 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../layouts/App';
 import { connect } from 'react-redux'
 import { getBrandOrganizations} from '../src/gql/items'
 import pageListStyle from '../src/styleMUI/organization/orgaizationsList'
-import CardBrand from '../components/brand/CardBrand'
+import CardBrand from '../components/card/CardBrand'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
-import {isNotTestUser, isPWA} from '../src/lib';
+import {isNotTestUser, isPWA, unawaited} from '../src/lib';
+
+const filters = [{name: 'Все', value: ''}, {name: 'Активные', value: 'active'}, {name: 'Неактивные', value: 'deactive'}]
 
 const Organization = React.memo((props) => {
     const classes = pageListStyle();
-    const { data } = props;
-     const { search, filter, sort, isMobileApp, city, device } = props.app;
-    const { profile } = props.user;
+    const {data} = props;
+     const {search, filter, sort, isMobileApp, city, device} = props.app;
+    const {profile} = props.user;
     let [list, setList] = useState(data.brandOrganizations);
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const searchTimeOut = useRef(null);
     let [type, setType] = useState('👁');
     const initialRender = useRef(true);
-    const getList = async ()=>{
-        setList((await getBrandOrganizations({search, sort, filter: filter, city: city})).brandOrganizations);
+    const getList = async () => {
+        setList(await getBrandOrganizations({search, sort, filter, city}));
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         setPagination(100);
     }
-    useEffect(()=>{
-        (async()=>{
-            if(!initialRender.current) {
-                await getList()
-            }
-        })()
-    },[filter, sort, city])
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
+    useEffect(() => {
+        if(!initialRender.current) 
+            unawaited(getList)
+    }, [filter, sort, city])
+    useEffect(() => {
+            if(initialRender.current) 
                 initialRender.current = false;
-            } else {
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    await getList()
-                }, 500)
-                setSearchTimeOut(searchTimeOut)
-
+            else {
+                if(searchTimeOut.current)
+                    clearTimeout(searchTimeOut.current)
+                searchTimeOut.current = setTimeout(()=>unawaited(getList), 500)
             }
-        })()
-    },[search])
+    }, [search])
     //установка pwa
     let [deferredPrompt, setDeferredPrompt] = useState(device.vendor==='Apple');
-    useEffect(()=>{
+    useEffect(() => {
         window.addEventListener('beforeinstallprompt', (e) => {
             // Сохраняем событие для последующего использования
             setDeferredPrompt(e);
         });
-    },[])
+    }, [])
     const prompt = () => {
         if(device.vendor==='Apple') {
             Router.push('/howtoinstall/ios')
@@ -62,21 +55,20 @@ const Organization = React.memo((props) => {
         else {
             deferredPrompt.prompt();
             deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
+                if(choiceResult.outcome === 'accepted') {
                     setDeferredPrompt(null)
                 }
             });
         }
     }
     //pagination
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
-        }
-    }
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, list])
     return (
-        <App cityShow checkPagination={checkPagination} searchShow={true} filters={data.filterOrganization} pageName='Бренды'>
+        <App cityShow checkPagination={checkPagination} searchShow filters={profile.role==='admin'&&filters} pageName='Бренды'>
             <Head>
                 <title>Бренды</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -86,7 +78,7 @@ const Organization = React.memo((props) => {
             </div>
             {
                 isNotTestUser(profile)&&isMobileApp&&(profile.role!=='client'||deferredPrompt&&!isPWA())?
-                    <div className={classes.scrollDown} onClick={()=>{
+                    <div className={classes.scrollDown} onClick={() => {
                         if(profile.role==='client') {
                             prompt()
                         }
@@ -131,8 +123,7 @@ Organization.getInitialProps = async function(ctx) {
         }
     return {
         data: {
-            height: role==='admin'?149:80,
-            ...await getBrandOrganizations({search: '', sort: ctx.store.getState().app.sort, filter: '', city: ctx.store.getState().app.city}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
+            brandOrganizations: await getBrandOrganizations({search: '', sort: ctx.store.getState().app.sort, filter: '', city: ctx.store.getState().app.city}, getClientGqlSsr(ctx.req))
         }
     };
 };

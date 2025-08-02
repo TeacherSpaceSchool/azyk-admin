@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import App from '../layouts/App';
 import { connect } from 'react-redux'
 import pageListStyle from '../src/styleMUI/statistic/statisticsList'
@@ -12,324 +12,275 @@ import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 const list = {
-    statisticAzykStore: [
-        {
-            name: 'Статистика агента AZYK.STORE',
-            link: '/statistic/agentAzykStore',
-            role: ['admin']
-        },
-        {
-            name: 'Статистика агентов AZYK.STORE',
-            link: '/statistic/agentsAzykStore',
-            role: ['admin']
-        },
-        {
-            name: 'Статистика заказов AZYK.STORE',
-            link: '/statistic/orderAzykStore',
-            role: ['admin']
-        }
-    ],
     statistic: [
         {
-            name: 'Активность клиентов',
-            link: '/statistic/activeclient',
-            role: ['admin', 'суперорганизация']
-        },
-        {
-            name: 'Активность организаций',
-            link: '/statistic/activeorganization',
-            role: ['admin', 'суперорганизация']
-        },
-        {
-            name: 'Активность товаров',
-            link: '/statistic/activeitem',
-            role: ['admin', 'суперорганизация']
-        },
-        {
-            name: 'Графики заказов',
-            link: '/statistic/chart',
-            role: ['admin', 'суперорганизация']
-        },
-        {
             name: 'История посещений',
-            link: '/statistic/agenthistorygeo',
-            role: ['admin', 'суперорганизация']
-        },
-        {
-            name: 'Карта клиентов',
-            link: '/statistic/clientGeo',
-            role: ['admin',]
-        },
-        {
-            name: 'Карта заказов',
-            link: '/statistic/ordergeo',
+            link: '/statistic/statistic/agenthistorygeo',
             role: ['admin', 'суперорганизация']
         },
         {
             name: 'Карта посещений',
-            link: '/statistic/agentmapgeo',
+            link: '/statistic/statistic/agentmapgeo',
             role: ['admin', 'суперорганизация']
         },
         {
             name: 'Рабочие часы',
-            link: '/statistic/agentsworktime',
+            link: '/statistic/statistic/agentsworktime',
             role: ['admin', 'суперорганизация']
         },
         {
-            name: 'Статистика агентов',
-            link: '/statistic/agents',
+            name: 'Агенты',
+            link: '/statistic/statistic/agents',
             role: ['admin', 'суперорганизация']
         },
         {
-            name: 'Статистика акций',
-            link: '/statistic/adss',
+            name: 'Акции',
+            link: '/statistic/statistic/adss',
             role: ['admin', 'суперорганизация']
         },
         {
-            name: 'Статистика возвратов',
-            link: '/statistic/returneds',
+            name: 'Возвраты',
+            link: '/statistic/statistic/returneds',
             role: ['admin', 'суперорганизация']
         },
         {
-            name: 'Статистика девайсов',
-            link: '/statistic/device',
+            name: 'Девайсы',
+            link: '/statistic/statistic/device',
             role: ['admin']
         },
         {
-            name: 'Статистика заказов',
-            link: '/statistic/order',
+            name: 'Заказы',
+            link: '/statistic/statistic/orders',
             role: ['admin', 'суперорганизация']
         },
         {
-            name: 'Статистика заказов вне маршрута',
-            link: '/statistic/ordersOffRoute',
+            name: 'Заказы вне маршрута',
+            link: '/statistic/statistic/ordersOffRoute',
             role: ['admin', 'суперорганизация']
         },
         {
-            name: 'Статистика клиента',
-            link: '/statistic/client/super',
+            name: 'Клиенты',
+            link: '/statistic/statistic/clients',
             role: ['admin', 'суперорганизация']
         },
         {
-            name: 'Статистика клиентов',
-            link: '/statistic/clients',
-            role: ['admin', 'суперорганизация']
-        },
-        {
-            name: 'Статистика клиентов в городах',
-            link: '/statistic/clientcity',
+            name: 'Клиенты в городах',
+            link: '/statistic/statistic/clientcity',
             role: ['admin']
         },
         {
-            name: 'Статистика мерчендайзинга',
-            link: '/statistic/merchandising',
+            name: 'Мерчендайзинг',
+            link: '/statistic/statistic/merchandising',
             role: ['admin', 'суперорганизация', 'организация']
         },
         {
-            name: 'Статистика подбрендов',
-            link: '/statistic/subbrand',
-            role: ['admin']
+            name: 'Товары',
+            link: '/statistic/statistic/items',
+            role: ['admin', 'суперорганизация']
         },
         {
-            name: 'Статистика товаров',
-            link: '/statistic/item',
-            role: ['admin']
-        },
-        {
-            name: 'Статистика часов',
-            link: '/statistic/hours',
+            name: 'Часы',
+            link: '/statistic/statistic/hours',
             role: ['admin']
         },
     ],
     tools: [
         {
             name: 'Дни поставки',
-            link: '/statistic/deliverydate',
+            link: '/statistic/tools/deliverydate',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент']
         },
         {
-            name: 'Корзина',
-            link: '/statistic/trash',
-            role: ['admin']
-        },
-        {
             name: 'Лимит покупки товаров клиентом',
-            link: '/statistic/limititemclient',
+            link: '/statistic/tools/limititemclient',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент']
         },
         {
             name: 'Логистика',
-            link: '/statistic/logisticorder',
+            link: '/statistic/tools/logisticorder',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент']
         },
         {
             name: 'Оффлайн заказы',
-            link: '/statistic/offlineorder',
+            link: '/statistic/tools/offlineorder',
             role: ['агент', 'суперагент']
         },
         {
-            name: 'Подписчики',
-            link: '/statistic/subscriber',
-            role: ['admin']
-        },
-        {
-            name: 'Проверка заказов',
-            link:'/statistic/checkorder',
-            role: ['admin']
-        },
-        {
-            name: 'Проверка интеграции клиентов',
-            link:'/statistic/checkintegrateclient',
-            role: ['admin']
-        },
-        {
             name: 'Проверка маршрутов',
-            link:'/statistic/checkagentroute',
+            link:'/statistic/tools/checkagentroute',
             role: ['суперорганизация', 'admin']
         },
         {
-            name: 'Пуш-уведомления',
-            link: '/statistic/notificationStatistic',
-            role: ['admin']
-        },
-        {
-            name: 'Сбои',
-            link: '/statistic/error',
-            role: ['admin']
-        },
-        {
             name: 'Скидки клиентов',
-            link: '/statistic/discountclient',
+            link: '/statistic/tools/discountclient',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент']
         },
         {
             name: 'Специальная цена категория',
-            link: '/statistic/specialpricecategory',
+            link: '/statistic/tools/specialpricecategory',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент']
         },
         {
             name: 'Специальная цена клиента',
-            link: '/statistic/specialpriceclient',
+            link: '/statistic/tools/specialpriceclient',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент']
+        },
+    ],
+    administration: [
+        {
+            name: 'История',
+            link: '/statistic/administration/histories',
+            role: ['admin']
+        },
+        {
+            name: 'Подписчики',
+            link: '/statistic/administration/subscriber',
+            role: ['admin']
+        },
+        {
+            name: 'Пуш-уведомления',
+            link: '/statistic/administration/notificationStatistic',
+            role: ['admin']
+        },
+        {
+            name: 'Сбои',
+            link: '/statistic/administration/errors',
+            role: ['admin']
+        },
+        {
+            name: 'Статистика сбоев',
+            link: '/statistic/administration/errorsStatistic',
+            role: ['admin']
         },
         {
             name: 'Статистика RAM',
-            link: '/statistic/ram',
+            link: '/statistic/administration/ram',
             role: ['admin']
         },
         {
             name: 'Файловое хранилище',
-            link: '/statistic/files',
+            link: '/statistic/administration/files',
             role: ['admin']
         },
         {
             name: 'Хранилище коллекций',
-            link: '/statistic/statisticstoragesize',
+            link: '/statistic/administration/statisticstoragesize',
             role: ['admin']
         },
     ],
     integrate: [
         {
             name: 'Акционная интеграции 1С',
-            link: '/statistic/outxmlads',
+            link: '/organizations?path=statistic/integrate/outxmlads&title=Акционная интеграция 1С',
             role: ['admin']
         },
         {
             name: 'Выгрузка интеграции 1С',
-            link: '/statistic/integrateouts',
-            role: ['admin']
-        },
-        {
-            name: 'Загрузка клиентов 1C',
-            link: '/statistic/uploadingclients',
-            role: ['admin']
-        },
-        {
-            name: 'Загрузка GUID клиентов 1C',
-            link: '/statistic/unloadingintegrate1C',
-            role: ['admin']
-        },
-        {
-            name: 'Загрузка маршрутов 1C',
-            link: '/statistic/uploadingagentroute',
-            role: ['admin']
-        },
-        {
-            name: 'Загрузка планов клиентов 1C',
-            link: '/statistic/uploadingplanclients',
-            role: ['admin', 'суперорганизация', 'организация', 'менеджер']
-        },
-        {
-            name: 'Загрузка районов 1C',
-            link: '/statistic/uploadingdistricts',
-            role: ['admin']
-        },
-        {
-            name: 'Загрузка товаров 1С',
-            link: '/statistic/uploadingitems',
+            link: '/organizations?path=statistic/integrate/integrateout&title=Выгрузка интеграции 1С',
             role: ['admin']
         },
         {
             name: 'Интеграция 1С',
-            link: '/statistic/integrates',
+            link: '/organizations?path=statistic/integrate/integrate&title=Интеграция 1С',
             role: ['admin']
         },
         {
             name: 'Интеграция клиентов 1С',
-            link: '/statistic/clientssync',
+            link: '/organizations?path=statistic/integrate/clientssync&title=Интеграция клиентов 1С',
+            role: ['admin']
+        },
+        {
+            name: 'Логи 1С',
+            link: '/organizations?path=statistic/integrate/integrationLogs&title=Логи 1С',
             role: ['admin']
         },
         {
             name: 'Несинхронизованные заказы 1С',
-            link: `/statistic/unsyncorder`,
+            link: `/statistic/integrate/unsyncorder`,
             role: ['admin']
         },
         {
-            name: 'Принятая интеграции 1С',
-            link: `/statistic/receivedatas`,
-            role: ['admin', 'суперорганизация', 'организация', 'менеджер']
+            name: 'Проверка интеграции клиентов',
+            link:'/statistic/integrate/checkintegrateclient',
+            role: ['admin']
         },
     ],
     load: [
         {
             name: 'Выгрузка акционных заказов',
-            link: '/statistic/unloadingadsorders',
+            link: '/statistic/load/unloadingadsorders',
             role: ['admin', 'суперорганизация', 'организация']
         },
         {
             name: 'Выгрузка заказов',
-            link: '/statistic/unloadingorders',
+            link: '/statistic/load/unloadingorders',
             role: ['admin', 'суперорганизация']
         },
         {
             name: 'Выгрузка клиентов',
-            link: '/statistic/unloadingclients',
+            link: '/statistic/load/unloadingclients',
             role: ['admin']
         },
         {
             name: 'Выгрузка маршрутов',
-            link: '/statistic/unloadingagentroutes',
+            link: '/statistic/load/unloadingagentroutes',
+            role: ['admin']
+        },
+        {
+            name: 'Выгрузка накладных',
+            link: '/statistic/load/unloadinginvoices',
             role: ['admin']
         },
         {
             name: 'Выгрузка оборудования',
-            link: '/statistic/unloadingequipments',
+            link: '/statistic/load/unloadingequipments',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер']
         },
         {
             name: 'Выгрузка планов клиентов',
-            link: '/statistic/unloadplanclients',
+            link: '/statistic/load/unloadplanclients',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер']
         },
         {
             name: 'Выгрузка районов',
-            link: '/statistic/unloadingdistricts',
+            link: '/statistic/load/unloadingdistricts',
             role: ['admin']
         },
         {
             name: 'Выгрузка сотрудников',
-            link: '/statistic/unloadingemployments',
+            link: '/statistic/load/unloadingemployments',
+            role: ['admin']
+        },
+        {
+            name: 'Загрузка клиентов',
+            link: '/statistic/load/uploadingclients',
+            role: ['admin']
+        },
+        {
+            name: 'Загрузка GUID клиентов',
+            link: '/statistic/load/unloadingintegrate1C',
+            role: ['admin']
+        },
+        {
+            name: 'Загрузка маршрутов',
+            link: '/statistic/load/uploadingagentroute',
+            role: ['admin']
+        },
+        {
+            name: 'Загрузка планов клиентов',
+            link: '/statistic/load/uploadingplanclients',
+            role: ['admin', 'суперорганизация', 'организация', 'менеджер']
+        },
+        {
+            name: 'Загрузка районов',
+            link: '/statistic/load/uploadingdistricts',
+            role: ['admin']
+        },
+        {
+            name: 'Загрузка товаров',
+            link: '/statistic/load/uploadingitems',
             role: ['admin']
         },
     ]
@@ -337,59 +288,53 @@ const list = {
 
 const Statistic = React.memo((props) => {
     const classes = pageListStyle();
-    const { isMobileApp, search } = props.app;
-    const { profile } = props.user;
-    let [showList, setShowList] = useState(props.showList);
+    const {isMobileApp, search} = props.app;
+    const {profile} = props.user;
+    let [showList, setShowList] = useState({});
     const [expanded, setExpanded] = React.useState(false);
-    const initialRender = useRef(true);
     const handleChange = (panel) => (event, isExpanded) => {
         setExpanded(isExpanded ? panel : false);
     };
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
-                initialRender.current = false;
-            } else {
-                showList = {
-                    statistic: [],
-                    tools: [],
-                    integrate: [],
-                    load: [],
-                    statisticAzykStore: []
-                }
-                for (let i = 0; i < list.statisticAzykStore.length; i++) {
-                    if (list.statisticAzykStore[i].name.toLowerCase().includes(search.toLowerCase()) && list.statisticAzykStore[i].role.includes(profile.role))
-                        showList.statisticAzykStore.push(list.statisticAzykStore[i])
-                }
-                for (let i = 0; i < list.statistic.length; i++) {
-                    if (list.statistic[i].name.toLowerCase().includes(search.toLowerCase()) && list.statistic[i].role.includes(profile.role))
-                        showList.statistic.push(list.statistic[i])
-                }
-                for (let i = 0; i < list.tools.length; i++) {
-                    if (list.tools[i].name.toLowerCase().includes(search.toLowerCase()) && list.tools[i].role.includes(profile.role))
-                        showList.tools.push(list.tools[i])
-                }
-                for (let i = 0; i < list.integrate.length; i++) {
-                    if (list.integrate[i].name.toLowerCase().includes(search.toLowerCase()) && list.integrate[i].role.includes(profile.role))
-                        showList.integrate.push(list.integrate[i])
-                }
-                for (let i = 0; i < list.load.length; i++) {
-                    if (list.load[i].name.toLowerCase().includes(search.toLowerCase()) && list.load[i].role.includes(profile.role))
-                        showList.load.push(list.load[i])
-                }
-                setShowList({...showList})
-            }
-        })()
-    },[search])
+    useEffect(() => {
+        showList = {
+            statistic: [],
+            tools: [],
+            administration: [],
+            integrate: [],
+            load: [],
+        }
+        for (let i = 0; i < list.statistic.length; i++) {
+            if(list.statistic[i].name.toLowerCase().includes(search.toLowerCase()) && list.statistic[i].role.includes(profile.role))
+                showList.statistic.push(list.statistic[i])
+        }
+        for (let i = 0; i < list.tools.length; i++) {
+            if(list.tools[i].name.toLowerCase().includes(search.toLowerCase()) && list.tools[i].role.includes(profile.role))
+                showList.tools.push(list.tools[i])
+        }
+        for (let i = 0; i < list.administration.length; i++) {
+            if(list.administration[i].name.toLowerCase().includes(search.toLowerCase()) && list.administration[i].role.includes(profile.role))
+                showList.administration.push(list.administration[i])
+        }
+        for (let i = 0; i < list.integrate.length; i++) {
+            if(list.integrate[i].name.toLowerCase().includes(search.toLowerCase()) && list.integrate[i].role.includes(profile.role))
+                showList.integrate.push(list.integrate[i])
+        }
+        for (let i = 0; i < list.load.length; i++) {
+            if(list.load[i].name.toLowerCase().includes(search.toLowerCase()) && list.load[i].role.includes(profile.role))
+                showList.load.push(list.load[i])
+        }
+        setShowList({...showList})
+    }, [search])
+
     return (
-        <App searchShow={true} pageName='Инструменты'>
+        <App searchShow pageName='Инструменты'>
             <Head>
                 <title>Инструменты</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className={classes.page}>
                 {
-                    showList.load&&showList.load.length>0?
+                    showList.load&&showList.load.length?
                         <ExpansionPanel expanded={expanded === 'load'} onChange={handleChange('load')} style={{width: 'calc(100% - 20px)', margin: 10, background: '#F5F5F5'}}>
                             <ExpansionPanelSummary
                                 expandIcon={<ExpandMoreIcon />}
@@ -402,15 +347,17 @@ const Statistic = React.memo((props) => {
                             <ExpansionPanelDetails className={classes.page}>
                                 {showList.load.map((element, idx)=>
                                     <Link key={`unload${idx}`} href={element.link}>
-                                        <Card className={isMobileApp?classes.cardM:classes.cardD}>
-                                            <CardActionArea>
-                                                <div className={classes.line}>
-                                                    <h3 className={classes.input}>
-                                                        {element.name}
-                                                    </h3>
-                                                </div>
-                                            </CardActionArea>
-                                        </Card>
+                                        <a>
+                                            <Card className={isMobileApp?classes.cardM:classes.cardD}>
+                                                <CardActionArea>
+                                                    <div className={classes.line}>
+                                                        <h3 className={classes.input}>
+                                                            {element.name}
+                                                        </h3>
+                                                    </div>
+                                                </CardActionArea>
+                                            </Card>
+                                        </a>
                                     </Link>
                                 )}
                             </ExpansionPanelDetails>
@@ -419,7 +366,7 @@ const Statistic = React.memo((props) => {
                         null
                 }
                 {
-                    showList.tools&&showList.tools.length>0?
+                    showList.tools&&showList.tools.length?
                         <ExpansionPanel expanded={expanded === 'tools'} onChange={handleChange('tools')} style={{width: 'calc(100% - 20px)', margin: 10, background: '#F5F5F5'}}>
                             <ExpansionPanelSummary
                                 expandIcon={<ExpandMoreIcon />}
@@ -432,15 +379,17 @@ const Statistic = React.memo((props) => {
                             <ExpansionPanelDetails className={classes.page} >
                                 {showList.tools.map((element, idx)=>
                                     <Link key={`tool${idx}`} href={element.link}>
-                                        <Card className={isMobileApp?classes.cardM:classes.cardD}>
-                                            <CardActionArea>
-                                                <div className={classes.line}>
-                                                    <h3 className={classes.input}>
-                                                        {element.name}
-                                                    </h3>
-                                                </div>
-                                            </CardActionArea>
-                                        </Card>
+                                        <a>
+                                            <Card className={isMobileApp?classes.cardM:classes.cardD}>
+                                                <CardActionArea>
+                                                    <div className={classes.line}>
+                                                        <h3 className={classes.input}>
+                                                            {element.name}
+                                                        </h3>
+                                                    </div>
+                                                </CardActionArea>
+                                            </Card>
+                                        </a>
                                     </Link>
                                 )}
                             </ExpansionPanelDetails>
@@ -449,7 +398,39 @@ const Statistic = React.memo((props) => {
                         null
                 }
                 {
-                    showList.integrate&& showList.integrate.length>0?
+                    showList.administration&&showList.administration.length?
+                        <ExpansionPanel expanded={expanded === 'administration'} onChange={handleChange('administration')} style={{width: 'calc(100% - 20px)', margin: 10, background: '#F5F5F5'}}>
+                            <ExpansionPanelSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls='panel1a-content'
+                                id='panel1a-header'
+                                style={{background: '#fff'}}
+                            >
+                                <h3>Администрирование</h3>
+                            </ExpansionPanelSummary>
+                            <ExpansionPanelDetails className={classes.page} >
+                                {showList.administration.map((element, idx)=>
+                                    <Link key={`tool${idx}`} href={element.link}>
+                                        <a>
+                                            <Card className={isMobileApp?classes.cardM:classes.cardD}>
+                                                <CardActionArea>
+                                                    <div className={classes.line}>
+                                                        <h3 className={classes.input}>
+                                                            {element.name}
+                                                        </h3>
+                                                    </div>
+                                                </CardActionArea>
+                                            </Card>
+                                        </a>
+                                    </Link>
+                                )}
+                            </ExpansionPanelDetails>
+                        </ExpansionPanel>
+                        :
+                        null
+                }
+                {
+                    showList.integrate&& showList.integrate.length?
                         <ExpansionPanel expanded={expanded === 'integrate'} onChange={handleChange('integrate')} style={{width: 'calc(100% - 20px)', margin: 10, background: '#F5F5F5'}}>
                             <ExpansionPanelSummary
                                 expandIcon={<ExpandMoreIcon />}
@@ -462,15 +443,17 @@ const Statistic = React.memo((props) => {
                             <ExpansionPanelDetails className={classes.page} >
                                 {showList.integrate.map((element, idx)=>
                                     <Link key={`integrate${idx}`} href={element.link}>
-                                        <Card className={isMobileApp?classes.cardM:classes.cardD}>
-                                            <CardActionArea>
-                                                <div className={classes.line}>
-                                                    <h3 className={classes.input}>
-                                                        {element.name}
-                                                    </h3>
-                                                </div>
-                                            </CardActionArea>
-                                        </Card>
+                                        <a>
+                                            <Card className={isMobileApp?classes.cardM:classes.cardD}>
+                                                <CardActionArea>
+                                                    <div className={classes.line}>
+                                                        <h3 className={classes.input}>
+                                                            {element.name}
+                                                        </h3>
+                                                    </div>
+                                                </CardActionArea>
+                                            </Card>
+                                        </a>
                                     </Link>
                                 )}
                             </ExpansionPanelDetails>
@@ -479,7 +462,7 @@ const Statistic = React.memo((props) => {
                         null
                 }
                 {
-                    showList.statistic&&showList.statistic.length>0?
+                    showList.statistic&&showList.statistic.length?
                         <ExpansionPanel expanded={expanded === 'statistic'} onChange={handleChange('statistic')} style={{width: 'calc(100% - 20px)', margin: 10, background: '#F5F5F5'}}>
                             <ExpansionPanelSummary
                                 expandIcon={<ExpandMoreIcon />}
@@ -492,45 +475,17 @@ const Statistic = React.memo((props) => {
                             <ExpansionPanelDetails className={classes.page} >
                                 {showList.statistic.map((element, idx)=>
                                     <Link key={`stat${idx}`} href={element.link}>
-                                        <Card className={isMobileApp?classes.cardM:classes.cardD}>
-                                            <CardActionArea>
-                                                <div className={classes.line}>
-                                                    <h3 className={classes.input}>
-                                                        {element.name}
-                                                    </h3>
-                                                </div>
-                                            </CardActionArea>
-                                        </Card>
-                                    </Link>
-                                )}
-                            </ExpansionPanelDetails>
-                        </ExpansionPanel>
-                        :
-                        null
-                }
-                {
-                    showList.statisticAzykStore&&showList.statisticAzykStore.length>0?
-                        <ExpansionPanel expanded={expanded === 'statisticAzykStore'} onChange={handleChange('statisticAzykStore')} style={{width: 'calc(100% - 20px)', margin: 10, background: '#F5F5F5'}}>
-                            <ExpansionPanelSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls='panel1a-content'
-                                id='panel1a-header'
-                                style={{background: '#fff'}}
-                            >
-                                <h3>Статистика AZYK.STORE</h3>
-                            </ExpansionPanelSummary>
-                            <ExpansionPanelDetails className={classes.page} >
-                                {showList.statisticAzykStore.map((element, idx)=>
-                                    <Link key={`statAzykStore${idx}`} href={element.link}>
-                                        <Card className={isMobileApp?classes.cardM:classes.cardD}>
-                                            <CardActionArea>
-                                                <div className={classes.line}>
-                                                    <h3 className={classes.input}>
-                                                        {element.name}
-                                                    </h3>
-                                                </div>
-                                            </CardActionArea>
-                                        </Card>
+                                        <a>
+                                            <Card className={isMobileApp?classes.cardM:classes.cardD}>
+                                                <CardActionArea>
+                                                    <div className={classes.line}>
+                                                        <h3 className={classes.input}>
+                                                            {element.name}
+                                                        </h3>
+                                                    </div>
+                                                </CardActionArea>
+                                            </Card>
+                                        </a>
                                     </Link>
                                 )}
                             </ExpansionPanelDetails>
@@ -553,36 +508,7 @@ Statistic.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
-    let showList = {
-        statistic: [],
-        tools: [],
-        integrate: [],
-        load: [],
-        statisticAzykStore: []
-    }
-    for(let i=0; i<list.statisticAzykStore.length; i++){
-        if(list.statisticAzykStore[i].role.includes(ctx.store.getState().user.profile.role))
-            showList.statisticAzykStore.push(list.statisticAzykStore[i])
-    }
-    for(let i=0; i<list.statistic.length; i++){
-        if(list.statistic[i].role.includes(ctx.store.getState().user.profile.role))
-            showList.statistic.push(list.statistic[i])
-    }
-    for(let i=0; i<list.tools.length; i++){
-        if(list.tools[i].role.includes(ctx.store.getState().user.profile.role))
-            showList.tools.push(list.tools[i])
-    }
-    for(let i=0; i<list.integrate.length; i++){
-        if(list.integrate[i].role.includes(ctx.store.getState().user.profile.role))
-            showList.integrate.push(list.integrate[i])
-    }
-    for(let i=0; i<list.load.length; i++){
-        if(list.load[i].role.includes(ctx.store.getState().user.profile.role))
-            showList.load.push(list.load[i])
-    }
-    return {
-        showList: showList
-    }
+    return {}
 };
 
 function mapStateToProps (state) {

@@ -308,36 +308,5 @@ export default makeStyles({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
-    },
-    showConsD: {
-        padding: 3,
-        height: 28,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: '0.75rem',
-        fontWeight: 'bold',
-        fontFamily: 'Roboto',
-        cursor: 'pointer',
-        userSelect: 'none',
-        background: '#e6e6e6',
-        borderRadius: 5
-    },
-    showConsM: {
-        padding: 3,
-        height: 27,
-        marginLeft: 10,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: '0.75rem',
-        fontWeight: 'bold',
-        fontFamily: 'Roboto',
-        cursor: 'pointer',
-        userSelect: 'none',
-        background: '#e6e6e6',
-        borderRadius: 5
-    },
-
-
+    }
 })

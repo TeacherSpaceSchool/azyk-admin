@@ -9,8 +9,8 @@ import dialogContentStyle from '../../src/styleMUI/dialogContent'
 
 const ItemList =  React.memo(
     (props) =>{
-        const { classes, items } = props;
-        const { showMiniDialog } = props.mini_dialogActions;
+        const {classes, items} = props;
+        const {showMiniDialog} = props.mini_dialogActions;
         let organization, number;
         return (
             <div className={classes.column}>
@@ -22,7 +22,7 @@ const ItemList =  React.memo(
                                         !idx||item[2]!==organization?
                                             <>
                                             {
-                                                (()=>{organization = item[2]; number = 0})()
+                                                (() => {organization = item[2]; number = 0})()
                                             }
                                             <div style={{fontWeight: 'bold', marginBottom: 10, marginTop: !idx?0:10}}>{organization}</div>
                                             </>
@@ -42,7 +42,7 @@ const ItemList =  React.memo(
                     })
                 }
                 <center>
-                    <Button variant="contained" color="secondary" onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant="contained" color="secondary" onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </center>

@@ -1,33 +1,31 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 
-export const deleteBasketAll = async(client)=>{
+export const addBasket = async (variables) => {
     try{
-        client = client? client : new SingletonApolloClient().getClient()
-        await client.mutate({
+        const client = new SingletonApolloClient().getClient()
+        const res = await client.mutate({
+            variables,
             mutation : gql`
-                    mutation{
-                        deleteBasketAll{
-                             data
-                        }
+                    mutation ($item: ID!, $count: Int!) {
+                        addBasket(item: $item, count: $count)
                     }`})
-    } catch(err){
+        return res.data.addBasket
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const addBasket = async(element)=>{
+export const deleteBasketAll = async (client) => {
     try{
-        const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client.mutate({
             mutation : gql`
-                    mutation ($item: ID!, $count: Int!, $consignment: Int) {
-                        addBasket(item: $item, count: $count, consignment: $consignment) {
-                             data
-                        }
+                    mutation{
+                        deleteBasketAll
                     }`})
-    } catch(err){
+        return res.data.deleteBasketAll
+    } catch(err) {
         console.error(err)
     }
 }

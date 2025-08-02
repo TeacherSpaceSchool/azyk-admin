@@ -1,907 +1,513 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 
-export const getStatisticGeoOrder = async({organization, dateStart, city}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization, dateStart, city},
-                query: gql`
-                    query ($organization: ID!, $dateStart: Date, $city: String) {
-                        statisticGeoOrder(organization: $organization, dateStart: $dateStart, city: $city) 
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
+const Statistic = `
+    columns
+    row {_id data}
+`
 
-export const getAgentMapGeos = async({agent, date}, client)=>{
+export const getAgentMapGeos = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {agent, date},
+                variables,
                 query: gql`
                     query ($agent: ID!, $date: String) {
                         agentMapGeos(agent: $agent, date: $date) 
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.agentMapGeos
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getStatisticMerchandising = async({organization, type, dateStart, dateType, agent}, client)=>{
+export const getStatisticMerchandising = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization, dateStart, dateType, type, agent},
-                query: gql`
-                    query ($organization: ID, $dateStart: Date, $type: String, $dateType: String, $agent: ID) {
-                        statisticMerchandising(organization: $organization, type: $type, dateStart: $dateStart, dateType: $dateType, agent: $agent)  {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticDevice = async(filter, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {filter,},
-                query: gql`
-                    query ($filter: String!) {
-                        statisticDevice(filter: $filter) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticHours = async({organization, dateStart, dateType, city, type}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization, dateStart, dateType, city, type},
-                query: gql`
-                    query ($organization: ID!, $dateStart: Date, $dateType: String, $city: String, $type: String!) {
-                        statisticHours(organization: $organization, dateStart: $dateStart, dateType: $dateType, city: $city, type: $type) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticOrder = async({company, dateStart, dateType, online, city}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {company, dateStart, dateType, online, city},
-                query: gql`
-                    query ($company: String, $dateStart: Date, $dateType: String, $online: Boolean, $city: String) {
-                        statisticOrder(company: $company, dateStart: $dateStart, dateType: $dateType, online: $online, city: $city) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticOrdersOffRoute = async(variables, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: variables,
-                query: gql`
-                    query ($type: String, $company: String, $dateStart: Date, $dateType: String, $online: Boolean, $city: String, $district: ID) {
-                        statisticOrdersOffRoute(type: $type, company: $company, dateStart: $dateStart, dateType: $dateType, online: $online, city: $city, district: $district) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticSubBrand = async({company, dateStart, dateType, online, city}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {company, dateStart, dateType, online, city},
-                query: gql`
-                    query ($company: String, $dateStart: Date, $dateType: String, $online: Boolean, $city: String) {
-                        statisticSubBrand(company: $company, dateStart: $dateStart, dateType: $dateType, online: $online, city: $city) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticAzykStoreOrder = async({company, dateStart, dateType, filter, city}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {company, dateStart, dateType, filter, city},
-                query: gql`
-                    query ($company: ID, $dateStart: Date, $dateType: String, $filter: String, $city: String) {
-                        statisticAzykStoreOrder(company: $company, dateStart: $dateStart, dateType: $dateType, filter: $filter, city: $city) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticUnsyncOrder = async({dateStart, city}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {dateStart, city},
-                query: gql`
-                    query ($dateStart: Date, $city: String) {
-                        statisticUnsyncOrder(dateStart: $dateStart, city: $city) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticAzykStoreAgent = async({agent, dateStart, dateType}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {agent: agent, dateStart: dateStart, dateType: dateType},
-                query: gql`
-                    query ($agent: ID!, $dateStart: Date, $dateType: String) {
-                        statisticAzykStoreAgent(agent: $agent, dateStart: $dateStart, dateType: $dateType) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticClient = async(arg, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: arg,
-                query: gql`
-                    query ($client: ID!, $dateStart: Date, $dateType: String, $online: Boolean) {
-                        statisticClient(client: $client, dateStart: $dateStart, dateType: $dateType, online: $online) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticReturned = async({company, dateStart, dateType, city}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {company, dateStart, dateType, city},
-                query: gql`
-                    query ($company: String, $dateStart: Date, $dateType: String, $city: String) {
-                        statisticReturned(company: $company, dateStart: $dateStart, dateType: $dateType, city: $city) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticClients = async({company, dateStart, dateType, district, filter, city}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {company, dateStart, dateType, district, filter, city},
-                query: gql`
-                    query ($company: String, $dateStart: Date, $district: ID, $dateType: String, $filter: String, $city: String) {
-                        statisticClients(company: $company, district: $district, dateStart: $dateStart, dateType: $dateType, filter: $filter, city: $city) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticClientActivity = async({online, organization, city}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {online, organization, city},
-                query: gql`
-                    query ($online: Boolean, $organization: ID, $city: String) {
-                        statisticClientActivity (online: $online, city: $city, organization: $organization) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticItemActivity = async({online, organization, city}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {online: online, organization: organization, city},
-                query: gql`
-                    query ($online: Boolean, $organization: ID, $city: String) {
-                        statisticItemActivity (online: $online, organization: $organization, city: $city) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticOrganizationActivity = async({online, organization, city}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {online: online, organization: organization, city},
-                query: gql`
-                    query ($online: Boolean, $organization: ID, $city: String) {
-                        statisticOrganizationActivity (online: $online, organization: $organization, city: $city) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getUnloadingOrders = async({organization, dateStart, filter}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization: organization, dateStart: dateStart, filter: filter},
-                query: gql`
-                    query ($organization: ID!, $dateStart: Date!, $filter: String!) {
-                        unloadingOrders(organization: $organization, dateStart: $dateStart, filter: $filter) {
-                            data
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getUnloadingInvoices = async({organization, dateStart, forwarder, all}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization: organization, dateStart: dateStart, forwarder: forwarder, all: all},
-                query: gql`
-                    query ($organization: ID!, $dateStart: Date!, $forwarder: ID, $all: Boolean) {
-                        unloadingInvoices(organization: $organization, dateStart: $dateStart, forwarder: $forwarder, all: $all) {
-                            data
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticAgentsWorkTime = async({organization, date}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization: organization, date: date},
-                query: gql`
-                    query ($organization: String, $date: Date) {
-                        statisticAgentsWorkTime(organization: $organization, date: $date) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getUnloadingAdsOrders = async({organization, dateStart}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization: organization, dateStart: dateStart},
-                query: gql`
-                    query ($organization: ID!, $dateStart: Date!) {
-                        unloadingAdsOrders(organization: $organization, dateStart: $dateStart) {
-                            data
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getUnloadingEmployments = async({organization}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization: organization},
-                query: gql`
-                    query ($organization: ID!) {
-                        unloadingEmployments(organization: $organization) {
-                            data
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getUnloadingDistricts = async({organization}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization: organization},
-                query: gql`
-                    query ($organization: ID!) {
-                        unloadingDistricts(organization: $organization) {
-                            data
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getUnloadingAgentRoutes = async({organization}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization: organization},
-                query: gql`
-                    query ($organization: ID!) {
-                        unloadingAgentRoutes(organization: $organization) {
-                            data
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticOrderChart = async({company, dateStart, dateType, type, online, city}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {city, company: company, dateStart: dateStart, dateType: dateType, type: type, online: online},
-                query: gql`
-                    query ($company: String, $dateStart: Date, $dateType: String, $type: String, $online: Boolean, $city: String) {
-                        statisticOrderChart(company: $company, dateStart: $dateStart, dateType: $dateType, type: $type, online: $online, city: $city) {
-                            all
-                            chartStatistic
-                                {
-                                    label
-                                    data
-                                }
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getCheckOrder = async(data, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: data,
-                query: gql`
-                    query ($company: String, $today: Date!, $city: String) {
-                        checkOrder(company: $company, today: $today, city: $city) {
-                            columns
-                            row 
-                                {data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getCheckAgentRoute = async(data, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: data,
-                query: gql`
-                    query ($agentRoute: ID!) {
-                        checkAgentRoute(agentRoute: $agentRoute) {
-                            columns
-                            row 
-                                {data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const checkIntegrateClient = async(data, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: data,
-                query: gql`
-                    query ($organization: ID, $type: String, $document: Upload) {
-                        checkIntegrateClient(organization: $organization, type: $type, document: $document) {
-                            columns
-                            row 
-                                {data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getUnloadingClients = async({organization}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization: organization},
-                query: gql`
-                    query ($organization: ID!) {
-                        unloadingClients(organization: $organization) {
-                            data
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticItem = async(variables, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
                 variables,
                 query: gql`
-                    query ($company: String, $dateStart: Date, $dateEnd: Date, $online: Boolean, $city: String) {
-                        statisticItem(company: $company, dateStart: $dateStart, dateEnd: $dateEnd, online: $online, city: $city) {
-                            columns
-                            row 
-                                {_id data}
-                        }
+                    query ($organization: ID, $dateStart: Date, $type: String, $dateEnd: Date, $agent: ID) {
+                        statisticMerchandising(organization: $organization, type: $type, dateStart: $dateStart, dateEnd: $dateEnd, agent: $agent)  {${Statistic}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.statisticMerchandising
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getStatisticAdss = async({company, dateStart, dateType, online, city}, client)=>{
+export const getStatisticDevice = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {company, dateStart, dateType, online, city},
+                variables,
                 query: gql`
-                    query ($company: String, $dateStart: Date, $dateType: String, $online: Boolean, $city: String) {
-                        statisticAdss(company: $company, dateStart: $dateStart, dateType: $dateType, online: $online, city: $city) {
-                            columns
-                            row 
-                                {_id data}
-                        }
+                    query ($filter: String!) {
+                        statisticDevice(filter: $filter) {${Statistic}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.statisticDevice
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getStatisticAgents = async({company, dateStart, dateType, city}, client)=>{
+export const getStatisticHours = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {company, dateStart, dateType, city},
+                variables,
                 query: gql`
-                    query ($company: String, $dateStart: Date, $dateType: String, $city: String) {
-                        statisticAgents(company: $company, dateStart: $dateStart, dateType: $dateType, city: $city) {
-                            columns
-                            row 
-                                {_id data}
-                        }
+                    query ($organization: ID!, $dateStart: Date, $dateEnd: Date, $city: String, $type: String!) {
+                        statisticHours(organization: $organization, dateStart: $dateStart, dateEnd: $dateEnd, city: $city, type: $type) {${Statistic}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.statisticHours
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getStatisticStorageSize = async(client)=>{
+export const getStatisticOrders = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID, $dateStart: Date, $dateEnd: Date, $online: Boolean, $city: String) {
+                        statisticOrders(organization: $organization, dateStart: $dateStart, dateEnd: $dateEnd, online: $online, city: $city) {${Statistic}}
+                    }`,
+            })
+        return res.data.statisticOrders
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getStatisticOrdersOffRoute = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($type: String, $organization: ID, $dateStart: Date, $dateEnd: Date, $online: Boolean, $city: String, $district: ID) {
+                        statisticOrdersOffRoute(type: $type, organization: $organization, dateStart: $dateStart, dateEnd: $dateEnd, online: $online, city: $city, district: $district) {${Statistic}}
+                    }`,
+            })
+        return res.data.statisticOrdersOffRoute
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getStatisticUnsyncOrder = async (client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables: {},
+                query: gql`
+                    query {
+                        statisticUnsyncOrder {${Statistic}}
+                    }`,
+            })
+        return res.data.statisticUnsyncOrder
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getStatisticReturned = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID, $dateStart: Date, $dateEnd: Date, $city: String) {
+                        statisticReturned(organization: $organization, dateStart: $dateStart, dateEnd: $dateEnd, city: $city) {${Statistic}}
+                    }`,
+            })
+        return res.data.statisticReturned
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getStatisticClients = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID, $dateStart: Date, $district: ID, $dateEnd: Date, $filter: String, $city: String) {
+                        statisticClients(organization: $organization, district: $district, dateStart: $dateStart, dateEnd: $dateEnd, filter: $filter, city: $city) {${Statistic}}
+                    }`,
+            })
+        return res.data.statisticClients
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getUnloadingOrders = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID!, $dateStart: Date!, $filter: String!) {
+                        unloadingOrders(organization: $organization, dateStart: $dateStart, filter: $filter)
+                    }`,
+            })
+        return res.data.unloadingOrders
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getUnloadingInvoices = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID!, $dateStart: Date!, $forwarder: ID, $all: Boolean) {
+                        unloadingInvoices(organization: $organization, dateStart: $dateStart, forwarder: $forwarder, all: $all)
+                    }`,
+            })
+        return res.data.unloadingInvoices
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getStatisticAgentsWorkTime = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID, $dateStart: Date) {
+                        statisticAgentsWorkTime(organization: $organization, dateStart: $dateStart) {${Statistic}}
+                    }`,
+            })
+        return res.data.statisticAgentsWorkTime
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getUnloadingAdsOrders = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID!, $dateStart: Date!) {
+                        unloadingAdsOrders(organization: $organization, dateStart: $dateStart)
+                    }`,
+            })
+        return res.data.unloadingAdsOrders
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getUnloadingEmployments = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID!) {
+                        unloadingEmployments(organization: $organization)
+                    }`,
+            })
+        return res.data.unloadingEmployments
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getUnloadingDistricts = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID!) {
+                        unloadingDistricts(organization: $organization)
+                    }`,
+            })
+        return res.data.unloadingDistricts
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getUnloadingAgentRoutes = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID!) {
+                        unloadingAgentRoutes(organization: $organization)
+                    }`,
+            })
+        return res.data.unloadingAgentRoutes
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getCheckAgentRoute = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($agentRoute: ID!) {
+                        checkAgentRoute(agentRoute: $agentRoute) {${Statistic}}
+                    }`,
+            })
+        return res.data.checkAgentRoute
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const checkIntegrateClient = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID, $type: String, $document: Upload) {
+                        checkIntegrateClient(organization: $organization, type: $type, document: $document) {${Statistic}}
+                    }`,
+            })
+        return res.data.checkIntegrateClient
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getUnloadingClients = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID!) {
+                        unloadingClients(organization: $organization)
+                    }`,
+            })
+        return res.data.unloadingClients
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getStatisticItems = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($dayStart: Int, $organization: ID, $dateStart: Date, $dateEnd: Date, $online: Boolean, $city: String) {
+                        statisticItems(dayStart: $dayStart, organization: $organization, dateStart: $dateStart, dateEnd: $dateEnd, online: $online, city: $city) {${Statistic}}
+                    }`,
+            })
+        return res.data.statisticItems
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getStatisticAdss = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID, $dateStart: Date, $dateEnd: Date, $online: Boolean, $city: String) {
+                        statisticAdss(organization: $organization, dateStart: $dateStart, dateEnd: $dateEnd, online: $online, city: $city) {${Statistic}}
+                    }`,
+            })
+        return res.data.statisticAdss
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getStatisticAgents = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID, $dateStart: Date, $dateEnd: Date, $city: String) {
+                        statisticAgents(organization: $organization, dateStart: $dateStart, dateEnd: $dateEnd, city: $city) {${Statistic}}
+                    }`,
+            })
+        return res.data.statisticAgents
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const getStatisticStorageSize = async (client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
             .query({
                 query: gql`
                     query {
-                        statisticStorageSize {
-                            columns
-                            row 
-                                {_id data}
-                        }
+                        statisticStorageSize {${Statistic}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.statisticStorageSize
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getStatisticClientCity = async(client)=>{
+export const getStatisticClientCity = async (client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
                 query: gql`
                     query {
-                        statisticClientCity {
-                            columns
-                            row 
-                                {_id data}
-                        }
+                        statisticClientCity {${Statistic}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.statisticClientCity
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getStatisticClientGeo = async({organization, item, search, city}, client)=>{
+export const getStatisticRAM = async (client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization, item, search, city},
-                query: gql`
-                    query($organization: ID, $item: ID, $search: String, $city: String) {
-                        statisticClientGeo(organization: $organization, item: $item, search: $search, city: $city) {
-                            client
-                            address
-                            data
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticAzykStoreAgents = async({company, dateStart, dateType, filter, city}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {company, dateStart, dateType, filter, city},
-                query: gql`
-                    query ($company: ID, $dateStart: Date, $dateType: String, $filter: String, $city: String) {
-                        statisticAzykStoreAgents(company: $company, dateStart: $dateStart, dateType: $dateType, filter: $filter, city: $city) {
-                            columns
-                            row 
-                                {_id data}
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getStatisticRAM = async(client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
                 query: gql`
                     query {
                         statisticRAM 
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.statisticRAM
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getActiveItem = async({organization}, client)=>{
+export const uploadingAgentRoute = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {organization: organization},
-                query: gql`
-                    query($organization: ID!) {
-                        activeItem(organization: $organization) {
-                            name
-                            _id
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getActiveOrganization = async(city, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {city},
-                query: gql`
-                    query($city: String) {
-                        activeOrganization(city: $city) {
-                            name
-                            _id
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const getSuperagentOrganization = async(city, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
-            .query({
-                variables: {city},
-                query: gql`
-                    query($city: String) {
-                        superagentOrganization(city: $city) {
-                            name
-                            _id
-                        }
-                    }`,
-            })
-        return res.data
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const uploadingAgentRoute = async({document, agentRoute}, client)=>{
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .mutate({
-                variables: {document: document, agentRoute: agentRoute},
+                variables,
                 mutation: gql`
                     mutation ($document: Upload!, $agentRoute: ID!) {
-                        uploadingAgentRoute(document: $document, agentRoute: $agentRoute) {
-                            data
-                        }
+                        uploadingAgentRoute(document: $document, agentRoute: $agentRoute)
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.uploadingAgentRoute
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const uploadingClients = async({document, organization, city}, client)=>{
+export const uploadingClients = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .mutate({
-                variables: {document, organization, city},
+                variables,
                 mutation: gql`
                     mutation ($document: Upload!, $organization: ID!, $city: String!) {
-                        uploadingClients(document: $document, organization: $organization, city: $city) {
-                            data
-                        }
+                        uploadingClients(document: $document, organization: $organization, city: $city)
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.uploadingClients
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const repairUnsyncOrder = async(ids)=>{
+export const repairUnsyncOrder = async () => {
     try{
-        let res = await (new SingletonApolloClient().getClient())
+        const res = await (new SingletonApolloClient().getClient())
             .mutate({
-                variables: {ids},
+                variables: {},
                 mutation: gql`
-                    mutation ($ids: [ID]!) {
-                        repairUnsyncOrder(ids: $ids) {
-                            data
-                        }
+                    mutation {
+                        repairUnsyncOrder 
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.repairUnsyncOrder
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const uploadingItems = async({document, organization, city}, client)=>{
+export const uploadingItems = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .mutate({
-                variables: {document, organization, city},
+                variables,
                 mutation: gql`
                     mutation ($document: Upload!, $organization: ID!, $city: String!) {
-                        uploadingItems(document: $document, organization: $organization, city: $city) {
-                            data
-                        }
+                        uploadingItems(document: $document, organization: $organization, city: $city)
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.uploadingItems
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const uploadingDistricts = async({document, organization}, client)=>{
+export const uploadingDistricts = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .mutate({
-                variables: {document: document, organization: organization},
+                variables,
                 mutation: gql`
                     mutation ($document: Upload!, $organization: ID!) {
-                        uploadingDistricts(document: $document, organization: $organization) {
-                            data
-                        }
+                        uploadingDistricts(document: $document, organization: $organization)
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.uploadingDistricts
+    } catch(err) {
         console.error(err)
     }
 }

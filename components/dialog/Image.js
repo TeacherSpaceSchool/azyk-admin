@@ -8,14 +8,14 @@ import dialogContentStyle from '../../src/styleMUI/dialogContent'
 
 const Image =  React.memo(
     (props) =>{
-        const { imgSrc } = props;
-        const { showFullDialog } = props.mini_dialogActions;
+        const {imgSrc} = props;
+        const {showFullDialog} = props.mini_dialogActions;
         return (
             <img style={{
                 width: 'calc(100vw - 50px)',
                 height: 'calc(100vh - 85px)',
                 objectFit: 'scale-down'
-            }} src={imgSrc} onClick={()=>{showFullDialog(false)}}/>
+            }} src={imgSrc} onClick={() => {showFullDialog(false)}}/>
         );
     }
 )

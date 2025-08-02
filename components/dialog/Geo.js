@@ -15,13 +15,13 @@ import GpsFixed from '@material-ui/icons/GpsFixed';
 
 const Geo =  React.memo(
     (props) =>{
-        const { showSnackBar } = props.snackbarActions;
-        const { showFullDialog, setMiniDialog, showMiniDialog } = props.mini_dialogActions;
-        const { classes, geo, name, idx, setAddressGeo, change } = props;
+        const {showSnackBar} = props.snackbarActions;
+        const {showFullDialog, setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+        const {classes, geo, name, idx, setAddressGeo, change} = props;
         let [newGeo, setNewGeo] = useState(geo?geo:'42.8700000, 74.5900000');
         let getGeo = () => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((position)=>{
+            if(navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
                     setNewGeo(position.coords.latitude+', '+position.coords.longitude)
                 });
             } else {
@@ -41,7 +41,7 @@ const Geo =  React.memo(
                             load?<CircularProgress/>:null
                         }
                         <div style={{display: load?'none':'block'}}>
-                            <Map onLoad={()=>{setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48}
+                            <Map onLoad={() => {setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48}
                                  state={{ center: newGeo.split(', '), zoom: 15 }}
                             >
                                 <Placemark
@@ -55,8 +55,8 @@ const Geo =  React.memo(
                     <center>
                         {
                             change?
-                                <Button variant='contained' color='primary' onClick={async()=>{
-                                    const action = async() => {
+                                <Button variant='contained' color='primary' onClick={() => {
+                                    const action = async () => {
                                         await setAddressGeo(newGeo, idx)
                                         showFullDialog(false);
                                     }
@@ -67,14 +67,14 @@ const Geo =  React.memo(
                                 </Button>
                                 :null
                         }
-                        <Button variant='contained' color='secondary' onClick={()=>{showFullDialog(false);}} className={classes.button}>
+                        <Button variant='contained' color='secondary' onClick={() => {showFullDialog(false);}} className={classes.button}>
                             Закрыть
                         </Button>
                     </center>
                 </div>
                 {
                     change?
-                        <Fab color='primary' aria-label='Найти геолокацию' className={classes.fabGeo} onClick={getGeo}>
+                        <Fab color='primary' className={classes.fabGeo} onClick={getGeo}>
                             <GpsFixed/>
                         </Fab>
                         :null}

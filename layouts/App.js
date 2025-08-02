@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import AppBar from '../components/app/AppBar'
 import Dialog from '../components/app/Dialog'
 import FullDialog from '../components/app/FullDialog'
@@ -16,47 +16,49 @@ import Router from 'next/router'
 import { useRouter } from 'next/router';
 import { subscriptionOrder } from '../src/gql/order';
 import { useSubscription } from '@apollo/react-hooks';
-import { useBottomScrollListener } from 'react-bottom-scroll-listener';
 import * as snackbarActions from '../redux/actions/snackbar'
 import { start } from '../src/service/idb'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
+import {isNotEmpty, unawaited} from '../src/lib';
 export const mainWindow = React.createRef();
 export const alert = React.createRef();
-export let containerRef;
+
+export let appBodyRef;
 
 const App = React.memo(props => {
-    const { setProfile, logout } = props.userActions;
-    const { setIsMobileApp } = props.appActions;
-    const { profile, authenticated } = props.user;
-    const { load, search, showAppBar, city, filter } = props.app;
-    let { checkPagination, sorts, filters, pageName, dates, searchShow, setList, list, defaultOpenSearch, organizations, cityShow, showDistrict, agents, cities } = props;
-    const { showFull, show  } = props.mini_dialog;
+    const {setProfile, logout} = props.userActions;
+    const {setIsMobileApp} = props.appActions;
+    const {profile, authenticated} = props.user;
+    const {load, search, showAppBar, city, filter} = props.app;
+    let {checkPagination, sorts, filters, pageName, dates, searchShow, setList, list, defaultOpenSearch, organizations, cityShow, showDistrict, agents, cities} = props;
+    const {showFull, show} = props.mini_dialog;
     const router = useRouter();
     const [unread, setUnread] = useState({});
     const [reloadPage, setReloadPage] = useState(false);
-    const { showSnackBar } = props.snackbarActions;
-    const { showMiniDialog, showFullDialog } = props.mini_dialogActions;
-    useEffect( ()=>{
+    const {showSnackBar} = props.snackbarActions;
+    const {showMiniDialog, showFullDialog} = props.mini_dialogActions;
+    appBodyRef = useRef(null);
+    useEffect( () => {
         if(authenticated&&!profile.role)
             setProfile()
         else if(!authenticated&&profile.role)
             logout(false)
-    },[authenticated])
-    useEffect( ()=>{
+    }, [authenticated])
+    useEffect( () => {
         if(mainWindow.current&&mainWindow.current.offsetWidth<900) {
             setIsMobileApp(true)
         }
-    },[mainWindow])
+    }, [mainWindow])
 
-    useEffect( ()=>{
+    useEffect( () => {
         if(process.browser) {
-            start()
-            window.addEventListener('offline', ()=>{showSnackBar('Нет подключения к Интернету')})
+            unawaited(start)
+            window.addEventListener('offline', () => {showSnackBar('Нет подключения к Интернету')})
         }
-    },[process.browser])
+    }, [process.browser])
 
-    useEffect( ()=>{
-        const routeChangeStart = (url, err)=>{
+    useEffect( () => {
+        const routeChangeStart = (url, err) => {
             if(router.asPath!==url&&(router.asPath.includes('items')||router.asPath.includes('brand')||router.asPath.includes('merchandisings'))) {
                 if(!sessionStorage.scrollPostionStore)
                     sessionStorage.scrollPostionStore = JSON.stringify({})
@@ -65,9 +67,11 @@ const App = React.memo(props => {
                 scrollPostionStore[router.asPath] = appBody.scrollTop
                 sessionStorage.scrollPostionStore = JSON.stringify(scrollPostionStore)
             }
-            if (!router.pathname.includes(url)&&!router.asPath.includes(url)&&!reloadPage)
+
+
+            if(!url.includes(router.pathname)/*&&!router.asPath.includes(url)*/&&!reloadPage)
                 setReloadPage(true)
-            if (err&&err.cancelled&&reloadPage)
+            if(err&&err.cancelled&&reloadPage)
                 setReloadPage(false)
         }
         const routeChangeComplete = (url) => {
@@ -87,18 +91,25 @@ const App = React.memo(props => {
             Router.events.off('routeChangeStart', routeChangeStart)
             Router.events.off('routeChangeComplete', routeChangeComplete)
         }
-    },[])
+    }, [])
 
-    containerRef = useBottomScrollListener(async()=>{
-        if(checkPagination) {
-            await setReloadPage(true)
-            await checkPagination()
-            await setReloadPage(false)
-        }
-    });
+    useEffect(() => {
+        const scrollHandle = async () => {
+            if(appBodyRef.current&&checkPagination&&appBodyRef.current.clientHeight<appBodyRef.current.scrollHeight) {
+                const scrolledTop = appBodyRef.current.scrollHeight - (appBodyRef.current.offsetHeight + appBodyRef.current.scrollTop)
+                if (scrolledTop<=300) {
+                    setReloadPage(true)
+                    await checkPagination()
+                    setReloadPage(false)
+                }
+            }
+        };
+        appBodyRef.current?.addEventListener('scroll', scrollHandle)
+        return () => appBodyRef.current?.removeEventListener('scroll', scrollHandle);
+    }, [process.browser, checkPagination])
     let subscriptionOrderRes = useSubscription(subscriptionOrder);
-    useEffect( ()=>{
-        if (
+    useEffect( () => {
+        if(
                 authenticated &&
                 profile.role &&
                 'экспедитор' !== profile.role &&
@@ -108,56 +119,56 @@ const App = React.memo(props => {
                 profile._id !== subscriptionOrderRes.data.reloadOrder.who&&
                 (!city||subscriptionOrderRes.data.reloadOrder.invoice.city===city)
         ) {
-            if (router.pathname === '/orders') {
-                if (subscriptionOrderRes.data.reloadOrder.type === 'ADD'&&!search.length&&!filter.length) {
+            if(router.pathname === '/orders') {
+                if(subscriptionOrderRes.data.reloadOrder.type === 'ADD'&&!search&&!filter.length) {
                     let have = false
                     let _list = [...list]
                     for (let i = 0; i < _list.length; i++) {
-                        if (_list[i]._id === subscriptionOrderRes.data.reloadOrder.invoice._id) {
+                        if(_list[i]._id === subscriptionOrderRes.data.reloadOrder.invoice._id) {
                             _list[i] = subscriptionOrderRes.data.reloadOrder.invoice
                             have = true
                         }
                     }
-                    if (have)
+                    if(have)
                         setList([..._list])
                     else
                         setList([subscriptionOrderRes.data.reloadOrder.invoice, ...list])
                 }
-                else if (subscriptionOrderRes.data.reloadOrder.type === 'SET') {
+                else if(subscriptionOrderRes.data.reloadOrder.type === 'SET') {
                     let _list = [...list]
                     for (let i = 0; i < _list.length; i++) {
-                        if (_list[i]._id === subscriptionOrderRes.data.reloadOrder.invoice._id) {
+                        if(_list[i]._id === subscriptionOrderRes.data.reloadOrder.invoice._id) {
                             _list[i] = subscriptionOrderRes.data.reloadOrder.invoice
                         }
                     }
                     setList([..._list])
                 }
-                else if (subscriptionOrderRes.data.reloadOrder.type === 'DELETE') {
-                    let index = undefined
+                else if(subscriptionOrderRes.data.reloadOrder.type === 'DELETE') {
+                    let index = null
                     let _list = [...list]
                     for (let i = 0; i < _list.length; i++) {
-                        if (_list[i]._id === subscriptionOrderRes.data.reloadOrder.invoice._id) {
+                        if(_list[i]._id === subscriptionOrderRes.data.reloadOrder.invoice._id) {
                             index = i
                         }
                     }
-                    if(index!==undefined) {
+                    if(isNotEmpty(index)) {
                         _list.splice(index, 1);
                         setList([..._list])
                     }
                 }
             }
             else {
-                if (!unread.orders) {
+                if(!unread.orders) {
                     unread.orders = true
                     setUnread({...unread})
                 }
-                if (navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate)
+                /*if(navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate)
                     navigator.vibrate(200);
-                /*if (alert.current)
+                if(alert.current)
                     alert.current.play()*/
             }
         }
-    },[subscriptionOrderRes.data])
+    }, [subscriptionOrderRes.data])
     useEffect(() => {
         router.beforePopState(() => {
             if(show||showFull) {
@@ -186,7 +197,7 @@ const App = React.memo(props => {
                     :
                     null
             }
-            <div ref={containerRef} className='App-body'>
+            <div ref={appBodyRef} className='App-body'>
                 {props.children}
             </div>
             <FullDialog/>

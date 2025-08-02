@@ -1,9 +1,9 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import pageListStyle from '../../src/styleMUI/item/itemList'
-import CardItem from '../../components/items/CardItem'
+import CardItem from '../../components/card/CardItem'
 import {getItems} from '../../src/gql/items';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
@@ -11,50 +11,40 @@ import initialApp from '../../src/initialApp'
 import Link from 'next/link';
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import Router from 'next/router'
+import {unawaited} from '../../src/lib';
 
 const Items = React.memo((props) => {
     const classes = pageListStyle();
-    const { data } = props;
+    const {data} = props;
     let [list, setList] = useState(data.items);
-    const { search, sort, organization } = props.app;
-    const { profile } = props.user;
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const {search, sort, organization} = props.app;
+    const {profile} = props.user;
+    const searchTimeOut= useRef(null);
     const initialRender = useRef(true);
-    const getList = async ()=>{
-        setList((await getItems({organization: organization, search, sort})).items)
+    const getList = async () => {
+        setList(await getItems({organization, search, sort}))
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
-    useEffect(()=>{
-        (async()=>{
-            if(!initialRender.current) {
-                await getList()
-            }
-        })()
-    },[sort, organization])
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
-                initialRender.current = false;
-            } else {
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    await getList()
-                }, 500)
-                setSearchTimeOut(searchTimeOut)
-
-            }
-        })()
-    },[search])
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
+    useEffect(() => {
+        if(!initialRender.current) unawaited(getList)
+    }, [sort, organization])
+    useEffect(() => {
+        if(initialRender.current)
+            initialRender.current = false;
+        else {
+            if(searchTimeOut.current)
+                clearTimeout(searchTimeOut.current)
+            searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
-    }
+    }, [search])
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, list])
     return (
-        <App organizations checkPagination={checkPagination} searchShow={true} sorts={data.sortItem} pageName={'Товары'}>
+        <App organizations checkPagination={checkPagination} searchShow pageName={'Товары'}>
             <Head>
                 <title>Товары</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -67,13 +57,13 @@ const Items = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <CardItem nl list={list} idx={idx} setList={setList} key={element._id} element={element}/>
+                            <CardItem idx={idx} list={list} setList={setList} key={element._id} element={element}/>
                         )}
                 ):null}
             </div>
             {['admin', 'суперорганизация', 'организация'].includes(profile.role)?
                 <Link href='/item/[id]' as={`/item/new`}>
-                    <Fab color='primary' aria-label='add' className={classes.fab}>
+                    <Fab color='primary' className={classes.fab}>
                         <AddIcon />
                     </Fab>
                 </Link>
@@ -96,7 +86,7 @@ Items.getInitialProps = async function(ctx) {
             Router.push('/contact')
     ctx.store.getState().app.sort = '-priotiry'
     return {
-        data: await getItems({search: '', sort: ctx.store.getState().app.sort}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
+        data: {items: await getItems({search: ''}, getClientGqlSsr(ctx.req))}
     };
 };
 

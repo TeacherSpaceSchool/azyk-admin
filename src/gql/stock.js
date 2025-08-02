@@ -1,100 +1,93 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 
-export const getItemsForStocks = async({organization}, client)=>{
+const Stock = `
+    _id
+    createdAt
+    item {_id name}
+    warehouse {_id name}
+    count
+`
+
+export const getItemsForStocks = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {organization},
+                variables,
                 query: gql`
-                    query ($organization: ID!) {
-                        itemsForStocks(organization: $organization) {
+                    query ($organization: ID!, $warehouse: ID) {
+                        itemsForStocks(organization: $organization, warehouse: $warehouse) {
                             _id
                             createdAt
                             name
                         }
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.itemsForStocks
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getStocks = async(variables, client)=>{
+export const getStocks = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: variables,
+                variables,
                 query: gql`
                     query ($search: String!, $client: ID, $organization: ID!) {
-                        stocks(search: $search, client: $client, organization: $organization) {
-                            _id
-                            createdAt
-                            item {_id name}
-                            organization {_id name}
-                            warehouse {_id name}
-                            count
-                        }
+                        stocks(search: $search, client: $client, organization: $organization) {${Stock}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.stocks
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const deleteStock = async(_id)=>{
+export const deleteStock = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
+        const res = await client.mutate({
             variables: {_id},
             mutation : gql`
                     mutation ($_id: ID!) {
-                        deleteStock(_id: $_id) {
-                             data
-                        }
+                        deleteStock(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.deleteStock
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const addStock = async(element)=>{
+export const addStock = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        let res = await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($item: ID!, $count: Float!, $organization: ID!, $warehouse: ID) {
-                        addStock(item: $item, count: $count, organization: $organization, warehouse: $warehouse) {
-                            _id
-                            createdAt
-                            item {_id name}
-                            warehouse {_id name}
-                            count
-                          }
+                        addStock(item: $item, count: $count, organization: $organization, warehouse: $warehouse) {${Stock}}
                     }`})
-        return res.data
-    } catch(err){
+        return res.data.addStock
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const setStock = async(element)=>{
+export const setStock = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($_id: ID!, $count: Float!) {
-                        setStock(_id: $_id, count: $count) {
-                             data
-                        }
+                        setStock(_id: $_id, count: $count)
                     }`})
-    } catch(err){
+        return res.data.setStock
+    } catch(err) {
         console.error(err)
     }
 }

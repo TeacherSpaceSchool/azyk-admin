@@ -1,7 +1,7 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../layouts/App';
-import CardReturned from '../components/returned/CardReturned'
+import CardReturned from '../components/card/CardReturned'
 import pageListStyle from '../src/styleMUI/returned/returnedList'
 import {getReturneds} from '../src/gql/returned'
 import { connect } from 'react-redux'
@@ -20,55 +20,53 @@ import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import { bindActionCreators } from 'redux'
 import Badge from '@material-ui/core/Badge';
 import Link from 'next/link';
+import {unawaited} from '../src/lib';
 
 const Returneds = React.memo((props) => {
     const classes = pageListStyle();
-    const { data } = props;
+    const {data} = props;
     let [simpleStatistic, setSimpleStatistic] = useState(['0']);
     let [list, setList] = useState(data.returneds);
-    const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
-    const { search, sort, date, city } = props.app;
-    const { profile } = props.user;
-    let [paginationWork, setPaginationWork] = useState(true);
-    const checkPagination = async()=>{
-        if(paginationWork){
-            let addedList = (await getReturneds({search, sort, date: date, skip: list.length, city})).returneds
-            if(addedList.length>0){
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    const {search, sort, date, city} = props.app;
+    const {profile} = props.user;
+    const paginationWork = useRef(true);
+    const checkPagination = useCallback(async () => {
+        if(paginationWork.current) {
+            paginationWork.current = false
+            let addedList = await getReturneds({search, sort, date, skip: list.length, city})
+            if(addedList.length) {
                 setList([...list, ...addedList])
+                paginationWork.current = true
             }
-            else
-                setPaginationWork(false)
         }
-    }
-    const getList = async ()=>{
+    }, [search, sort, date, list, city])
+    const getList = async () => {
         setSelected([])
-        setList((await getReturneds({search, sort, date: date, skip: 0, city})).returneds)
-        setSimpleStatistic((await getReturnedsSimpleStatistic({search, date: date, city})).returnedsSimpleStatistic);
+        setList(await getReturneds({search, sort, date, skip: 0, city}))
+        setSimpleStatistic(await getReturnedsSimpleStatistic({search, date, city}));
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
-        setPaginationWork(true);
+        paginationWork.current = true;
     }
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
-    useEffect(()=>{
-        (async()=>{
-            if(!initialRender.current) {
-                await getList()
-            }})()
-    },[sort, date, city])
-    useEffect(()=>{
-        (async()=>{
+    useEffect(() => {
+        if(!initialRender.current)
+            unawaited(getList)
+    }, [sort, date, city])
+    useEffect(() => {
+        (async () => {
             if(initialRender.current) {
                 initialRender.current = false;
-                setSimpleStatistic((await getReturnedsSimpleStatistic({search, date: date, city})).returnedsSimpleStatistic)
+                setSimpleStatistic(await getReturnedsSimpleStatistic({search, date, city}))
             } else {
-                if (searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async () => {
-                    await getList()
+                if(searchTimeOut.current)
+                    clearTimeout(searchTimeOut.current)
+                searchTimeOut.current = setTimeout(() => {
+                    unawaited(getList)
                 }, 500)
-                setSearchTimeOut(searchTimeOut)
         }})()
-    },[search])
+    }, [search])
     let [showStat, setShowStat] = useState(false);
     let [selected, setSelected] = useState([]);
     let [anchorEl, setAnchorEl] = useState(null);
@@ -80,7 +78,7 @@ const Returneds = React.memo((props) => {
     };
 
     return (
-        <App cityShow checkPagination={checkPagination} setList={setList} list={list} searchShow={true} dates={true} sorts={data.sortReturned} pageName='Возвраты'>
+        <App cityShow checkPagination={checkPagination} list={list} setList={setList} searchShow dates pageName='Возвраты'>
             <Head>
                 <title>Возвраты</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -93,36 +91,9 @@ const Returneds = React.memo((props) => {
                             showStat?
                                 <>
                                 <br/>
-                                {simpleStatistic[1]&&simpleStatistic[1]!=='0'?`Всего сумма: ${simpleStatistic[1]} сом`:null}
-                                {
-                                    simpleStatistic[2]&&simpleStatistic[2]!=='0'?
-                                        <>
-                                        <br/>
-                                        {`Консигнаций: ${simpleStatistic[2]} сом`}
-                                        <br/>
-                                        {`Оплачено консигнаций: ${simpleStatistic[3]} сом`}
-                                        </>
-                                        :
-                                        null
-                                }
-                                {
-                                    simpleStatistic[4]&&simpleStatistic[4]!=='0'?
-                                        <>
-                                        <br/>
-                                        {`Тоннаж: ${simpleStatistic[4]} кг`}
-                                        </>
-                                        :
-                                        null
-                                }
-                                {
-                                    simpleStatistic[5]&&simpleStatistic[5]!=='0'?
-                                        <>
-                                        <br/>
-                                        {`Кубатура: ${simpleStatistic[5]} см³`}
-                                        </>
-                                        :
-                                        null
-                                }
+                                {`Сумма: ${simpleStatistic[1]} сом`}
+                                <br/>
+                                {`Тоннаж: ${simpleStatistic[2]} кг`}
                                 </>
                                 :
                                 null
@@ -134,34 +105,32 @@ const Returneds = React.memo((props) => {
                         <ClickNHold
                             style={{background: selected.includes(element._id)?'rgba(255, 179, 0, 0.15)':null}}
                             time={3}
-                            onClickNHold={()=>{
+                            onClickNHold={() => {
                                 if(profile.role==='admin'&&element.orders[0].status==='отмена')
                                     if(selected.includes(element._id)) {
-                                        selected = selected.filter((i)=>i!==element._id)
-                                        setSelected([...selected])
+                                        setSelected(selected => selected.filter((i)=>i!==element._id))
                                     }
                                     else
                                         setSelected([...selected, element._id])
-
-                            }}
+                            }} key={element._id}
                         >
-                            <CardReturned list={list} idx={idx} setSelected={setSelected} selected={selected} setList={setList} key={element._id} element={element}/>
+                            <CardReturned idx={idx} setSelected={setSelected} selected={selected} list={list} setList={setList} element={element}/>
                         </ClickNHold>
                         )}
                 ):null}
             </div>
             {selected.length?
-                <Fab onClick={open} color='primary' aria-label='add' className={classes.fab}>
+                <Fab onClick={open} color='primary' className={classes.fab}>
                     <Badge color='secondary' badgeContent={selected.length}>
                         <SettingsIcon />
                     </Badge>
                 </Fab>
                 :
-                <Link href='/returned/new'>
-                    <Fab color='primary' aria-label='add' className={classes.fab}>
+                ['суперорганизация', 'организация', 'менеджер', 'агент', 'суперагент'].includes(profile.role)?<Link href='/returned/new'>
+                    <Fab color='primary' className={classes.fab}>
                         <AddIcon />
                     </Fab>
-                </Link>
+                </Link>:null
             }
             <Menu
                 anchorEl={anchorEl}
@@ -177,16 +146,9 @@ const Returneds = React.memo((props) => {
                     horizontal: 'left',
                 }}
             >
-                <MenuItem style={{color: 'red'}} onClick={async()=>{
-                    const action = async() => {
-                        let _list = [...list]
-                        for(let i=0; i<_list.length; i++){
-                            if(selected.includes(_list[i].idx)) {
-                                _list.splice(i, 1)
-                                i-=1
-                            }
-                        }
-                        setList(_list)
+                <MenuItem style={{color: 'red'}} onClick={() => {
+                    const action = async () => {
+                        setList(list => list.filter(item => !selected.includes(item.idx)))
                         await deleteReturneds(selected)
                     }
                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
@@ -211,7 +173,9 @@ Returneds.getInitialProps = async function(ctx) {
             Router.push('/contact')
     ctx.store.getState().app.sort = '-createdAt'
     return {
-        data: await getReturneds({city: ctx.store.getState().app.city, search: '', sort: '-createdAt', date: '', skip: 0}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+        data: {
+            returneds: await getReturneds({city: ctx.store.getState().app.city, search: '', sort: '-createdAt', date: '', skip: 0}, getClientGqlSsr(ctx.req))
+        }
     };
 };
 

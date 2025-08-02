@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
@@ -8,7 +8,7 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
-import { pdDDMMYYHHMM, checkFloat, pdDDMMYYYYWW } from '../../src/lib'
+import {pdDDMMYYHHMM, checkFloat, pdDDMMYYYYWW} from '../../src/lib'
 import Confirmation from './Confirmation'
 import Geo from '../../components/dialog/Geo'
 import HistoryReturned from '../../components/dialog/HistoryReturned'
@@ -19,50 +19,53 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 const Returned =  React.memo(
     (props) =>{
-        const { isMobileApp } = props.app;
-        const { profile, authenticated } = props.user;
-        const { showMiniDialog, setMiniDialog, showFullDialog, setFullDialog } = props.mini_dialogActions;
-        const { classes, element, setList, list, idx } = props;
+        const {isMobileApp} = props.app;
+        const {profile, authenticated} = props.user;
+        const {showMiniDialog, setMiniDialog, showFullDialog, setFullDialog} = props.mini_dialogActions;
+        const {classes, element, setList, idx} = props;
         let [allPrice, setAllPrice] = useState(element.allPrice);
         let [items, setItems] = useState(element.items);
         let [allTonnage, setAllTonnage] = useState(element.allTonnage);
         let [confirmationForwarder, setConfirmationForwarder] = useState(element.confirmationForwarder);
-        let [cancelForwarder, setCancelForwarder] = useState(element.cancelForwarder!=undefined&&element.cancelForwarder);
+        let [cancelForwarder, setCancelForwarder] = useState(element.cancelForwarder);
         const width = isMobileApp? (window.innerWidth-112) : 500;
-        const allowOrganization = (['менеджер', 'суперорганизация', 'организация', 'агент'].includes(profile.role)&&profile.organization===element.organization._id)
-        const { showSnackBar } = props.snackbarActions;
-        let canculateAllPrice = ()=>{
+        const {showSnackBar} = props.snackbarActions;
+        //подсчет общей суммы
+        useEffect(() => {
             allTonnage=0
             allPrice=0
-            for(let i=0; i<items.length; i++){
+            for(let i=0; i<items.length; i++) {
                 allPrice+=items[i].allPrice
                 allTonnage+=items[i].allTonnage
             }
             setAllPrice(checkFloat(allPrice))
             setAllTonnage(checkFloat(allTonnage))
-        }
-        let increment = (idx)=>{
+        }, [items])
+        //увеличение
+        let increment = (idx) => {
             items[idx].count+=1
             items[idx].allPrice = checkFloat(items[idx].price * items[idx].count)
             items[idx].allTonnage = checkFloat(items[idx].count * items[idx].weight)
-            canculateAllPrice()
+            setItems(items => [...items])
         }
-        let decrement = (idx)=>{
+        //уменьшение
+        let decrement = (idx) => {
             if(items[idx].count>1) {
                 items[idx].count -= 1
                 items[idx].allPrice = checkFloat(items[idx].price * items[idx].count)
                 items[idx].allTonnage = checkFloat(items[idx].count * items[idx].weight)
-                canculateAllPrice()
+                setItems(items => [...items])
             }
         }
-        let remove = (idx)=>{
+        //удаление
+        let remove = (idx) => {
             if(items.length>1) {
                 items.splice(idx, 1)
                 setItems([...items])
-                canculateAllPrice()
             } else
                 showSnackBar('Товары не могут отсутствовать в заказе')
         }
+        //статус
         const status = element.cancelForwarder?'отмена':element.confirmationForwarder?'принят':'обработка'
         return (
             <div className={classes.column} style={{width: width}}>
@@ -97,22 +100,17 @@ const Returned =  React.memo(
                         null
 
                 }
-                {
-                    (['admin', 'суперагент'].includes(profile.role)||allowOrganization)&&element.updatedAt!==element.createdAt?
-                       <a>
-                           <div style={{cursor: 'pointer'}} className={classes.row} onClick={()=>{setMiniDialog('История', <HistoryReturned invoice={element._id}/>)}}>
-                               <div className={classes.nameField}>Изменен:&nbsp;</div>
-                               <div className={classes.value}>{pdDDMMYYHHMM(element.updatedAt)}</div>
-                            </div>
-                       </a>
-                        :
-                        null
-                }
+                <a>
+                    <div style={{cursor: 'pointer'}} className={classes.row} onClick={() => {setMiniDialog('История', <HistoryReturned returned={element._id}/>)}}>
+                        <div className={classes.nameField}>Изменен:&nbsp;</div>
+                        <div className={classes.value}>{pdDDMMYYHHMM(element.updatedAt)}</div>
+                    </div>
+                </a>
                 <div className={classes.row}>
                     <div className={classes.nameField}>Адрес: &nbsp;</div>
                     <div className={classes.value}>{`${element.address[2]?`${element.address[2]}, `:''}${element.address[0]}${element.city?` (${element.city})`:''}`}</div>
                 </div>
-                <div className={classes.geo} style={{color: element.address[1]?'#ffb300':'red'}} onClick={()=>{
+                <div className={classes.geo} style={{color: element.address[1]?'#ffb300':'red'}} onClick={() => {
                     if(element.address[1]) {
                         setFullDialog('Геолокация', <Geo geo={element.address[1]}/>)
                         showFullDialog(true)
@@ -138,7 +136,7 @@ const Returned =  React.memo(
                     </div>
                 </a>
                 {
-                    element.agent&&element.agent.name?
+                    element.agent?
                         <a href={`/employment/${element.agent._id}`} target='_blank'>
                             <div className={classes.row}>
                                 <div className={classes.nameField}>Агент:&nbsp;</div>
@@ -178,13 +176,7 @@ const Returned =  React.memo(
                     {status!=='обработка'?<><br/><br/></>:null}
                     {
                         items.map((item, idx) => {
-                            if(
-                                status==='обработка'&&
-                                (
-                                    allowOrganization||
-                                    ['admin', 'суперагент'].includes(profile.role)
-                                )
-                            )
+                            if(status==='обработка')
                                 return(
                                     <div key={item._id} className={classes.column}>
                                         <div className={classes.row}>
@@ -192,9 +184,7 @@ const Returned =  React.memo(
                                             <a href={`/item/${item._id}`} target='_blank'>
                                                 <div className={classes.value}>{item.item}</div>
                                             </a>
-                                            <IconButton onClick={()=>{
-                                                remove(idx)
-                                            }} color='secondary' className={classes.button} aria-label='удалить'>
+                                            <IconButton onClick={() => remove(idx)} color='secondary' className={classes.button}>
                                                 <CancelIcon style={{height: 20, width: 20}}/>
                                             </IconButton>
                                         </div>
@@ -202,9 +192,9 @@ const Returned =  React.memo(
                                             <div className={classes.nameField}>Количество:&nbsp;</div>
                                             <div className={classes.column}>
                                                 <div className={classes.row}>
-                                                    <div className={classes.counterbtn} onClick={()=>{decrement(idx)}}>-</div>
+                                                    <div className={classes.counterbtn} onClick={() => decrement(idx)}>-</div>
                                                     <div className={classes.value}>{item.count}&nbsp;шт</div>
-                                                    <div className={classes.counterbtn} onClick={()=>{increment(idx)}}>+</div>
+                                                    <div className={classes.counterbtn} onClick={() => increment(idx)}>+</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -248,9 +238,7 @@ const Returned =  React.memo(
                         control={
                             <Checkbox
                                 checked={confirmationForwarder}
-                                onChange={()=>{
-                                    setConfirmationForwarder(!confirmationForwarder);
-                                }}
+                                onChange={() => setConfirmationForwarder(!confirmationForwarder)}
                                 color='primary'
                             />
                         }
@@ -263,7 +251,7 @@ const Returned =  React.memo(
                         control={
                             <Checkbox
                                 checked={cancelForwarder}
-                                onChange={()=>{setCancelForwarder(!cancelForwarder)}}
+                                onChange={() => setCancelForwarder(!cancelForwarder)}
                                 color='secondary'
                             />
                         }
@@ -276,27 +264,27 @@ const Returned =  React.memo(
                     />
                 </div>
                 <div>
-                    <Button variant='contained' color='primary' onClick={()=>{
-                            const action = async() => {
+                    <Button variant='contained' color='primary' onClick={() => {
+                            const action = async () => {
                                 let returned = {returned: element._id}
                                 if(element.confirmationForwarder!==confirmationForwarder) returned.confirmationForwarder=confirmationForwarder;
                                 if(element.cancelForwarder!==cancelForwarder) returned.cancelForwarder=cancelForwarder;
-                                for(let i=0; i<items.length; i++){
+                                for(let i=0; i<items.length; i++) {
                                     delete items[i].__typename
                                 }
                                 let res = await setReturned({items: items, ...returned})
-                                if (res) {
-                                    let _list = [...list]
-                                    _list[idx] = res
-                                    setList(_list)
-                                }
+                                if(res)
+                                    setList(list => {
+                                        list[idx] = res
+                                        return [...list]
+                                    })
                                 showMiniDialog(false);
                             }
                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                         }} className={classes.button}>
                             Сохранить
                         </Button>
-                        <Button variant='contained' color='secondary' onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                        <Button variant='contained' color='secondary' onClick={() => {showMiniDialog(false);}} className={classes.button}>
                             Закрыть
                         </Button>
                     </div>

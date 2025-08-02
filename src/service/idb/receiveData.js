@@ -2,7 +2,7 @@ import { db } from '../idb'
 
 export let initReceiveData = (db) => {
     try {
-        if (db.objectStoreNames.contains('receiveData')) {
+        if(db.objectStoreNames.contains('receiveData')) {
             db.deleteObjectStore('receiveData');
         }
         const store = db.createObjectStore('receiveData', {
@@ -11,27 +11,27 @@ export let initReceiveData = (db) => {
         });
         store.createIndex('name', 'name', { unique: true });
     }
-    catch (error){
+    catch (error) {
         console.error('initReceiveData', error)
     }
 }
 
 export let getReceiveDataByIndex = async(index) => {
     try {
-        if(db!==undefined){
+        if(db) {
             return (await db.getFromIndex('receiveData', 'name', index)).data
         }
     }
-    catch (error){
+    catch (error) {
         console.error('getReceiveDataByIndex', error)
     }
 }
 
 export let putReceiveDataByIndex = async(index,  data) => {
     try {
-        if(db!==undefined){
+        if(db) {
             let res = await db.getFromIndex('receiveData', 'name', index)
-            if(res===undefined){
+            if(!res) {
                 await db.add('receiveData', {
                     name: index,
                     data: data
@@ -42,7 +42,7 @@ export let putReceiveDataByIndex = async(index,  data) => {
             }
         }
     }
-    catch (error){
+    catch (error) {
         console.error('putReceiveDataByIndex', error)
     }
 }

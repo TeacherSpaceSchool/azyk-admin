@@ -1,7 +1,7 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../layouts/App';
-import CardOrder from '../components/order/CardOrder'
+import CardOrder from '../components/card/CardOrder'
 import pageListStyle from '../src/styleMUI/orders/orderList'
 import {getOrders} from '../src/gql/order'
 import { connect } from 'react-redux'
@@ -20,78 +20,77 @@ import * as appActions from '../redux/actions/app'
 import { bindActionCreators } from 'redux'
 import Badge from '@material-ui/core/Badge';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import {unawaited} from '../src/lib';
+
+const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value: 'обработка'}, {name: 'Акции', value: 'акция'}, {name: 'Без геолокации', value: 'Без геолокации'}, {name: 'Не синхронизированные', value: 'Не синхронизированные'}]
 
 const Orders = React.memo((props) => {
     const classes = pageListStyle();
-    const { data } = props;
+    const {data} = props;
     const initialRender = useRef(true);
     let [simpleStatistic, setSimpleStatistic] = useState(['0']);
-    let [list, setList] = useState(data.invoices);
-    const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
-    const { showLoad } = props.appActions;
-    const { search, filter, sort, date, organization, city } = props.app;
-    const { profile } = props.user;
-    let numberSearch = useRef(0);
-    let paginationWork = useRef(true);
-    const checkPagination = async()=>{
-        if(paginationWork.current){
-            let addedList = (await getOrders({search, sort, filter: filter, date: date, skip: list.length, organization: organization, city: city})).invoices
-            if(addedList.length>0){
+    let [list, setList] = useState(data.orders);
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    const {showLoad} = props.appActions;
+    const {search, filter, sort, date, organization, city} = props.app;
+    const {profile} = props.user;
+    const paginationWork = useRef(true);
+    const checkPagination = useCallback(async () => {
+        if(paginationWork.current) {
+            paginationWork.current = false
+            let addedList = await getOrders({search, sort, filter, date, skip: list.length, organization, city})
+            if(addedList.length) {
                 setList([...list, ...addedList])
+                paginationWork.current = true
             }
-            else
-                paginationWork.current = false
         }
-    }
-    const getList = async (_numberSearch)=>{
+    }, [search, sort, filter, date, organization, city, list])
+    const getList = async () => {
         setSelected([])
-        let list = (await getOrders({search, sort, filter: filter, date: date, skip: 0, organization: organization, city: city})).invoices
-        let simpleStatistic = (await getInvoicesSimpleStatistic({search, filter: filter, date: date, organization: organization, city: city})).invoicesSimpleStatistic
-        if(!_numberSearch||_numberSearch===numberSearch.current) {
-            setList(list)
-            setSimpleStatistic(simpleStatistic);
-            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
-            paginationWork.current = true
-        }
+        // eslint-disable-next-line no-undef
+        const [orders, invoicesSimpleStatistic] = await Promise.all([
+            getOrders({search, sort, filter, date, skip: 0, organization, city}),
+            getInvoicesSimpleStatistic({search, filter, date, organization, city})
+        ])
+        setList(orders)
+        setSimpleStatistic(invoicesSimpleStatistic);
+        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
+        paginationWork.current = true
      }
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
-    useEffect(()=>{
-        (async ()=>{
-            if(!initialRender.current) {
+    useEffect(() => {
+        if(!initialRender.current) {
+            unawaited(async () => {
                 showLoad(true)
                 await getList()
                 showLoad(false)
-            }
-        })()
-    },[filter, sort, date, organization, city])
-    useEffect(()=>{
-        (async ()=>{
+            })
+        }
+    }, [filter, sort, date, organization, city])
+    const [searchTimeOut, setSearchTimeOut] = useState(null);
+    useEffect(() => {
+        (async () => {
             if(initialRender.current) {
                 initialRender.current = false;
-                setSimpleStatistic((await getInvoicesSimpleStatistic({search, filter: filter, date: date, organization: organization, city: city})).invoicesSimpleStatistic)
+                setSimpleStatistic(await getInvoicesSimpleStatistic({search, filter, date, organization, city}))
             } else {
                 if(searchTimeOut)
                     clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    numberSearch.current += 1
-                    await getList(numberSearch.current)
+                setSearchTimeOut(setTimeout(async () => {
+                    await getList()
                     setSearchTimeOut(null)
-                }, 500)
-                setSearchTimeOut(searchTimeOut)
+                }, 500))
             }
         })()
-    },[search])
+    }, [search])
     let [showStat, setShowStat] = useState(false);
     let [selected, setSelected] = useState([]);
     let [anchorEl, setAnchorEl] = useState(null);
     let open = event => {
         setAnchorEl(event.currentTarget);
     };
-    let close = () => {
-        setAnchorEl(null);
-    };
+    let close = () => setAnchorEl(null);
     return (
-        <App organizations cityShow checkPagination={checkPagination} setList={setList} list={list} searchShow={true} dates={true} filters={data.filterInvoice} sorts={data.sortInvoice} pageName='Заказы'>
+        <App organizations filters={!profile.client&&filters} cityShow checkPagination={checkPagination} list={list} setList={setList} searchShow dates pageName='Заказы'>
             <Head>
                 <title>Заказы</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -104,36 +103,9 @@ const Orders = React.memo((props) => {
                             showStat?
                                 <>
                                 <br/>
-                                {simpleStatistic[1]&&simpleStatistic[1]!=='0'?`Сумма: ${simpleStatistic[1]} сом`:null}
-                                {
-                                    simpleStatistic[2]&&simpleStatistic[2]!=='0'?
-                                        <>
-                                        <br/>
-                                        {`Консигнаций: ${simpleStatistic[2]} сом`}
-                                        <br/>
-                                        {`Оплачено консигнаций: ${simpleStatistic[3]} сом`}
-                                        </>
-                                        :
-                                        null
-                                }
-                                {
-                                    simpleStatistic[4]&&simpleStatistic[4]!=='0'?
-                                        <>
-                                        <br/>
-                                        {`Тоннаж: ${simpleStatistic[4]} кг`}
-                                        </>
-                                        :
-                                        null
-                                }
-                                {
-                                    simpleStatistic[5]&&simpleStatistic[5]!=='0'?
-                                        <>
-                                        <br/>
-                                        {`Кубатура: ${simpleStatistic[5]} см³`}
-                                        </>
-                                        :
-                                        null
-                                }
+                                {`Сумма: ${simpleStatistic[1]} сом`}
+                                    <br/>
+                                {`Тоннаж: ${simpleStatistic[2]} кг`}
                                 </>
                                 :
                                 null
@@ -147,27 +119,29 @@ const Orders = React.memo((props) => {
                         list?list.map((element, idx)=> {
                             return(
                                 <ClickNHold
+                                    key={element._id}
                                     style={{background: selected.includes(element._id)?'rgba(255, 179, 0, 0.15)':null}}
                                     time={3}
-                                    onClickNHold={()=>{
+                                    onClickNHold={() => {
                                         if(profile.role==='admin'&&(element.cancelClient||element.cancelForwarder))
                                             if(selected.includes(element._id)) {
-                                                selected = selected.filter((i)=>i!==element._id)
-                                                setSelected([...selected])
+                                                setSelected(selected => {
+                                                    selected.splice(selected.indexOf(element._id), 1)
+                                                    return [...selected]
+                                                })
                                             }
                                             else
-                                                setSelected([...selected, element._id])
+                                                setSelected(selected => [...selected, element._id])
 
                                     }}
                                 >
-                                    <CardOrder list={list} idx={idx} setSelected={setSelected} selected={selected} setList={setList} key={element._id} element={element}/>
+                                    <CardOrder idx={idx} setSelected={setSelected} selected={selected} list={list} setList={setList} element={element}/>
                                 </ClickNHold>
-                            )}
-                        ):null
+                            )}):null
                 }
             </div>
             {profile.role==='admin'&&(selected.length||filter==='обработка')?
-                <Fab onClick={open} color='primary' aria-label='add' className={classes.fab}>
+                <Fab onClick={open} color='primary' className={classes.fab}>
                     <Badge color='secondary' badgeContent={selected.length}>
                         <SettingsIcon />
                     </Badge>
@@ -190,10 +164,8 @@ const Orders = React.memo((props) => {
                 }}
             >
                 {filter==='обработка' ?
-                    <MenuItem onClick={async () => {
-                        const action = async () => {
-                            await acceptOrders()
-                        }
+                    <MenuItem onClick={() => {
+                        const action = async () => await acceptOrders()
                         setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                         showMiniDialog(true);
                         setSelected([])
@@ -203,17 +175,10 @@ const Orders = React.memo((props) => {
                     null
                 }
                 {selected.length ?
-                    <MenuItem style={{color: 'red'}} onClick={async () => {
+                    <MenuItem style={{color: 'red'}} onClick={() => {
                         const action = async () => {
-                            let _list = [...list]
-                            for (let i = 0; i < _list.length; i++) {
-                                if (selected.includes(_list[i].idx)) {
-                                    _list.splice(i, 1)
-                                    i -= 1
-                                }
-                            }
-                            setList(_list)
                             await deleteOrders(selected)
+                            setList(list => list.filter(order => !selected.includes(order._id)))
                         }
                         setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                         showMiniDialog(true);
@@ -240,14 +205,7 @@ Orders.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            ...await getOrders({
-                city: ctx.store.getState().app.city,
-                search: '',
-                sort: '-createdAt',
-                filter: '',
-                date: '',
-                skip: 0
-            }, ctx.req ? await getClientGqlSsr(ctx.req) : undefined)
+            orders: await getOrders({city: ctx.store.getState().app.city, search: '', sort: '-createdAt', filter: '', date: '', skip: 0}, getClientGqlSsr(ctx.req))
         }
     };
 };

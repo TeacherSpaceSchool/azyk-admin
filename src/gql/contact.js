@@ -1,10 +1,10 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 
-export const getContact = async(client)=>{
+export const getContact = async (client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
                 query: gql`
                     query {
@@ -15,29 +15,27 @@ export const getContact = async(client)=>{
                             email
                             phone
                             info
-                            social
                             warehouse
                           }
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.contact
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const setContact = async(element)=>{
+export const setContact = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
-                    mutation ($warehouse: String!, $name: String!, $image: Upload, $address: [String]!, $email: [String]!, $phone: [String]!, $info: String!, $social: [String]!) {
-                        setContact(warehouse: $warehouse, name: $name, image: $image, address: $address, email: $email, phone: $phone, info: $info, social: $social) {
-                             data
-                        }
+                    mutation ($warehouse: String!, $name: String!, $image: Upload, $address: [String]!, $email: [String]!, $phone: [String]!, $info: String!) {
+                        setContact(warehouse: $warehouse, name: $name, image: $image, address: $address, email: $email, phone: $phone, info: $info)
                     }`})
-    } catch(err){
+        return res.data.setContact
+    } catch(err) {
         console.error(err)
     }
 }

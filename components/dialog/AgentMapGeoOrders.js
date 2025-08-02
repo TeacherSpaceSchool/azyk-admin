@@ -4,14 +4,13 @@ import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
-import { getGeoDistance } from '../../src/lib'
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
 
 const AgentMapGeoOrders =  React.memo(
     (props) =>{
-        const { classes, orders, setIndexOrder } = props;
-        const { showMiniDialog } = props.mini_dialogActions;
+        const {classes, orders, setIndexOrder} = props;
+        const {showMiniDialog} = props.mini_dialogActions;
         return (
             <div className={classes.column}>
                 {
@@ -38,7 +37,7 @@ const AgentMapGeoOrders =  React.memo(
                     })
                 }
                 <center>
-                    <Button variant="contained" color="secondary" onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant="contained" color="secondary" onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </center>

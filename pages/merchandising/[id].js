@@ -42,6 +42,7 @@ import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import {maxImageSize} from '../../src/lib';
 
 const marks = [
     {
@@ -68,18 +69,17 @@ const marks = [
 const types = ['холодные полки', 'теплые полки'];
 
 const Merchandising = React.memo((props) => {
-    const { profile } = props.user;
+    const {profile} = props.user;
     const classes = organizationStyle();
-    const { data } = props;
-    const { isMobileApp } = props.app;
-    const { showAppBar } = props.appActions;
-    const { showSnackBar } = props.snackbarActions;
-    let [client, setClient] = useState(data.merchandising?data.merchandising.client:undefined);
-    let [organization, setOrganization] = useState(data.merchandising?data.merchandising.organization:undefined);
-    let [geo, setGeo] = useState(data.merchandising?data.merchandising.geo:undefined);
+    const {data} = props;
+    const {isMobileApp} = props.app;
+    const {showAppBar} = props.appActions;
+    const {showSnackBar} = props.snackbarActions;
+    let [client, setClient] = useState(data.merchandising?data.merchandising.client:null);
+    let [organization, setOrganization] = useState(data.merchandising?data.merchandising.organization:null);
     let [productAvailability, setProductAvailability] = useState(data.merchandising?data.merchandising.productAvailability:[]);
     let [productInventory, setProductInventory] = useState(data.merchandising?data.merchandising.productInventory:false);
-    let [productConditions, setProductConditions] = useState(data.merchandising?data.merchandising.productConditions:undefined);
+    let [productConditions, setProductConditions] = useState(data.merchandising?data.merchandising.productConditions:0);
     let [productLocation, setProductLocation] = useState(data.merchandising?data.merchandising.productLocation:0);
     let [previews, setPreviews] = useState(data.merchandising?data.merchandising.images:[]);
     let [images, setImages] = useState([]);
@@ -91,7 +91,7 @@ const Merchandising = React.memo((props) => {
     let [typeImage, setTypeImage] = useState('product');
     let [indexImage, setIndexImage] = useState(0);
     let handleChangeImage = (async (event) => {
-        if(event.target.files[0].size/1024/1024<50){
+        if(event.target.files[0].size/1024/1024<maxImageSize) {
             let image = await resizeImg(event.target.files[0])
             if(typeImage==='products') {
                 setImages([image, ...images])
@@ -102,61 +102,57 @@ const Merchandising = React.memo((props) => {
                 fhos[indexImage].previews = [image, ...fhos[indexImage].previews]
                 setFhos([...fhos])
             }
-        } else {
-            showSnackBar('Файл слишком большой')
-        }
+        } else showSnackBar('Файл слишком большой')
     })
     let [type, setType] = useState(data.merchandising?data.merchandising.type:types[0]);
     let handleType =  (event) => {
         setType(event.target.value)
     };
-    const searchTimeOutRef = useRef(null);
-    useEffect(()=>{
+    let [geo, setGeo] = useState(data.merchandising?data.merchandising.geo:null);
+    const geolocationTimeOut = useRef(null);
+    useEffect(() => {
         if(router.query.id === 'new') {
-            if (navigator.geolocation) {
-                searchTimeOutRef.current = setInterval(() => {
+            if(navigator.geolocation) {
+                geolocationTimeOut.current = setInterval(() => {
                     navigator.geolocation.getCurrentPosition((position) => {
                         setGeo(position.coords.latitude + ', ' + position.coords.longitude)
                     })
                 }, 1000)
                 return () => {
-                    clearInterval(searchTimeOutRef.current)
+                    clearInterval(geolocationTimeOut.current)
                 }
             } else {
                 showSnackBar('Геолокация не поддерживается')
             }
         }
-    },[])
-    useEffect(()=>{
+    }, [])
+    useEffect(() => {
         if(profile.organization)
             setOrganization({_id: profile.organization})
-    },[])
-    useEffect(()=>{
-        (async()=>{
+    }, [])
+    useEffect(() => {(async () => {
             if(router.query.id==='new')
                 setProductAvailability([])
             if(organization&&organization._id&&organization._id!=='super')
-                setItems((await getBrands({organization: organization._id, search: '', sort: 'name'})).brands)
+                setItems(await getBrands({organization: organization._id, search: '', sort: 'name'}))
             else
                 setItems([])
-        })()
-    },[organization])
+    })()}, [organization])
     let [fhos, setFhos] = useState(data.merchandising?data.merchandising.fhos:[]);
     let [needFho, setNeedFho] = useState(data.merchandising?data.merchandising.needFho:false);
     let [comment, setComment] = useState(data.merchandising?data.merchandising.comment:'');
     let [stateProduct, setStateProduct] = useState(data.merchandising?data.merchandising.stateProduct:0);
-    let [reviewerComment, setReviewerComment] = useState(data.merchandising&&data.merchandising.reviewerComment?data.merchandising.reviewerComment:'');
-    let [reviewerScore, setReviewerScore] = useState(data.merchandising&&data.merchandising.reviewerScore?data.merchandising.reviewerScore:0);
-    const { setMiniDialog, showMiniDialog, setFullDialog, showFullDialog } = props.mini_dialogActions;
+    let [reviewerComment, setReviewerComment] = useState(data.merchandising?data.merchandising.reviewerComment:'');
+    let [reviewerScore, setReviewerScore] = useState(data.merchandising?data.merchandising.reviewerScore:0);
+    const {setMiniDialog, showMiniDialog, setFullDialog, showFullDialog} = props.mini_dialogActions;
     const router = useRouter()
     const [clients, setClients] = useState([]);
     const [inputValue, setInputValue] = React.useState('');
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const searchTimeOut = useRef(null);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
-        (async()=>{
-            if (inputValue.length<3) {
+            if(inputValue.length<3) {
                 setClients([]);
                 if(open)
                     setOpen(false)
@@ -166,17 +162,15 @@ const Merchandising = React.memo((props) => {
             else {
                 if(!loading)
                     setLoading(true)
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    setClients((await getClients({search: inputValue, sort: '-name', filter: 'all'})).clients)
+                if(searchTimeOut.current)
+                    clearTimeout(searchTimeOut.current)
+                searchTimeOut.current = setTimeout(async () => {
+                    setClients(await getClients({search: inputValue, sort: '-name', filter: 'all'}))
                     if(!open)
                         setOpen(true)
                     setLoading(false)
                 }, 500)
-                setSearchTimeOut(searchTimeOut)
             }
-        })()
     }, [inputValue]);
     const handleChange = event => {
         setInputValue(event.target.value);
@@ -195,14 +189,13 @@ const Merchandising = React.memo((props) => {
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                 {
-                    data.merchandising?
+                    router.query.id==='new'||data.merchandising?
                         ['admin', 'суперагент', 'суперорганизация', 'организация', 'менеджер', 'агент', 'мерчендайзер'].includes(profile.role)?
                             <>
                                 <FormControl className={classes.input}>
                                     <InputLabel>Тип полок</InputLabel>
                                     <Select
                                         inputProps={{
-                                            'aria-label': 'description',
                                             readOnly: router.query.id!=='new',
                                         }}
                                         value={type}
@@ -224,7 +217,7 @@ const Merchandising = React.memo((props) => {
                                     }}
                                     noOptionsText='Ничего не найдено'
                                     renderInput={params => (
-                                        <TextField {...params} label='Организация' fullWidth/>
+                                        <TextField error={!organization} {...params} label='Организация' fullWidth/>
                                     )}
                                 />
                                 :
@@ -244,7 +237,7 @@ const Merchandising = React.memo((props) => {
                                     }}
                                     noOptionsText='Ничего не найдено'
                                     renderInput={params => (
-                                        <TextField {...params} label='Выберите клиента' variant='outlined' fullWidth
+                                        <TextField error={!client} {...params} label='Выберите клиента' fullWidth
                                                    onChange={handleChange}
                                                    InputProps={{
                                                        ...params.InputProps,
@@ -276,14 +269,11 @@ const Merchandising = React.memo((props) => {
                             }
                             <div className={classes.box}>
                                 <TextField
-                                    multiline={true}
+                                    multiline
                                     label='Комментарий'
                                     value={comment}
                                     className={classes.input}
-                                    onChange={(event)=>{if(router.query.id==='new')setComment(event.target.value)}}
-                                    inputProps={{
-                                        'aria-label': 'description',
-                                    }}
+                                    onChange={(event) => {if(router.query.id==='new')setComment(event.target.value)}}
                                 />
                             </div>
                             <div className={classes.box}>
@@ -300,7 +290,7 @@ const Merchandising = React.memo((props) => {
                                     control={
                                         <Checkbox
                                             checked={productInventory}
-                                            onChange={()=>{
+                                            onChange={() => {
                                                 if(router.query.id==='new')setProductInventory(!productInventory);
                                             }}
                                             color='primary'
@@ -330,7 +320,7 @@ const Merchandising = React.memo((props) => {
                             {
                                 organization&&organization._id!=='super'?
                                     <div className={classes.box}>
-                                        <Typography style={{cursor: 'pointer'}} onClick={()=>{setShowItems(!showItems)}} component='legend'>{`${showItems?'🐵':'🙈'} Товар в наличие: ${productAvailability.length}/${items.length}`}</Typography>
+                                        <Typography style={{cursor: 'pointer'}} onClick={() => setShowItems(!showItems)} component='legend'>{`${showItems?'🐵':'🙈'} Товар в наличие: ${productAvailability.length}/${items.length}`}</Typography>
                                         {
                                             showItems?
                                                 <>
@@ -338,14 +328,14 @@ const Merchandising = React.memo((props) => {
                                                 <FormControl error={!productAvailability.length} component='fieldset' className={classes.formControl}>
                                                     <FormGroup>
                                                         {items.map((element) => {
-                                                                if (router.query.id === 'new' || productAvailability.includes(element.name))
+                                                                if(router.query.id === 'new' || productAvailability.includes(element.name))
                                                                     return <FormControlLabel key={element._id} control={<Checkbox
                                                                         color='primary'
                                                                         checked={productAvailability.includes(element.name)}
                                                                         onChange={() => {
-                                                                            if (router.query.id === 'new') {
+                                                                            if(router.query.id === 'new') {
                                                                                 let index = productAvailability.indexOf(element.name)
-                                                                                if (index !== -1)
+                                                                                if(index !== -1)
                                                                                     productAvailability.splice(index, 1)
                                                                                 else productAvailability.push(element.name)
                                                                                 setProductAvailability([...productAvailability])
@@ -366,66 +356,67 @@ const Merchandising = React.memo((props) => {
                                     :
                                     null
                             }
-                            <div className={classes.box}>
-                                <GridList className={classes.gridList} cols={2.5}>
-                                    {router.query.id === 'new' ?
-                                        <GridListTile
-                                            onClick={() => {
-                                                setTypeImage('products')
-                                                imageRef.current.click()
-                                            }}>
-                                            <img style={{cursor: 'pointer'}} src={'/static/add.png'}/>
-                                            <GridListTileBar
-                                                title={'Добавить'}
-                                                classes={{
-                                                    root: classes.titleBar,
-                                                    title: classes.title,
-                                                }}
-                                            />
-                                        </GridListTile>
-                                        :
-                                        null
-                                    }
-                                    {previews.map((preview, idx) => (
-                                        <GridListTile key={preview}>
-                                            <img style={{cursor: 'pointer'}} src={preview} onClick={()=>{
-                                                showAppBar(false)
-                                                setShowLightbox(true)
-                                                setLightboxImages([...previews])
-                                                setLightboxIndex(idx)
-                                            }}/>
-                                            {router.query.id === 'new' ?
+                                <div className={classes.box}>
+                                    <Typography component='legend'>Фотографии</Typography>
+                                    <GridList className={classes.gridList} cols={2.5}>
+                                        {router.query.id === 'new' ?
+                                            <GridListTile
+                                                onClick={() => {
+                                                    setTypeImage('products')
+                                                    imageRef.current.click()
+                                                }}>
+                                                <img style={{cursor: 'pointer'}} src={'/static/add.png'}/>
                                                 <GridListTileBar
+                                                    title={'Добавить'}
                                                     classes={{
                                                         root: classes.titleBar,
                                                         title: classes.title,
                                                     }}
-                                                    actionIcon={
-                                                        <IconButton>
-                                                            <RemoveIcon onClick={() => {
-                                                                previews = [...previews]
-                                                                previews.splice(idx, 1)
-                                                                setPreviews(previews)
-                                                                images = [...images]
-                                                                images.splice(idx, 1)
-                                                                setImages(images)
-                                                            }} className={classes.title}/>
-                                                        </IconButton>
-                                                    }
                                                 />
-                                                :
-                                                null
-                                            }
-                                        </GridListTile>
-                                    ))}
-                                </GridList>
-                            </div>
+                                            </GridListTile>
+                                            :
+                                            null
+                                        }
+                                        {previews.map((preview, idx) => (
+                                            <GridListTile key={preview}>
+                                                <img style={{cursor: 'pointer'}} src={preview} onClick={() => {
+                                                    showAppBar(false)
+                                                    setShowLightbox(true)
+                                                    setLightboxImages([...previews])
+                                                    setLightboxIndex(idx)
+                                                }}/>
+                                                {router.query.id === 'new' ?
+                                                    <GridListTileBar
+                                                        classes={{
+                                                            root: classes.titleBar,
+                                                            title: classes.title,
+                                                        }}
+                                                        actionIcon={
+                                                            <IconButton>
+                                                                <RemoveIcon onClick={() => {
+                                                                    previews = [...previews]
+                                                                    previews.splice(idx, 1)
+                                                                    setPreviews(previews)
+                                                                    images = [...images]
+                                                                    images.splice(idx, 1)
+                                                                    setImages(images)
+                                                                }} className={classes.title}/>
+                                                            </IconButton>
+                                                        }
+                                                    />
+                                                    :
+                                                    null
+                                                }
+                                            </GridListTile>
+                                        ))}
+                                    </GridList>
+                                </div>
                             <div className={classes.box}>
                                 <FormControlLabel
                                     control={
                                         <Checkbox
                                             checked={needFho}
-                                            onChange={()=>{
+                                            onChange={() => {
                                                 if(router.query.id==='new')setNeedFho(!needFho);
                                             }}
                                             color='primary'
@@ -442,26 +433,22 @@ const Merchandising = React.memo((props) => {
                                             placeholder='Тип ФХО'
                                             value={fho.type}
                                             className={classes.input}
-                                            onChange={(event)=>{
+                                            onChange={(event) => {
                                                 if(router.query.id==='new') {
                                                     fhos[idx].type = event.target.value
                                                     setFhos([...fhos])
                                                 }
                                             }}
-                                            inputProps={{
-                                                'aria-label': 'description',
-                                            }}
                                             endAdornment={
                                                 <InputAdornment position='end'>
                                                     <IconButton
-                                                        onClick={()=>{
+                                                        onClick={() => {
                                                             if(router.query.id==='new') {
                                                                 fhos.splice(idx, 1)
                                                                 setFhos([...fhos])
                                                             }
                                                         }}
-                                                        aria-label='toggle password visibility'
-                                                    >
+                                                                                                            >
                                                         <RemoveIcon/>
                                                     </IconButton>
                                                 </InputAdornment>
@@ -496,7 +483,7 @@ const Merchandising = React.memo((props) => {
                                         control={
                                             <Checkbox
                                                 checked={fho.foreignProducts}
-                                                onChange={()=>{
+                                                onChange={() => {
                                                     if(router.query.id==='new') {
                                                         fhos[idx].foreignProducts = !fho.foreignProducts
                                                         setFhos([...fhos])
@@ -543,7 +530,7 @@ const Merchandising = React.memo((props) => {
                                         }
                                         {(router.query.id === 'new'?fho.previews:fho.images).map((preview, idx1) => (
                                             <GridListTile key={preview}>
-                                                <img src={preview} style={{cursor: 'pointer'}} onClick={()=>{
+                                                <img src={preview} style={{cursor: 'pointer'}} onClick={() => {
                                                     showAppBar(false)
                                                     setShowLightbox(true)
                                                     setLightboxImages([...(router.query.id === 'new'?fho.previews:fho.images)])
@@ -578,7 +565,7 @@ const Merchandising = React.memo((props) => {
                             {router.query.id === 'new' ?
                                 <>
                                 <br/>
-                                <Button variant='contained' onClick={async () => {
+                                <Button variant='contained' onClick={() => {
                                     fhos = [{
                                         type: '',
                                         images: [],
@@ -610,14 +597,11 @@ const Merchandising = React.memo((props) => {
                                     </div>
                                     <div className={classes.box}>
                                         <TextField
-                                            multiline={true}
+                                            multiline
                                             label='Комментарий проверяющего'
                                             value={reviewerComment}
                                             className={classes.input}
-                                            onChange={(event)=>{if(!data.merchandising.check&&['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role))setReviewerComment(event.target.value)}}
-                                            inputProps={{
-                                                'aria-label': 'description',
-                                            }}
+                                            onChange={(event) => {if(!data.merchandising.check&&['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role))setReviewerComment(event.target.value)}}
                                         />
                                     </div>
                                     </>
@@ -627,10 +611,10 @@ const Merchandising = React.memo((props) => {
                             <div className={isMobileApp?classes.bottomRouteM:classes.bottomRouteD}>
                                 {
                                     router.query.id==='new'?
-                                        <Button onClick={async()=>{
-                                            if(client&&organization){
-                                                const action = async() => {
-                                                    await addMerchandising({
+                                        <Button onClick={() => {
+                                            if(client&&organization) {
+                                                const action = async () => {
+                                                    const res = await addMerchandising({
                                                         organization: organization._id,
                                                         client: client._id,
                                                         productAvailability,
@@ -638,14 +622,14 @@ const Merchandising = React.memo((props) => {
                                                         productConditions,
                                                         productLocation,
                                                         images,
-                                                        fhos: fhos.map((fho)=>{delete fho.previews; return fho}),
+                                                        fhos: fhos.map((fho) => {delete fho.previews; return fho}),
                                                         needFho,
                                                         stateProduct,
                                                         type,
                                                         comment,
                                                         geo
                                                     })
-                                                    Router.push(`/merchandisings/${organization._id}`)
+                                                    if(res) Router.push(`/merchandising/${res}`)
                                                 }
                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                 showMiniDialog(true)
@@ -661,14 +645,14 @@ const Merchandising = React.memo((props) => {
                                 {
                                     router.query.id!=='new'?
                                         <>
-                                        <Button onClick={async () => {
+                                        <Button onClick={() => {
                                             Router.push(`/merchandisings/${organization?organization._id:'super'}?client=${client._id}`)
                                         }} size='small' color='primary'>
                                             История
                                         </Button>
                                         {
                                             geo ?
-                                                <Button onClick={async () => {
+                                                <Button onClick={() => {
                                                     setFullDialog('Карта', <Geos geos={[{geo: geo, name: 'Мерчендайзер'}, {geo: client.address[0][1], name: client.name}]}/>)
                                                     showFullDialog(true)
                                                 }} size='small' color='primary'>
@@ -679,9 +663,9 @@ const Merchandising = React.memo((props) => {
                                         }
                                         {
                                             !data.merchandising.check&&['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role) ?
-                                                <Button onClick={async () => {
+                                                <Button onClick={() => {
                                                     const action = async () => {
-                                                        await checkMerchandising({ids: router.query.id, reviewerScore, reviewerComment})
+                                                        await checkMerchandising({_id: router.query.id, reviewerScore, reviewerComment})
                                                         Router.back()
                                                     }
                                                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
@@ -694,9 +678,9 @@ const Merchandising = React.memo((props) => {
                                         }
                                         {
                                             !data.merchandising.check?
-                                                <Button onClick={async()=>{
-                                                    const action = async() => {
-                                                        await deleteMerchandising([router.query.id])
+                                                <Button onClick={() => {
+                                                    const action = async () => {
+                                                        await deleteMerchandising(router.query.id)
                                                         Router.back()
                                                     }
                                                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
@@ -752,13 +736,15 @@ Merchandising.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
+    // eslint-disable-next-line no-undef
+    const [merchandising, organizations] = await Promise.all([
+        ctx.query.id!=='new'?getMerchandising(ctx.query.id, getClientGqlSsr(ctx.req)):null,
+        ctx.query.id==='new'?getOrganizations({search: '', filter: ''}, getClientGqlSsr(ctx.req)):null
+    ])
     return {
         data: {
-            ...(await getOrganizations({search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)),
-            ...ctx.query.id!=='new' ?
-                await getMerchandising({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
-                :
-                {merchandising: {organization: undefined, type: types[0], client: undefined, productAvailability: [], geo:undefined, productInventory: false, productConditions: 0, productLocation: 0, images: [], fhos: [], needFho: false, check: false, stateProduct: 0, comment:''}}
+            merchandising,
+            ...organizations?{organizations: [{name: 'AZYK.STORE', _id: 'super'}, ...organizations]}:{}
         }
     };
 };

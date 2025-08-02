@@ -1,76 +1,71 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 
-export const getWarehouses = async(args, client)=>{
+const Warehouse = `
+    _id
+    createdAt
+    name
+    guid
+`
+
+export const getWarehouses = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: args,
+                variables,
                 query: gql`
                     query ($search: String!, $organization: ID!) {
-                        warehouses(search: $search, organization: $organization) {
-                            _id
-                            createdAt
-                            name
-                            guid
-                          }
+                        warehouses(search: $search, organization: $organization) {${Warehouse}}
                     }`,
             })
         return res.data.warehouses
-    } catch(err){
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const deleteWarehouse = async(_id)=>{
+export const deleteWarehouse = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
+        const res = await client.mutate({
             variables: {_id},
             mutation : gql`
                     mutation ($_id: ID!) {
-                        deleteWarehouse(_id: $_id) {
-                             data
-                        }
+                        deleteWarehouse(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.deleteWarehouse
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const addWarehouse = async(element)=>{
+export const addWarehouse = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        let res = await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($organization: ID!, $guid: String, $name: String!) {
-                        addWarehouse(organization: $organization, guid: $guid, name: $name) {
-                            _id
-                            createdAt
-                            guid
-                            name
-                        }
+                        addWarehouse(organization: $organization, guid: $guid, name: $name) {${Warehouse}}
                     }`})
-        return res.data
-    } catch(err){
+        return res.data.addWarehouse
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const setWarehouse = async(element)=>{
+export const setWarehouse = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($_id: ID!, $guid: String, $name: String) {
-                        setWarehouse(_id: $_id, guid: $guid, name: $name) {
-                             data
-                        }
+                        setWarehouse(_id: $_id, guid: $guid, name: $name)
                     }`})
-    } catch(err){
+        return res.data.setWarehouse
+    } catch(err) {
         console.error(err)
     }
 }

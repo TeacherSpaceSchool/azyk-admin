@@ -18,84 +18,76 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import TextField from '@material-ui/core/TextField';
 import Confirmation from '../components/dialog/Confirmation'
-import AddSocial from '../components/dialog/AddSocial'
 import Geo from '../components/dialog/Geo'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
-import PhoneIcon from '@material-ui/icons/Phone';
 import Sign from '../components/dialog/Sign';
+import {maxImageSize} from '../src/lib';
 
 
 const Contact = React.memo((props) => {
     const classes = contactStyle();
-    const { data } = props;
-    const { isMobileApp } = props.app;
-    const { showSnackBar } = props.snackbarActions;
+    const {data} = props;
+    const {isMobileApp} = props.app;
+    const {showSnackBar} = props.snackbarActions;
     let [name, setName] = useState(data.contact.name);
     let [address, setAddress] = useState(data.contact.address);
     let [newAddress, setNewAddress] = useState('');
-    let addAddress = ()=>{
+    let addAddress = () => {
         address = [...address, newAddress]
         setAddress(address)
         setNewAddress('')
     };
-    let editAddress = (event, idx)=>{
+    let editAddress = (event, idx) => {
         address[idx] = event.target.value
         setAddress([...address])
     };
-    let deleteAddress = (idx)=>{
+    let deleteAddress = (idx) => {
         address.splice(idx, 1);
         setAddress([...address])
     };
     let [warehouse, setWarehouse] = useState(data.contact.warehouse);
     let [email, setEmail] = useState(data.contact.email);
     let [newEmail, setNewEmail] = useState('');
-    let addEmail = ()=>{
+    let addEmail = () => {
         email = [...email, newEmail]
         setEmail(email)
         setNewEmail('')
     };
-    let editEmail = (event, idx)=>{
+    let editEmail = (event, idx) => {
         email[idx] = event.target.value
         setEmail([...email])
     };
-    let deleteEmail = (idx)=>{
+    let deleteEmail = (idx) => {
         email.splice(idx, 1);
         setEmail([...email])
     };
     let [phone, setPhone] = useState(data.contact.phone);
     let [newPhone, setNewPhone] = useState('');
-    let addPhone = ()=>{
+    let addPhone = () => {
         phone = [...phone, newPhone]
         setPhone(phone)
         setNewPhone('')
     };
-    let editPhone = (event, idx)=>{
+    let editPhone = (event, idx) => {
         phone[idx] = event.target.value
         setPhone([...phone])
     };
-    let deletePhone = (idx)=>{
+    let deletePhone = (idx) => {
         phone.splice(idx, 1);
         setPhone([...phone])
     };
-    let [social, setSocial] = useState(data.contact.social);
-    let addSocial = (value, idx)=>{
-        social[idx] = value
-        setSocial([...social])
-    };
     let [info, setInfo] = useState(data.contact.info);
     let [preview, setPreview] = useState(data.contact.image===''?'/static/add.png':data.contact.image);
-    let [image, setImage] = useState(undefined);
+    let [image, setImage] = useState(null);
     let handleChangeImage = ((event) => {
-        if(event.target.files[0].size/1024/1024<50){
+        if(event.target.files[0].size/1024/1024<maxImageSize) {
             setImage(event.target.files[0])
             setPreview(URL.createObjectURL(event.target.files[0]))
-        } else {
-            showSnackBar('Файл слишком большой')
-        }
+        } else showSnackBar('Файл слишком большой')
     })
-    const { profile } = props.user;
-    const { setMiniDialog, showMiniDialog, setFullDialog, showFullDialog } = props.mini_dialogActions;
+    const {profile} = props.user;
+    const {setMiniDialog, showMiniDialog, setFullDialog, showFullDialog} = props.mini_dialogActions;
     return (
         <App pageName='Контакты'>
             <Head>
@@ -110,65 +102,41 @@ const Contact = React.memo((props) => {
                                     <div className={classes.column}>
                                         <label htmlFor='contained-button-file'>
                                             <img
+                                                style={preview==='/static/add.png'?{border: '1px red solid'}:null}
                                                 className={isMobileApp?classes.mediaM:classes.mediaD}
                                                 src={preview}
                                                 alt={'Добавить'}
                                             />
                                         </label>
                                         <br/>
-                                        <div className={classes.geo} style={{color: warehouse&&warehouse.length>0?'#ffb300':'red'}} onClick={()=>{
-                                            setFullDialog('Геолокация', <Geo change={true} geo={warehouse} setAddressGeo={setWarehouse}/>)
+                                        <div className={classes.geo} style={{color: warehouse&&warehouse.length?'#ffb300':'red'}} onClick={() => {
+                                            setFullDialog('Геолокация', <Geo change geo={warehouse} setAddressGeo={setWarehouse}/>)
                                             showFullDialog(true)
                                         }}>
                                             Склад
                                         </div>
-                                        Наши страницы
-                                        <div className={classes.row}>
-                                            <img src='/static/instagram.svg' onClick={()=>{
-                                                setMiniDialog('Instagram', <AddSocial social={social[0]} action={addSocial} idx={0}/>)
-                                                showMiniDialog(true)
-                                            }} className={classes.mediaSocial}/>
-                                            <img src='/static/facebook.svg' onClick={()=>{
-                                                setMiniDialog('Facebook', <AddSocial social={social[1]} action={addSocial} idx={1}/>)
-                                                showMiniDialog(true)
-                                            }} className={classes.mediaSocial}/>
-                                            <img src='/static/twitter.svg' onClick={()=>{
-                                                setMiniDialog('Twitter', <AddSocial social={social[2]} action={addSocial} idx={2}/>)
-                                                showMiniDialog(true)
-                                            }} className={classes.mediaSocial}/>
-                                            <img src='/static/telegram.svg' onClick={()=>{
-                                                setMiniDialog('Telegram', <AddSocial social={social[3]} action={addSocial} idx={3}/>)
-                                                showMiniDialog(true)
-                                            }} className={classes.mediaSocial}/>
-                                        </div>
                                     </div>
                                     <div>
                                         <TextField
+                                            error={!name}
                                                 label='Имя'
                                                 value={name}
                                                 className={classes.input}
-                                                onChange={(event)=>{setName(event.target.value)}}
-                                                inputProps={{
-                                                    'aria-label': 'description',
-                                                }}
-                                            />
+                                                onChange={(event) => {setName(event.target.value)}}
+                                        />
                                         {address.map((element, idx)=>
                                             <FormControl  key={`address${idx}`} className={classes.input}>
                                                 <InputLabel>Адрес</InputLabel>
                                                 <Input
                                                     placeholder='Адрес'
                                                     value={element}
-                                                    onChange={(event)=>{editAddress(event, idx)}}
-                                                    inputProps={{
-                                                        'aria-label': 'description',
-                                                    }}
+                                                    onChange={(event) => {editAddress(event, idx)}}
                                                     endAdornment={
-                                                        <InputAdornment position="end">
+                                                        <InputAdornment position='end'>
                                                             <IconButton
-                                                                onClick={()=>{
+                                                                onClick={() => {
                                                                     deleteAddress(idx)
                                                                 }}
-                                                                aria-label='toggle password visibility'
                                                             >
                                                                 <Remove/>
                                                             </IconButton>
@@ -177,9 +145,7 @@ const Contact = React.memo((props) => {
                                                 />
                                             </FormControl>
                                         )}
-                                        <Button onClick={async()=>{
-                                            addAddress()
-                                        }} size='small' color='primary'>
+                                        <Button onClick={() => addAddress()} size='small' color='primary'>
                                             Добавить адрес
                                         </Button>
                                         <br/>
@@ -189,18 +155,10 @@ const Contact = React.memo((props) => {
                                                 <InputLabel>Email</InputLabel>
                                                 <Input
                                                     value={element}
-                                                    onChange={(event)=>{editEmail(event, idx)}}
-                                                    inputProps={{
-                                                        'aria-label': 'description',
-                                                    }}
+                                                    onChange={(event) => {editEmail(event, idx)}}
                                                     endAdornment={
-                                                        <InputAdornment position="end">
-                                                            <IconButton
-                                                                onClick={()=>{
-                                                                    deleteEmail(idx)
-                                                                }}
-                                                                aria-label='toggle password visibility'
-                                                            >
+                                                        <InputAdornment position='end'>
+                                                            <IconButton onClick={() => deleteEmail(idx)}>
                                                                 <Remove/>
                                                             </IconButton>
                                                         </InputAdornment>
@@ -208,7 +166,7 @@ const Contact = React.memo((props) => {
                                                 />
                                             </FormControl>
                                         )}
-                                        <Button onClick={async()=>{
+                                        <Button onClick={() => {
                                             addEmail()
                                         }} size='small' color='primary'>
                                             Добавить email
@@ -220,17 +178,13 @@ const Contact = React.memo((props) => {
                                                 <InputLabel>Телефон</InputLabel>
                                                 <Input
                                                     value={element}
-                                                    onChange={(event)=>{editPhone(event, idx)}}
-                                                    inputProps={{
-                                                        'aria-label': 'description',
-                                                    }}
+                                                    onChange={(event) => {editPhone(event, idx)}}
                                                     endAdornment={
-                                                        <InputAdornment position="end">
+                                                        <InputAdornment position='end'>
                                                             <IconButton
-                                                                onClick={()=>{
+                                                                onClick={() => {
                                                                     deletePhone(idx)
                                                                 }}
-                                                                aria-label='toggle password visibility'
                                                             >
                                                                 <Remove/>
                                                             </IconButton>
@@ -239,7 +193,7 @@ const Contact = React.memo((props) => {
                                                 />
                                             </FormControl>
                                         )}
-                                        <Button onClick={async()=>{
+                                        <Button onClick={() => {
                                             addPhone()
                                         }} size='small' color='primary'>
                                             Добавить телефон
@@ -247,30 +201,20 @@ const Contact = React.memo((props) => {
                                         <br/>
                                         <br/>
                                         <TextField
-                                            multiline={true}
+                                            error={!info}
+                                            multiline
                                             label='Информация'
                                             value={info}
                                             className={classes.input}
-                                            onChange={(event)=>{setInfo(event.target.value)}}
-                                            inputProps={{
-                                                'aria-label': 'description',
-                                            }}
+                                            onChange={(event) => {setInfo(event.target.value)}}
                                         />
                                         <div className={classes.row}>
-                                            <Button onClick={async()=>{
+                                            <Button onClick={() => {
                                                 let editElement = {
-                                                    name: name,
-                                                    address: address,
-                                                    email: email,
-                                                    phone: phone,
-                                                    social: social,
-                                                    info: info,
-                                                    warehouse: warehouse
+                                                    name, address, email, phone, info, warehouse
                                                 }
-                                                if(image!==undefined)editElement.image = image
-                                                const action = async() => {
-                                                    await setContact(editElement)
-                                                }
+                                                if(image)editElement.image = image
+                                                const action = async () => await setContact(editElement)
                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                 showMiniDialog(true)
                                             }} size='small' color='primary'>
@@ -287,49 +231,6 @@ const Contact = React.memo((props) => {
                                         src={preview}
                                         alt={name}
                                     />
-                                    {
-                                        social[0].length>0||social[1].length>0||social[2].length>0||social[3].length>0?
-                                            <>
-                                        Наши страницы
-                                        <div className={classes.row}>
-                                            {
-                                                social[0].length>0?
-                                                    <a href={social[0]}>
-                                                        <img src='/static/instagram.svg' className={classes.mediaSocial}/>
-                                                    </a>
-                                                    :
-                                                    null
-                                            }
-                                            {
-                                                social[1].length>0?
-                                                    <a href={social[1]}>
-                                                        <img src='/static/facebook.svg' className={classes.mediaSocial}/>
-                                                    </a>
-                                                    :
-                                                    null
-                                            }
-                                            {
-                                                social[2].length>0?
-                                                    <a href={social[2]}>
-                                                        <img src='/static/twitter.svg' className={classes.mediaSocial}/>
-                                                    </a>
-                                                    :
-                                                    null
-                                            }
-                                            {
-                                                social[3].length>0?
-                                                    <a href={social[3]}>
-                                                        <img src='/static/telegram.svg' className={classes.mediaSocial}/>
-                                                    </a>
-                                                    :
-                                                    null
-
-                                            }
-                                        </div>
-                                        </>
-                                            :
-                                            null
-                                    }
                                 </div>
                                             <div>
                                                 <div className={classes.name}>
@@ -355,9 +256,9 @@ const Contact = React.memo((props) => {
                                                         Телефон:&nbsp;
                                                     </div>
                                                     <div className={classes.column}>
-                                                        {phone.map((element, idx)=>{
+                                                        {phone.map((element, idx) => {
                                                             let tel = ''
-                                                            for(let i=0; i<element.length; i++){
+                                                            for(let i=0; i<element.length; i++) {
                                                                 if('0123456789+'.includes(element[i]))
                                                                     tel+=element[i]
                                                             }
@@ -391,7 +292,7 @@ const Contact = React.memo((props) => {
                                                         </svg>
                                                         WhatsApp
                                                     </a>
-                                                    &nbsp;&nbsp;&nbsp;
+                                                    {/*&nbsp;&nbsp;&nbsp;
                                                     <a
                                                         href='tel:+996559995197'
                                                         className={classes.value}
@@ -399,7 +300,7 @@ const Contact = React.memo((props) => {
                                                     >
                                                         <PhoneIcon/>
                                                         Позвонить
-                                                    </a>
+                                                    </a>*/}
                                                 </div>
                                                 {
                                                     email[0]?<div className={classes.row}>
@@ -434,7 +335,7 @@ const Contact = React.memo((props) => {
             />
             {
                 !profile.role?
-                    <div className={classes.scrollDown} onClick={()=>{
+                    <div className={classes.scrollDown} onClick={() => {
                         setMiniDialog('Вход', <Sign isMobileApp={isMobileApp}/>)
                         showMiniDialog(true)
                     }}>
@@ -454,7 +355,7 @@ Contact.getInitialProps = async function(ctx) {
     await initialApp(ctx)
     return {
         data: {
-            ...await getContact(ctx.req?await getClientGqlSsr(ctx.req):undefined)
+            contact: await getContact(getClientGqlSsr(ctx.req))
         }
 
     };

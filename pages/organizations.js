@@ -1,81 +1,117 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../layouts/App';
 import { connect } from 'react-redux'
 import { getOrganizations } from '../src/gql/organization'
 import pageListStyle from '../src/styleMUI/organization/orgaizationsList'
-import CardOrganization from '../components/organization/CardOrganization'
+import CardOrganization from '../components/card/CardOrganization'
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Link from 'next/link';
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
-import Router from 'next/router'
+import Router, {useRouter} from 'next/router'
+import {getQueryParam, unawaited} from '../src/lib';
+import {getAdsOrganizations} from '../src/gql/ads';
+
+const adsPath = 'ads'
+
+const filters = [{name: 'Все', value: ''}, {name: 'Активные', value: 'active'}, {name: 'Неактивные', value: 'deactive'}]
 
 const Organization = React.memo((props) => {
     const classes = pageListStyle();
-    const { data } = props;
+    const {data} = props;
+    const {profile} = props.user;
+    const router = useRouter();
+    const defaultPath = 'organization'
+    const path = router.query.path||defaultPath
+    const defaultTitle = 'Организации'
+    const title = router.query.title||defaultTitle
+    const showSuperOrganization = profile.role==='admin'&&path!==defaultPath&&router.query.super
     let [list, setList] = useState(data.organizations);
-    const { search, filter, city } = props.app;
-    const { profile } = props.user;
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const {search, filter, city} = props.app;
+    const prevPath = useRef(null);
+    const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
-    const getList = async ()=>{
-        setList((await getOrganizations({search, filter: filter, city: city})).organizations);
+    const getList = async (varPath) => {
+        setList(profile.role!=='admin'&&(varPath||path)===adsPath?
+            await getAdsOrganizations()
+            :
+            await getOrganizations({search, filter, city})
+        );
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         setPagination(100);
     }
-    useEffect(()=>{
-        (async()=>{
-            if(!initialRender.current) {
-                await getList()
+    useEffect(() => {
+        const routeChangeComplete = (url) => {
+            if(
+                profile.role!=='admin'&&(!prevPath.current||
+                (prevPath.current!==url&&
+                (!prevPath.current.includes(adsPath)&&url.includes(adsPath)||
+                prevPath.current.includes(adsPath)&&!url.includes(adsPath))))
+            ) {
+                unawaited(() => getList(getQueryParam(url, 'path')||defaultPath))
             }
-        })()
-    },[filter, city])
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
-                initialRender.current = false;
-            } else {
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    await getList()
-                }, 500)
-                setSearchTimeOut(searchTimeOut)
-            }
-        })()
-    },[ search])
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
+            prevPath.current = url;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         }
-    }
+        Router.events.on('routeChangeComplete', routeChangeComplete);
+        return () => {
+            Router.events.off('routeChangeComplete', routeChangeComplete)
+        }
+    }, [])
+    useEffect(() => {
+        if (!initialRender.current) unawaited(getList)
+    }, [filter, city])
+    useEffect(() => {
+        if(initialRender.current) {
+            initialRender.current = false;
+        } else {
+            if(searchTimeOut.current)
+                clearTimeout(searchTimeOut.current)
+            searchTimeOut.current = setTimeout(() => {
+                unawaited(getList)
+            }, 500)
+        }
+    }, [search])
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, list])
     return (
-        <App cityShow checkPagination={checkPagination} searchShow={true} filters={data.filterOrganization} pageName='Организации'>
+        <App cityShow checkPagination={checkPagination} searchShow filters={profile.role==='admin'&&filters} pageName={title}>
             <Head>
-                <title>Организации</title>
+                <title>{title}</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
                 {`Всего: ${list.length}`}
             </div>
             <div className={classes.page}>
+                {
+                    showSuperOrganization?
+                        <Link href={`/${path}/[id]`} as={`/${path}/super`}>
+                            <a>
+                                <CardOrganization element={{name: 'AZYK.STORE', image: '/static/512x512.png'}}/>
+                            </a>
+                        </Link>
+                        :null
+                }
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <Link href='/organization/[id]' as={`/organization/${element._id}`}>
+                            <Link key={element._id} href={`/${path}/[id]`} as={`/${path}/${element._id}`}>
                                 <a>
-                                    <CardOrganization organization key={element._id} setList={setList} element={element}/>
+                                    <CardOrganization list={list} setList={setList} element={element}/>
                                 </a>
                             </Link>
                         )}
                 ):null}
             </div>
-            {profile.role==='admin'?
+            {profile.role==='admin'&&path===defaultPath?
                 <Link href='/organization/[id]' as={`/organization/new`}>
-                    <Fab color='primary' aria-label='add' className={classes.fab}>
+                    <Fab color='primary' className={classes.fab}>
                         <AddIcon />
                     </Fab>
                 </Link>
@@ -97,7 +133,12 @@ Organization.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     return {
-        data: await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+        data: {
+            organizations: ctx.store.getState().user.profile.role!=='admin'&&ctx.query.path===adsPath?
+                await getAdsOrganizations(getClientGqlSsr(ctx.req))
+                :
+                await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, getClientGqlSsr(ctx.req))
+        }
     };
 };
 

@@ -2,7 +2,7 @@ import { db } from '../idb'
 
 export let initOfflineOrders = (db) => {
     try {
-        if (db.objectStoreNames.contains('offlineOrders')) {
+        if(db.objectStoreNames.contains('offlineOrders')) {
             db.deleteObjectStore('offlineOrders');
         }
         db.createObjectStore('offlineOrders', {
@@ -10,54 +10,54 @@ export let initOfflineOrders = (db) => {
             autoIncrement: true,
         });
     }
-    catch (error){
+    catch (error) {
         console.error(error)
     }
 }
 
-export let clearAllOfflineOrders = async() => {
+export let clearAllOfflineOrders = async () => {
     try {
-        if(db!==undefined){
+        if(db) {
             await db.clear('offlineOrders')
         }
     }
-    catch (error){
+    catch (error) {
         console.error(error)
     }
 }
 
 export let deleteOfflineOrderByKey = async(key) => {
     try {
-        if(db!==undefined){
+        if(db) {
             await db.delete('offlineOrders', key)
         }
     }
-    catch (error){
+    catch (error) {
         console.error(error)
     }
 }
 
-export let getAllOfflineOrders = async() => {
+export let getAllOfflineOrders = async () => {
     try {
-        if(db!==undefined){
+        if(db) {
             let res = await db.getAll('offlineOrders')
             return res.map(res=>{return {...res.data, key: res.id}})
         }
     }
-    catch (error){
+    catch (error) {
         console.error(error)
     }
 }
 
 export let putOfflineOrders = async(data) => {
     try {
-        if(db!==undefined){
+        if(db) {
             await db.add('offlineOrders', {
                 data: data
             });
         }
     }
-    catch (error){
+    catch (error) {
         console.error(error)
     }
 }

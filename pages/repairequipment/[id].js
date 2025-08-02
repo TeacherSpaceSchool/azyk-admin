@@ -11,7 +11,6 @@ import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import { useRouter } from 'next/router'
-import { getActiveOrganization } from '../../src/gql/statistic'
 import Router from 'next/router'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import TextField from '@material-ui/core/TextField';
@@ -32,43 +31,40 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
+import {getOrganizations} from '../../src/gql/organization';
 
 const RepairEquipment = React.memo((props) => {
-    const { profile } = props.user;
+    const {profile} = props.user;
     const classes = organizationStyle();
-    const { data } = props;
-    const { isMobileApp, city } = props.app;
-    const { showSnackBar } = props.snackbarActions;
+    const {data} = props;
+    const {isMobileApp, city} = props.app;
+    const {showSnackBar} = props.snackbarActions;
     const initialRender = useRef(true);
     const [clients, setClients] = useState([]);
     const [inputValue, setInputValue] = React.useState('');
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const searchTimeOut = useRef(null);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
-        (async()=>{
-            if (inputValue.length < 3) {
+            if(inputValue.length < 3) {
                 setClients([]);
-                if (open)
+                if(open)
                     setOpen(false)
-                if (loading)
+                if(loading)
                     setLoading(false)
             }
             else {
-                if (!loading)
+                if(!loading)
                     setLoading(true)
-                if (searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async () => {
-                    setClients((await getClients({search: inputValue, sort: '-name', filter: 'all', city})).clients)
-                    if (!open)
+                if(searchTimeOut.current)
+                    clearTimeout(searchTimeOut.current)
+                searchTimeOut.current = setTimeout(async () => {
+                    setClients(await getClients({search: inputValue, sort: '-name', filter: 'all', city}))
+                    if(!open)
                         setOpen(true)
                     setLoading(false)
                 }, 500)
-                setSearchTimeOut(searchTimeOut)
             }
-        })()
     }, [inputValue]);
     const handleChange = event => {
         setInputValue(event.target.value);
@@ -80,72 +76,63 @@ const RepairEquipment = React.memo((props) => {
     let [accept, setAccept] = useState(data.repairEquipment?data.repairEquipment.accept:false);
     let [done, setDone] = useState(data.repairEquipment?data.repairEquipment.done:false);
     let [cancel, setCancel] = useState(data.repairEquipment?data.repairEquipment.cancel:false);
-    let [activeOrganization, setActiveOrganization] = useState(data.activeOrganization);
+    let [organizations, setOrganizations] = useState(data.organizations);
     let [defect, setDefect] = useState(data.repairEquipment?data.repairEquipment.defect:[]);
     let [repair, setRepair] = useState(data.repairEquipment?data.repairEquipment.repair:[]);
-    let [organization, setOrganization] = useState(data.repairEquipment!==null?data.repairEquipment.organization:undefined);
-    let [client, setClient] = useState(data.repairEquipment?data.repairEquipment.client:undefined);
-    let [equipment, setEquipment] = useState(data.repairEquipment?data.repairEquipment.equipment:undefined);
+    let [organization, setOrganization] = useState(data.repairEquipment?data.repairEquipment.organization:profile.organization?{_id: profile.organization}:null);
+    let [client, setClient] = useState(data.repairEquipment?data.repairEquipment.client:null);
+    let [equipment, setEquipment] = useState(data.repairEquipment?data.repairEquipment.equipment:null);
     let handleOrganization = async (organization) => {
         setOrganization(organization)
     };
-    const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const router = useRouter()
-    useEffect(()=>{
-        (async()=>{
+    useEffect(() => {
+        (async () => {
             if(initialRender.current) {
                 initialRender.current = false;
-                if(profile.organization)
-                    setOrganization({_id: profile.organization})
             }
             else {
-                setOrganization(undefined)
-                setActiveOrganization((await getActiveOrganization(city)).activeOrganization)
+                setOrganization(null)
+                setOrganizations(await getOrganizations({search: '', filter: '', city}))
             }
         })()
-    },[city])
+    }, [city])
     return (
-        <App cityShow={router.query.id==='new'} pageName={data.repairEquipment?router.query.id==='new'?'Добавить':data.repairEquipment.number:'Ничего не найдено'}>
+        <App cityShow={router.query.id==='new'} pageName={router.query.id==='new'?'Добавить':data.repairEquipment?data.repairEquipment.number:'Ничего не найдено'}>
             <Head>
-                <title>{data.repairEquipment!==null?router.query.id==='new'?'Добавить':data.repairEquipment.number:'Ничего не найдено'}</title>
+                <title>{router.query.id==='new'?'Добавить':data.repairEquipment?data.repairEquipment.number:'Ничего не найдено'}</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                 {
-                    data.repairEquipment!==null?
+                    router.query.id==='new'||data.repairEquipment?
                         <>
                         {
                             !profile.organization&& router.query.id==='new'?
                                 <Autocomplete
                                     className={classes.input}
-                                    options={activeOrganization}
+                                    options={organizations}
                                     getOptionLabel={option => option.name}
                                     value={organization}
-                                    onChange={(event, newValue) => {
-                                        handleOrganization(newValue)
-                                    }}
+                                    onChange={(event, newValue) => handleOrganization(newValue)}
                                     noOptionsText='Ничего не найдено'
-                                    renderInput={params => (
-                                        <TextField {...params} label='Выберите организацию' fullWidth />
-                                    )}
+                                    renderInput={params => <TextField error={!organization} {...params} label='Выберите организацию' fullWidth />}
                                 />
                                 :
-                                !profile.organization&&organization.name?
+                                !profile.organization&&organization?
                                     <TextField
                                         label='Организация'
                                         value={organization.name}
                                         className={classes.input}
-                                        inputProps={{
-                                            'aria-label': 'description',
-                                            readOnly: true,
-                                        }}
+                                        inputProps={{readOnly: true}}
                                     />
                                     :
                                     null
                         }
                         {
-                            profile.role!=='ремонтник'&&!data.repairEquipment.accept&&!data.repairEquipment.cancel?
+                            router.query.id==='new'||profile.role!=='ремонтник'&&!data.repairEquipment.accept&&!data.repairEquipment.cancel?
                                 <Autocomplete
                                     onClose={()=>setOpen(false)}
                                     open={open}
@@ -153,19 +140,17 @@ const RepairEquipment = React.memo((props) => {
                                     className={classes.input}
                                     options={clients}
                                     getOptionLabel={option => `${option.name}${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
-                                    onChange={(event, newValue) => {
-                                        handleClient(newValue)
-                                    }}
+                                    onChange={(event, newValue) => handleClient(newValue)}
                                     value={client}
                                     noOptionsText='Ничего не найдено'
                                     renderInput={params => (
-                                        <TextField {...params} label='Выберите клиента' variant='outlined' fullWidth
+                                        <TextField error={!client} {...params} label='Выберите клиента' fullWidth
                                                    onChange={handleChange}
                                                    InputProps={{
                                                        ...params.InputProps,
                                                        endAdornment: (
                                                            <React.Fragment>
-                                                               {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                                                               {loading ? <CircularProgress color='inherit' size={20} /> : null}
                                                                {params.InputProps.endAdornment}
                                                            </React.Fragment>
                                                        ),
@@ -178,55 +163,42 @@ const RepairEquipment = React.memo((props) => {
                                     label='Клиент'
                                     value={`${client.name}${client.address&&client.address[0]?` (${client.address[0][2]?`${client.address[0][2]}, `:''}${client.address[0][0]})`:''}`}
                                     className={classes.input}
-                                    inputProps={{
-                                        'aria-label': 'description',
-                                        readOnly: true,
-                                    }}
+                                    inputProps={{readOnly: true}}
                                 />
                         }
                         <TextField
+                            error={!equipment}
                             label='Оборудование'
                             value={equipment}
                             className={classes.input}
-                            onChange={(event)=>{
-                                if(profile.role!=='ремонтник'&&!data.repairEquipment.accept&&!data.repairEquipment.cancel)
-                                    setEquipment(event.target.value)
-                            }}
-                            inputProps={{
-                                'aria-label': 'description',
-                            }}
+                            inputProps={{readOnly: data.repairEquipment&&(accept||cancel)}}
+                            onChange={(event) => setEquipment(event.target.value)}
                         />
                         {
-                            data.repairEquipment.agent?
+                            data.repairEquipment&&data.repairEquipment.agent?
                                 <TextField
                                     label='Агент'
                                     value={data.repairEquipment.agent.name}
                                     className={classes.input}
-                                    inputProps={{
-                                        'aria-label': 'description',
-                                        readOnly: true,
-                                    }}
+                                    inputProps={{readOnly: true}}
                                 />
                                 :
                                 null
                         }
                         {
-                            data.repairEquipment.repairman?
+                            data.repairEquipment&&data.repairEquipment.repairman?
                                 <TextField
                                     label='Ремонтник'
                                     value={data.repairEquipment.repairman.name}
                                     className={classes.input}
-                                    inputProps={{
-                                        'aria-label': 'description',
-                                        readOnly: true,
-                                    }}
+                                    inputProps={{readOnly: true}}
                                 />
                                 :
                                 null
                         }
                         <ExpansionPanel className={classes.input}>
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                                <h3>
+                                <h3 style={{color: defect[0]?'black':'red'}}>
                                     Неисправностей {defect.length}
                                 </h3>
                             </ExpansionPanelSummary>
@@ -239,19 +211,16 @@ const RepairEquipment = React.memo((props) => {
                                                 placeholder={`Неисправность ${idx+1}`}
                                                 value={element}
                                                 className={classes.input}
-                                                onChange={(event)=>{
+                                                onChange={(event) => {
                                                     defect[idx] = event.target.value
                                                     setDefect([...defect])
                                                 }}
-                                                inputProps={{
-                                                    'aria-label': 'description',
-                                                    readOnly: profile.role==='ремонтник'||data.repairEquipment.accept||data.repairEquipment.cancel
-                                                }}
+                                                inputProps={{readOnly: router.query.id!=='new'&&(profile.role==='ремонтник'||data.repairEquipment.accept||data.repairEquipment.cancel)}}
                                                 endAdornment={
-                                                    profile.role!=='ремонтник'&&!data.repairEquipment.accept&&!data.repairEquipment.cancel?
-                                                        <InputAdornment position="end">
+                                                    router.query.id==='new'||profile.role!=='ремонтник'&&!data.repairEquipment.accept&&!data.repairEquipment.cancel?
+                                                        <InputAdornment position='end'>
                                                             <IconButton
-                                                                onClick={()=>{
+                                                                onClick={() => {
                                                                     defect.splice(idx, 1);
                                                                     setDefect([...defect])
                                                                 }}
@@ -267,8 +236,8 @@ const RepairEquipment = React.memo((props) => {
                                     </div>
                                 ): null}
                                 {
-                                    profile.role!=='ремонтник'&&!data.repairEquipment.accept&&!data.repairEquipment.cancel?
-                                        <Button onClick={async()=>{
+                                    router.query.id==='new'||profile.role!=='ремонтник'&&!data.repairEquipment.accept&&!data.repairEquipment.cancel?
+                                        <Button onClick={async () => {
                                             defect = [...defect, '']
                                             setDefect(defect)
                                         }} size='small' color='primary'>
@@ -280,7 +249,7 @@ const RepairEquipment = React.memo((props) => {
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
                         {
-                            accept?
+                            data.repairEquipment&&data.repairEquipment.accept?
                                 <ExpansionPanel className={classes.input}>
                                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                                         <h3>
@@ -296,19 +265,16 @@ const RepairEquipment = React.memo((props) => {
                                                         placeholder={`Ремонт ${idx+1}`}
                                                         value={element}
                                                         className={classes.input}
-                                                        onChange={(event)=>{
+                                                        onChange={(event) => {
                                                             repair[idx] = event.target.value
                                                             setRepair([...repair])
                                                         }}
-                                                        inputProps={{
-                                                            'aria-label': 'description',
-                                                            readOnly: !['admin', 'ремонтник'].includes(profile.role)||data.repairEquipment.done
-                                                        }}
+                                                        inputProps={{readOnly: !['admin', 'ремонтник'].includes(profile.role)||data.repairEquipment.done}}
                                                         endAdornment={
                                                             ['admin', 'ремонтник'].includes(profile.role)&&!data.repairEquipment.done?
-                                                                <InputAdornment position="end">
+                                                                <InputAdornment position='end'>
                                                                     <IconButton
-                                                                        onClick={()=>{
+                                                                        onClick={() => {
                                                                             repair.splice(idx, 1);
                                                                             setRepair([...repair])
                                                                         }}
@@ -347,7 +313,7 @@ const RepairEquipment = React.memo((props) => {
                                     control={
                                         <Checkbox
                                             checked={accept}
-                                            onChange={()=>{
+                                            onChange={() => {
                                                 setAccept(!accept)
                                             }}
                                             color='primary'
@@ -360,7 +326,7 @@ const RepairEquipment = React.memo((props) => {
                                     control={
                                         <Checkbox
                                             checked={done}
-                                            onChange={()=>{
+                                            onChange={() => {
                                                 setDone(!done)
                                             }}
                                             color='primary'
@@ -373,7 +339,7 @@ const RepairEquipment = React.memo((props) => {
                                     control={
                                         <Checkbox
                                             checked={cancel}
-                                            onChange={()=>{
+                                            onChange={() => {
                                                 setCancel(!cancel)
                                             }}
                                             color='secondary'
@@ -388,12 +354,12 @@ const RepairEquipment = React.memo((props) => {
                         <div className={classes.row}>
                             {
                                 router.query.id==='new'?
-                                    <Button onClick={async()=>{
-                                        if (defect.length>0&&equipment&&client&&client._id) {
-                                            const action = async() => {
-                                                let repairEquipment = {organization: organization._id, equipment, client: client._id, defect: defect}
-                                                await addRepairEquipment(repairEquipment)
-                                                Router.push(`/repairequipments/${organization&&organization._id?organization._id:profile.organization}`)
+                                    <Button onClick={async () => {
+                                        if(defect.length&&equipment&&client&&organization) {
+                                            const action = async () => {
+                                                const res = await addRepairEquipment({organization: organization._id, equipment, client: client._id, defect})
+                                                if(res)
+                                                    Router.push(`/repairequipment/${res}`)
                                             }
                                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                             showMiniDialog(true)
@@ -405,7 +371,7 @@ const RepairEquipment = React.memo((props) => {
                                     </Button>
                                     :
                                     <>
-                                    <Button onClick={async()=>{
+                                    <Button onClick={async () => {
                                         let editElement = {_id: data.repairEquipment._id}
                                         if(accept!==data.repairEquipment.accept)editElement.accept = accept
                                         if(done!==data.repairEquipment.done)editElement.done = done
@@ -414,7 +380,7 @@ const RepairEquipment = React.memo((props) => {
                                         if(profile.role!=='ремонтник'&&!data.repairEquipment.accept&&!data.repairEquipment.cancel)editElement.equipment = equipment
                                         if(profile.role!=='ремонтник'&&!data.repairEquipment.accept&&!data.repairEquipment.cancel&&client)editElement.client = client._id
                                         if(['admin', 'ремонтник'].includes(profile.role)&&!data.repairEquipment.done&&data.repairEquipment.accept)editElement.repair = repair
-                                        const action = async() => {
+                                        const action = async () => {
                                             await setRepairEquipment(editElement)
                                             router.reload()
                                         }
@@ -426,9 +392,9 @@ const RepairEquipment = React.memo((props) => {
                                     {
                                         data.repairEquipment.cancel?
                                             <Button onClick={
-                                                async()=>{
-                                                    const action = async() => {
-                                                        await deleteRepairEquipment([data.repairEquipment._id])
+                                                async () => {
+                                                    const action = async () => {
+                                                        await deleteRepairEquipment(data.repairEquipment._id)
                                                         Router.push(`/repairequipments/${organization._id}`)
                                                     }
                                                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
@@ -463,10 +429,15 @@ RepairEquipment.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
+    // eslint-disable-next-line no-undef
+    const [repairEquipment, organizations] = await Promise.all([
+        ctx.query.id!=='new'?getRepairEquipment(ctx.query.id, getClientGqlSsr(ctx.req)):null,
+        ctx.query.id==='new'?getOrganizations({search: '', filter: ''}, getClientGqlSsr(ctx.req)):null
+    ])
     return {
         data: {
-            ...ctx.query.id!=='new'?await getRepairEquipment({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{repairEquipment:{defect: [],repair: [],equipment: undefined,organization: undefined}},
-            activeOrganization: ctx.store.getState().user.profile.organization?[]:[{name: 'AZYK.STORE', _id: 'super'}, ...(await getActiveOrganization(ctx.store.getState().app.city, ctx.req?await getClientGqlSsr(ctx.req):undefined)).activeOrganization],
+            repairEquipment,
+            ...organizations?{organizations}:{}
         }
     };
 };

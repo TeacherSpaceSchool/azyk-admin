@@ -89,9 +89,9 @@ export default makeStyles({
 
     },
     selectType: {
-        width: 100,
+        width: 120,
         textAlign: 'center',
-        margin: 10,
+        margin: 5,
         padding: 4,
         cursor: 'pointer',
         borderRadius: 10,

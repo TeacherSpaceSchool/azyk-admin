@@ -16,22 +16,22 @@ import GeoSelectClient from './GeoSelectClient';
 
 const Geo =  React.memo(
     (props) =>{
-        const { showFullDialog, setFullDialog } = props.mini_dialogActions;
-        const { showSnackBar } = props.snackbarActions;
-        const { profile } = props.user;
-        const { classes, clients, unselectedClient, selectClient } = props;
+        const {showFullDialog, setFullDialog} = props.mini_dialogActions;
+        const {showSnackBar} = props.snackbarActions;
+        const {profile} = props.user;
+        const {classes, clients, unselectedClient, selectClient} = props;
         let [geo, setGeo] = useState(null);
         let [follow, setFollow] = useState(false);
-        const searchTimeOutRef = useRef(null);
-        useEffect(()=>{
-            if (navigator.geolocation) {
-                searchTimeOutRef.current = setInterval(() => {
+        const geolocationTimeOut = useRef(null);
+        useEffect(() => {
+            if(navigator.geolocation) {
+                geolocationTimeOut.current = setInterval(() => {
                     navigator.geolocation.getCurrentPosition((position) => {
                         setGeo([position.coords.latitude, position.coords.longitude])
                     });
                 }, 1000)
-                return ()=>{
-                    clearInterval(searchTimeOutRef.current)
+                return () => {
+                    clearInterval(geolocationTimeOut.current)
                 }
             } else {
                 showSnackBar('Геолокация не поддерживается')
@@ -48,7 +48,7 @@ const Geo =  React.memo(
                         }
                         {geo&&follow?
                             <div style={{display: load?'none':'block'}}>
-                                <Map onLoad={()=>{setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48} defaultState={{ center: ['42.8700000', '74.5900000'], zoom: 12 }}
+                                <Map onLoad={() => {setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48} defaultState={{ center: ['42.8700000', '74.5900000'], zoom: 12 }}
                                      state={{ center: geo, zoom: 18 }}>
                                     <TrafficControl options={{ float: 'right' }} />
                                     {clients.map((client, idx)=> {
@@ -81,7 +81,7 @@ const Geo =  React.memo(
                             </div>
                             :
                             <div style={{display: load?'none':'block'}}>
-                                <Map onLoad={()=>{setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48} defaultState={{ center: ['42.8700000', '74.5900000'], zoom: 12 }}>
+                                <Map onLoad={() => {setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48} defaultState={{ center: ['42.8700000', '74.5900000'], zoom: 12 }}>
                                     <TrafficControl options={{ float: 'right' }} />
                                     {clients.map((client, idx)=> {
                                         if(client.user.status==='active'&&client.address[0]&&client.address[0][1]) return <Placemark
@@ -115,19 +115,19 @@ const Geo =  React.memo(
                     <center>
                         {
                             unselectedClient&&profile.role==='admin'?
-                                <Button variant='contained' color='primary' onClick={()=>{setFullDialog('Редактировать район',
+                                <Button variant='contained' color='primary' onClick={() => {setFullDialog('Редактировать район',
                                     <GeoSelectClient clients={unselectedClient} selectClient={selectClient}/>);}} className={classes.button}>
                                     Редактировать
                                 </Button>
                                 :
                                 null
                         }
-                        <Button variant='contained' color='secondary' onClick={()=>{showFullDialog(false);}} className={classes.button}>
+                        <Button variant='contained' color='secondary' onClick={() => {showFullDialog(false);}} className={classes.button}>
                             Закрыть
                         </Button>
                     </center>
                 </div>
-                <Fab color={follow?'primary':'secondary'} aria-label='Найти геолокацию' className={classes.fabGeo} onClick={()=>setFollow(!follow)}>
+                <Fab color={follow?'primary':'secondary'} className={classes.fabGeo} onClick={()=>setFollow(!follow)}>
                     <GpsFixed/>
                 </Fab>
             </YMaps>

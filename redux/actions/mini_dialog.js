@@ -3,7 +3,7 @@ import { SET_MINI_DIALOG, SHOW_MINI_DIALOG, SET_FULL_DIALOG, SHOW_FULL_DIALOG } 
 export function setMiniDialog(title, child) {
     return {
         type: SET_MINI_DIALOG,
-        payload: {title: title, child: child}
+        payload: {title, child: child}
     }
 }
 
@@ -17,7 +17,7 @@ export function showMiniDialog(show) {
 export function setFullDialog(title, child) {
     return {
         type: SET_FULL_DIALOG,
-        payload: {title: title, child: child}
+        payload: {title, child: child}
     }
 }
 

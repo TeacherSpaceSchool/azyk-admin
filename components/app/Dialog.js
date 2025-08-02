@@ -8,15 +8,14 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 
 const MyDialog =  React.memo(
     (props) =>{
-        const { title, child, show  } = props.mini_dialog;
-        const { showMiniDialog } = props.mini_dialogActions;
+        const {title, child, show} = props.mini_dialog;
+        const {showMiniDialog} = props.mini_dialogActions;
         return (
                 <Dialog
                     open={show}
-                    onClose={()=>{showMiniDialog(false)}}
-                    aria-labelledby='alert-dialog-title'
-                    aria-describedby='alert-dialog-description'>
-                    <DialogTitle onClose={()=>{showMiniDialog(false)}}>{title}</DialogTitle>
+                    onClose={() => {showMiniDialog(false)}}
+                >
+                    <DialogTitle style={!title?{height: 0, padding: '0px !important'}:{}} onClose={() => {showMiniDialog(false)}}>{title}</DialogTitle>
                     <DialogContent>
                         {child}
                     </DialogContent>

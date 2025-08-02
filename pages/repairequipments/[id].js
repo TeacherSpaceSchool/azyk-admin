@@ -1,10 +1,10 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import { getRepairEquipments } from '../../src/gql/repairEquipment'
 import pageListStyle from '../../src/styleMUI/equipment/equipmentList'
-import CardRepairEquipment from '../../components/equipment/CardRepairEquipment'
+import CardRepairEquipment from '../../components/card/CardRepairEquipment'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
@@ -12,53 +12,45 @@ import Link from 'next/link';
 import Router from 'next/router'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
+import {unawaited} from '../../src/lib';
+
+const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value: 'обработка'}, {name: 'Отмена', value: 'отмена'}, {name: 'Принят', value: 'принят'}, {name: 'Выполнен', value: 'выполнен'}]
 
 const RepairEquipments = React.memo((props) => {
     const classes = pageListStyle();
-    const { data } = props;
+    const {data} = props;
     let [list, setList] = useState(data.repairEquipments);
-    const { search, filter } = props.app;
-    const { profile } = props.user;
+    const {search, filter} = props.app;
+    const {profile} = props.user;
     const router = useRouter()
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
-    const getList = async ()=>{
-        setList((await getRepairEquipments({organization: router.query.id, search, filter: filter})).repairEquipments)
+    const getList = async () => {
+        setList(await getRepairEquipments({organization: router.query.id, search, filter}))
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
-    useEffect(()=>{
-        (async()=>{
-            if(!initialRender.current) {
-                await getList()
-            }
-        })()
-    },[filter])
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
+    useEffect(() => {
+        if(!initialRender.current) unawaited(getList)
+    }, [filter])
+    useEffect(() => {
+            if(initialRender.current) 
                 initialRender.current = false;
-            } else {
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    await getList()
-                }, 500)
-                setSearchTimeOut(searchTimeOut)
-
+            else {
+                if(searchTimeOut.current)
+                    clearTimeout(searchTimeOut.current)
+                searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
             }
-        })()
-    },[search])
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
-        }
-    }
+    }, [search])
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, list])
     return (
-        <App checkPagination={checkPagination} searchShow={true} filters={data.filterRepairEquipment} pageName={'Ремонт'}>
+        <App checkPagination={checkPagination} searchShow filters={filters} pageName={'Ремонт оборудования'}>
             <Head>
-                <title>Ремонт</title>
+                <title>Ремонт оборудования</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
@@ -68,13 +60,13 @@ const RepairEquipments = React.memo((props) => {
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <CardRepairEquipment list={list} idx={idx} key={element._id} setList={setList} element={element}/>
+                            <CardRepairEquipment idx={idx} key={element._id} list={list} setList={setList} element={element}/>
                         )}
                 ):null}
             </div>
             {['admin', 'суперорганизация', 'организация', 'агент', 'менеджер'].includes(profile.role)?
                 <Link href='/repairequipment/[id]' as={`/repairequipment/new`}>
-                    <Fab color='primary' aria-label='add' className={classes.fab}>
+                    <Fab color='primary' className={classes.fab}>
                         <AddIcon />
                     </Fab>
                 </Link>
@@ -96,7 +88,9 @@ RepairEquipments.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     return {
-        data: await getRepairEquipments({organization: ctx.query.id, search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+        data: {
+            repairEquipments: await getRepairEquipments({organization: ctx.query.id, search: '', filter: ''}, getClientGqlSsr(ctx.req))
+        }
     };
 };
 

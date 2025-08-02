@@ -4,17 +4,17 @@ let swRegistration = null;
 import { applicationKey, urlSubscribe } from '../redux/constants/other';
 
 export let checkDisableSubscribe = () => {
-    if('Notification' in window){
-        if (Notification.permission !== 'denied') {
+    if('Notification' in window) {
+        if(Notification.permission !== 'denied') {
             Notification.requestPermission()
         }
-        if (localStorage.browserNumber&&Notification.permission !== 'granted') {
+        if(localStorage.browserNumber&&Notification.permission !== 'granted') {
             let xmlHttp = new XMLHttpRequest();
             xmlHttp.open('POST', `${urlSubscribe}/delete`);
             xmlHttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8', );
             xmlHttp.onreadystatechange = function () {
-                if (xmlHttp.readyState != 4) return;
-                localStorage.browserNumber = undefined
+                if(xmlHttp.readyState != 4) return;
+                localStorage.browserNumber = null
             };
             xmlHttp.send(JSON.stringify({number: localStorage.browserNumber}));
         }
@@ -24,18 +24,18 @@ export let checkDisableSubscribe = () => {
 export let register = (update) => {
 // Installing service worker
     return new Promise(async (resolve) => {
-        if ('serviceWorker' in navigator && 'PushManager' in window) {
+        if('serviceWorker' in navigator && 'PushManager' in window) {
             navigator.serviceWorker.ready.then((swReg) => {
-                if (!!swReg) {
+                if(!!swReg) {
                     swRegistration = swReg;
                     swRegistration.pushManager.getSubscription()
                         .then(function (subscription) {
                             isSubscribed = !(subscription === null);
-                            if (isSubscribed) {
+                            if(isSubscribed) {
                                 saveSubscription(subscription);
                                 isSubscribed = true;
                                 resolve()
-                                /*if (update||!localStorage.browserNumber) {
+                                /*if(update||!localStorage.browserNumber) {
                                     subscription.unsubscribe().then(function () {
                                         saveSubscription(subscription);
                                         isSubscribed = true;
@@ -72,12 +72,12 @@ export let register = (update) => {
 }
 
 export let unregister = () => {
-    if(localStorage.browserNumber){
+    if(localStorage.browserNumber) {
         let xmlHttp = new XMLHttpRequest();
         xmlHttp.open('POST', `${urlSubscribe}/unregister`);
         xmlHttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8', );
         xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState != 4) return;
+            if(xmlHttp.readyState != 4) return;
         };
         if(localStorage.browserNumber)
             xmlHttp.send(JSON.stringify({number: localStorage.browserNumber}));
@@ -92,6 +92,7 @@ function urlB64ToUint8Array(base64String) {
         .replace(/_/g, '/');
 
     const rawData = window.atob(base64);
+    // eslint-disable-next-line no-undef
     const outputArray = new Uint8Array(rawData.length);
 
     for (let i = 0; i < rawData.length; ++i) {
@@ -108,7 +109,7 @@ function saveSubscription(subscription) {
     xmlHttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8', );
     xmlHttp.setRequestHeader('Authorization', 'Bearer '+Cookies.get('jwt'), );
     xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState != 4) return;
+        if(xmlHttp.readyState != 4) return;
         if(xmlHttp.response)
             localStorage.browserNumber = xmlHttp.response
     };

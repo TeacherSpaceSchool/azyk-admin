@@ -18,69 +18,6 @@ import { SingletonApolloClient } from '../../src/singleton/client';
 import { unregister, register } from '../../src/subscribe';
 import Router from 'next/router';
 
-export function signup(payload) {
-    return async (dispatch) => {
-        await dispatch({
-            type: SHOW_LOAD,
-            payload: true
-        })
-        try {
-            const client = new SingletonApolloClient().getClient()
-            let result = await client.mutate({
-                variables: payload,
-                mutation : gql`
-                    mutation ($login: String!, $password: String!) {
-                        signupuser(login: $login, password: $password) {
-                           role
-                           status
-                           login
-                           organization
-                           client
-                           employment
-                           addedClient
-                           agentSubBrand
-                           _id
-                           city
-                        }
-                    }`})
-            if(result.data.signupuser.role==='Проверьте данные') {
-                await dispatch({
-                    type: ERROR_AUTHENTICATED,
-                    payload: true
-                })
-                await dispatch({
-                    type: SHOW_LOAD,
-                    payload: false
-                })
-            }
-            else {
-                await dispatch({
-                    type: SHOW_MINI_DIALOG,
-                    payload: false
-                })
-                /*
-                await dispatch({type: AUTHENTICATED});
-                await dispatch({
-                    type: SET_PROFILE,
-                    payload: result.data.signupuser
-                })*/
-                //await window.location.reload()
-                await register(true)
-                await Router.push(`/client/${result.data.signupuser._id}`)
-            }
-        } catch(error) {
-            await dispatch({
-                type: SHOW_LOAD,
-                payload: false
-            })
-            dispatch({
-                type: ERROR_AUTHENTICATED,
-                payload: true
-            });
-        }
-    };
-}
-
 export function signin(payload) {
     return async (dispatch) => {
         await dispatch({
@@ -148,7 +85,7 @@ export function signin(payload) {
 export function checkAuthenticated() {
     return async (dispatch) => {
         try {
-            if (Cookies.get('jwt')) {
+            if(Cookies.get('jwt')) {
                 dispatch ({type: AUTHENTICATED});
             } else {
                 dispatch ({type: UNAUTHENTICATED});
@@ -187,7 +124,7 @@ export function logout(reload) {
         localStorage.removeItem('extendedJWT')
         if(reload) {
             await unregister()
-            await Router.push('/contact')
+            Router.push('/contact')
             window.location.reload()
         }
         else

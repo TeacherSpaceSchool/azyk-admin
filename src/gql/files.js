@@ -1,46 +1,41 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
-import { SingletonStore } from '../singleton/store';
 
-export const getFiles = async(filter, client)=>{
+const File = `
+    name
+    url
+    size
+    createdAt
+    active
+    owner
+`
+
+export const getFiles = async (client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {filter},
                 query: gql`
-                    query ($filter: String!) {
-                        files(filter: $filter) {
-                            name
-                            url
-                            size
-                            createdAt
-                            active
-                            owner
-                        }
-                        filterFile {
-                            name
-                           value
-                        }
+                    query {
+                        files {${File}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.files
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const clearAllDeactiveFiles = async()=>{
+export const clearAllDeactiveFiles = async () => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
+        const res = await client.mutate({
             mutation : gql`
                     mutation {
-                        clearAllDeactiveFiles {
-                             data
-                        }
+                        clearAllDeactiveFiles
                     }`})
-    } catch(err){
+        return res.data.clearAllDeactiveFiles
+    } catch(err) {
         console.error(err)
     }
 }

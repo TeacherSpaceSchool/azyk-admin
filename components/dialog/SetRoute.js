@@ -10,13 +10,13 @@ import Button from '@material-ui/core/Button';
 
 const Geo =  React.memo(
     (props) =>{
-        const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
-        const { classes, invoice, getInvoices, route, geo } = props;
-        const { isMobileApp } = props.app;
+        const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+        const {classes, invoice, getInvoices, route, geo} = props;
+        const {isMobileApp} = props.app;
         return (
             <div className={classes.column}>
                 <center>
-                    <Button variant='contained' color='primary' onClick={()=>{setMiniDialog('Заказ', <Order getInvoices={getInvoices} route={route} element={invoice}/>);}} className={classes.button}>
+                    <Button variant='contained' color='primary' onClick={() => {setMiniDialog('Заказ', <Order getInvoices={getInvoices} route={route} element={invoice}/>);}} className={classes.button}>
                         Просмотреть заказ
                     </Button>
                 </center>
@@ -27,13 +27,13 @@ const Geo =  React.memo(
                             :
                             `https://2gis.kg/bishkek/geo/${geo[1]},${geo[0]}/center/${geo[1]},${geo[0]}/zoom/12`
                     } target='_blank'>
-                        <Button variant='contained' color='primary' onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                        <Button variant='contained' color='primary' onClick={() => {showMiniDialog(false);}} className={classes.button}>
                             Построить маршрут
                         </Button>
                     </a>
                 </center>
                 <center>
-                    <Button variant='contained' color='secondary' onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant='contained' color='secondary' onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </center>

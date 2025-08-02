@@ -12,18 +12,18 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const SetOrganizations =  React.memo(
     (props) =>{
-        const { classes, activeOrganization } = props;
-        let [organizationChange, setOrganizationChange] = useState(undefined);
-        const { isMobileApp } = props.app;
-        const { showMiniDialog } = props.mini_dialogActions;
-        const { setOrganization } = props.appActions;
+        const {classes, organizations} = props;
+        let [organizationChange, setOrganizationChange] = useState(null);
+        const {isMobileApp} = props.app;
+        const {showMiniDialog} = props.mini_dialogActions;
+        const {setOrganization} = props.appActions;
         const width = isMobileApp? (window.innerWidth-112) : 500
         return (
             <div className={classes.main}>
                 <Autocomplete
                     style={{width: width}}
                     className={classes.textField}
-                    options={activeOrganization}
+                    options={organizations}
                     getOptionLabel={option => option.name}
                     value={organizationChange}
                     onChange={(event, newValue) => {
@@ -32,9 +32,9 @@ const SetOrganizations =  React.memo(
                     noOptionsText='Ничего не найдено'
                     renderInput={params => (
                         <TextField {...params} label='Организация' fullWidth
-                                   onKeyPress={async event => {
-                                       if (event.key === 'Enter'&&organizationChange) {
-                                           await setOrganization(organizationChange._id)
+                                   onKeyPress={event => {
+                                       if(event.key === 'Enter'&&organizationChange) {
+                                           setOrganization(organizationChange._id)
                                            showMiniDialog(false);
                                        }
                                    }}/>
@@ -42,14 +42,14 @@ const SetOrganizations =  React.memo(
                 />
                 <br/>
                 <div>
-                    <Button variant="contained" color="primary" onClick={async()=>{
+                    <Button variant="contained" color='primary' onClick={() => {
                        if(organizationChange)
-                           await setOrganization(organizationChange._id)
+                           setOrganization(organizationChange._id)
                        showMiniDialog(false);
                     }} className={classes.button}>
                         Сохранить
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant="contained" color="secondary" onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </div>

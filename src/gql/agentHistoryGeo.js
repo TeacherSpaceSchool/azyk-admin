@@ -1,40 +1,37 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
-import { SingletonStore } from '../singleton/store';
 
-export const getAgentHistoryGeos = async(arg, client)=>{
+export const getAgentHistoryGeos = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: arg,
+                variables,
                 query: gql`
                     query ($organization: ID, $agent: ID, $date: String) {
                         agentHistoryGeos(organization: $organization, agent: $agent, date: $date) {
                             columns
-                            row 
-                                {_id data}
+                            row {_id data}
                           }
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.agentHistoryGeos
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const addAgentHistoryGeo = async(element)=>{
+export const addAgentHistoryGeo = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($client: ID!, $geo: String!) {
-                        addAgentHistoryGeo(client: $client, geo: $geo) {
-                             data
-                        }
+                        addAgentHistoryGeo(client: $client, geo: $geo)
                     }`})
-    } catch(err){
+        return res.data.addAgentHistoryGeo
+    } catch(err) {
         console.error(err)
     }
 }

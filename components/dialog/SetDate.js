@@ -12,17 +12,17 @@ import { pdDatePicker } from '../../src/lib'
 
 const SetDate =  React.memo(
     (props) =>{
-        const { classes } = props;
-        let [dateChange, setDateChange] = useState();
-        useEffect(()=>{
+        const {classes} = props;
+        let [dateChange, setDateChange] = useState(null);
+        useEffect(() => {
             let dateStart = new Date()
-            if (dateStart.getHours()<3)
+            if(dateStart.getHours()<3)
                 dateStart.setDate(dateStart.getDate() - 1)
             setDateChange(pdDatePicker(dateStart))
         }, []);
-        const { isMobileApp } = props.app;
-        const { showMiniDialog } = props.mini_dialogActions;
-        const { setDate } = props.appActions;
+        const {isMobileApp} = props.app;
+        const {showMiniDialog} = props.mini_dialogActions;
+        const {setDate} = props.appActions;
         const width = isMobileApp? (window.innerWidth-112) : 500
         return (
             <div className={classes.main}>
@@ -35,26 +35,23 @@ const SetDate =  React.memo(
                         shrink: true,
                     }}
                     value={dateChange}
-                    inputProps={{
-                        'aria-label': 'description',
-                    }}
                     onChange={ event => setDateChange(event.target.value) }
-                    onKeyPress={async event => {
-                        if (event.key === 'Enter') {
-                            await setDate(new Date(dateChange))
+                    onKeyPress={event => {
+                        if(event.key === 'Enter') {
+                            setDate(new Date(dateChange))
                             showMiniDialog(false);
                         }
                     }}
                 />
                 <br/>
                 <div>
-                    <Button variant="contained" color="primary" onClick={async()=>{
-                       await setDate(new Date(dateChange))
+                    <Button variant="contained" color='primary' onClick={() => {
+                       setDate(new Date(dateChange))
                        showMiniDialog(false);
                     }} className={classes.button}>
                         Сохранить
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant="contained" color="secondary" onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </div>

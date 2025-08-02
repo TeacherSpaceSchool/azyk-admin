@@ -1,36 +1,38 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 
-export const getSpecialPriceClients = async({client, organization}, _client)=>{
+const SpecialPriceClient = `
+    _id
+    createdAt
+    client {_id name address}
+    price
+    organization {_id name}
+    item {_id name}
+`
+
+export const getSpecialPriceClients = async (variables, _client) => {
     try{
         _client = _client? _client : new SingletonApolloClient().getClient()
-        let res = await _client
+        const res = await _client
             .query({
-                variables: {client, organization},
+                variables,
                 query: gql`
                     query ($client: ID!, $organization: ID) {
-                        specialPriceClients(client: $client, organization: $organization) {
-                            _id
-                            createdAt
-                            client {_id name address}
-                            price
-                            organization {_id name}
-                            item {_id name}
-                          }
+                        specialPriceClients(client: $client, organization: $organization) {${SpecialPriceClient}}
                     }`,
             })
         return res.data.specialPriceClients
-    } catch(err){
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getItemsForSpecialPriceClients = async({client, organization}, _client)=>{
+export const getItemsForSpecialPriceClients = async (variables, client) => {
     try{
-        _client = _client? _client : new SingletonApolloClient().getClient()
-        let res = await _client
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
             .query({
-                variables: {client, organization},
+                variables,
                 query: gql`
                     query ($client: ID!, $organization: ID) {
                         itemsForSpecialPriceClients(client: $client, organization: $organization) {
@@ -40,61 +42,52 @@ export const getItemsForSpecialPriceClients = async({client, organization}, _cli
                     }`,
             })
         return res.data.itemsForSpecialPriceClients
-    } catch(err){
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const deleteSpecialPriceClient = async(_id)=>{
+export const deleteSpecialPriceClient = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
+        const res = await client.mutate({
             variables: {_id},
             mutation : gql`
                     mutation ($_id: ID!) {
-                        deleteSpecialPriceClient(_id: $_id) {
-                             data
-                        }
+                        deleteSpecialPriceClient(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.setSpecialPriceClient
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const addSpecialPriceClient = async(element)=>{
+export const addSpecialPriceClient = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        let res = await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($client: ID!, $organization: ID!, $price: Float!, $item: ID!) {
-                        addSpecialPriceClient(client: $client, organization: $organization, price: $price, item: $item) {
-                            _id
-                            createdAt
-                            client {_id name address}
-                            price
-                            organization {_id name}
-                            item {_id name}
-                        }
+                        addSpecialPriceClient(client: $client, organization: $organization, price: $price, item: $item) {${SpecialPriceClient}}
                     }`})
         return res.data.addSpecialPriceClient
-    } catch(err){
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const setSpecialPriceClient = async(element)=>{
+export const setSpecialPriceClient = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($_id: ID!, $price: Float!) {
-                        setSpecialPriceClient(_id: $_id, price: $price) {
-                             data
-                        }
+                        setSpecialPriceClient(_id: $_id, price: $price)
                     }`})
-    } catch(err){
+        return res.data.setSpecialPriceClient
+    } catch(err) {
         console.error(err)
     }
 }

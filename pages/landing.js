@@ -1,6 +1,6 @@
 import Router from 'next/router'
-import Head from "next/head";
-import React from "react";
+import Head from 'next/head';
+import React from 'react';
 
 const Landing = () => {
     return (

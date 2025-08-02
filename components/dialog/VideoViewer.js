@@ -9,13 +9,13 @@ import Button from '@material-ui/core/Button';
 
 const VideoViewer =  React.memo(
     (props) =>{
-        const { showFullDialog } = props.mini_dialogActions;
-        const { classes, video } = props;
+        const {showFullDialog} = props.mini_dialogActions;
+        const {classes, video} = props;
         return (
             <div className={classes.column}>
                 <iframe style={{height: window.innerHeight-145, width: window.innerWidth-48}} src={video} frameborder='0' allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture' allowfullscreen='allowfullscreen'/>
                 <center>
-                    <Button variant='contained' color='secondary' onClick={()=>{showFullDialog(false);}} className={classes.button}>
+                    <Button variant='contained' color='secondary' onClick={() => {showFullDialog(false);}} className={classes.button}>
                             Закрыть
                     </Button>
                 </center>

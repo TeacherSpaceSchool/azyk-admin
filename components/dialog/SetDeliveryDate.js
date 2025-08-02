@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
@@ -21,36 +21,35 @@ import { saveDeliveryDates } from '../../src/gql/deliveryDate'
 
 const SetDeliveryDate =  React.memo(
     (props) =>{
-        const { classes, organization, deliveryDates, setDeliveryDates } = props;
-        const { isMobileApp } = props.app;
-        const { showSnackBar } = props.snackbarActions;
-        const { showMiniDialog, setMiniDialog } = props.mini_dialogActions;
-        let [searchTimeOut, setSearchTimeOut] = useState(null);
+        const {classes, organization, deliveryDates, setDeliveryDates} = props;
+        const {isMobileApp} = props.app;
+        const {showSnackBar} = props.snackbarActions;
+        const {showMiniDialog, setMiniDialog} = props.mini_dialogActions;
+        const searchTimeOut = useRef(null);
         const [open, setOpen] = useState(false);
         const [inputValue, setInputValue] = React.useState('');
         const [loading, setLoading] = useState(true);
         const [clients, setClients] = useState([]);
         useEffect(() => {
-            (async()=>{
-                if (inputValue.length < 3) {
+            (async () => {
+                if(inputValue.length < 3) {
                     setClients([]);
-                    if (open)
+                    if(open)
                         setOpen(false)
-                    if (loading)
+                    if(loading)
                         setLoading(false)
                 }
                 else {
-                    if (!loading)
+                    if(!loading)
                         setLoading(true)
-                    if (searchTimeOut)
-                        clearTimeout(searchTimeOut)
-                    searchTimeOut = setTimeout(async () => {
-                        setClients((await getClients({search: inputValue, sort: '-name', filter: 'all'})).clients)
-                        if (!open)
+                    if(searchTimeOut.current)
+                        clearTimeout(searchTimeOut.current)
+                    searchTimeOut.current = setTimeout(async () => {
+                        setClients(await getClients({search: inputValue, sort: '-name', filter: 'all'}))
+                        if(!open)
                             setOpen(true)
                         setLoading(false)
                     }, 500)
-                    setSearchTimeOut(searchTimeOut)
                 }
             })()
         }, [inputValue]);
@@ -84,13 +83,13 @@ const SetDeliveryDate =  React.memo(
                     noOptionsText='Ничего не найдено'
                     style={{width: width}}
                     renderInput={params => (
-                        <TextField {...params} label='Выберите клиента' variant='outlined' fullWidth
+                        <TextField {...params} label='Выберите клиента' fullWidth
                                    onChange={handleChange}
                                    InputProps={{
                                        ...params.InputProps,
                                        endAdornment: (
                                            <React.Fragment>
-                                               {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                                               {loading ? <CircularProgress color='inherit' size={20} /> : null}
                                                {params.InputProps.endAdornment}
                                            </React.Fragment>
                                        ),
@@ -112,33 +111,33 @@ const SetDeliveryDate =  React.memo(
                 </FormControl>
                 <br/>
                 <div style={{width: width, flexWrap: 'wrap'}} className={classes.row}>
-                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={()=>{days[0] = !days[0];setDays([...days])}} size='small' color={days[0]?'primary':''}>
+                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={() => {days[0] = !days[0];setDays([...days])}} size='small' color={days[0]?'primary':''}>
                         ПН
                     </Button>
-                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={()=>{days[1] = !days[1];setDays([...days])}} size='small' color={days[1]?'primary':''}>
+                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={() => {days[1] = !days[1];setDays([...days])}} size='small' color={days[1]?'primary':''}>
                         ВТ
                     </Button>
-                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={()=>{days[2] = !days[2];setDays([...days])}} size='small' color={days[2]?'primary':''}>
+                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={() => {days[2] = !days[2];setDays([...days])}} size='small' color={days[2]?'primary':''}>
                         СР
                     </Button>
-                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={()=>{days[3] = !days[3];setDays([...days])}} size='small' color={days[3]?'primary':''}>
+                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={() => {days[3] = !days[3];setDays([...days])}} size='small' color={days[3]?'primary':''}>
                         ЧТ
                     </Button>
-                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={()=>{days[4] = !days[4];setDays([...days])}} size='small' color={days[4]?'primary':''}>
+                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={() => {days[4] = !days[4];setDays([...days])}} size='small' color={days[4]?'primary':''}>
                         ПТ
                     </Button>
-                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={()=>{days[5] = !days[5];setDays([...days])}} size='small' color={days[5]?'primary':''}>
+                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={() => {days[5] = !days[5];setDays([...days])}} size='small' color={days[5]?'primary':''}>
                         СБ
                     </Button>
-                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={()=>{days[6] = !days[6];setDays([...days])}} size='small' color={days[6]?'primary':''}>
+                    <Button style={{width: 50, margin: 5}} variant='contained' onClick={() => {days[6] = !days[6];setDays([...days])}} size='small' color={days[6]?'primary':''}>
                         ВС
                     </Button>
                 </div>
                 <br/>
                 <div>
-                    <Button variant="contained" color="primary" onClick={async()=>{
-                        if(client&&client._id){
-                            const action = async() => {
+                    <Button variant="contained" color='primary' onClick={async () => {
+                        if(client&&client._id) {
+                            const action = async () => {
                                 await saveDeliveryDates([client._id], organization._id, days, priority)
                                 if(deliveryDates[client._id]) {
                                     deliveryDates[client._id] = {
@@ -160,7 +159,7 @@ const SetDeliveryDate =  React.memo(
                     }} className={classes.button}>
                         Сохранить
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant="contained" color="secondary" onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
@@ -8,7 +8,7 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
-import { pdDDMMYYHHMM, pdDDMMYYHHMMCancel, pdDDMMYYYYWW, checkFloat } from '../../src/lib'
+import {pdDDMMYYHHMM, pdDDMMYYHHMMCancel, pdDDMMYYYYWW, checkFloat, isNotEmpty} from '../../src/lib'
 import Confirmation from './Confirmation'
 import Geo from '../../components/dialog/Geo'
 import OrderAdss from '../../components/dialog/OrderAdss'
@@ -17,126 +17,124 @@ import IconButton from '@material-ui/core/IconButton';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import {checkInt} from '../../redux/constants/other';
+
+const editEmploymentRoles = ['экспедитор', 'admin', 'суперорганизация', 'организация', 'менеджер', 'агент', 'суперагент', 'суперэкспедитор']
+const statusColor = {'обработка': 'orange', 'принят': 'blue', 'выполнен': 'green', 'отмена': 'red'}
 
 const Order =  React.memo(
     (props) =>{
-        const { isMobileApp } = props.app;
-        const { profile, authenticated } = props.user;
-        const { showMiniDialog, setMiniDialog, showFullDialog, setFullDialog } = props.mini_dialogActions;
-        const { classes, element, setList, list, idx } = props;
+        const initialRender = useRef(true);
+        const {isMobileApp} = props.app;
+        const {profile, authenticated} = props.user;
+        const {showSnackBar} = props.snackbarActions;
+        const {showMiniDialog, setMiniDialog, showFullDialog, setFullDialog} = props.mini_dialogActions;
+        const {classes, element, setList, idx} = props;
+        const width = isMobileApp? (window.innerWidth-112) : 500;
+        //в обработке
+        const isProcessing = element.orders[0].status==='обработка'
+        //isProcessingOrTaken
+        const isProcessingOrTaken = ['обработка', 'принят'].includes(element.orders[0].status)
+        //позиции
         let [orders, setOrders] = useState([...element.orders]);
+        //акции
         let [adss, setAdss] = useState([...element.adss]);
+        //общая цена
         let [allPrice, setAllPrice] = useState(element.allPrice);
-        let [consignmentPrice, setConsignmentPrice] = useState(element.consignmentPrice);
+        //тоннаж
         let [allTonnage, setAllTonnage] = useState(element.allTonnage);
-        let [showCons, setShowCons] = useState({});
+        //отображать отказ
         let [showReturn, setShowReturn] = useState({});
+        //накладная принята
         let [taken, setTaken] = useState(element.taken);
-        let [paymentConsignation, setPaymentConsignation] = useState(element.paymentConsignation);
+        //confirmation
         let [confirmationForwarder, setConfirmationForwarder] = useState(element.confirmationForwarder);
         let [confirmationClient, setConfirmationClient] = useState(element.confirmationClient);
-        let [cancelForwarder, setCancelForwarder] = useState(element.cancelForwarder!=undefined&&element.cancelForwarder);
-        let [cancelClient, setCancelClient] = useState(element.cancelClient!=undefined&&element.cancelClient);
-        let [changeOrders, setChangeOrders] = useState(false);
-        const width = isMobileApp? (window.innerWidth-112) : 500;
-        const allowOrganization = (['экспедитор', 'менеджер', 'суперорганизация', 'организация', 'агент'].includes(profile.role)&&profile.organization===element.organization._id)
-        const { showSnackBar } = props.snackbarActions;
-        let canculateAllPrice = ()=>{
-            allTonnage=0
-            allPrice=0
-            consignmentPrice=0
-            for(let i=0; i<orders.length; i++){
-                consignmentPrice+=orders[i].consignmentPrice
-                allPrice+=orders[i].allPrice
-                allTonnage+=orders[i].allTonnage
+        //cancel
+        let [cancelForwarder, setCancelForwarder] = useState(!!element.cancelForwarder);
+        let [cancelClient, setCancelClient] = useState(!!element.cancelClient);
+        //заказ изменен
+        let [changedOrders, setChangedOrders] = useState(false);
+        //пересчет заказа
+        const calculateOrder = ({idx, count, returned}) => {
+            if(isNotEmpty(returned))
+                orders[idx].returned = returned
+            else if(isNotEmpty(count)) {
+                orders[idx].allPrice = checkFloat(orders[idx].allPrice / orders[idx].count * count)
+                orders[idx].count = count
+                orders[idx].allTonnage = checkFloat(orders[idx].count * orders[idx].item.weight)
             }
-            setAllPrice(checkFloat(allPrice))
-            setAllTonnage(checkFloat(allTonnage))
-            setConsignmentPrice(consignmentPrice)
-            setChangeOrders(true)
-        }
-        let increment = (idx)=>{
-            let price = orders[idx].allPrice/orders[idx].count
-            if(orders[idx].item.apiece)
-                orders[idx].count+=1
-            else
-                orders[idx].count+=orders[idx].item.packaging
-            orders[idx].allPrice = checkFloat(orders[idx].count * price)
-            orders[idx].allTonnage = orders[idx].count * orders[idx].item.weight
             setOrders([...orders])
-            canculateAllPrice()
+
         }
-        let decrement = (idx)=>{
+        //count
+        const addPackage = (idx) => calculateOrder({idx, count: (checkInt(orders[idx].count/orders[idx].item.packaging)+1)*orders[idx].item.packaging})
+        let increment = (idx) => calculateOrder({idx, count: orders[idx].item.apiece?orders[idx].count+1:orders[idx].count+orders[idx].item.packaging})
+        let decrement = (idx) => {
             let price = orders[idx].allPrice/orders[idx].count
-            if(orders[idx].count>1&&orders[idx].item.apiece) {
-                if(!element.organization.minimumOrder||((allPrice-price)>=element.organization.minimumOrder)) {
-                    orders[idx].count -= 1
-                    orders[idx].allPrice = checkFloat(orders[idx].count * price)
-                    orders[idx].allTonnage = orders[idx].count * orders[idx].item.weight
-                    setOrders([...orders])
-                    canculateAllPrice()
-                } else
-                    showSnackBar('Сумма не может быть меньше минимальной')
-            }
-            else if(orders[idx].count>orders[idx].item.packaging&&!orders[idx].item.apiece) {
-                if(!element.organization.minimumOrder||((allPrice-price*orders[idx].item.packaging)>=element.organization.minimumOrder)) {
-                    orders[idx].count -= orders[idx].item.packaging
-                    orders[idx].allPrice = checkFloat(orders[idx].count * price)
-                    orders[idx].allTonnage = orders[idx].count * orders[idx].item.weight
-                    setOrders([...orders])
-                    canculateAllPrice()
-                } else
-                    showSnackBar('Сумма не может быть меньше минимальной')
+            const decrementCount = orders[idx].item.apiece?1:orders[idx].item.packaging
+            if(orders[idx].count>decrementCount) {
+                if(profile.role!=='client'||!element.organization.minimumOrder||((allPrice-price*decrementCount)>=element.organization.minimumOrder))
+                    calculateOrder({idx, count: orders[idx].count-decrementCount})
+                else showSnackBar('Сумма не может быть меньше минимальной')
             }
         }
-        let incrementConsignation = (idx)=>{
-            let price = orders[idx].allPrice/orders[idx].count
-            if(orders[idx].consignment<orders[idx].count){
-                orders[idx].consignment+=1
-                orders[idx].consignmentPrice = checkFloat(orders[idx].consignment*price)
+        //добавить упаковку на отказ
+        let addReturnedPackage = (idx) => {
+            let returned = (checkInt(orders[idx].returned / orders[idx].item.packaging) + 1) * orders[idx].item.packaging
+            if(returned<=orders[idx].count)
+                orders[idx].returned = returned
+            else
+                orders[idx].returned = orders[idx].count
+            setOrders([...orders])
+        }
+        let incrementReturned = (idx) => {
+            if(orders[idx].returned<orders[idx].count) {
+                orders[idx].returned += 1
                 setOrders([...orders])
-                canculateAllPrice()
             }
         }
-        let decrementConsignation = (idx)=>{
-            if(orders[idx].consignment>0) {
-                let price = orders[idx].allPrice/orders[idx].count
-                orders[idx].consignment -= 1
-                orders[idx].consignmentPrice = checkFloat(orders[idx].consignment*price)
-                setOrders([...orders])
-                canculateAllPrice()
-            }
-        }
-        let incrementReturned = (idx)=>{
-            if(orders[idx].returned<orders[idx].count){
-                orders[idx].returned+=1
-                setOrders([...orders])
-                canculateAllPrice()
-            }
-        }
-        let decrementReturned  = (idx)=>{
+        let decrementReturned  = (idx) => {
             if(orders[idx].returned>0) {
                 orders[idx].returned -= 1
                 setOrders([...orders])
-                canculateAllPrice()
             }
         }
-        let remove = (idx)=>{
+        let remove = (idx) => {
             if(orders.length>1) {
                 orders.splice(idx, 1)
                 setOrders([...orders])
-                canculateAllPrice()
             } else
                 showSnackBar('Товары не могут отсутствовать в заказе')
         }
         let [priceAfterReturn, setPriceAfterReturn] = useState(0);
-        useEffect(()=>{
+        //пересчет общей цены
+        const calculateAllPrice = () => {
+            allTonnage = 0
+            allPrice = 0
+            for(const order of orders) {
+                allPrice += order.allPrice
+                allTonnage += order.allTonnage
+            }
+            setAllPrice(checkFloat(allPrice))
+            setAllTonnage(checkFloat(allTonnage))
+        }
+        const calculatePriceAfterReturn = () => {
             priceAfterReturn = 0
-            for(let i=0; i<orders.length; i++){
-                priceAfterReturn += (orders[i].allPrice-orders[i].returned*(orders[i].allPrice / orders[i].count))
+            for(const order of orders) {
+                priceAfterReturn += (order.allPrice-order.returned*(order.allPrice / order.count))
             }
             setPriceAfterReturn(checkFloat(priceAfterReturn))
-        },[orders,])
+        }
+        useEffect(() => {
+            calculatePriceAfterReturn()
+            if(initialRender.current)
+                initialRender.current = false
+            else {
+                setChangedOrders(true)
+                calculateAllPrice()
+            }
+        }, [orders])
         return (
             <div className={classes.column} style={{width: width}}>
                 <div className={classes.row}>
@@ -145,15 +143,12 @@ const Order =  React.memo(
                 </div>
                 <div className={classes.row}>
                     <div className={classes.nameField}>Статус:&nbsp;</div>
-                    <div className={classes.value}>{
-                        element.orders[0].status==='принят'&&(element.confirmationForwarder||element.confirmationClient)?
-                            element.confirmationClient?
-                                'подтвержден клиентом'
+                    <div className={classes.value} style={{color: statusColor[element.orders[0].status]}}>{
+                        element.orders[0].status==='принят'&&(element.confirmationForwarder||element.confirmationClient)&&!(element.confirmationForwarder&&element.confirmationClient)?
+                            element.confirmationForwarder?
+                                'доставлен поставщиком'
                                 :
-                                element.confirmationForwarder?
-                                    'доставлен поставщиком'
-                                    :
-                                    element.orders[0].status
+                                'подтвержден клиентом'
                             :
                             element.orders[0].status
                     }</div>
@@ -179,12 +174,11 @@ const Order =  React.memo(
                         </div>
                         :
                         null
-
                 }
                 {
-                    (['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)||allowOrganization)&&element.orders[0].updatedAt!==element.orders[0].createdAt?
+                    !profile.client?
                         <a>
-                            <div style={{cursor: 'pointer'}} className={classes.row} onClick={()=>{setMiniDialog('История', <HistoryOrder invoice={element._id}/>)}}>
+                            <div style={{cursor: 'pointer'}} className={classes.row} onClick={() => {setMiniDialog('История', <HistoryOrder invoice={element._id}/>)}}>
                                 <div className={classes.nameField}>Изменен:&nbsp;</div>
                                 <div className={classes.value}>{`${pdDDMMYYHHMM(element.orders[0].updatedAt)}${element.editor?`, ${element.editor}`:''}`}</div>
                             </div>
@@ -196,7 +190,7 @@ const Order =  React.memo(
                     <div className={classes.nameField}>Адрес: &nbsp;</div>
                     <div className={classes.value}>{`${element.address[2]?`${element.address[2]}, `:''}${element.address[0]}${element.city?` (${element.city})`:''}`}</div>
                 </div>
-                <div className={classes.geo} style={{color: element.address[1]?'#ffb300':'red'}} onClick={()=>{
+                <div className={classes.geo} style={{color: element.address[1]?'#ffb300':'red'}} onClick={() => {
                     if(element.address[1]) {
                         setFullDialog('Геолокация', <Geo geo={element.address[1]}/>)
                         showFullDialog(true)
@@ -222,7 +216,7 @@ const Order =  React.memo(
                     </div>
                 </a>
                 {
-                    element.agent&&element.agent.name?
+                    element.agent?
                         <a href={`/employment/${element.agent._id}`} target='_blank'>
                             <div className={classes.row}>
                                 <div className={classes.nameField}>Агент: &nbsp;</div>
@@ -233,7 +227,7 @@ const Order =  React.memo(
                         null
                 }
                 {
-                    element.track!==undefined?
+                    isNotEmpty(element.track)&&!profile.client?
                         <div className={classes.row}>
                             <div className={classes.nameField}>Рейс:&nbsp;</div>
                             <div className={classes.value}>{element.track}</div>
@@ -242,7 +236,7 @@ const Order =  React.memo(
                         null
                 }
                 {
-                    element.forwarder&&element.forwarder.name?
+                    element.forwarder?
                         <div className={classes.row}>
                             <div className={classes.nameField}>Экспедитор:&nbsp;</div>
                             <div className={classes.value}>{element.forwarder.name}</div>
@@ -252,18 +246,16 @@ const Order =  React.memo(
                 }
 
                 <div
-                    onClick={()=>{
+                    onClick={() => {
                         if(profile.role!=='client') {
-                            setFullDialog('Акции', <OrderAdss invoice={element._id}
-                                                              organization={element.organization._id}
-                                                              setAdss={setAdss} adss={adss}/>)
+                            setFullDialog('Акции', <OrderAdss invoice={element._id} organization={element.organization._id} setAdss={setAdss} adss={adss}/>)
                             showFullDialog(true)
                         }
                     }}
                     className={classes.row}>
                     <div className={classes.nameField}>Акции:&nbsp;</div>
                     <div style={{cursor: 'pointer', ...(!adss[0]?{color: 'red'}:{color: '#ffb300'})}}>
-                        {adss.length>0?
+                        {adss.length?
                             adss.map((ads, idx)=>
                                 idx<4? <div key={`ads${idx}`} className={classes.value}>
                                         {ads.title}
@@ -292,15 +284,6 @@ const Order =  React.memo(
                     <div className={classes.value}>{priceAfterReturn!==allPrice?`${priceAfterReturn} сом/${allPrice} сом`:`${allPrice} сом`}</div>
                 </div>
                 {
-                    consignmentPrice?
-                        <div className={classes.row}>
-                            <div className={classes.nameField}>Консигнации:&nbsp;</div>
-                            <div className={classes.value} style={{color: element.paymentConsignation?'green':'red'}}>{consignmentPrice}&nbsp;сом,&nbsp;{element.paymentConsignation?'оплачены':'не оплачены'}</div>
-                        </div>
-                        :
-                        null
-                }
-                {
                     authenticated&&profile.role!=='client'?
                         <>
                             {
@@ -320,54 +303,41 @@ const Order =  React.memo(
                     <div className={classes.nameField}>Способ оплаты:&nbsp;</div>
                     <div className={classes.value}>{element.paymentMethod}</div>
                 </div>
-                <div className={classes.row}>
+                {element.info?<div className={classes.row}>
                     <div className={classes.nameField}>Информация:&nbsp;</div>
                     <div className={classes.value}>{element.info}</div>
-                </div>
+                </div>:null}
                 <br/>
                 <div className={classes.column}>
                     <b>{`Товары(${orders.length}):`}</b>
-                    {element.orders[0].status!=='обработка'?<><br/><br/></>:null}
+                    <br/>{!isProcessing?<br/>:null}
                     {
                         orders.map((order, idx) => {
-                            if(
-                                element.orders[0].status==='обработка'&&
-                                (
-                                    profile.role==='client'||
-                                    allowOrganization||
-                                    ['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)
-                                )
-                            )
-                                return(
-                                    <div key={order.item._id} className={classes.column}>
-                                        <div className={classes.row}>
-                                            <div className={classes.nameField}>Товар:&nbsp;</div>
-                                            <a href={`/item/${order.item._id}`} target='_blank'>
-                                                <div className={classes.value}>{order.item.name}</div>
-                                            </a>
-                                            <IconButton onClick={()=>{
-                                                remove(idx)
-                                            }} color='secondary' className={classes.button} aria-label='удалить'>
-                                                <CancelIcon style={{height: 20, width: 20}}/>
-                                            </IconButton>
-                                        </div>
-                                        <div className={classes.row}>
-                                            <div className={classes.nameField}>Количество:&nbsp;</div>
+                            const isLast = idx===(orders.length+1)
+                            return <div key={order.item._id} className={classes.column}>
+                                <div className={classes.row}>
+                                    <div className={classes.nameField}>Товар:&nbsp;</div>
+                                    <a href={`/item/${order.item._id}`} target='_blank'>
+                                        <div className={classes.value}>{order.item.name}</div>
+                                    </a>
+                                    {isProcessing?<IconButton onClick={() => remove(idx)} color='secondary' className={classes.button}>
+                                        <CancelIcon style={{height: 20, width: 20}}/>
+                                    </IconButton>:null}
+                                </div>
+                                <div className={classes.row}>
+                                    <div className={classes.nameField}>Количество{order.returned?' (факт./итого)':''}:&nbsp;</div>
+                                    {
+                                        isProcessing?
                                             <div className={classes.column}>
                                                 <div className={classes.row}>
-                                                    <div className={classes.counterbtn} onClick={()=>{decrement(idx)}}>-</div>
-                                                    <div className={classes.value}>{order.count}&nbsp;{order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}</div>
-                                                    <div className={classes.counterbtn} onClick={()=>{increment(idx)}}>+</div>
+                                                    <div className={classes.counterbtn} onClick={() => decrement(idx)}>-</div>
+                                                    <div className={classes.value}>{order.count}&nbsp;{order.item.unit||'шт'}</div>
+                                                    <div className={classes.counterbtn} onClick={() => increment(idx)}>+</div>
                                                 </div>
                                                 {
                                                     orders[idx].item.apiece?
-                                                        <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
-                                                            let price = orders[idx].allPrice/orders[idx].count
-                                                            orders[idx].count = (parseInt(orders[idx].count/order.item.packaging)+1)*order.item.packaging
-                                                            orders[idx].allPrice = orders[idx].count * price
-                                                            orders[idx].allTonnage = orders[idx].count * orders[idx].item.weight
-                                                            setOrders([...orders])
-                                                            canculateAllPrice()
+                                                        <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={() => {
+                                                            addPackage(idx)
                                                         }}>
                                                             Добавить упаковку
                                                         </div>
@@ -377,142 +347,28 @@ const Order =  React.memo(
                                                         </div>
                                                 }
                                             </div>
-                                        </div>
-                                        <div className={classes.row}>
-                                            <div className={classes.nameField}>Общая стоимость:&nbsp;</div>
-                                            <div className={classes.value}>{order.allPrice}&nbsp;сом</div>
-                                        </div>
-                                        {
-                                            element.organization.consignation?
-                                                <div className={classes.row}>
-                                                    <div onClick={()=>{showCons[order._id]=!showCons[order._id];setShowCons({...showCons})}} style={showCons[order._id]?{background: '#ffb300'}:{}} className={classes.minibtn}>КОНС</div>
-                                                </div>
-                                                :null
-
-                                        }
-                                        {
-                                            showCons[order._id]||showReturn[order._id]?
-                                                <br/>
-                                                :null
-                                        }
-                                        {
-                                            showCons[order._id]?
-                                                <>
-                                                    <div className={classes.row}>
-                                                        <div className={classes.nameField}>Консигнации:&nbsp;</div>
-                                                        <div className={classes.column}>
-                                                            <div className={classes.row}>
-                                                                <div className={classes.counterbtn} onClick={()=>{decrementConsignation(idx)}}>-</div>
-                                                                <div className={classes.value}>{order.consignment}&nbsp;{order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}</div>
-                                                                <div className={classes.counterbtn} onClick={()=>{incrementConsignation(idx)}}>+</div>
-                                                            </div>
-                                                            <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
-                                                                let consignment = (parseInt(orders[idx].consignment/order.item.packaging)+1)*order.item.packaging
-                                                                if(consignment<=orders[idx].count){
-                                                                    orders[idx].consignment = consignment
-                                                                }
-                                                                else
-                                                                    orders[idx].consignment = orders[idx].count
-                                                                let price = orders[idx].allPrice/orders[idx].count
-                                                                orders[idx].consignmentPrice = orders[idx].consignment * price
-                                                                setOrders([...orders])
-                                                                canculateAllPrice()
-                                                            }}>
-                                                                Добавить упаковку
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className={classes.row}>
-                                                        <div className={classes.nameField}>Стоимость консигнации:&nbsp;</div>
-                                                        <div className={classes.value}>{order.consignmentPrice}&nbsp;сом</div>
-                                                    </div>
-                                                </>
-                                                :
-                                                null
-                                        }
-                                    </div>
-                                )
-                            else if(
-                                allowOrganization&&!confirmationForwarder
-                                ||
-                                ['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)
-                            )
-                                return(
-                                    <div key={order.item._id} className={classes.column}>
-                                        <a href={`/item/${order.item._id}`} target='_blank'>
-                                            <div className={classes.row}>
-                                                <div className={classes.nameField}>Товар:&nbsp;</div>
-                                                <div className={classes.value}>{order.item.name}</div>
-                                            </div>
-                                        </a>
-                                        <div className={classes.row}>
-                                            <div className={classes.nameField}>Количество{order.returned?' (факт./итого)':''}:&nbsp;</div>
-                                            <div className={classes.value}>{order.returned?`${order.count-order.returned} ${order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}/${order.count} ${order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}`:`${order.count} ${order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}`}</div>
-                                        </div>
-                                        <div className={classes.row}>
-                                            <div className={classes.nameField}>Сумма{order.returned?' (факт./итого)':''}:&nbsp;</div>
+                                            :
                                             <div className={classes.value}>
-                                                {
-                                                    order.returned?
-                                                        `${checkFloat(order.allPrice/order.count*(order.count-order.returned))} сом/${order.allPrice} сом`
-                                                        :
-                                                        `${order.allPrice} сом`
-                                                }
+                                                {`${order.returned?`${order.count-order.returned} ${order.item.unit||'шт'}/`:''}${order.count} ${order.item.unit||'шт'}`}
                                             </div>
-                                        </div>
-                                        <div className={classes.row}>
-                                            {element.organization.consignation?
-                                                <div onClick={()=>{showCons[order._id]=!showCons[order._id];setShowCons({...showCons})}} style={showCons[order._id]?{background: '#ffb300'}:{}} className={classes.minibtn}>КОНС</div>
+                                    }
+                                </div>
+                                <div className={classes.row}>
+                                    <div className={classes.nameField}>Сумма{order.returned?' (факт./итого)':''}:&nbsp;</div>
+                                    <div className={classes.value}>
+                                        {`${order.returned?`${checkFloat(order.allPrice/order.count*(order.count-order.returned))} сом/`:''}${order.allPrice} сом`}
+                                    </div>
+                                </div>
+                                {
+                                    isProcessingOrTaken&&editEmploymentRoles.includes(profile.role)?
+                                        <>
+                                            {!isProcessing&&element.organization.refusal?
+                                                <div onClick={() => {setShowReturn(showReturn => ({...showReturn, [order._id]: !showReturn[order._id]}))}} style={showReturn[order._id]?{background: '#ffb300'}:{}} className={classes.minibtn}>ОТКАЗ</div>
                                                 :
                                                 null
                                             }
-                                            {element.organization.refusal?
-                                                <div onClick={()=>{showReturn[order._id]=!showReturn[order._id];setShowReturn({...showReturn})}} style={showReturn[order._id]?{background: '#ffb300'}:{}} className={classes.minibtn}>ОТКАЗ</div>
-                                                :
-                                                null
-                                            }
-                                        </div>
-                                        {
-                                            showCons[order._id]||showReturn[order._id]?
+                                            {showReturn[order._id]?<>
                                                 <br/>
-                                                :null
-                                        }
-                                        {
-                                            showCons[order._id]?
-                                                <>
-                                                    <div className={classes.row}>
-                                                        <div className={classes.nameField}>Консигнации:&nbsp;</div>
-                                                        <div className={classes.column}>
-                                                            <div className={classes.row}>
-                                                                <div className={classes.counterbtn} onClick={()=>{decrementConsignation(idx)}}>-</div>
-                                                                <div className={classes.value}>{order.consignment}&nbsp;{order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}</div>
-                                                                <div className={classes.counterbtn} onClick={()=>{incrementConsignation(idx)}}>+</div>
-                                                            </div>
-                                                            <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
-                                                                let consignment = (parseInt(orders[idx].consignment/order.item.packaging)+1)*order.item.packaging
-                                                                if(consignment<=orders[idx].count){
-                                                                    orders[idx].consignment = consignment
-                                                                }
-                                                                else
-                                                                    orders[idx].consignment = orders[idx].count
-                                                                let price = orders[idx].allPrice/orders[idx].count
-                                                                orders[idx].consignmentPrice = orders[idx].consignment * price
-                                                                setOrders([...orders])
-                                                                canculateAllPrice()
-                                                            }}>
-                                                                Добавить упаковку
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className={classes.row}>
-                                                        <div className={classes.nameField}>Стоимость консигнации:&nbsp;</div>
-                                                        <div className={classes.value}>{order.consignmentPrice}&nbsp;сом</div>
-                                                    </div>
-                                                </>
-                                                :null
-                                        }
-                                        {
-                                            showReturn[order._id] ?
                                                 <div className={classes.row}>
                                                     <div className={classes.nameField}>Отказ:&nbsp;</div>
                                                     <div className={classes.column}>
@@ -523,122 +379,45 @@ const Order =  React.memo(
                                                             </div>
                                                             <div
                                                                 className={classes.value}>{order.returned}&nbsp;
-                                                                {order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}
+                                                                {order.item.unit?order.item.unit:'шт'}
                                                             </div>
                                                             <div className={classes.counterbtn} onClick={() => {
                                                                 incrementReturned(idx)
                                                             }}>+
                                                             </div>
                                                         </div>
-                                                        <div className={classes.addPackaging}
-                                                             style={{color: '#ffb300'}} onClick={() => {
-                                                            let returned = (parseInt(orders[idx].returned / order.item.packaging) + 1) * order.item.packaging
-                                                            if (returned <= orders[idx].count) {
-                                                                orders[idx].returned = returned
-                                                            }
-                                                            else
-                                                                orders[idx].returned = orders[idx].count
-                                                            setOrders([...orders])
-                                                            canculateAllPrice()
+                                                        <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={() => {
+                                                            addReturnedPackage(idx)
                                                         }}>
                                                             Добавить упаковку
                                                         </div>
                                                     </div>
                                                 </div>
-                                                : null
-                                        }
-                                        <br/>
-                                    </div>
-                                )
-                            else
-                                return(
-                                    <div key={order.item._id} className={classes.column}>
-                                        <a href={`/item/${order.item._id}`} target='_blank'>
-                                            <div className={classes.row}>
-                                                <div className={classes.nameField}>Товар:&nbsp;</div>
-                                                <div className={classes.value}>{order.item.name}</div>
-                                            </div>
-                                        </a>
-                                        <div className={classes.row}>
-                                            <div className={classes.nameField}>Количество{order.returned?' (факт./итого)':''}:&nbsp;</div>
-                                            <div className={classes.value}>{order.returned?`${order.count-order.returned} ${order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}/${order.count} ${order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}`:`${order.count} ${order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}`}</div>
-                                        </div>
-                                        <div className={classes.row}>
-                                            <div className={classes.nameField}>Сумма{order.returned?' (факт./итого)':''}:&nbsp;</div>
-                                            <div className={classes.value}>
-                                                {
-                                                    order.returned?
-                                                        `${checkFloat(order.allPrice/order.count*(order.count-order.returned))}/${order.allPrice} сом`
-                                                        :
-                                                        `${order.allPrice} сом`
-                                                }
-                                            </div>
-                                        </div>
-                                        {
-                                            order.consignment?
-                                                <>
-                                                    <div className={classes.row}>
-                                                        <div className={classes.nameField}>Консигнации:&nbsp;</div>
-                                                        <div className={classes.value}>{order.consignment}&nbsp;{order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}</div>
-                                                    </div>
-                                                    <div className={classes.row}>
-                                                        <div className={classes.nameField}>Стоимость консигнации:&nbsp;</div>
-                                                        <div className={classes.value}>{order.consignmentPrice}&nbsp;сом</div>
-                                                    </div>
-                                                </>
-                                                :
-                                                null
-                                        }
-                                        {
-                                            order.returned?
-                                                <>
-                                                    <div className={classes.row}>
-                                                        <div className={classes.nameField}>Отказ:&nbsp;</div>
-                                                        <div className={classes.value}>{order.returned}&nbsp;{order.item.unit&&order.item.unit.length>0?order.item.unit:'шт'}</div>
-                                                    </div>
-                                                </>
-                                                :
-                                                null
-                                        }
-                                        <br/>
-                                    </div>
-                                )
+                                            </>:null}
+                                        </>
+                                        :
+                                        order.returned?
+                                            <>
+                                                <div className={classes.row}>
+                                                    <div className={classes.nameField}>Отказ:&nbsp;</div>
+                                                    <div className={classes.value}>{order.returned}&nbsp;{order.item.unit?order.item.unit:'шт'}</div>
+                                                </div>
+                                            </>
+                                            :
+                                            null
+                                }
+                                {!isProcessing&&!isLast?<br/>:null}
+                            </div>
                         })
                     }
                 </div>
-                {element.orders[0].status==='обработка'?<br/>:null}
-                {
-                    consignmentPrice?
-                        <div>
-                            <FormControlLabel
-                                disabled={changeOrders||!(['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)||allowOrganization)}
-                                control={
-                                    <Checkbox
-                                        checked={paymentConsignation}
-                                        onChange={()=>{
-                                            setPaymentConsignation(!paymentConsignation);
-                                        }}
-                                        color='primary'
-                                    />
-                                }
-                                label='Консигнации оплачены'
-                            />
-                        </div>
-                        :
-                        null
-                }
                 <div>
                     <FormControlLabel
-                        disabled={changeOrders||(['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)?
-                                !['обработка','принят'].includes(element.orders[0].status)
-                                :
-                                !(allowOrganization&&['обработка','принят'].includes(element.orders[0].status)))}
+                        disabled={changedOrders||!['обработка','принят'].includes(element.orders[0].status)||!editEmploymentRoles.includes(profile.role)}
                         control={
                             <Checkbox
                                 checked={taken}
-                                onChange={()=>{
-                                    setTaken(!taken);
-                                }}
+                                onChange={() => setTaken(!taken)}
                                 color='primary'
                             />
                         }
@@ -647,18 +426,11 @@ const Order =  React.memo(
                 </div>
                 <div>
                     <FormControlLabel
-                        disabled={changeOrders||(
-                            ['admin', 'суперэкспедитор'].includes(profile.role)?
-                                !['выполнен','принят'].includes(element.orders[0].status)
-                                :
-                                !((allowOrganization||'экспедитор'===profile.role)&&'принят'===element.orders[0].status)
-                        )}
+                        disabled={changedOrders||element.orders[0].status!=='принят'||!['admin', 'суперэкспедитор', 'экспедитор'].includes(profile.role)}
                         control={
                             <Checkbox
                                 checked={confirmationForwarder}
-                                onChange={()=>{
-                                    setConfirmationForwarder(!confirmationForwarder);
-                                }}
+                                onChange={() => setConfirmationForwarder(!confirmationForwarder)}
                                 color='primary'
                             />
                         }
@@ -667,21 +439,11 @@ const Order =  React.memo(
                 </div>
                 <div>
                     <FormControlLabel
-                        disabled={changeOrders||(
-                            profile.role==='admin'?
-                                !['выполнен','принят'].includes(element.orders[0].status)
-                                :
-                                profile.role==='client'?
-                                    'принят'!==element.orders[0].status
-                                    :
-                                    true
-                        )}
+                        disabled={changedOrders||element.orders[0].status!=='принят'||!['admin', 'client'].includes(profile.role)}
                         control={
                             <Checkbox
                                 checked={confirmationClient}
-                                onChange={()=>{
-                                    setConfirmationClient(!confirmationClient);
-                                }}
+                                onChange={() => setConfirmationClient(!confirmationClient)}
                                 color='primary'
                             />
                         }
@@ -690,17 +452,17 @@ const Order =  React.memo(
                 </div>
                 <div>
                     <FormControlLabel
-                        disabled={changeOrders||(
+                        disabled={changedOrders||(
                             ['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)?
                                 !['отмена','обработка'].includes(element.orders[0].status)
                                 :
-                                !(('client'===profile.role||allowOrganization)&&['отмена','обработка'].includes(element.orders[0].status))
+                                !(['client', ...editEmploymentRoles].includes(profile.role)&&['отмена','обработка'].includes(element.orders[0].status))
                         )}
                         control={
                             <Checkbox
                                 checked={
-                                    element.cancelClient!=undefined||element.cancelForwarder!=undefined?
-                                        element.cancelClient!=undefined?
+                                    !!(element.cancelClient||element.cancelForwarder?
+                                        element.cancelClient?
                                             cancelClient
                                             :
                                             cancelForwarder
@@ -708,12 +470,12 @@ const Order =  React.memo(
                                         'client'===profile.role?
                                             cancelClient
                                             :
-                                            cancelForwarder
+                                            cancelForwarder)
                                 }
-                                onChange={()=>{
+                                onChange={() => {
                                     if('client'===profile.role) setCancelClient(!cancelClient);
-                                    else if(['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)){
-                                        if(element.cancelClient!=undefined)
+                                    else if(['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)) {
+                                        if(element.cancelClient)
                                             setCancelClient(!cancelClient)
                                         else
                                             setCancelForwarder(!cancelForwarder)
@@ -733,29 +495,25 @@ const Order =  React.memo(
                 </div>
                 <center>
                     {
-                        ((profile.role==='client'||allowOrganization||['агент', 'экспедитор'].includes(profile.role)||['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)))?
-                            <Button variant='contained' color='primary' onClick={()=>{
-                                const action = async() => {
-                                    if(!changeOrders) {
+                        (profile.role==='client'||editEmploymentRoles.includes(profile.role))?
+                            <Button variant='contained' color='primary' onClick={() => {
+                                const action = async () => {
+                                    if(!changedOrders) {
                                         let invoice = {invoice: element._id, adss: adss.map(ads => ads._id)}
-                                        if (element.taken !== taken) invoice.taken = taken;
-                                        if (element.confirmationClient !== confirmationClient) invoice.confirmationClient = confirmationClient;
-                                        if (element.confirmationForwarder !== confirmationForwarder) invoice.confirmationForwarder = confirmationForwarder;
-                                        if (element.cancelClient !== cancelClient) invoice.cancelClient = cancelClient;
-                                        if (element.cancelForwarder !== cancelForwarder) invoice.cancelForwarder = cancelForwarder;
-                                        if (element.paymentConsignation !== paymentConsignation) invoice.paymentConsignation = paymentConsignation;
+                                        if(element.taken !== taken) invoice.taken = taken;
+                                        if(element.confirmationClient !== confirmationClient) invoice.confirmationClient = confirmationClient;
+                                        if(element.confirmationForwarder !== confirmationForwarder) invoice.confirmationForwarder = confirmationForwarder;
+                                        if(element.cancelClient !== cancelClient) invoice.cancelClient = cancelClient;
+                                        if(element.cancelForwarder !== cancelForwarder) invoice.cancelForwarder = cancelForwarder;
                                         await setInvoice(invoice)
                                     }
-
                                     let sendOrders = [];
-                                    if(changeOrders) {
+                                    if(changedOrders) {
                                         sendOrders = orders.map((order) => {
                                             return {
                                                 _id: order._id,
-                                                consignmentPrice: order.consignmentPrice,
                                                 name: order.item.name,
                                                 returned: taken !== true ? 0 : order.returned,
-                                                consignment: order.consignment,
                                                 count: order.count,
                                                 allPrice: order.allPrice,
                                                 allTonnage: order.allTonnage,
@@ -765,10 +523,11 @@ const Order =  React.memo(
                                     }
                                     const res = await setOrder({orders: sendOrders, invoice: element._id})
 
-                                    if (res&&list) {
-                                        let _list = [...list]
-                                        _list[idx] = res
-                                        setList(_list)
+                                    if(res&&setList) {
+                                        setList(list => {
+                                            list[idx] = res
+                                            return [...list]
+                                        })
                                     }
                                     showMiniDialog(false);
                                 }
@@ -779,7 +538,7 @@ const Order =  React.memo(
                             :
                             null
                     }
-                    <Button variant='contained' color='secondary' onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant='contained' color='secondary' onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </center>

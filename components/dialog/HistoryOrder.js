@@ -11,18 +11,18 @@ import { pdDDMMYYHHMM } from '../../src/lib'
 
 const HistoryOrder =  React.memo(
     (props) =>{
-        const { isMobileApp } = props.app;
-        const { showMiniDialog } = props.mini_dialogActions;
-        const { classes, invoice } = props;
+        const {isMobileApp} = props.app;
+        const {showMiniDialog} = props.mini_dialogActions;
+        const {classes, invoice} = props;
         let [historyOrders, setHistoryOrders] = useState([]);
         const width = isMobileApp? (window.innerWidth-112) : 500;
-        useEffect(()=>{
-            (async()=>{
-                historyOrders = (await getOrderHistorys(invoice)).orderHistorys
+        useEffect(() => {
+            (async () => {
+                historyOrders = await getOrderHistorys(invoice)
                 if(historyOrders)
                     setHistoryOrders(historyOrders)
             })()
-        },[])
+        }, [])
         return (
             <div className={classes.column} style={{width: width}}>
                 {
@@ -41,7 +41,7 @@ const HistoryOrder =  React.memo(
                     )
                 }
                 <div>
-                    <Button variant='contained' color='secondary' onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant='contained' color='secondary' onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </div>

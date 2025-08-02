@@ -11,16 +11,16 @@ import { pdDDMMYYHHMM } from '../../src/lib'
 
 const HistoryReturned =  React.memo(
     (props) =>{
-        const { isMobileApp } = props.app;
-        const { showMiniDialog } = props.mini_dialogActions;
-        const { classes, returned } = props;
+        const {isMobileApp} = props.app;
+        const {showMiniDialog} = props.mini_dialogActions;
+        const {classes, returned} = props;
         let [historyOrders, setHistoryOrders] = useState([]);
         const width = isMobileApp? (window.innerWidth-112) : 500;
-        useEffect(()=>{
-            (async()=>{
-                setHistoryOrders((await getReturnedHistorys(returned)).returnedHistorys)
+        useEffect(() => {
+            (async () => {
+                setHistoryOrders(await getReturnedHistorys(returned))
             })()
-        },[])
+        }, [])
         return (
             <div className={classes.column} style={{width: width}}>
                 {
@@ -39,7 +39,7 @@ const HistoryReturned =  React.memo(
                     )
                 }
                 <div>
-                    <Button variant='contained' color='secondary' onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant='contained' color='secondary' onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </div>

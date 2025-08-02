@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux'
 import { addOrders } from '../../src/gql/order'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
+import * as appActions from '../../redux/actions/app'
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -20,19 +21,19 @@ import Link from 'next/link';
 import WhatshotIcon from '@material-ui/icons/Whatshot';
 import { addBasket } from '../../src/gql/basket';
 import { addAgentHistoryGeo } from '../../src/gql/agentHistoryGeo'
-import { getGeoDistance } from '../../src/lib'
+import {getGeoDistance, unawaited} from '../../src/lib'
 import { getDeliveryDate } from '../../src/gql/deliveryDate';
-import { getDiscountClient } from '../../src/gql/discountClient';
 import { pdDDMMYYYYWW } from '../../src/lib';
 import { putOfflineOrders } from '../../src/service/idb/offlineOrders';
 
 const BuyBasket =  React.memo(
     (props) =>{
-        const { isMobileApp } = props.app;
-        const { profile } = props.user;
-        const { client, allPrice, organization, adss, agent, basket, geo, classes } = props;
-        const { showMiniDialog } = props.mini_dialogActions;
-        const { showSnackBar } = props.snackbarActions;
+        const {isMobileApp} = props.app;
+        const {profile} = props.user;
+        const {client, allPrice, organization, adss, agent, basket, geo, classes} = props;
+        const {showMiniDialog} = props.mini_dialogActions;
+        const {showSnackBar} = props.snackbarActions;
+        const {showLoad} = props.appActions;
         const width = isMobileApp? (window.innerWidth-112) : 500
         let [info, setInfo] = useState('');
         let [inv, setInv] = useState(false);
@@ -40,40 +41,31 @@ const BuyBasket =  React.memo(
             setInfo(event.target.value)
         };
         let [paymentMethod, setPaymentMethod] = useState('Наличные');
-        let [discount, setDiscount] = useState(undefined);
-        let [dateDelivery, setDateDelivery] = useState(undefined);
+        let [dateDelivery, setDateDelivery] = useState(null);
         let handleDateDelivery =  (event) => {
             setDateDelivery(event.target.value)
         };
-        let [dateDeliverys, setDateDeliverys] = useState([true, true, true, true, true, true, false]);
+        let [deliveryDays, setDeliveryDays] = useState([true, true, true, true, true, true, false]);
         let [priority, setPriority] = useState(0);
         let [week, setWeek] = useState([]);
-        let [unlock, setUnlock] = useState(false);
+        const unlock = useRef(true);
         let paymentMethods = ['Наличные', 'Перечисление', 'Консигнация']
         let handlePaymentMethod =  (event) => {
             setPaymentMethod(event.target.value)
         };
-        useEffect(()=>{
-            (async()=>{
-                if(!unlock) {
-                    discount = (await getDiscountClient({
-                        client: client._id,
-                        organization: organization._id
-                    })).discountClient
-                    setDiscount(discount?discount.discount:0)
-                    dateDeliverys = (await getDeliveryDate({
-                        client: client._id,
-                        organization: organization._id
-                    })).deliveryDate
-                    if (dateDeliverys) {
-                        setPriority(dateDeliverys.priority?dateDeliverys.priority:0)
-                        dateDeliverys = dateDeliverys.days
-                        if (!agent)
-                            dateDeliverys[6] = false
-                        setDateDeliverys([...dateDeliverys])
+        useEffect(() => {
+            (async () => {
+                if(unlock.current) {
+                    unlock.current = false
+                    for(const key in basket) unawaited(() => addBasket({item: basket[key]._id, count: basket[key].count}))
+                    const deliveryDate = await getDeliveryDate({client: client._id, organization: organization._id})
+                    if(deliveryDate) {
+                        setPriority(deliveryDate.priority?deliveryDate.priority:0)
+                        deliveryDays = deliveryDate.days
+                        /*if(!agent)
+                            deliveryDays[6] = false*/
+                        setDeliveryDays([...deliveryDays])
                     }
-                    else
-                        dateDeliverys = [true, true, true, true, true, true, false]
                     for (let i = 0; i < 7; i++) {
                         let day = new Date()
                         if(day.getHours()>=3)
@@ -82,31 +74,23 @@ const BuyBasket =  React.memo(
                         day.setHours(3, 0, 0, 0)
                         let dayWeek = day.getDay() === 0 ? 6 : (day.getDay() - 1)
                         week[dayWeek] = day
-                        if(!dateDelivery&&dateDeliverys[dayWeek]){
+                        if(!dateDelivery&&deliveryDays[dayWeek]) {
                             dateDelivery = day
                             setDateDelivery(dateDelivery)
                         }
                     }
                     setWeek([...week])
-                    for (let i = 0; i < basket.length; i++) {
-                        if (basket[i].count > 0)
-                            await addBasket({
-                                item: basket[i]._id,
-                                count: basket[i].count,
-                                consignment: basket[i].consignment
-                            })
-                    }
-                    setUnlock(true)
+                    unlock.current = true
                 }
             })()
-        },[])
+        }, [])
         return (
             <div className={classes.main}>
                 {
-                    adss&&adss.length>0?
+                    adss&&adss.length?
                         <>
                         <Link href={`/ads/${organization._id}`}>
-                            <div onClick={()=>{showMiniDialog(false)}} className={classes.showAds} style={{width: width}}>
+                            <div onClick={() => {showMiniDialog(false)}} className={classes.showAds} style={{width: width}}>
                                 <WhatshotIcon color='inherit'/>&nbsp;Просмотреть акции
                             </div>
                         </Link>
@@ -126,19 +110,16 @@ const BuyBasket =  React.memo(
                     value={info}
                     className={isMobileApp?classes.inputM:classes.inputD}
                     onChange={handleInfo}
-                    inputProps={{
-                        'aria-label': 'description',
-                    }}
                 />
                 <br/>
                 {
-                    week.length>0?
+                    week.length?
                         <>
                         <FormControl style={{width: width}} className={isMobileApp?classes.inputM:classes.inputD}>
                             <InputLabel>День доставки</InputLabel>
                             <Select value={dateDelivery} onChange={handleDateDelivery}>
-                                {week.map((element, idx)=>{
-                                    if(dateDeliverys[idx])
+                                {week.map((element, idx) => {
+                                    if(deliveryDays[idx])
                                         return <MenuItem value={element}>{pdDDMMYYYYWW(element)}</MenuItem>
                                 }
                                 )}
@@ -176,7 +157,7 @@ const BuyBasket =  React.memo(
                     agent||['A','Horeca'].includes(client.category)?
                         <FormControlLabel
                             style={{width: width}}
-                            onChange={(e)=>{
+                            onChange={(e) => {
                                 setInv(e.target.checked)
                             }}
                             control={<Checkbox/>}
@@ -185,57 +166,56 @@ const BuyBasket =  React.memo(
                         :
                         null
                 }
-                {discount?<div style={{width: width}} className={classes.itogo}><b>Скидка: &nbsp;</b>{discount}%</div>:null}
-                <div style={{width: width}} className={classes.itogo}><b>Итого:</b>{` ${allPrice-allPrice/100*discount} сом`}</div>
+                <div style={{width: width}} className={classes.itogo}><b>Итого:</b>&nbsp;{allPrice} сом</div>
                 <br/>
                 <div>
-                    <Button variant='contained' color='primary' onClick={async()=>{
-                        if(unlock) {
-                            if (agent || !organization.minimumOrder === 0 || organization.minimumOrder <= allPrice) {
-                               if (paymentMethod.length > 0) {
+                    <Button variant='contained' color='primary' onClick={async () => {
+                        if(unlock.current) {
+                            unlock.current = false
+                            if(agent || !organization.minimumOrder || organization.minimumOrder<=allPrice) {
+                               if(paymentMethod.length) {
+                                   showMiniDialog(false);
+                                   showLoad(true)
                                    sessionStorage.catalog = '{}'
                                    sessionStorage.catalogID = null
-                                   if(navigator.onLine){
-                                       if (agent&&geo&&client.address[0][1].includes(', ')) {
+                                   if(navigator.onLine) {
+                                       if(agent&&geo&&client.address[0][1].includes(', ')) {
                                            let distance = getGeoDistance(geo.coords.latitude, geo.coords.longitude, ...(client.address[0][1].split(', ')))
-                                           if(distance<1000){
-                                               await addAgentHistoryGeo({client: client._id, geo: `${geo.coords.latitude}, ${geo.coords.longitude}`})
+                                           if(distance<1000) {
+                                               unawaited(() => addAgentHistoryGeo({client: client._id, geo: `${geo.coords.latitude}, ${geo.coords.longitude}`}))
                                            }
                                        }
                                        await addOrders({
-                                           inv: inv,
-                                           priority: priority,
+                                           inv,
+                                           priority,
                                            unite: organization.unite,
-                                           info: info,
-                                           paymentMethod: paymentMethod,
+                                           info,
+                                           paymentMethod,
                                            organization: organization._id,
                                            client: client._id,
-                                           dateDelivery: dateDelivery
+                                           dateDelivery
                                        })
                                        Router.push('/orders')
                                    }
                                    else if(profile.role.includes('агент')) {
                                        await putOfflineOrders({
                                            ...(geo?{geo: {latitude: geo.coords.latitude, longitude: geo.coords.longitude}}:{}),
-                                           inv: inv,
-                                           priority: priority,
+                                           inv,
+                                           priority,
                                            unite: organization.unite,
-                                           info: info,
-                                           paymentMethod: paymentMethod,
+                                           info,
+                                           paymentMethod,
                                            organization: organization._id,
                                            client: client._id,
-                                           dateDelivery: dateDelivery,
-                                           basket: basket,
+                                           dateDelivery,
+                                           basket,
                                            address: client.address[0],
                                            name: client.name,
-                                           allPrice: `${allPrice-allPrice/100*discount} сом`
+                                           allPrice: `${allPrice} сом`
                                        })
-                                       Router.push('/statistic/offlineorder')
+                                       Router.push('/statistic/tools/offlineorder')
                                    }
-                                   showMiniDialog(false);
-                                   /*const action = async () => {
-                                   }
-                                   setMiniDialog('Вы уверены?', <Confirmation action={action}/>)*/
+                                   showLoad(false)
                                }
                                else
                                    showSnackBar('Заполните все поля')
@@ -243,6 +223,7 @@ const BuyBasket =  React.memo(
                             else {
                                 showSnackBar('Сумма заказа должна быть выше минимальной')
                             }
+                            unlock.current = true
                         }
                         else {
                             showSnackBar('Подождите...')
@@ -250,7 +231,7 @@ const BuyBasket =  React.memo(
                     }} className={classes.button}>
                         Купить
                     </Button>
-                    <Button variant='contained' color='secondary' onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant='contained' color='secondary' onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </div>
@@ -270,6 +251,7 @@ function mapDispatchToProps(dispatch) {
     return {
         mini_dialogActions: bindActionCreators(mini_dialogActions, dispatch),
         snackbarActions: bindActionCreators(snackbarActions, dispatch),
+        appActions: bindActionCreators(appActions, dispatch),
     }
 }
 

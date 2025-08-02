@@ -1,67 +1,54 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../layouts/App';
 import { connect } from 'react-redux'
 import { getSubBrands } from '../src/gql/subBrand'
-import {getOrganization, getOrganizations} from '../src/gql/organization'
+import {getOrganizations} from '../src/gql/organization'
 import pageListStyle from '../src/styleMUI/subbrand/subbrandList'
-import CardSubBrand from '../components/subBrand/CardSubBrand'
+import CardSubBrand from '../components/card/CardSubBrand'
 import Router from 'next/router'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
+import {unawaited} from '../src/lib';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
+import Link from 'next/link';
 
 const SubBrands = React.memo((props) => {
     const classes = pageListStyle();
-    const { data } = props;
+    const {data} = props;
     let [list, setList] = useState(data.subBrands);
-    const { search, organization, city } = props.app;
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
-    let [organizations, setOrganizations] = useState(data.organizations);
+    const {search, organization, city} = props.app;
+    const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
-                initialRender.current = false;
-            } else {
-                setOrganizations((await getOrganizations({search: '', filter: '', city})).organizations)
-            }
-        })()
-    },[city])
-    const getList = async ()=>{
-        setList((await getSubBrands({search, organization, city})).subBrands);
+    const getList = async () => {
+        setList(await getSubBrands({search, organization, city}));
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         setPagination(100);
     }
-    useEffect(()=>{
-        (async()=>{
+    useEffect(() => {
             if(!initialRender.current) {
-                await getList()
+                unawaited(getList)
             }
-        })()
-    },[city, organization])
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
-                initialRender.current = false;
-            } else {
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    await getList()
-                }, 500)
-                setSearchTimeOut(searchTimeOut)
-
-            }
-        })()
-    },[search])
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
+    }, [city, organization])
+    useEffect(() => {
+        if(initialRender.current)
+            initialRender.current = false;
+        else {
+            if(searchTimeOut.current)
+                clearTimeout(searchTimeOut.current)
+            searchTimeOut.current = setTimeout(() => {
+                unawaited(getList)
+            }, 500)
         }
-    }
+    }, [search])
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, list])
     return (
-        <App checkPagination={checkPagination} searchShow={true}  pageName='Подбренды' organizations cityShow>
+        <App checkPagination={checkPagination} searchShow  pageName='Подбренды' organizations cityShow>
             <Head>
                 <title>Подбренды</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -70,13 +57,17 @@ const SubBrands = React.memo((props) => {
                 <div className='count'>
                     {`Всего: ${list.length}`}
                 </div>
-                <CardSubBrand list={list} organization={data.organization} organizations={organizations} setList={setList}/>
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
                         return(
-                            <CardSubBrand list={list} idx={idx}  key={element._id} setList={setList} element={element} organizations={organizations}/>
+                            <CardSubBrand idx={idx}  key={element._id} list={list} setList={setList} element={element} organizations={data.organizations}/>
                         )
                 }):null}
+                <Link href='/subbrand/[id]' as={`/subbrand/new`}>
+                    <Fab color='primary' className={classes.fab}>
+                        <AddIcon />
+                    </Fab>
+                </Link>
             </div>
         </App>
     )
@@ -85,7 +76,6 @@ const SubBrands = React.memo((props) => {
 SubBrands.getInitialProps = async function(ctx) {
     await initialApp(ctx)
     let role = ctx.store.getState().user.profile.role
-    let organization = ctx.store.getState().user.profile.organization
     let authenticated = ctx.store.getState().user.authenticated
     if(!['admin', 'суперорганизация', 'организация'].includes(role))
         if(ctx.res) {
@@ -97,14 +87,7 @@ SubBrands.getInitialProps = async function(ctx) {
         else {
             Router.push(['суперагент','агент'].includes(role)?'/catalog':!authenticated?'/contact':'/items/all')
         }
-    return {
-        data:
-            {
-                ...await getSubBrands({search: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-                ...await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-                ...organization?await getOrganization({_id: organization}, ctx.req?await getClientGqlSsr(ctx.req):undefined):{}
-            },
-    };
+    return {data: {subBrands: await getSubBrands({search: ''}, getClientGqlSsr(ctx.req))}};
 };
 
 function mapStateToProps (state) {

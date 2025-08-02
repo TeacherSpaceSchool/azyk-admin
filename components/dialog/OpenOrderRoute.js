@@ -10,13 +10,13 @@ import Button from '@material-ui/core/Button';
 
 const OpenRoute =  React.memo(
     (props) =>{
-        const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
-        const { classes, idx, _list, route, _elemenet, _setList_, geoMy, geoOrder } = props;
-        const { isMobileApp } = props.app;
+        const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+        const {classes, idx, _list, route, _elemenet, _setList_, geoMy, geoOrder} = props;
+        const {isMobileApp} = props.app;
         return (
             <div className={classes.column}>
                 <center>
-                    <Button variant='contained' color='primary' onClick={()=>{
+                    <Button variant='contained' color='primary' onClick={() => {
                         setMiniDialog('Заказ', <Order idx={idx} list={_list} route={route}
                                                       element={_elemenet} setList={_setList_}/>);
                     }} className={classes.button}>
@@ -25,13 +25,13 @@ const OpenRoute =  React.memo(
                 </center>
                 <center>
                     <a href={`${isMobileApp?'dgis':'https'}://2gis.ru/routeSearch/rsType/car/from/${geoMy[1]},${geoMy[0]}/to/${geoOrder[1]},${geoOrder[0]}`} target='_blank'>
-                        <Button variant='contained' color='primary' onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                        <Button variant='contained' color='primary' onClick={() => {showMiniDialog(false);}} className={classes.button}>
                             Построить маршрут
                         </Button>
                     </a>
                 </center>
                 <center>
-                    <Button variant='contained' color='secondary' onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant='contained' color='secondary' onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </center>

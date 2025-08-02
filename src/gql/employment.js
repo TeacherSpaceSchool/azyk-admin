@@ -1,257 +1,174 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
-import { SingletonStore } from '../singleton/store';
 
-export const getEmploymentsTrash = async({search}, client)=>{
+const Employment = `
+    _id
+    createdAt
+    name
+    email
+    phone
+    user {_id role status login}
+    organization {_id name}
+`
+
+export const getEmployments = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {search},
+                variables,
                 query: gql`
-                    query ($search: String!) {
-                        employmentsTrash(search: $search) {
-                            _id
-                            createdAt
-                            name
-                            email
-                            del
-                            phone
-                            user 
-                                {_id role status login}
-                            organization 
-                                {_id name}
-                          }
+                    query ($organization: ID, $search: String!, $filter: String!, $skip: Int) {
+                        employments(organization: $organization, search: $search, filter: $filter, skip: $skip) {${Employment}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.employments
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getEmployments = async({organization, search, sort, filter: filter}, client)=>{
+export const getEmploymentsCount = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {organization: organization, search, sort, filter: filter},
+                variables,
                 query: gql`
-                    query ($organization: ID, $search: String!, $sort: String!, $filter: String!) {
-                        employments(organization: $organization, search: $search, sort: $sort, filter: $filter) {
-                            _id
-                            createdAt
-                            name
-                            email
-                            phone
-                            user 
-                                {_id role status login}
-                            organization 
-                                {_id name}
-                          }
-                          sortEmployment {
-                           name
-                            field
-                          }
-                          filterEmployment {
-                           name
-                           value
-                          }
+                    query ($organization: ID, $search: String!, $filter: String!) {
+                        employmentsCount(organization: $organization, search: $search, filter: $filter)
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.employmentsCount
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getEmployment = async({_id: _id}, client)=> {
+export const getEmployment = async (_id, client)=> {
     try {
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {_id: _id},
+                variables: {_id},
                 query: gql`
                     query ($_id: ID!) {
-                        employment(_id: $_id) {
-                            _id
-                            createdAt
-                            name
-                            email
-                            phone
-                            user 
-                                {_id role status login}
-                            organization 
-                                {_id name}
-                        }
+                        employment(_id: $_id) {${Employment}}
                     }`,
             })
-        return res.data
+        return res.data.employment
     } catch (err) {
         console.error(err)
     }
 }
 
-export const getManagers = async({_id: _id}, client)=>{
+export const getManagers = async (organization, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {_id: _id},
+                variables: {organization},
                 query: gql`
-                    query ($_id: ID) {
-                        managers(_id: $_id) {
-                            _id
-                            createdAt
-                            name
-                            email
-                            phone
-                            user 
-                                {_id role status login}
-                            organization 
-                                {_id name}
-                        }
+                    query ($organization: ID) {
+                        managers(organization: $organization) {${Employment}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.managers
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getEcspeditors = async({_id: _id}, client)=>{
+export const getEcspeditors = async (organization, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {_id: _id},
+                variables: {organization},
                 query: gql`
-                    query ($_id: ID) {
-                        ecspeditors(_id: $_id) {
-                            _id
-                            createdAt
-                            name
-                            email
-                            phone
-                            user 
-                                {_id role status login}
-                            organization 
-                                {_id name}
-                        }
+                    query ($organization: ID) {
+                        ecspeditors(organization: $organization) {${Employment}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.ecspeditors
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const getAgents = async({_id: _id}, client)=>{
+export const getAgents = async (organization, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {_id: _id},
+                variables: {organization},
                 query: gql`
-                    query ($_id: ID) {
-                        agents(_id: $_id) {
-                            _id
-                            createdAt
-                            name
-                            email
-                            phone
-                            user 
-                                {_id role status login}
-                            organization 
-                                {_id name}
-                        }
+                    query ($organization: ID) {
+                        agents(organization: $organization) {${Employment}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.agents
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const onoffEmployment = async(ids, organization)=>{
+export const onoffEmployment = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {_id: ids},
+        const res = await client.mutate({
+            variables: {_id},
             mutation : gql`
-                    mutation ($_id: [ID]!) {
-                        onoffEmployment(_id: $_id) {
-                             data
-                        }
+                    mutation ($_id: ID!) {
+                        onoffEmployment(_id: $_id)
                     }`})
-        if(organization)
-            return await getEmployments({organization: organization, ...(new SingletonStore().getStore().getState().app)})
-    } catch(err){
+        return res.data.onoffEmployment
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const restoreEmployment = async(ids)=>{
+export const deleteEmployment = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {_id: ids},
+        const res = await client.mutate({
+            variables: {_id},
             mutation : gql`
-                    mutation ($_id: [ID]!) {
-                        restoreEmployment(_id: $_id) {
-                             data
-                        }
+                    mutation ($_id: ID!) {
+                        deleteEmployment(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.deleteEmployment
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const deleteEmployment = async(ids)=>{
+export const setEmployments = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {_id: ids},
-            mutation : gql`
-                    mutation ($_id: [ID]!) {
-                        deleteEmployment(_id: $_id) {
-                             data
-                        }
-                    }`})
-    } catch(err){
-        console.error(err)
-    }
-}
-
-export const setEmployments = async(element)=>{
-    try{
-        const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($_id: ID!, $name: String, $email: String, $newPass: String, $role: String, $phone: [String], $login: String) {
-                        setEmployment(_id: $_id, name: $name, email: $email, newPass: $newPass, role: $role, phone: $phone, login: $login) {
-                             data
-                        }
+                        setEmployment(_id: $_id, name: $name, email: $email, newPass: $newPass, role: $role, phone: $phone, login: $login)
                     }`})
-    } catch(err){
+        return res.data.setEmployment
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const addEmployment = async(element)=>{
+export const addEmployment = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: element,
+        const res = await client.mutate({
+            variables,
             mutation : gql`
                     mutation ($name: String!, $email: String!, $phone: [String]!, $login: String!, $password: String!, $role: String!, $organization: ID) {
-                        addEmployment(name: $name, email: $email, phone: $phone, login: $login, password: $password, role: $role, organization: $organization) {
-                             data
-                        }
+                        addEmployment(name: $name, email: $email, phone: $phone, login: $login, password: $password, role: $role, organization: $organization)
                     }`})
-        //return await getEmployments(new SingletonStore().getStore().getState().app)
-    } catch(err){
+        return res.data.addEmployment
+    } catch(err) {
         console.error(err)
     }
 }

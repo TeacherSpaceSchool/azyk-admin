@@ -9,15 +9,15 @@ import Button from '@material-ui/core/Button';
 
 const PdfViewer =  React.memo(
     (props) =>{
-        const { showFullDialog } = props.mini_dialogActions;
-        const { classes, pdf } = props;
+        const {showFullDialog} = props.mini_dialogActions;
+        const {classes, pdf} = props;
         return (
             <div className={classes.column}>
                 <object style={{height: window.innerHeight-140, width: window.innerWidth-48}} data={pdf} type='application/pdf'>
                     <iframe style={{height: window.innerHeight-145, width: window.innerWidth-48}} src={`https://docs.google.com/viewer?url=${pdf}&embedded=true`}/>
                 </object>
                 <center>
-                    <Button variant='contained' color='secondary' onClick={()=>{showFullDialog(false);}} className={classes.button}>
+                    <Button variant='contained' color='secondary' onClick={() => {showFullDialog(false);}} className={classes.button}>
                             Закрыть
                     </Button>
                 </center>

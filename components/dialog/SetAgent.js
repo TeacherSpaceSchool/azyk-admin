@@ -12,11 +12,11 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const SetAgent =  React.memo(
     (props) =>{
-        const { classes, agents, agent } = props;
+        const {classes, agents, agent} = props;
         let [agentChange, setAgentChange] = useState(agent);
-        const { isMobileApp } = props.app;
-        const { showMiniDialog } = props.mini_dialogActions;
-        const { setAgent } = props.appActions;
+        const {isMobileApp} = props.app;
+        const {showMiniDialog} = props.mini_dialogActions;
+        const {setAgent} = props.appActions;
         const width = isMobileApp? (window.innerWidth-112) : 500
         return (
             <div className={classes.main}>
@@ -33,7 +33,7 @@ const SetAgent =  React.memo(
                     renderInput={params => (
                         <TextField {...params} label='Агент' fullWidth
                                    onKeyPress={async event => {
-                                       if (event.key === 'Enter'&&agentChange) {
+                                       if(event.key === 'Enter'&&agentChange) {
                                            await setAgent(agentChange._id)
                                            showMiniDialog(false);
                                        }
@@ -42,14 +42,14 @@ const SetAgent =  React.memo(
                 />
                 <br/>
                 <div>
-                    <Button variant="contained" color="primary" onClick={async()=>{
+                    <Button variant="contained" color='primary' onClick={async () => {
                        if(agentChange)
                            await setAgent(agentChange._id)
                        showMiniDialog(false);
                     }} className={classes.button}>
                         Сохранить
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant="contained" color="secondary" onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </div>

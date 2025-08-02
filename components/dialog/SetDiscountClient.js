@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
@@ -18,36 +18,35 @@ import { checkInt } from '../../src/lib'
 
 const SetDiscountClient =  React.memo(
     (props) =>{
-        const { classes, organization, discountClients, setDiscountClients } = props;
-        const { isMobileApp } = props.app;
-        const { showSnackBar } = props.snackbarActions;
-        const { showMiniDialog, setMiniDialog } = props.mini_dialogActions;
-        let [searchTimeOut, setSearchTimeOut] = useState(null);
+        const {classes, organization, discountClients, setDiscountClients} = props;
+        const {isMobileApp} = props.app;
+        const {showSnackBar} = props.snackbarActions;
+        const {showMiniDialog, setMiniDialog} = props.mini_dialogActions;
+        const searchTimeOut = useRef(null);
         const [open, setOpen] = useState(false);
         const [inputValue, setInputValue] = React.useState('');
         const [loading, setLoading] = useState(true);
         const [clients, setClients] = useState([]);
         useEffect(() => {
-            (async()=>{
-                if (inputValue.length < 3) {
+            (async () => {
+                if(inputValue.length < 3) {
                     setClients([]);
-                    if (open)
+                    if(open)
                         setOpen(false)
-                    if (loading)
+                    if(loading)
                         setLoading(false)
                 }
                 else {
-                    if (!loading)
+                    if(!loading)
                         setLoading(true)
-                    if (searchTimeOut)
-                        clearTimeout(searchTimeOut)
-                    searchTimeOut = setTimeout(async () => {
-                        setClients((await getClients({search: inputValue, sort: '-name', filter: 'all'})).clients)
-                        if (!open)
+                    if(searchTimeOut.current)
+                        clearTimeout(searchTimeOut.current)
+                    searchTimeOut.current = setTimeout(async () => {
+                        setClients(await getClients({search: inputValue, sort: '-name', filter: 'all'}))
+                        if(!open)
                             setOpen(true)
                         setLoading(false)
                     }, 500)
-                    setSearchTimeOut(searchTimeOut)
                 }
             })()
         }, [inputValue]);
@@ -76,13 +75,13 @@ const SetDiscountClient =  React.memo(
                     noOptionsText='Ничего не найдено'
                     style={{width: width}}
                     renderInput={params => (
-                        <TextField {...params} label='Выберите клиента' variant='outlined' fullWidth
+                        <TextField {...params} label='Выберите клиента' fullWidth
                                    onChange={handleChange}
                                    InputProps={{
                                        ...params.InputProps,
                                        endAdornment: (
                                            <React.Fragment>
-                                               {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                                               {loading ? <CircularProgress color='inherit' size={20} /> : null}
                                                {params.InputProps.endAdornment}
                                            </React.Fragment>
                                        ),
@@ -97,19 +96,16 @@ const SetDiscountClient =  React.memo(
                     label='Скидка'
                     value={discount}
                     className={classes.input}
-                    onChange={(event)=>{
+                    onChange={(event) => {
                         setDiscount(checkInt(event.target.value))}
                     }
-                    inputProps={{
-                        'aria-label': 'description',
-                    }}
                 />
                 <br/>
                 <div>
-                    <Button variant="contained" color="primary" onClick={async()=>{
-                        if(client&&client._id){
-                            const action = async() => {
-                                await saveDiscountClients([client._id], organization._id, discount)
+                    <Button variant="contained" color='primary' onClick={async () => {
+                        if(client&&client._id) {
+                            const action = async () => {
+                                await saveDiscountClients({clients:[client._id], organization:organization._id, discount})
                                 discountClients[client._id] = {
                                     client: client._id,
                                     discount: discount,
@@ -127,7 +123,7 @@ const SetDiscountClient =  React.memo(
                     }} className={classes.button}>
                         Сохранить
                     </Button>
-                    <Button variant="contained" color="secondary" onClick={()=>{showMiniDialog(false);}} className={classes.button}>
+                    <Button variant="contained" color="secondary" onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </div>

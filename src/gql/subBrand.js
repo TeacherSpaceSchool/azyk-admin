@@ -1,106 +1,125 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 
-export const getSubBrands = async({organization, search, city}, client)=>{
+const SubBrand = `
+    _id
+    createdAt  
+    image
+    miniInfo
+    priotiry
+    status
+    cities
+    minimumOrder
+    guid
+    name
+    organization {_id name}
+`
+
+export const getSubBrands = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
-        let res = await client
+        const res = await client
             .query({
-                variables: {organization, search, city},
+                variables,
                 query: gql`
                     query ($organization: ID, $search: String!, $city: String) {
-                        subBrands(organization: $organization, search: $search, city: $city) {
-                            _id
-                            createdAt  
-                             image
-                             miniInfo
-                             priotiry
-                             status
-                             cities
-                             minimumOrder
-                             name
-                            organization
-                                {_id name consignation}
-                        }
+                        subBrands(organization: $organization, search: $search, city: $city) {${SubBrand}}
                     }`,
             })
-        return res.data
-    } catch(err){
+        return res.data.subBrands
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const deleteSubBrand = async(ids)=>{
+export const getSubBrand = async (_id, client) => {
     try{
-        const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {_id: ids},
-            mutation : gql`
-                    mutation ($_id: [ID]!) {
-                        deleteSubBrand(_id: $_id) {
-                             data
-                        }
-                    }`})
-    } catch(err){
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables: {_id},
+                query: gql`
+                    query ($_id: ID!) {
+                        subBrand(_id: $_id) {${SubBrand}}
+                    }`,
+            })
+        return res.data.subBrand
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const onoffSubBrand = async(ids)=>{
+export const deleteSubBrand = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {_id: ids},
+        const res = await client.mutate({
+            variables: {_id},
             mutation : gql`
-                    mutation ($_id: [ID]!) {
-                        onoffSubBrand(_id: $_id) {
-                             data
-                        }
+                    mutation ($_id: ID!) {
+                        deleteSubBrand(_id: $_id)
                     }`})
-    } catch(err){
+        return res.data.deleteSubBrand
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const addSubBrand = async(element)=>{
+export const onoffSubBrand = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        let res = await client.mutate({
-            variables: {...element},
+        const res = await client.mutate({
+            variables: {_id},
             mutation : gql`
-                    mutation ($minimumOrder: Int, $image: Upload!, $name: String!, $miniInfo: String!, $priotiry: Int, $organization: ID!, $cities: [String]!) {
-                        addSubBrand(minimumOrder: $minimumOrder, image: $image, name: $name, miniInfo: $miniInfo, priotiry: $priotiry, organization: $organization, cities: $cities) {
-                             _id
-                            createdAt  
-                             image
-                             miniInfo
-                             minimumOrder
-                             priotiry
-                             status
-                             cities
-                             name
-                            organization
-                                {_id name consignation}
-                        }
+                    mutation ($_id: ID!) {
+                        onoffSubBrand(_id: $_id)
                     }`})
-        return res.data
-    } catch(err){
+        return res.data.onoffSubBrand
+    } catch(err) {
         console.error(err)
     }
 }
 
-export const setSubBrand = async(element)=>{
+export const addSubBrand = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables: {...element},
+        const res = await client.mutate({
+            variables,
             mutation : gql`
-                    mutation ($_id: ID!, $minimumOrder: Int, $image: Upload, $name: String, $miniInfo: String, $priotiry: Int, $cities: [String]) {
-                        setSubBrand(_id: $_id, minimumOrder: $minimumOrder, image: $image, name: $name, miniInfo: $miniInfo, priotiry: $priotiry, cities: $cities) {
-                             data
-                        }
+                    mutation ($minimumOrder: Int, $image: Upload!, $name: String!, $guid: String!, $miniInfo: String!, $priotiry: Int, $organization: ID!) {
+                        addSubBrand(minimumOrder: $minimumOrder, image: $image, name: $name, guid: $guid, miniInfo: $miniInfo, priotiry: $priotiry, organization: $organization)
                     }`})
-    } catch(err){
+        return res.data.addSubBrand
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const setSubBrand = async (variables) => {
+    try{
+        const client = new SingletonApolloClient().getClient()
+        const res = await client.mutate({
+            variables,
+            mutation : gql`
+                    mutation ($_id: ID!, $minimumOrder: Int, $image: Upload, $name: String, $guid: String, $miniInfo: String, $priotiry: Int) {
+                        setSubBrand(_id: $_id, minimumOrder: $minimumOrder, image: $image, name: $name, guid: $guid, miniInfo: $miniInfo, priotiry: $priotiry) 
+                    }`})
+        return res.data.setSubBrand
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const setSubBrandForItems = async (variables) => {
+    try{
+        const client = new SingletonApolloClient().getClient()
+        const res = await client.mutate({
+            variables,
+            mutation : gql`
+                    mutation ($subBrand: ID!, $selectedItems: [ID]!, $unselectedItems: [ID]!) {
+                        setSubBrandForItems(subBrand: $subBrand, selectedItems: $selectedItems, unselectedItems: $unselectedItems) 
+                    }`})
+        return res.data.setSubBrandForItems
+    } catch(err) {
         console.error(err)
     }
 }

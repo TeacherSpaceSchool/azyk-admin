@@ -211,19 +211,5 @@ export default makeStyles({
         cursor: 'pointer',
         userSelect: 'none',
         width: 140
-    },
-    showCons: {
-        marginLeft: 15,
-        padding: 3,
-        textAlign: 'center',
-        fontSize: '0.875rem',
-        fontWeight: 'bold',
-        fontFamily: 'Roboto',
-        whiteSpace: 'pre-wrap',
-        cursor: 'pointer',
-        userSelect: 'none',
-        background: '#e6e6e6',
-        borderRadius: 5
-    },
-
+    }
 })

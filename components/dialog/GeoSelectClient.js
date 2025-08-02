@@ -17,8 +17,8 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 const GeoSelectClient =  React.memo(
     (props) =>{
-        const { showFullDialog, setMiniDialog, showMiniDialog } = props.mini_dialogActions;
-        const { classes, clients, selectClient } = props;
+        const {showFullDialog, setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+        const {classes, clients, selectClient} = props;
         let [yellowData, setYellowData] = useState([]);
         let [show, setShow] = useState(false);
         let [geo1, setGeo1] = useState([42.86745, 74.592635]);
@@ -49,11 +49,10 @@ const GeoSelectClient =  React.memo(
             setGeo4(geo[0][3])
         }
         let [load, setLoad] = useState(true);
-        useEffect(()=>{
-            (async()=>{
+        useEffect(() => {
                 let _yellowData = []
                 let data
-                for(let i=0; i<clients.length; i++){
+                for(let i=0; i<clients.length; i++) {
                     if(clients[i].address[0]&&clients[i].address[0][1]&&clients[i].address[0][1].length) {
                         data = {
                             type: 'Feature',
@@ -71,8 +70,7 @@ const GeoSelectClient =  React.memo(
                     }
                 }
                 setYellowData(_yellowData)
-            })()
-        },[])
+        }, [])
         return (
             <YMaps>
                 <div className={classes.column}>
@@ -81,7 +79,7 @@ const GeoSelectClient =  React.memo(
                             load?<CircularProgress/>:null
                         }
                         <div style={{display: load?'none':'block'}}>
-                            <Map onLoad={()=>{setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48}
+                            <Map onLoad={() => {setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48}
                                  defaultState={{ center: [42.8700000, 74.5900000], zoom: 15 }}
                             >
                                 {
@@ -138,13 +136,13 @@ const GeoSelectClient =  React.memo(
                         </div>
                     </div>
                     <center>
-                        <Button variant='contained' color='primary' onClick={async()=>{
-                            const action = async() => {
+                        <Button variant='contained' color='primary' onClick={async () => {
+                            const action = () => {
                                 showFullDialog(false);
-                                for(let i=0; i<clients.length; i++){
-                                    if(clients[i].address[0]&&clients[i].address[0][1]&&clients[i].address[0][1].length){
-                                        if(classifyPoint([geo1, geo2, geo3, geo4], clients[i].address[0][1].split(', '))===-1){
-                                            await selectClient(i)
+                                for(let i=0; i<clients.length; i++) {
+                                    if(clients[i].address[0]&&clients[i].address[0][1]&&clients[i].address[0][1].length) {
+                                        if(classifyPoint([geo1, geo2, geo3, geo4], clients[i].address[0][1].split(', '))===-1) {
+                                            selectClient(i)
                                         }
                                     }
                                 }
@@ -154,12 +152,12 @@ const GeoSelectClient =  React.memo(
                         }} className={classes.button}>
                             Принять
                         </Button>
-                        <Button variant='contained' color='secondary' onClick={()=>{showFullDialog(false);}} className={classes.button}>
+                        <Button variant='contained' color='secondary' onClick={() => {showFullDialog(false);}} className={classes.button}>
                             Закрыть
                         </Button>
                     </center>
                 </div>
-                <Fab color={show?'primary':'secondary'} aria-label='Показать/Спрятать' className={classes.fabGeo} onClick={()=>setShow(!show)}>
+                <Fab color={show?'primary':'secondary'} className={classes.fabGeo} onClick={()=>setShow(!show)}>
                     {show?<Visibility/>:<VisibilityOff/>}
                 </Fab>
             </YMaps>

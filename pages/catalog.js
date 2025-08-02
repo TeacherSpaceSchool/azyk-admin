@@ -1,11 +1,11 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../layouts/App';
 import { connect } from 'react-redux'
 import pageListStyle from '../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat, isNotEmpty} from '../src/lib';
+import {checkInt, checkFloat, isNotEmpty, unawaited} from '../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import * as snackbarActions from '../redux/actions/snackbar'
@@ -27,367 +27,302 @@ import {getPlanClient} from '../src/gql/planClient';
 import {getSpecialPriceCategories} from '../src/gql/specialPriceCategory';
 import {getLimitItemClients} from '../src/gql/limitItemClient';
 import {getStocks} from '../src/gql/stock';
+import {getDiscountClient} from '../src/gql/discountClient';
+import Info from '@material-ui/icons/Info';
+import IconButton from '@material-ui/core/IconButton';
 
 const Catalog = React.memo((props) => {
+    const {search, isMobileApp} = props.app;
     const classes = pageListStyle();
-    const { setMiniDialog, showMiniDialog } = props.mini_dialogActions;
-    const { showSnackBar } = props.snackbarActions;
-    const { profile } = props.user;
-    const { data } = props;
-    const [clients, setClients] = useState([]);
-    let [normalPrices, setNormalPrices] = useState(data.normalPrices);
-    let [limitItemClient, setLimitItemClient] = useState({});
-    let [stockClient, setStockClient] = useState({});
-    const checkMaxCount = (idx) => {
-        let maxCount
-        if(isNotEmpty(stockClient[list[idx]._id])&&isNotEmpty(limitItemClient[list[idx]._id])) {
-            maxCount = stockClient[list[idx]._id]<limitItemClient[list[idx]._id]?stockClient[list[idx]._id]:limitItemClient[list[idx]._id]
-        }
-        else if(isNotEmpty(stockClient[list[idx]._id])) {
-            maxCount = stockClient[list[idx]._id]
-        }
-        else if(isNotEmpty(limitItemClient[list[idx]._id])) {
-            maxCount = limitItemClient[list[idx]._id]
-        }
-        return maxCount
-    }
-    const { search } = props.app;
-    const [inputValue, setInputValue] = React.useState('');
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
-    let [searchTimeOut1, setSearchTimeOut1] = useState(null);
-    const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    const {showSnackBar} = props.snackbarActions;
+    const {profile} = props.user;
+    const {data} = props;
+    //первый рендер
     const initialRender = useRef(true);
-    const getList = async ()=>{
-        normalPrices = {}
-        if(organization&&organization._id) {
-            list = (await getBrands({organization: organization._id, search, sort: '-priotiry'})).brands
-            for(let i=0; i<list.length; i++){
-                normalPrices[list[i]._id] = list[i].price
-            }
-            if(client) {
-                const _specialPrices = await getSpecialPriceClients({client: client._id, organization: organization._id})
-                const specialPrices = {}
-                for(let i=0; i<_specialPrices.length; i++){
-                    specialPrices[_specialPrices[i].item._id] = _specialPrices[i].price
-                }
-                const _specialPriceCategories = await getSpecialPriceCategories({client: client._id, organization: organization._id})
-                const specialPriceCategories = {}
-                for(let i=0; i<_specialPriceCategories.length; i++){
-                    specialPriceCategories[_specialPriceCategories[i].item._id] = _specialPriceCategories[i].price
-                }
-                for(let i=0; i<list.length; i++){
-                    if(isNotEmpty(specialPrices[list[i]._id]))
-                        list[i].price = specialPrices[list[i]._id]
-                    else if(isNotEmpty(specialPriceCategories[list[i]._id]))
-                        list[i].price = specialPriceCategories[list[i]._id]
-                }
-            }
-            setList([...list]);
-            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
-            setPagination(100);
-        }
-        setNormalPrices({...normalPrices})
-    }
-    useEffect(() => {
-        (async()=>{
-            if (inputValue.length < 3) {
-                setClients([]);
-                if (open)
-                    setOpen(false)
-                if (loading)
-                    setLoading(false)
-            }
-            else {
-                if (!loading)
-                    setLoading(true)
-                if (searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async () => {
-                    setClients((await getClients({search: inputValue, sort: '-name', filter: 'Включенные', catalog: true})).clients)
-                    if (!open)
-                        setOpen(true)
-                    setLoading(false)
-                }, 500)
-                setSearchTimeOut(searchTimeOut)
-            }
-        })()
-    }, [inputValue]);
-    const handleChange = event => {
-        setInputValue(event.target.value);
-    };
-    let [list, setList] = useState(data.brands);
-    const [planClient, setPlanClient] = useState(null);
-    const [basket, setBasket] = useState({});
-    let [organization, setOrganization] = useState(data.organization);
-    let [geo, setGeo] = useState(undefined);
-    let handleOrganization = async (organization) => {
-        await deleteBasketAll()
-        setBasket({})
-        setOrganization(organization)
-    };
-    const searchTimeOutRef = useRef(null);
-    useEffect(()=>{
-        (async()=>{
-            if(profile.organization){
-                organization = data.brandOrganizations.filter(elem=>elem._id===profile.organization)[0]
-                setOrganization({...organization})
-            }
-            if(sessionStorage.catalog&&sessionStorage.catalog!=='{}'){
-                setBasket(JSON.parse(sessionStorage.catalog))
-            }
-        })()
-    },[])
-    useEffect(()=>{
-        if (navigator.geolocation){
-            searchTimeOutRef.current = setInterval(() => {
-                navigator.geolocation.getCurrentPosition((position)=>{
-                    setGeo(position)
-                })
-            }, 1000)
-            return ()=>{
-                clearInterval(searchTimeOutRef.current)
-            }
-        } else {
-            showSnackBar('Геолокация не поддерживается')
-        }
-    },[])
-    useEffect(()=>{
-        (async()=>{
-            if(!initialRender.current)
-                await getList()
-        })()
-    },[organization])
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
-                initialRender.current = false;
-            } else {
-                if(organization&&organization._id) {
-                    if (searchTimeOut1)
-                        clearTimeout(searchTimeOut1)
-                    searchTimeOut1 = setTimeout(async () => {
-                        await getList()
-                    }, 500)
-                    setSearchTimeOut1(searchTimeOut1)
-                }
-
-            }
-        })()
-    },[search])
+    //лимиты клиента
+    let [limitItemClient, setLimitItemClient] = useState({});
+    //остаток клиента
+    let [stockClient, setStockClient] = useState({});
+    //список товаров
+    let [brands, setBrands] = useState(data.brands);
+    let [list, setList] = useState([]);
+    //клиент
     let [client, setClient] = useState(data.client);
     let handleClient = async (client) => {
-        for(let i=0; i<list.length; i++){
-            if(normalPrices[list[i]._id]!=undefined)
-                list[i].price = normalPrices[list[i]._id]
-        }
-        if(client&&organization&&organization._id){
-            const _specialPrices = await getSpecialPriceClients({client: client._id, organization: organization._id})
-            const specialPrices = {}
-            for(let i=0; i<_specialPrices.length; i++){
-                specialPrices[_specialPrices[i].item._id] = _specialPrices[i].price
-            }
-            const _specialPriceCategories = await getSpecialPriceCategories({client: client._id, organization: organization._id})
-            const specialPriceCategories = {}
-            for(let i=0; i<_specialPriceCategories.length; i++){
-                specialPriceCategories[_specialPriceCategories[i].item._id] = _specialPriceCategories[i].price
-            }
-            for(let i=0; i<list.length; i++){
-                if(isNotEmpty(specialPrices[list[i]._id]))
-                    list[i].price = specialPrices[list[i]._id]
-                else if(isNotEmpty(specialPriceCategories[list[i]._id]))
-                    list[i].price = specialPriceCategories[list[i]._id]
-            }
-            setPlanClient((await getPlanClient({client: client._id, organization: organization._id})).planClient)
-        }
-        else {
-            setPlanClient(null)
-        }
-        setList([...list]);
         setClient(client)
         setBasket({})
+        unawaited(deleteBasketAll)
         setOpen(false)
     };
+    const [clients, setClients] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [inputValue, setInputValue] = useState('');
+    const handleChange = event => setInputValue(event.target.value);
+    const searchTimeOutClient = useRef(null);
+    useEffect(() => {
+        if(inputValue.length < 3) {
+            setClients([]);
+            if(open)
+                setOpen(false)
+            if(loading)
+                setLoading(false)
+        }
+        else {
+            if(!loading)
+                setLoading(true)
+            if(searchTimeOutClient.current)
+                clearTimeout(searchTimeOutClient.current)
+            searchTimeOutClient.current = setTimeout(async () => {
+                setClients(await getClients({search: inputValue, sort: '-name', filter: 'Включенные', catalog: true}))
+                if(!open)
+                    setOpen(true)
+                setLoading(false)
+            }, 500)
+        }
+    }, [inputValue]);
+    //план клиента
+    let [planClient, setPlanClient] = useState(null);
+    //корзина
+    const [basket, setBasket] = useState({});
+    //организация
+    let [organization, setOrganization] = useState(null);
+    const handleOrganization = async (newOrganization) => {
+        //очистить корзину суперагента
+        if(
+            !profile.organization&&(
+                (organization?organization.organization?organization.organization._id:organization._id:null)!==
+                (newOrganization.organization?newOrganization.organization._id:newOrganization._id)
+            )
+        ) {
+            setBasket({})
+            unawaited(deleteBasketAll)
+        }
+        //нет организации
+        else if(!newOrganization)
+            newOrganization = {_id: profile.organization}
+        //получаем список товаров
+        if(newOrganization)
+            brands = await getBrands({organization: newOrganization._id, search, sort: '-priotiry'})
+        else
+            brands = []
+        setBrands([...brands]);
+        //прокручиваем вверх
+        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
+        setPagination(100);
+        //задаем организацию
+        setOrganization({...newOrganization})
+    };
+    //цена корзины
     let [allPrice, setAllPrice] = useState(0);
-    const { isMobileApp } = props.app;
-    let increment = async (idx)=>{
-        let id = list[idx]._id
-        if(!basket[id])
-            basket[id] = {_id: id, count: 0, allPrice: 0, consignment: 0}
-        basket[id].count = checkInt(basket[id].count)
-        basket[id].count+=list[idx].apiece?1:(list[idx].packaging?list[idx].packaging:1)
-
-        const maxCount = checkMaxCount(idx)
-        if(isNotEmpty(maxCount)&&basket[id].count>maxCount) {
-            basket[id].count = maxCount
-        }
-
-        basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
-        setBasket({...basket})
-    }
-    let decrement = async (idx)=>{
-        let id = list[idx]._id
-        if(basket[id]){
-            if(basket[id].count>0) {
-                basket[id].count = checkInt(basket[id].count)
-                basket[id].count -= list[idx].apiece?1:(list[idx].packaging?list[idx].packaging:1)
-                if(basket[id].count<0) {
-                    basket[id].count = 0
+    //изменение клиента или списка товаров
+    useEffect(() => {(async () => {
+        //лимиты клиента
+        limitItemClient = {}
+        //остатки клиента
+        stockClient = {}
+        //план клиента
+        planClient = null
+        //если задан клиент
+        if(client&&organization) {
+            //данные
+            // eslint-disable-next-line no-undef
+            let [limitItemClients, stocks, planClientData, specialPricesData, specialPriceCategoriesData, discountClient] = await Promise.all([
+                getLimitItemClients({client: client._id, organization: organization._id}),
+                getStocks({client: client._id, search: '', organization: organization._id}),
+                getPlanClient({client: client._id, organization: organization._id}),
+                getSpecialPriceClients({client: client._id, organization: organization._id}),
+                getSpecialPriceCategories({category: client.category, organization: organization._id}),
+                getDiscountClient({client: client._id, organization: organization._id})
+            ]);
+            //план клиента
+            planClient = planClientData
+            //перебор лимитов
+            if(limitItemClients&&limitItemClients.length)
+                for(const element of limitItemClients)
+                    limitItemClient[element.item._id] = element.limit
+            //перебор остатков
+            if(stocks&&stocks.length)
+                for(const stock of stocks)
+                    stockClient[stock.item._id] = stock.count
+            //спец цена клиента
+            const specialPrices = {}
+            for(const specialPrice of specialPricesData)
+                specialPrices[specialPrice.item._id] = specialPrice.price
+            //спец цена категории
+            const specialPriceCategories = {}
+            for(const specialPriceCategory of specialPriceCategoriesData)
+                specialPriceCategories[specialPriceCategory.item._id] = specialPriceCategory.price
+            //скидка
+            const discount = discountClient?discountClient.discount:0
+            //перебор списка товаров и задание цены
+            setBrands(brands => {
+                for(const brand of brands) {
+                    //price
+                    if(isNotEmpty(specialPrices[brand._id]))
+                        brand.price = specialPrices[brand._id]
+                    else if(isNotEmpty(specialPriceCategories[brand._id]))
+                        brand.price = specialPriceCategories[brand._id]
+                    brand.price = checkFloat(brand.price-brand.price/100*discount)
+                    //maxcount
+                    if(isNotEmpty(stockClient[brand._id])&&isNotEmpty(limitItemClient[brand._id]))
+                        brand.maxCount = stockClient[brand._id]<limitItemClient[brand._id]?stockClient[brand._id]:limitItemClient[brand._id]
+                    else if(isNotEmpty(stockClient[brand._id]))
+                        brand.maxCount = stockClient[brand._id]
+                    else if(isNotEmpty(limitItemClient[brand._id]))
+                        brand.maxCount = limitItemClient[brand._id]
                 }
-                basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
-                setBasket({...basket})
+                return [...brands]
+            });
+        }
+        setPlanClient(planClient)
+        setLimitItemClient({...limitItemClient})
+        setStockClient({...stockClient})
+    })()}, [client, organization])
+    //геолокация
+    const geo = useRef(null);
+    const searchTimeOutGeo = useRef(null);
+    useEffect(() => {
+        if(navigator.geolocation) {
+            searchTimeOutGeo.current = setInterval(() => navigator.geolocation.getCurrentPosition((position) => geo.current = position), 10000)
+            return () => clearInterval(searchTimeOutGeo.current)
+        } else
+            showSnackBar('Геолокация не поддерживается')
+    }, [])
+    //увеличение
+    const increment = (idx) => {
+        const item = list[idx]
+        const basketItem = basket[item._id]||{_id: item._id, count: 0, allPrice: 0}
+        basketItem.count = checkInt(basketItem.count) + (item.apiece?1:(item.packaging?item.packaging:1))
+        if(basketItem.count<0)
+            basketItem.count = 0
+        if(isNotEmpty(item.maxCount)&&basketItem.count>item.maxCount)
+            basketItem.count = item.maxCount
+        basketItem.allPrice = checkFloat(basketItem.count*item.price)
+        setBasket({...basket, [item._id]: basketItem})
+    }
+    //уменьшение
+    const decrement = (idx) => {
+        const item = list[idx]
+        const basketItem = basket[item._id]
+        if(basketItem) {
+            if(basketItem.count>0) {
+                basketItem.count = checkInt(basketItem.count) - (item.apiece?1:(item.packaging?item.packaging:1))
+                if(basketItem.count<0)
+                    basketItem.count = 0
+                basketItem.allPrice = checkFloat(basketItem.count*item.price)
             }
+            else if(basketItem.count<0)
+                basketItem.count = 0
+            setBasket({...basket, [item._id]: basketItem})
         }
     }
-    let incrementConsignment = async(idx)=>{
-        let id = list[idx]._id
-        if(basket[id]&&basket[id].consignment<basket[id].count) {
-            basket[id].consignment += 1
-            setBasket({...basket})
-        }
+    //изменение количества напрямую
+    const setBasketChange = (idx, count) => {
+        const item = list[idx]
+        const basketItem = basket[item._id]||{_id: item._id, count: 0, allPrice: 0}
+        basketItem.count = checkInt(count)
+        if(isNotEmpty(item.maxCount)&&basketItem.count>item.maxCount)
+            basketItem.count = item.maxCount
+        basketItem.allPrice = checkFloat(basketItem.count*item.price)
+        setBasket({...basket, [item._id]: basketItem})
     }
-    let decrementConsignment = async(idx)=>{
-        let id = list[idx]._id
-        if(basket[id]&&basket[id].consignment>0) {
-            basket[id].consignment -= 1
-            setBasket({...basket})
-        }
-
+    //изменить упаковок
+    const setPackage = (idx, count) => {
+        const item = list[idx]
+        const basketItem = basket[item._id]||{_id: item._id, count: 0, allPrice: 0}
+        basketItem.count = count*(item.packaging?item.packaging:1)
+        if(isNotEmpty(item.maxCount)&&basketItem.count>item.maxCount)
+            basketItem.count = item.maxCount
+        basketItem.allPrice = checkFloat(basketItem.count*item.price)
+        setBasket({...basket, [item._id]: basketItem})
     }
-    let showConsignment = (idx)=>{
-        let id = list[idx]._id
-        if(basket[id]) {
-            basket[id].showConsignment = !basket[id].showConsignment
-            setBasket({...basket})
+    //первозапуск и сохранение корзины
+    useEffect(() => {
+        if(initialRender.current) {
+            //нахождение организации пользователя
+            if(profile.organization)
+                setOrganization(data.brandOrganizations.find(elem=>elem._id===profile.organization))
+            //возобнавление корзины
+            if(sessionStorage.catalog&&sessionStorage.catalog!=='{}')
+                setBasket(JSON.parse(sessionStorage.catalog))
+            //первозапуск окончен
+            initialRender.current = false;
         }
-    }
-    let setBasketChange= async(idx, count)=>{
-        let id = list[idx]._id
-        if(!basket[id])
-            basket[id] = {_id: id, count: 0, allPrice: 0, consignment: 0}
-        basket[id].count = checkInt(count)
-
-        const maxCount = checkMaxCount(idx)
-        if(isNotEmpty(maxCount)&&basket[id].count>maxCount) {
-            basket[id].count = maxCount
-        }
-
-        basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
-        setBasket({...basket})
-    }
-    let setPackage= async(idx, count)=>{
-        let id = list[idx]._id
-        if(!basket[id])
-            basket[id] = {_id: id, count: 0, allPrice: 0, consignment: 0}
-        basket[id].count = checkInt(basket[id].count)
-        basket[id].count = count*(list[idx].packaging?list[idx].packaging:1)
-
-        const maxCount = checkMaxCount(idx)
-        if(isNotEmpty(maxCount)&&basket[id].count>maxCount) {
-            basket[id].count = maxCount
-        }
-
-        basket[id].allPrice = checkFloat(basket[id].count*list[idx].price)
-        setBasket({...basket})
-    }
-    let setPackageConsignment = async(idx, count)=>{
-        let id = list[idx]._id
-        if(basket[id]){
-            let consignment = count*(list[idx].packaging?list[idx].packaging:1)
-            if(consignment<=basket[id].count){
-                basket[id].consignment = consignment
-                setBasket({...basket})
-            }
-        }
-    }
-    useEffect(()=>{
-        if(!initialRender.current) {
+        else {
             sessionStorage.catalog = JSON.stringify(basket)
-            let keys = Object.keys(basket)
             allPrice = 0
-            for (let i = 0; i < keys.length; i++) {
-                allPrice += basket[keys[i]].allPrice
-            }
+            for (const key in basket) allPrice += basket[key].allPrice
             setAllPrice(checkFloat(allPrice))
         }
-    },[basket])
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
-        }
-    }
-    useEffect(()=>{
-        (async()=>{
-            limitItemClient = {}
-            stockClient = {}
-            if(client) {
-                let res = await getLimitItemClients({client: client._id, organization: organization._id})
-                if(res) {
-                    for(let i=0;i<res.length;i++){
-                        limitItemClient[res[i].item._id] = res[i].limit
-                    }
-                }
-                res = await getStocks({client: client._id, search: '', organization: organization._id})
-                if(res&&res.stocks) {
-                    for(let i=0;i<res.stocks.length;i++){
-                        stockClient[res.stocks[i].item._id] = res.stocks[i].count
-                    }
-                }
-            }
-            setLimitItemClient({...limitItemClient})
-            setStockClient({...stockClient})
-        })()
-    },[client])
+    }, [basket])
+    //пагинация
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, list])
+    //поиск
+    useEffect(() => {
+        setList([...brands.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))])
+    }, [search, brands])
+    //рендер
     return (
-        <App checkPagination={checkPagination} searchShow={true} pageName='Каталог'>
+        <App checkPagination={checkPagination} searchShow pageName='Каталог'>
             <Head>
                 <title>Каталог</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
+                    <div className={classes.row} style={{width: '100%'}}>
+                        {
+                            data.client?
+                                <TextField
+                                    label='Клиент'
+                                    variant='outlined'
+                                    value={data.client.name}
+                                    className={classes.input}
+                                    inputProps={{readOnly: true}}
+                                />
+                                :
+                                <Autocomplete
+                                    onClose={()=>setOpen(false)}
+                                    open={open}
+                                    disableOpenOnFocus
+                                    className={classes.input}
+                                    options={clients}
+                                    getOptionLabel={option => `${option.address&&option.address[0]?`${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]}`:''}`}
+                                    onChange={(event, newValue) => handleClient(newValue)}
+                                    noOptionsText='Ничего не найдено'
+                                    renderInput={params => (
+                                        <TextField {...params} label='Выберите клиента' fullWidth variant='outlined'
+                                                   onChange={handleChange}
+                                                   InputProps={{
+                                                       ...params.InputProps,
+                                                       endAdornment: (
+                                                           <React.Fragment>
+                                                               {loading ? <CircularProgress color='inherit' size={20} /> : null}
+                                                               {params.InputProps.endAdornment}
+                                                           </React.Fragment>
+                                                       ),
+                                                   }}
+                                        />
+                                    )}
+                                />
+                        }
+                        {
+                            client?
+                                <IconButton onClick={() => window.open(`/client/${client._id}`, '_blank')}>
+                                    <Info/>
+                                </IconButton>
+                                :
+                                null
+                        }
+                    </div>
                     {
-                        data.client?
-                            <TextField
-                                label='Клиент'
-                                value={data.client.name}
-                                className={classes.input}
-                                inputProps={{
-                                    'aria-label': 'description',
-                                    readOnly: true,
-                                }}
-                            />
-                            :
-                            <Autocomplete
-                                onClose={()=>setOpen(false)}
-                                open={open}
-                                disableOpenOnFocus
-                                className={classes.input}
-                                options={clients}
-                                getOptionLabel={option => `${/*option.name*/''}${option.address&&option.address[0]?`${/*' ('*/''}${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]}${/*')'*/''}`:''}`}
-                                onChange={(event, newValue) => {
-                                    handleClient(newValue)
-                                }}
-                                noOptionsText='Ничего не найдено'
-                                renderInput={params => (
-                                    <TextField {...params} label='Выберите клиента' variant='outlined' fullWidth
-                                               onChange={handleChange}
-                                               InputProps={{
-                                                   ...params.InputProps,
-                                                   endAdornment: (
-                                                       <React.Fragment>
-                                                           {loading ? <CircularProgress color='inherit' size={20} /> : null}
-                                                           {params.InputProps.endAdornment}
-                                                       </React.Fragment>
-                                                   ),
-                                               }}
-                                    />
-                                )}
-                            />
-                    }
-                    {
-                        planClient?
+                        planClient&&planClient.current&&planClient.month?
                             <>
                                 <Divider style={{marginTop: 10, marginBottom: 5}}/>
                                 <div className={classes.row} style={{justifyContent: 'center'}}>
@@ -408,54 +343,41 @@ const Catalog = React.memo((props) => {
                     {
                         data.brandOrganizations.length>1&&profile.agentSubBrand?
                             <>
-                            <Autocomplete
-                                style={{marginBottom: 10}}
-                                className={classes.input}
-                                options={data.brandOrganizations}
-                                getOptionLabel={option => option.name}
-                                onChange={(event, newValue) => {
-                                    handleOrganization(newValue)
-                                }}
-                                noOptionsText='Ничего не найдено'
-                                renderInput={params => (
-                                    <TextField {...params} label='Выберите организацию' variant='outlined' fullWidth />
-                                )}
-                            />
+                                <Autocomplete
+                                    style={{marginBottom: 10}}
+                                    className={classes.input}
+                                    options={data.brandOrganizations}
+                                    getOptionLabel={option => option.name}
+                                    onChange={(event, newValue) => {
+                                        handleOrganization(newValue)
+                                    }}
+                                    noOptionsText='Ничего не найдено'
+                                    renderInput={params => (
+                                        <TextField {...params} label='Выберите организацию' fullWidth variant='outlined'/>
+                                    )}
+                                />
                             </>
                             :null
 
                     }
-                    <div style={{display: 'flex', width: '100%', justifyContent: 'center', marginBottom: 10}}>
-                        {
-                            organization&&organization.catalog?
-                                <Button className={classes.input} onClick={() => window.open(organization.catalog, '_blank')} size='small' color='primary'>
-                                    Открыть каталог
-                                </Button>
-                                :
-                                null
-                        }
-                        {
-                            client?
-                                <Button className={classes.input} onClick={() => window.open(`/client/${client._id}`, '_blank')} size='small' color='primary'>
-                                    Посмотреть клиента
-                                </Button>
-                                :
-                                null
-                        }
-                    </div>
-
-
-
+                    {
+                        organization&&organization.catalog?
+                            <Button className={classes.input} onClick={() => window.open(organization.catalog, '_blank')} size='small' color='primary'>
+                                Открыть каталог
+                            </Button>
+                            :
+                            null
+                    }
                     {
                         list.map((row, idx) => {
-                            let price
-                            if(basket[row._id]&&basket[row._id].allPrice)
-                                price = basket[row._id].allPrice
-                            else
-                                price = row.price
-                            if(idx<pagination)
-                                return(
-                                        <div>
+                                let price
+                                if(basket[row._id]&&basket[row._id].allPrice)
+                                    price = basket[row._id].allPrice
+                                else
+                                    price = row.price
+                                if(idx<pagination)
+                                    return(
+                                        <div key={row._id}>
                                             <div className={classes.line}>
                                                 <img className={classes.media} src={row.image}/>
                                                 <div className={classes.column} style={{width: 'calc(100% - 142px)'}}>
@@ -465,28 +387,18 @@ const Catalog = React.memo((props) => {
                                                     </b>
                                                     <div className={classes.line}>
                                                         <div className={classes.counter}>
-                                                            <div className={classes.counterbtn} onClick={() => {
-                                                                decrement(idx)
-                                                            }}>–
+                                                            <div className={classes.counterbtn} onClick={() => decrement(idx)}>
+                                                                –
                                                             </div>
                                                             <input readOnly={!row.apiece} type={isMobileApp?'number':'text'} className={classes.counternmbr}
-                                                                   value={basket[row._id]?basket[row._id].count:''} onChange={(event) => {
-                                                                setBasketChange(idx, event.target.value)
-                                                            }}/>
-                                                            <div className={classes.counterbtn} onClick={() => {
-                                                                increment(idx)
-                                                            }}>+
+                                                                   value={basket[row._id]?basket[row._id].count:''} onChange={(event) => setBasketChange(idx, event.target.value)}/>
+                                                            <div className={classes.counterbtn} onClick={() => increment(idx)}>
+                                                                +
                                                             </div>
-                                                        </div>
-                                                        &nbsp;&nbsp;&nbsp;
-                                                        <div className={classes.showCons} style={{color: basket[row._id]&&basket[row._id].showConsignment?'#ffb300':'#000'}} onClick={()=>{
-                                                            showConsignment(idx)
-                                                        }}>
-                                                            КОНС
                                                         </div>
                                                     </div>
                                                     <div className={classes.row}>
-                                                        <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
+                                                        <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={() => {
                                                             setMiniDialog('Упаковок', <SetPackage
                                                                 action={setPackage}
                                                                 idx={idx}/>)
@@ -505,35 +417,13 @@ const Catalog = React.memo((props) => {
                                                             </div>:null
                                                         }
                                                     </div>
-                                                    {
-                                                        basket[row._id]&&basket[row._id].showConsignment?
-                                                            <>
-                                                            <br/>
-                                                            <div className={classes.row}>
-                                                                <div className={classes.valuecons}>Консигнация</div>
-                                                                <div className={classes.counterbtncons} onClick={()=>{decrementConsignment(idx)}}>-</div>
-                                                                <div className={classes.valuecons}>{basket[row._id]?basket[row._id].consignment:0}&nbsp;шт</div>
-                                                                <div className={classes.counterbtncons} onClick={()=>{incrementConsignment(idx)}}>+</div>
-                                                            </div>
-                                                            <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={()=>{
-                                                                setMiniDialog('Упаковок', <SetPackage
-                                                                    action={setPackageConsignment}
-                                                                    idx={idx}/>)
-                                                                showMiniDialog(true)
-                                                            }}>
-                                                                Упаковок: {basket[row._id]?(basket[row._id].consignment/(row.packaging?row.packaging:1)).toFixed(1):0}
-                                                            </div>
-                                                            </>
-                                                            :
-                                                            null
-                                                    }
                                                 </div>
                                             </div>
                                             <br/>
                                             <Divider/>
                                             <br/>
                                         </div>
-                                )
+                                    )
                             }
                         )
                     }
@@ -550,25 +440,17 @@ const Catalog = React.memo((props) => {
                         }
                     </div>
                 </div>
-                <div className={isMobileApp?classes.buyM:classes.buyD} onClick={async ()=>{
-                    if(allPrice>0) {
-                        if(client&&client._id) {
-                            /*let proofeAddress = client.address[0]&&client.address[0][0]&&client.address[0][0].length > 0&&client.address[0][1]&&client.address[0][1].length > 0
-                            if (
-                                client._id && proofeAddress && client.name && client.name.length > 0 && client.phone && client.phone.length > 0
-                            ) {*/
-                                setMiniDialog('Купить', <BuyBasket
-                                    geo={geo}
-                                    agent={true}
-                                    client={client}
-                                    basket = {Object.values(basket)}
-                                    allPrice={allPrice}
-                                    organization={organization}/>)
-                                showMiniDialog(true)
-                            /*}
-                            else {
-                                Router.push(`/client/${client._id}`)
-                            }*/
+                <div className={isMobileApp?classes.buyM:classes.buyD} onClick={() => {
+                    if(allPrice) {
+                        if(client) {
+                            setMiniDialog('Купить', <BuyBasket
+                                geo={geo.current}
+                                agent
+                                client={client}
+                                basket = {Object.values(basket)}
+                                allPrice={allPrice}
+                                organization={organization}/>)
+                            showMiniDialog(true)
                         }
                         else
                             showSnackBar('Пожалуйста выберите клиента')
@@ -585,7 +467,9 @@ const Catalog = React.memo((props) => {
 
 Catalog.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['агент', 'суперагент', 'экспедитор', 'суперорганизация', 'организация', 'менеджер', 'суперэкспедитор'].includes(ctx.store.getState().user.profile.role))
+    const profile = ctx.store.getState().user.profile;
+    const organization = profile.organization
+    if(!['агент', 'суперагент', 'экспедитор', 'суперорганизация', 'организация', 'менеджер', 'суперэкспедитор'].includes(profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -593,38 +477,17 @@ Catalog.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
-    await deleteBasketAll(ctx.req?await getClientGqlSsr(ctx.req):undefined)
-    let brands = ctx.store.getState().user.profile.organization?(await getBrands({organization: ctx.store.getState().user.profile.organization, search: '', sort: '-priotiry'}, ctx.req?await getClientGqlSsr(ctx.req):undefined)).brands:[]
-    let normalPrices = {}
-    for(let i=0; i<brands.length; i++){
-        normalPrices[brands[i]._id] = brands[i].price
-    }
-    let client = ctx.query.client?(await getClient({_id: ctx.query.client}, ctx.req?await getClientGqlSsr(ctx.req):undefined)).client:undefined
-    if(ctx.store.getState().user.profile.organization&&ctx.query.client){
-        const _specialPrices = await getSpecialPriceClients({client: ctx.query.client, organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
-        const specialPrices = {}
-        for(let i=0; i<_specialPrices.length; i++){
-            specialPrices[_specialPrices[i].item._id] = _specialPrices[i].price
-        }
-        const _specialPriceCategories = await getSpecialPriceCategories({client: ctx.query.client, organization: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
-        const specialPriceCategories = {}
-        for(let i=0; i<_specialPriceCategories.length; i++){
-            specialPriceCategories[_specialPriceCategories[i].item._id] = _specialPriceCategories[i].price
-        }
-        for(let i=0; i<brands.length; i++){
-            if(isNotEmpty(specialPrices[brands[i]._id]))
-                brands[i].price = specialPrices[brands[i]._id]
-            else if(isNotEmpty(specialPriceCategories[brands[i]._id]))
-                brands[i].price = specialPriceCategories[brands[i]._id]
-        }
-    }
+    //данные
+    unawaited(() => deleteBasketAll(getClientGqlSsr(ctx.req)))
+    // eslint-disable-next-line no-undef
+    const [brands, brandOrganizations, client] = await Promise.all([
+        organization?getBrands({organization, search: '', sort: '-priotiry'}, getClientGqlSsr(ctx.req)):null,
+        getBrandOrganizations({search: '', filter: ''}, getClientGqlSsr(ctx.req)),
+        ctx.query.client?getClient(ctx.query.client, getClientGqlSsr(ctx.req)):null
+    ])
     return {
         data: {
-            brands,
-            organization: {_id: ctx.store.getState().user.profile.organization},
-            client,
-            ...await getBrandOrganizations({search: '', filter: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-            normalPrices
+            brands, client, brandOrganizations
         }
     };
 };

@@ -1,10 +1,10 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
-import { getEquipments } from '../../src/gql/equipment'
+import {getEquipments, getEquipmentsCount} from '../../src/gql/equipment'
 import pageListStyle from '../../src/styleMUI/equipment/equipmentList'
-import CardEquipment from '../../components/equipment/CardEquipment'
+import CardEquipment from '../../components/card/CardEquipment'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import Router from 'next/router'
 import initialApp from '../../src/initialApp'
@@ -14,78 +14,76 @@ import Fab from '@material-ui/core/Fab';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import {unawaited} from '../../src/lib';
+import {getOrganization} from '../../src/gql/organization';
 
 const Equipments = React.memo((props) => {
     const classes = pageListStyle();
-    const { data } = props;
+    const {data} = props;
     let [list, setList] = useState(data.equipments);
-    const { search, agent } = props.app;
+    let [count, setCount] = useState(data.equipmentsCount);
+    const {search, agent} = props.app;
     const router = useRouter()
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
-    const getList = async ()=>{
-        setList((await getEquipments({organization: router.query.id, search, agent})).equipments)
-        setPagination(100);
+    const getList = async () => {
+        // eslint-disable-next-line no-undef
+        const [equipments, equipmentsCount] = await Promise.all([
+            getEquipments({organization: router.query.id, search, skip: 0}),
+            getEquipmentsCount({organization: router.query.id, search})
+        ])
+        setList(equipments);
+        setCount(equipmentsCount);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        paginationWork.current = true;
     }
-    useEffect(()=>{
-        (async()=>{
-            if(!initialRender.current) {
-                await getList()
-            }
-        })()
-    },[agent])
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
+    useEffect(() => {
+        if(!initialRender.current)
+            unawaited(getList)
+    }, [agent])
+    useEffect(() => {
+            if(initialRender.current) 
                 initialRender.current = false;
-            } else {
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
-                    await getList()
-                }, 500)
-                setSearchTimeOut(searchTimeOut)
-
+            else {
+                if(searchTimeOut.current)
+                    clearTimeout(searchTimeOut.current)
+                searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
             }
-        })()
-    },[search])
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
+    }, [search])
+    const paginationWork = useRef(true);
+    const checkPagination = useCallback(async () => {
+        if(paginationWork.current) {
+            paginationWork.current = false
+            let addedList = await getEquipments({organization: router.query.id, search, skip: list.length})
+            if(addedList.length) {
+                setList([...list, ...addedList])
+                paginationWork.current = true
+            }
         }
-    }
+    }, [search, list])
     let [anchorEl, setAnchorEl] = useState(null);
-    let open = event => {
-        setAnchorEl(event.currentTarget);
-    };
-    let close = () => {
-        setAnchorEl(null);
-    };
+    let open = event => setAnchorEl(event.currentTarget);
+    let close = () => setAnchorEl(null);
     return (
-        <App checkPagination={checkPagination} searchShow={true} pageName='Оборудование' agents>
+        <App checkPagination={checkPagination} searchShow pageName='Оборудование' agents>
             <Head>
                 <title>Оборудование</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${list.length}`}
+                {`Всего: ${count}`}
             </div>
             <div className={classes.page}>
-                <CardEquipment list={list} setList={setList} agents={data.agents}/>
+                <CardEquipment organization={data.organization} list={list} setList={setList} agents={data.agents}/>
                 {list?list.map((element, idx)=> {
-                    if(idx<pagination)
-                        return(
-                            <CardEquipment list={list} idx={idx} key={element._id} setList={setList} element={element} agents={data.agents}/>
-                        )}
-                ):null}
+                    return <CardEquipment organization={data.organization} idx={idx} key={element._id} list={list} setList={setList} element={element} agents={data.agents}/>
+                }):null}
             </div>
-            <Fab onClick={open} color='primary' aria-controls="simple-menu" aria-haspopup="true" className={classes.fab}>
+            <Fab onClick={open} color='primary' className={classes.fab}>
                 <SettingsIcon />
             </Fab>
             <Menu
-                id="simple-menu"
+                id='simple-menu'
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={close}
@@ -98,9 +96,9 @@ const Equipments = React.memo((props) => {
                     horizontal: 'left',
                 }}
             >
-                <MenuItem onClick={()=>{
+                <MenuItem onClick={() => {
                     close()
-                    Router.push('/statistic/unloadingequipments')
+                    Router.push('/statistic/load/unloadingequipments')
                 }}>
                     Выгрузить
                 </MenuItem>
@@ -120,10 +118,19 @@ Equipments.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     ctx.store.getState().app.organization = ctx.query.id
+    // eslint-disable-next-line no-undef
+    const [organization, equipments, equipmentsCount, agents] = await Promise.all([
+        getOrganization(ctx.query.id, getClientGqlSsr(ctx.req)),
+        getEquipments({organization: ctx.query.id, search: '', skip: 0}, getClientGqlSsr(ctx.req)),
+        getEquipmentsCount({organization: ctx.query.id, search: ''}, getClientGqlSsr(ctx.req)),
+        getAgents(ctx.query.id, getClientGqlSsr(ctx.req))
+    ])
     return {
         data: {
-            ...await getEquipments({organization: ctx.query.id, search: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined),
-            ...await getAgents({_id: ctx.query.id}, ctx.req?await getClientGqlSsr(ctx.req):undefined)
+            organization,
+            equipments,
+            equipmentsCount,
+            agents
         }
     };
 };

@@ -1,9 +1,9 @@
 import Head from 'next/head';
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../layouts/App';
 import pageListStyle from '../src/styleMUI/blog/blogList'
 import {getBlogs} from '../src/gql/blog'
-import CardBlog from '../components/blog/CardBlog'
+import CardBlog from '../components/card/CardBlog'
 import { connect } from 'react-redux'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
@@ -11,37 +11,32 @@ import Router from 'next/router'
 
 const Blog = React.memo((props) => {
     const classes = pageListStyle();
-    const { data } = props;
+    const {data} = props;
     let [list, setList] = useState(data.blogs);
-    const { search } = props.app;
-    const { profile } = props.user;
-    let [searchTimeOut, setSearchTimeOut] = useState(null);
+    const {search} = props.app;
+    const {profile} = props.user;
+    const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
-    useEffect(()=>{
-        (async()=>{
-            if(initialRender.current) {
+    useEffect(() => {(async () => {
+            if(initialRender.current) 
                 initialRender.current = false;
-            } else {
-                if(searchTimeOut)
-                    clearTimeout(searchTimeOut)
-                searchTimeOut = setTimeout(async()=>{
+            else {
+                if(searchTimeOut.current)
+                    clearTimeout(searchTimeOut.current)
+                searchTimeOut.current = setTimeout(async () => {
                     setList(await getBlogs({search}))
                     setPagination(100);
                     (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
                 }, 500)
-                setSearchTimeOut(searchTimeOut)
-
             }
-        })()
-    },[search])
-    let [pagination, setPagination] = useState(100);
-    const checkPagination = ()=>{
-        if(pagination<list.length){
-            setPagination(pagination+100)
-        }
-    }
+    })()}, [search])
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, list])
     return (
-        <App checkPagination={checkPagination} searchShow={true} pageName='Блог'>
+        <App checkPagination={checkPagination} searchShow pageName='Блог'>
             <Head>
                 <title>Блог</title>
                 <meta name='robots' content='index, follow'/>
@@ -52,11 +47,8 @@ const Blog = React.memo((props) => {
             <div className={classes.page}>
                 {profile.role==='admin'?<CardBlog list={list} setList={setList}/>:null}
                 {list?list.map((element, idx)=> {
-                        if(idx<pagination)
-                            return(
-                                <CardBlog list={list} idx={idx} key={element._id} setList={setList} element={element}/>
-                            )}
-                ):null}
+                    if(idx<pagination) return <CardBlog idx={idx} key={element._id} list={list} setList={setList} element={element}/>
+                }):null}
             </div>
         </App>
     )
@@ -73,7 +65,7 @@ Blog.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     return {
-        data: {blogs: await getBlogs({search: ''}, ctx.req?await getClientGqlSsr(ctx.req):undefined)}
+        data: {blogs: await getBlogs({search: ''}, getClientGqlSsr(ctx.req))}
     };
 };
 

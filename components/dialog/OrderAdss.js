@@ -5,31 +5,31 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import {getAdss} from '../../src/gql/ads'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
-import CardAds from '../ads/CardAds'
+import CardAds from '../card/CardAds'
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Checkbox from '@material-ui/core/Checkbox';
 import * as snackbarActions from '../../redux/actions/snackbar'
+import {isEmpty, isNotEmpty} from '../../src/lib';
 
 const OrderAdss =  React.memo(
     (props) =>{
-        const { classes, organization, setAdss, adss, invoice } = props;
-        const { showSnackBar } = props.snackbarActions;
+        const {classes, organization, setAdss, adss} = props;
         let [selectedAdss, setSelectedAdss] = useState(adss);
         let [allAdss, setAllAdss] = useState([]);
-        useEffect(()=>{
-            (async()=>{
-                setAllAdss((await getAdss({search: '', organization: organization})).adss)
+        useEffect(() => {
+            (async () => {
+                setAllAdss(await getAdss({search: '', organization: organization}))
             })()
-        },[])
-        const { isMobileApp } = props.app;
-        const { profile } = props.user;
-        const { showFullDialog } = props.mini_dialogActions;
+        }, [])
+        const {isMobileApp} = props.app;
+        const {profile} = props.user;
+        const {showFullDialog} = props.mini_dialogActions;
         return (
             <div className={classes.main}>
                 {allAdss?allAdss.map((element)=> {
-                    let index=undefined;
-                    for(let i=0; i<selectedAdss.length; i++){
+                    let index=null;
+                    for(let i=0; i<selectedAdss.length; i++) {
                         if(selectedAdss[i]._id===element._id)
                             index = i
                     }
@@ -37,9 +37,9 @@ const OrderAdss =  React.memo(
                             <div key={element._id} style={isMobileApp ? {alignItems: 'baseline'} : {}}
                                  className={isMobileApp ? classes.column : classes.row}>
                                     <div>
-                                        <Checkbox checked={index!==undefined}
+                                        <Checkbox checked={isNotEmpty(index)}
                                                   onChange={() => {
-                                                      if (index===undefined) {
+                                                      if(isEmpty(index)) {
                                                           selectedAdss.push(element)
                                                       } else {
                                                           selectedAdss.splice(index, 1)
@@ -51,13 +51,13 @@ const OrderAdss =  React.memo(
                                     </div>
                             </div>
                         )
-                    else if(index!==undefined) return <CardAds element={element}/>
+                    else if(isNotEmpty(index)) return <CardAds element={element}/>
                 }):null}
                 <br/>
                 <div>
                     {
                         profile.role!=='client'?
-                            <Button variant="contained" color="primary" onClick={async()=>{
+                            <Button variant="contained" color='primary' onClick={async () => {
                                 await setAdss(selectedAdss);
                                 showFullDialog(false);
                             }} className={classes.button}>
@@ -66,7 +66,7 @@ const OrderAdss =  React.memo(
                             :
                             null
                     }
-                    <Button variant="contained" color="secondary" onClick={()=>{showFullDialog(false);}} className={classes.button}>
+                    <Button variant="contained" color="secondary" onClick={() => {showFullDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
                 </div>
