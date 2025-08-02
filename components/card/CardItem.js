@@ -113,6 +113,7 @@ const CardItem = React.memo((props) => {
                             className={classes.media}
                             src={element.image}
                             alt={element.name}
+                            loading='lazy'
                         />
                     </a>
                 </Link>

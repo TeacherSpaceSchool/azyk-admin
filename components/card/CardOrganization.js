@@ -17,6 +17,7 @@ const CardOrganization = React.memo((props) => {
                             className={classes.mediaO}
                             src={element.image}
                             alt={element.name}
+                            loading='lazy'
                         />
                        <div className={classes.column}>
                            <h3 className={classes.input}>

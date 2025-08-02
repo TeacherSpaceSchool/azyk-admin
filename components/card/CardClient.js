@@ -46,6 +46,7 @@ const CardOrganization = React.memo((props) => {
                                     className={classes.media}
                                     src={element.image?element.image:'/static/add.png'}
                                     alt={element.name}
+                                    loading='lazy'
                                 />
                             </a>
                         </Link>

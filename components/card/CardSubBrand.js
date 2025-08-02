@@ -24,6 +24,7 @@ const CardSubBrand = React.memo((props) => {
                                     className={classes.mediaO}
                                     src={element.image}
                                     alt={'Изменить'}
+                                    loading='lazy'
                                 />
                             </label>
                             <div>

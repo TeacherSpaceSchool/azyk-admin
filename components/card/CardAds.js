@@ -85,6 +85,7 @@ const CardAds = React.memo((props) => {
                                 className={isMobileApp?classes.mediaM:classes.mediaD}
                                 src={preview}
                                 alt={'Изменить'}
+                                loading='lazy'
                             />
                         </label>
                         <CardContent>
@@ -394,6 +395,7 @@ const CardAds = React.memo((props) => {
                                         className={isMobileApp?classes.mediaM:classes.mediaD}
                                         alt={element.title}
                                         src={element.image}
+                                        loading='lazy'
                                     />
                                 </a>
                                 <div style={{fontSize: '1rem', margin: 20, whiteSpace: 'pre-wrap'}}>

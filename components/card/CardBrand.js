@@ -29,6 +29,7 @@ const CardBrand = React.memo((props) => {
                         className={classes.mediaBrand}
                         src={element.image}
                         alt={element.name}
+                        loading='lazy'
                     />
                     <div className={classes.textBrand}>
                         {element.miniInfo?element.miniInfo:element.name}
@@ -44,6 +45,7 @@ const CardBrand = React.memo((props) => {
                                 className={classes.mediaO}
                                 src={element.image}
                                 alt={element.name}
+                                loading='lazy'
                             />
                             <div className={classes.column}>
                                 <h3 className={classes.input}>

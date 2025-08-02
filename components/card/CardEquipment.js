@@ -108,6 +108,7 @@ const CardEquipment = React.memo((props) => {
                                 className={classes.mediaO}
                                 src={preview}
                                 alt={number}
+                                loading='lazy'
                             />
                             :
                             null

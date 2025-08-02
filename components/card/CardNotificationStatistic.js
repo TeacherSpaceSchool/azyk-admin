@@ -54,6 +54,7 @@ const NotificationStatistic = React.memo((props) => {
                                 className={isMobileApp?classes.mediaM:classes.mediaD}
                                 src={preview}
                                 alt={'Изменить'}
+                                loading='lazy'
                             />
                         </label>
                         <CardContent>
@@ -126,6 +127,7 @@ const NotificationStatistic = React.memo((props) => {
                                     className={isMobileApp?classes.mediaM:classes.mediaD}
                                     src={preview}
                                     alt={element.title}
+                                    loading='lazy'
                                 />
                                 :null
                         }

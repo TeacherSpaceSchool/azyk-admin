@@ -56,6 +56,7 @@ const CardBlog = React.memo((props) => {
                                 className={isMobileApp?classes.mediaM:classes.mediaD}
                                 src={preview}
                                 alt={'Изменить'}
+                                loading='lazy'
                             />
                         </label>
                         <CardContent>
@@ -148,6 +149,7 @@ const CardBlog = React.memo((props) => {
                                 className={isMobileApp?classes.mediaM:classes.mediaD}
                                 src={element.image}
                                 alt={element.title}
+                                loading='lazy'
                             />
                             <div className={classes.shapka}>
                                 <div className={classes.title}>{element.title}</div>
