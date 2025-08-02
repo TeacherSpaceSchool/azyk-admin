@@ -89,7 +89,7 @@ Stock.getInitialProps = async function(ctx) {
     ])
     return {
         data: {
-            warehouses: [defaultWarehouse, ...warehouses],
+            ...warehouses?{warehouses: [defaultWarehouse, ...warehouses]}:{},
             stocks
         }
     };
