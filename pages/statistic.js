@@ -334,6 +334,38 @@ const Statistic = React.memo((props) => {
             </Head>
             <div className={classes.page}>
                 {
+                    showList.administration&&showList.administration.length?
+                        <ExpansionPanel expanded={expanded === 'administration'} onChange={handleChange('administration')} style={{width: 'calc(100% - 20px)', margin: 10, background: '#F5F5F5'}}>
+                            <ExpansionPanelSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls='panel1a-content'
+                                id='panel1a-header'
+                                style={{background: '#fff'}}
+                            >
+                                <h3>Администрирование</h3>
+                            </ExpansionPanelSummary>
+                            <ExpansionPanelDetails className={classes.page} >
+                                {showList.administration.map((element, idx)=>
+                                    <Link key={`tool${idx}`} href={element.link}>
+                                        <a>
+                                            <Card className={isMobileApp?classes.cardM:classes.cardD}>
+                                                <CardActionArea>
+                                                    <div className={classes.line}>
+                                                        <h3 className={classes.input}>
+                                                            {element.name}
+                                                        </h3>
+                                                    </div>
+                                                </CardActionArea>
+                                            </Card>
+                                        </a>
+                                    </Link>
+                                )}
+                            </ExpansionPanelDetails>
+                        </ExpansionPanel>
+                        :
+                        null
+                }
+                {
                     showList.load&&showList.load.length?
                         <ExpansionPanel expanded={expanded === 'load'} onChange={handleChange('load')} style={{width: 'calc(100% - 20px)', margin: 10, background: '#F5F5F5'}}>
                             <ExpansionPanelSummary
@@ -378,38 +410,6 @@ const Statistic = React.memo((props) => {
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails className={classes.page} >
                                 {showList.tools.map((element, idx)=>
-                                    <Link key={`tool${idx}`} href={element.link}>
-                                        <a>
-                                            <Card className={isMobileApp?classes.cardM:classes.cardD}>
-                                                <CardActionArea>
-                                                    <div className={classes.line}>
-                                                        <h3 className={classes.input}>
-                                                            {element.name}
-                                                        </h3>
-                                                    </div>
-                                                </CardActionArea>
-                                            </Card>
-                                        </a>
-                                    </Link>
-                                )}
-                            </ExpansionPanelDetails>
-                        </ExpansionPanel>
-                        :
-                        null
-                }
-                {
-                    showList.administration&&showList.administration.length?
-                        <ExpansionPanel expanded={expanded === 'administration'} onChange={handleChange('administration')} style={{width: 'calc(100% - 20px)', margin: 10, background: '#F5F5F5'}}>
-                            <ExpansionPanelSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls='panel1a-content'
-                                id='panel1a-header'
-                                style={{background: '#fff'}}
-                            >
-                                <h3>Администрирование</h3>
-                            </ExpansionPanelSummary>
-                            <ExpansionPanelDetails className={classes.page} >
-                                {showList.administration.map((element, idx)=>
                                     <Link key={`tool${idx}`} href={element.link}>
                                         <a>
                                             <Card className={isMobileApp?classes.cardM:classes.cardD}>

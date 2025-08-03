@@ -14,7 +14,7 @@ export default makeStyles({
     page: {
         paddingTop: 10,
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'stretch',
         justifyContent: 'center',
         flexDirection: 'row',
         flexWrap: 'wrap'

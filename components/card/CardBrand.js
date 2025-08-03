@@ -31,9 +31,12 @@ const CardBrand = React.memo((props) => {
                         alt={element.name}
                         loading='lazy'
                     />
-                    <div className={classes.textBrand}>
-                        {element.miniInfo?element.miniInfo:element.name}
+                    <div className={classes.nameBrand}>
+                        {element.name}
                     </div>
+                    {element.miniInfo?<div className={classes.textBrand}>
+                        {element.miniInfo}
+                    </div>:null}
                 </Card>
             </Link>
             :

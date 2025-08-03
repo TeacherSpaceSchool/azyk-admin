@@ -22,7 +22,8 @@ export default makeStyles({
         fontWeight: '500',
         fontSize: '0.875rem',
         fontFamily: 'Roboto',
-        wordBreak: 'break-all'
+        wordBreak: 'break-all',
+        whiteSpace: 'pre-line'
     },
     row: {
         display: 'flex',

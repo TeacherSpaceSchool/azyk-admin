@@ -53,10 +53,11 @@ export default makeStyles({
     cardBrand: {
         width: 'calc(100vw / 3 - 10px)',
         margin: /*5*/3,
+        padding: 3,
         display: 'flex',
         alignItems: 'center',
         flexDirection: 'column',
-        height: /*135*/122
+        //height: /*135*/122
     },
     mediaBrand: {
         borderRadius: /*30*/10,
@@ -64,7 +65,6 @@ export default makeStyles({
         height: /*67*/80,
         width: /*67*/80,
         //margin: 5,
-        marginTop: 3
     },
     nameBrand: {
         width: 'calc(100vw / 3 - 15px)',
@@ -72,7 +72,7 @@ export default makeStyles({
         fontSize: '0.81rem',
         fontFamily: 'Roboto',
         overflow: 'hidden',
-        height: 15,
+        //height: 15,
         marginBottom: 3,
         textAlign: 'center'
     },
@@ -81,7 +81,7 @@ export default makeStyles({
         fontSize: /*'0.6875rem'*/'0.75rem',
         fontFamily: 'Roboto',
         overflow: 'hidden',
-        height: /*45*/36,
+        //height: /*45*/36,
         lineHeight: '11px',
         marginTop: 3,
         textAlign: 'center'
