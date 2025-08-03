@@ -55,3 +55,24 @@ export const getErrorsStatistic = async (client) => {
         console.error(err)
     }
 }
+
+let lastError, lastPath;
+export const addError = async ({err, path}, client) => {
+    if(lastError!==err&&lastPath!==path) {
+        lastError = err
+        lastPath = path
+        try {
+            client = client? client : new SingletonApolloClient().getClient()
+            const res = await client.mutate({
+                variables: {err, path},
+                mutation: gql`
+                    mutation ($err: String!, $path: String!) {
+                        addError(err: $err, path: $path)
+                    }`
+            })
+            return res.data.addError
+        } catch (err) {
+            console.error(err)
+        }
+    }
+}

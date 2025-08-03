@@ -20,6 +20,8 @@ import * as snackbarActions from '../redux/actions/snackbar'
 import { start } from '../src/service/idb'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import {isNotEmpty, unawaited} from '../src/lib';
+import ErrorBoundary from '../components/app/ErrorBoundary';
+import {addError} from '../src/gql/error';
 export const mainWindow = React.createRef();
 export const alert = React.createRef();
 
@@ -186,7 +188,30 @@ const App = React.memo(props => {
             })
         }
     }, [show, showFull]);
-    return(
+    //error listener
+    useEffect(() => {
+        const sendError = async (err) => {
+            if(!['NotAllowedError: Registration failed - permission denied'].includes(err))
+                await addError({err, path: `sendError ${router.pathname}`})
+        }
+        //error
+        const handleError = async event => {
+            if(event.error)
+                await sendError((event.error.stack&&event.error.message).slice(0, 250))
+        };
+        const handleUnhandledRejection = async (event) => {
+            const reason = event.reason;
+            await sendError(reason?.stack?.toString().slice(0, 250) || reason?.toString() || 'Unknown rejection')
+        };
+        window.addEventListener('error', handleError);
+        window.addEventListener('unhandledrejection', handleUnhandledRejection);
+        //remove listener
+        return () => {
+            window.removeEventListener('error', handleError)
+            window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+        }
+    }, []);
+    return <ErrorBoundary>
         <div ref={mainWindow} className='App'>
             {
                 showAppBar?
@@ -212,7 +237,7 @@ const App = React.memo(props => {
             }
             <audio src='/alert.mp3' ref={alert}/>
         </div>
-    )
+    </ErrorBoundary>
 });
 
 function mapStateToProps (state) {
