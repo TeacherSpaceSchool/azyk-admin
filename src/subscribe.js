@@ -28,6 +28,10 @@ export let register = (update) => {
             navigator.serviceWorker.ready.then((swReg) => {
                 if(!!swReg) {
                     swRegistration = swReg;
+
+                    // **Принудительно обновляем SW**
+                    swRegistration.update();
+
                     swRegistration.pushManager.getSubscription()
                         .then(function (subscription) {
                             isSubscribed = !(subscription === null);
