@@ -45,14 +45,6 @@ const CardIntegrateOutShoro = React.memo((props) => {
                             </div>
                             :null
                     }
-                    {
-                        element.client?
-                            <div className={classes.row}>
-                                <div className={classes.nameField}>Клиенты:&nbsp;</div>
-                                <div className={classes.value}>{`${element.client.name}${element.client.address&&element.client.address[0]?` (${element.client.address[0][2]?`${element.client.address[0][2]}, `:''}${element.client.address[0][0]})`:''}`}</div>
-                            </div>
-                            :null
-                    }
                     <div className={classes.row}>
                         <div className={classes.nameField}>Дата:&nbsp;</div>
                         <div className={classes.value}>{pdDDMMYY(element.date?element.date:element.createdAt)}</div>
