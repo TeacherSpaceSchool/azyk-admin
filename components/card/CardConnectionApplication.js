@@ -43,7 +43,6 @@ const CardConnectionApplication = React.memo((props) => {
             <Card className={isMobileApp?classes.cardM:classes.cardD}>
                 {
                     element?
-                        <CardActionArea>
                             <CardContent>
                                 <div className={classes.row}>
                                     <div className={classes.nameField}>Время заявки:&nbsp;</div>
@@ -67,7 +66,6 @@ const CardConnectionApplication = React.memo((props) => {
                                     <div className={classes.value}>{element.whereKnow}</div>
                                 </div>:null}
                             </CardContent>
-                        </CardActionArea>
                         :
                         <CardContent>
                             <TextField

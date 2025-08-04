@@ -33,7 +33,7 @@ const CardEmployment = React.memo((props) => {
                                     </div>
                                 </div>
                                 {
-                                    element.phone.length?
+                                    element.phone&&element.phone[0]?
                                         <div className={classes.row}>
                                             <div className={classes.nameField}>
                                                 Телефон:&nbsp;

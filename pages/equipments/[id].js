@@ -21,19 +21,15 @@ const Equipments = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [list, setList] = useState(data.equipments);
-    let [count, setCount] = useState(data.equipmentsCount);
+    let [count, setCount] = useState('');
+    const getCount = async () => setCount(await getEquipmentsCount({organization: router.query.id, search, ...agent?{agent}:{}}))
     const {search, agent} = props.app;
     const router = useRouter()
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
     const getList = async () => {
-        // eslint-disable-next-line no-undef
-        const [equipments, equipmentsCount] = await Promise.all([
-            getEquipments({organization: router.query.id, search, skip: 0}),
-            getEquipmentsCount({organization: router.query.id, search})
-        ])
-        setList(equipments);
-        setCount(equipmentsCount);
+        unawaited(getCount)
+        setList(await getEquipments({organization: router.query.id, search, skip: 0, ...agent?{agent}:{}}));
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         paginationWork.current = true;
     }
@@ -42,8 +38,10 @@ const Equipments = React.memo((props) => {
             unawaited(getList)
     }, [agent])
     useEffect(() => {
-            if(initialRender.current) 
+            if(initialRender.current) {
                 initialRender.current = false;
+                unawaited(getCount)
+            }
             else {
                 if(searchTimeOut.current)
                     clearTimeout(searchTimeOut.current)
@@ -54,7 +52,7 @@ const Equipments = React.memo((props) => {
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
             paginationWork.current = false
-            let addedList = await getEquipments({organization: router.query.id, search, skip: list.length})
+            let addedList = await getEquipments({organization: router.query.id, search, skip: list.length, ...agent?{agent}:{}})
             if(addedList.length) {
                 setList([...list, ...addedList])
                 paginationWork.current = true
@@ -119,17 +117,15 @@ Equipments.getInitialProps = async function(ctx) {
             Router.push('/contact')
     ctx.store.getState().app.organization = ctx.query.id
     // eslint-disable-next-line no-undef
-    const [organization, equipments, equipmentsCount, agents] = await Promise.all([
+    const [organization, equipments, agents] = await Promise.all([
         getOrganization(ctx.query.id, getClientGqlSsr(ctx.req)),
         getEquipments({organization: ctx.query.id, search: '', skip: 0}, getClientGqlSsr(ctx.req)),
-        getEquipmentsCount({organization: ctx.query.id, search: ''}, getClientGqlSsr(ctx.req)),
         getAgents(ctx.query.id, getClientGqlSsr(ctx.req))
     ])
     return {
         data: {
             organization,
             equipments,
-            equipmentsCount,
             agents
         }
     };

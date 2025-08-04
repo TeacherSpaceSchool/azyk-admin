@@ -14,7 +14,6 @@ const NotificationStatistic = React.memo((props) => {
     return (
         <Card className={isMobileApp?classes.cardM:classes.cardD}>
             <CardContent>
-                            <CardActionArea>
                                 <div className={classes.row}>
                                     <div className={classes.nameField}>Дата подписки:&nbsp;</div>
                                     <div className={classes.value}>{pdDDMMYYHHMM(element.createdAt)}</div>
@@ -31,7 +30,6 @@ const NotificationStatistic = React.memo((props) => {
                                     <div className={classes.nameField}>Статус:&nbsp;</div>
                                     <div className={classes.value}>{element.status}</div>
                                 </div>
-                            </CardActionArea>
                         </CardContent>
                     </Card>
     );

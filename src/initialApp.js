@@ -1,6 +1,6 @@
 import { getProfile } from '../redux/actions/user'
 import { setClient } from './gql/client'
-import { getJWT, checkMobile, getCityCookie } from './lib'
+import {getJWT, checkMobile, getCityCookie, unawaited} from './lib'
 import uaParserJs from 'ua-parser-js';
 import { getClientGqlSsr } from './getClientGQL'
 
@@ -37,9 +37,9 @@ export default async (ctx) => {
                             }
                         }
                 }
-                setClient({_id: ctx.store.getState().user.profile.client,
+                unawaited(() => setClient({_id: ctx.store.getState().user.profile.client,
                     device: `${ua.device.vendor ? `${ua.device.vendor}-` : ''}${deviceModel} | ${ua.os.name ? `${ua.os.name}-` : ''}${ua.os.version ? ua.os.version : ''} | ${ua.browser.name ? `${ua.browser.name}-` : ''}${ua.browser.version ? ua.browser.version : ''}`
-                }, getClientGqlSsr(ctx.req))
+                }, getClientGqlSsr(ctx.req)))
             }
         }
         else {

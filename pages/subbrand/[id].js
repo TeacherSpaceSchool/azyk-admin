@@ -83,8 +83,8 @@ const SubBrand = React.memo((props) => {
     //item
     const [items, setItems] = useState([])
     //count
-    const unselectedCount = items.filter(item => !item.subBrand||item.subBrand._id!==router.query.id).length
-    const selectedCount = items.filter(item => item.subBrand&&item.subBrand._id===router.query.id).length
+    const unselectedCount = items.filter(item => (!item.subBrand||item.subBrand._id!==router.query.id)&&(!search||(item.name.toLowerCase()).includes(search.toLowerCase()))).length
+    const selectedCount = items.filter(item => (item.subBrand&&item.subBrand._id===router.query.id)&&(!search||(item.name.toLowerCase()).includes(search.toLowerCase()))).length
     //organization
     let [organizations, setOrganizations] = useState(data.organizations);
     let [organization, setOrganization] = useState(router.query.id==='new'||!data.subBrand?null:data.subBrand.organization||{name: 'AZYK.STORE', _id: 'super'});
@@ -119,12 +119,10 @@ const SubBrand = React.memo((props) => {
         setPagination(100)
         let filtredItems = []
         if(selectType === 'Не выбранные')
-            filtredItems = items.filter(item => !item.subBrand||item.subBrand._id !== router.query.id)
+            filtredItems = items.filter(item => (!item.subBrand||item.subBrand._id !== router.query.id)&&(!search||(item.name.toLowerCase()).includes(search.toLowerCase())))
         else if(selectType === 'Выбранные')
-            filtredItems = items.filter(item => item.subBrand&&item.subBrand._id === router.query.id)
-        if(search)
-            filtredItems = filtredItems.filter(item => (item.name.toLowerCase()).includes(search.toLowerCase()))
-        setFiltredItems(filtredItems)
+            filtredItems = items.filter(item => (item.subBrand&&item.subBrand._id === router.query.id)&&(!search||(item.name.toLowerCase()).includes(search.toLowerCase())))
+        setFiltredItems([...filtredItems])
     }, [selectType, search, items])
     //render
     return (
@@ -211,11 +209,12 @@ const SubBrand = React.memo((props) => {
                                 </div>
                             </div>
                             <div className={classes.listInvoices}>{filtredItems.map((item, idx) => {
-                                return <div key={item._id} style={isMobileApp ? {alignItems: 'baseline'} : {}}
-                                            className={isMobileApp ? classes.column : classes.row}>
-                                    <Checkbox checked={selectType==='Выбранные'}
-                                                    onChange={() => handleFiltredItems(item._id)}
-                                /> <CardItem key={item._id} element={item}/> </div>
+                                if(idx<pagination)
+                                    return <div key={item._id} style={isMobileApp ? {alignItems: 'baseline'} : {}}
+                                                className={isMobileApp ? classes.column : classes.row}>
+                                        <Checkbox checked={selectType==='Выбранные'}
+                                                        onChange={() => handleFiltredItems(item._id)}
+                                    /> <CardItem key={item._id} element={item}/> </div>
                             })}</div>
                         </>:null}
                         <div className={isMobileApp?classes.bottomRouteM:classes.bottomRouteD}>
@@ -253,11 +252,13 @@ const SubBrand = React.memo((props) => {
                                                     if(priotiry !== data.subBrand.priotiry) editElement.priotiry = priotiry
                                                     if(minimumOrder !== data.subBrand.minimumOrder) editElement.minimumOrder = minimumOrder
                                                     if(image) editElement.image = image
-                                                    if(Object.keys(editElement).length>1)
-                                                        await setSubBrand(editElement)
                                                     const unselectedItems = (items.filter(item => !item.subBrand||item.subBrand._id!==router.query.id)).map(item => item._id)
                                                     const selectedItems = (items.filter(item => item.subBrand&&item.subBrand._id===router.query.id)).map(item => item._id)
-                                                    await setSubBrandForItems({subBrand: router.query.id, unselectedItems, selectedItems})
+                                                    // eslint-disable-next-line no-undef
+                                                    await Promise.all([
+                                                        Object.keys(editElement).length>1?await setSubBrand(editElement):null,
+                                                        setSubBrandForItems({subBrand: router.query.id, unselectedItems, selectedItems})
+                                                    ])
                                                 }
                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                 showMiniDialog(true)

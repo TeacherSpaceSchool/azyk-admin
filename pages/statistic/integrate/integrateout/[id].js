@@ -24,6 +24,7 @@ const IntegrateOutShoro = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [simpleStatistic, setSimpleStatistic] = useState(['0']);
+    const getSimpleStatistic = async () => setSimpleStatistic(type==='Возвраты'? await getStatisticOutXMLReturnedShoros({organization: router.query.id}) : await getStatisticOutXMLShoros({organization: router.query.id}))
     let [list, setList] = useState(data.outXMLShoros);
     const initialRender = useRef(true);
     const paginationWork = useRef(true);
@@ -47,19 +48,10 @@ const IntegrateOutShoro = React.memo((props) => {
         }
     }, [search, filter, list])
     const getList = async () => {
-        // eslint-disable-next-line no-undef
-        const [listData, statisticData] = await Promise.all([
-            type==='Возвраты'?
-                getOutXMLReturnedShoros({search, filter, skip: 0, organization: router.query.id})
-                :
-                getOutXMLShoros({search, filter, skip: 0, organization: router.query.id}),
-            type==='Возвраты'?
-                getStatisticOutXMLReturnedShoros({organization: router.query.id})
-                :
-                getStatisticOutXMLShoros({organization: router.query.id})
-        ])
-        setList(listData)
-        setSimpleStatistic(statisticData)
+        setList(type==='Возвраты'?
+            await getOutXMLReturnedShoros({search, filter, skip: 0, organization: router.query.id})
+            :
+            await getOutXMLShoros({search, filter, skip: 0, organization: router.query.id}))
         paginationWork.current = true;
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
     }
@@ -77,6 +69,7 @@ const IntegrateOutShoro = React.memo((props) => {
         else {
             unawaited(getList)
         }
+        unawaited(getSimpleStatistic)
     }, [filter, type])
     let [showStat, setShowStat] = useState(false);
     let [anchorEl, setAnchorEl] = useState(null);
@@ -167,15 +160,9 @@ IntegrateOutShoro.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
-    // eslint-disable-next-line no-undef
-    const [outXMLShoros, statisticOutXMLShoros] = await Promise.all([
-        getOutXMLShoros({organization: ctx.query.id, search: '', skip: 0,filter:''}, getClientGqlSsr(ctx.req)),
-        getStatisticOutXMLShoros({organization: ctx.query.id}, getClientGqlSsr(ctx.req))
-    ])
     return {
         data: {
-            outXMLShoros,
-            statisticOutXMLShoros
+            outXMLShoros: await getOutXMLShoros({organization: ctx.query.id, search: '', skip: 0,filter:''}, getClientGqlSsr(ctx.req))
         }
     };
 };

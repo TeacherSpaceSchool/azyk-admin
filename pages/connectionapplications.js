@@ -21,7 +21,8 @@ const ConnectionApplications = React.memo((props) => {
     const {data} = props;
     const initialRender = useRef(true);
     let [list, setList] = useState(data.connectionApplications);
-    let [simpleStatistic, setSimpleStatistic] = useState(data.connectionApplicationsSimpleStatistic);
+    let [simpleStatistic, setSimpleStatistic] = useState('');
+    const getSimpleStatistic = async () => setSimpleStatistic(await getConnectionApplicationsSimpleStatistic({filter}))
     const {filter, isMobileApp} = props.app;
     const paginationWork = useRef(true);
     const checkPagination = useCallback(async () => {
@@ -35,23 +36,18 @@ const ConnectionApplications = React.memo((props) => {
         }
     }, [filter, list])
     const getList = async () => {
-        // eslint-disable-next-line no-undef
-        const [connectionApplications, connectionApplicationsSimpleStatistic] = await Promise.all([
-            getConnectionApplications({filter, skip: 0}),
-            getConnectionApplicationsSimpleStatistic({filter})
-        ])
-        setList(connectionApplications)
-        setSimpleStatistic(connectionApplicationsSimpleStatistic)
+        unawaited(getSimpleStatistic)
+        setList(await getConnectionApplications({filter, skip: 0}))
         paginationWork.current = true;
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
     useEffect(() => {
         if(initialRender.current) {
             initialRender.current = false;
+            unawaited(getSimpleStatistic)
         }
-        else {
+        else
             unawaited(getList)
-        }
     }, [filter])
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     return (
@@ -108,15 +104,9 @@ ConnectionApplications.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
-    // eslint-disable-next-line no-undef
-    const [connectionApplications, connectionApplicationsSimpleStatistic] = await Promise.all([
-        getConnectionApplications({skip: 0, filter: ''}, getClientGqlSsr(ctx.req)),
-        getConnectionApplicationsSimpleStatistic({filter: ''}, getClientGqlSsr(ctx.req))
-    ])
     return {
         data: {
-            connectionApplications,
-            connectionApplicationsSimpleStatistic,
+            connectionApplications: await getConnectionApplications({skip: 0, filter: ''}, getClientGqlSsr(ctx.req)),
         }
     };
 };

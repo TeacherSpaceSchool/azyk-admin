@@ -25,7 +25,8 @@ const Plan = React.memo((props) => {
     const router = useRouter()
     const initialRender = useRef(true);
     let [list, setList] = useState(data.planClients);
-    let [count, setCount] = useState(data.planClientsCount);
+    let [count, setCount] = useState('');
+    const getCount = async () => setCount(await getPlanClientsCount({search, skip: 0, city, organization: router.query.id, ...district?{district}:{}}))
     const {search, city, district} = props.app;
     const searchTimeOut = useRef(null);
     const paginationWork = useRef(true);
@@ -40,13 +41,8 @@ const Plan = React.memo((props) => {
         }
     }, [search, list, city, district])
     const getList = async () => {
-        // eslint-disable-next-line no-undef
-        const [planClients, planClientsCount] = await Promise.all([
-            getPlanClients({search, skip: 0, city, organization: router.query.id, ...district?{district}:{}}),
-            getPlanClientsCount({search, skip: 0, city, organization: router.query.id, ...district?{district}:{}})
-        ])
-        setList(planClients)
-        setCount(planClientsCount)
+        unawaited(getCount)
+        setList(await getPlanClients({search, skip: 0, city, organization: router.query.id, ...district?{district}:{}}))
         paginationWork.current = true;
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
@@ -54,8 +50,10 @@ const Plan = React.memo((props) => {
         if(!initialRender.current) unawaited(getList)
     }, [city, district])
     useEffect(() => {
-        if(initialRender.current)
+        if(initialRender.current) {
             initialRender.current = false;
+            unawaited(getCount)
+        }
         else {
             if(searchTimeOut.current)
                 clearTimeout(searchTimeOut.current)
@@ -135,16 +133,14 @@ Plan.getInitialProps = async function(ctx) {
             Router.push('/contact')
     ctx.store.getState().app.organization = ctx.query.id
     // eslint-disable-next-line no-undef
-    const [organization, planClients, planClientsCount] = await Promise.all([
+    const [organization, planClients] = await Promise.all([
         getOrganization(ctx.query.id, getClientGqlSsr(ctx.req)),
-        getPlanClients({organization: ctx.query.id, search: '', skip: 0}, getClientGqlSsr(ctx.req)),
-        getPlanClientsCount({organization: ctx.query.id, search: '', skip: 0}, getClientGqlSsr(ctx.req))
+        getPlanClients({organization: ctx.query.id, search: '', skip: 0}, getClientGqlSsr(ctx.req))
     ])
     return {
         data: {
             organization,
-            planClients,
-            planClientsCount
+            planClients
         }
     };
 };

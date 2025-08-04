@@ -21,14 +21,10 @@ const Client = React.memo((props) => {
     const {data} = props;
     let [list, setList] = useState(data.clients);
     let [simpleStatistic, setSimpleStatistic] = useState();
-    const getSimpleStatistic = async () => {
-        // eslint-disable-next-line no-undef
-        setSimpleStatistic(await getClientsSimpleStatistic({search, filter, date, city}))
-    }
+    const getSimpleStatistic = async () => setSimpleStatistic(await getClientsSimpleStatistic({search, filter, date, city}))
     const paginationWork = useRef(true);
     const getList = async () => {
         unawaited(getSimpleStatistic)
-        // eslint-disable-next-line no-undef
         const clients = await getClients({search, sort, filter, date, skip: 0, city})
         setList(clients);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});

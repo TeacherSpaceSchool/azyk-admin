@@ -26,6 +26,7 @@ const Returneds = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [simpleStatistic, setSimpleStatistic] = useState(['0']);
+    const getSimpleStatistic = async () => setSimpleStatistic(await getReturnedsSimpleStatistic({search, date, city}))
     let [list, setList] = useState(data.returneds);
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {search, sort, date, city} = props.app;
@@ -43,8 +44,8 @@ const Returneds = React.memo((props) => {
     }, [search, sort, date, list, city])
     const getList = async () => {
         setSelected([])
-        setList(await getReturneds({search, sort, date, skip: 0, city}))
-        setSimpleStatistic(await getReturnedsSimpleStatistic({search, date, city}));
+        unawaited(getSimpleStatistic)
+        setList(await getReturneds({search, sort, date, skip: 0, city}));
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
         paginationWork.current = true;
     }
@@ -58,7 +59,7 @@ const Returneds = React.memo((props) => {
         (async () => {
             if(initialRender.current) {
                 initialRender.current = false;
-                setSimpleStatistic(await getReturnedsSimpleStatistic({search, date, city}))
+                unawaited(getSimpleStatistic)
             } else {
                 if(searchTimeOut.current)
                     clearTimeout(searchTimeOut.current)

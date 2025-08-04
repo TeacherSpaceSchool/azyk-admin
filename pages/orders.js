@@ -29,10 +29,7 @@ const Orders = React.memo((props) => {
     const {data} = props;
     const initialRender = useRef(true);
     let [simpleStatistic, setSimpleStatistic] = useState(['0']);
-    const getSimpleStatistic = async () => {
-        // eslint-disable-next-line no-undef
-        setSimpleStatistic(await getInvoicesSimpleStatistic({search, filter, date, organization, city}))
-    }
+    const getSimpleStatistic = async () => setSimpleStatistic(await getInvoicesSimpleStatistic({search, filter, date, organization, city}))
     let [list, setList] = useState(data.orders);
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {showLoad} = props.appActions;
@@ -52,7 +49,6 @@ const Orders = React.memo((props) => {
     const getList = async () => {
         setSelected([])
         unawaited(getSimpleStatistic)
-        // eslint-disable-next-line no-undef
         const orders = await getOrders({search, sort, filter, date, skip: 0, organization, city})
         setList(orders);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});

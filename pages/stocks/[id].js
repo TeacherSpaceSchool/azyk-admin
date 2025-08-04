@@ -65,8 +65,8 @@ const Stock = React.memo((props) => {
                     if(idx<pagination)
                         return(
                             <CardStock idx={idx} key={element._id} warehouses={data.warehouses} organization={router.query.id} list={list} setList={setList} element={element}/>
-                        )}
-                ):null}
+                        )
+                }):null}
             </div>
         </App>
     )

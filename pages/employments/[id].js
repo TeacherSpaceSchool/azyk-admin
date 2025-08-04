@@ -21,19 +21,15 @@ const Employment = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [list, setList] = useState(data.employments);
-    let [count, setCount] = useState(data.employmentsCount);
+    let [count, setCount] = useState('');
+    const getCount = async () => setCount(await getEmploymentsCount({organization: router.query.id, search, filter}))
     const {search, filter, sort} = props.app;
     const router = useRouter()
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
     const getList = async () => {
-        // eslint-disable-next-line no-undef
-        const [employments, employmentsCount] = await Promise.all([
-            getEmployments({organization: router.query.id, search, filter, skip: 0}),
-            getEmploymentsCount({organization: router.query.id, search, filter})
-        ])
-        setList(employments)
-        setCount(employmentsCount);
+        unawaited(getCount)
+        setList(await getEmployments({organization: router.query.id, search, filter, skip: 0}));
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         paginationWork.current = true;
     }
@@ -42,8 +38,10 @@ const Employment = React.memo((props) => {
             unawaited(getList)
     }, [filter, sort])
     useEffect(() => {
-        if(initialRender.current)
+        if(initialRender.current) {
             initialRender.current = false;
+            unawaited(getCount)
+        }
         else {
             if(searchTimeOut.current)
                 clearTimeout(searchTimeOut.current)
@@ -96,14 +94,9 @@ Employment.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
-    // eslint-disable-next-line no-undef
-    const [employments, employmentsCount] = await Promise.all([
-        getEmployments({organization: ctx.query.id, search: '', filter: '', skip: 0}, getClientGqlSsr(ctx.req)),
-        getEmploymentsCount({organization: ctx.query.id, search: '', filter: ''}, getClientGqlSsr(ctx.req)),
-    ])
     return {
         data: {
-            employments, employmentsCount
+            employments: await getEmployments({organization: ctx.query.id, search: '', filter: '', skip: 0}, getClientGqlSsr(ctx.req))
         }
     };
 };

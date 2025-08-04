@@ -41,7 +41,6 @@ const CardBlog = React.memo((props) => {
     let date = pdDDMMYYYY(element?new Date(element.createdAt):new Date())
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
-    let [all, setAll] = useState(false);
     return (
         <Card className={isMobileApp?classes.cardM:classes.cardD}>
             {
@@ -142,9 +141,6 @@ const CardBlog = React.memo((props) => {
                     :
                     element?
                         <>
-                        <CardActionArea onClick={async ()=> {
-                            setAll(!all)
-                        }}>
                             <img
                                 className={isMobileApp?classes.mediaM:classes.mediaD}
                                 src={element.image}
@@ -158,7 +154,6 @@ const CardBlog = React.memo((props) => {
                             <div style={{fontSize: '1rem', margin: 20, whiteSpace: 'pre-wrap'}}>
                                 {element.text}
                             </div>
-                        </CardActionArea>
                         </>
                         :null
             }

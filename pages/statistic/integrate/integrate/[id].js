@@ -24,6 +24,7 @@ const Integrate = React.memo((props) => {
     const {showLoad} = props.appActions;
     let [list, setList] = useState(data.integrate1Cs);
     let [simpleStatistic, setSimpleStatistic] = useState(null);
+    const getSimpleStatistic = async () => setSimpleStatistic(await getIntegrate1CsSimpleStatistic({search, filter, organization: router.query.id}))
     const {search, filter} = props.app;
     let [showStat, setShowStat] = useState(false);
     const searchTimeOut = useRef(null);
@@ -38,9 +39,6 @@ const Integrate = React.memo((props) => {
             }
         }
     }, [search, filter, list])
-    const getSimpleStatistic = async () => {
-        setSimpleStatistic(await getIntegrate1CsSimpleStatistic({search, filter, organization: router.query.id}))
-    }
     const getList = async () => {
         showLoad(true)
         setList(await getIntegrate1Cs({search, filter, skip: 0, organization: router.query.id}))
