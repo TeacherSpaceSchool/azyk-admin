@@ -1,6 +1,5 @@
 import React  from 'react';
 import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
@@ -26,7 +25,6 @@ const CardIntegrateOutShoro = React.memo((props) => {
     const {isMobileApp} = props.app;
     return (
         <Card className={isMobileApp?classes.cardM:classes.cardD}>
-            <CardActionArea>
                 <CardContent className={classes.column}>
                     {
                         element.number?
@@ -78,7 +76,6 @@ const CardIntegrateOutShoro = React.memo((props) => {
                             null
                     }
                 </CardContent>
-            </CardActionArea>
             <CardActions>
                 {element.status!=='check'?
                     <Button onClick={async () => {
