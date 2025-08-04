@@ -348,21 +348,16 @@ const Item = React.memo((props) => {
                                                         }} size='small' color={status==='active'?'primary':'secondary'}>
                                                             {status==='active'?'Отключить':'Включить'}
                                                         </Button>
-                                                        {
-                                                            profile.role==='admin'?
-                                                                <Button onClick={() => {
-                                                                    const action = async () => {
-                                                                        await deleteItem(data.item._id)
-                                                                        Router.push(`/brand/${organization._id}`)
-                                                                    }
-                                                                    setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                                                                    showMiniDialog(true)
-                                                                }} size='small' color='secondary'>
-                                                                    Удалить
-                                                                </Button>
-                                                                :
-                                                                null
-                                                        }
+                                                        <Button onClick={() => {
+                                                            const action = async () => {
+                                                                await deleteItem(data.item._id)
+                                                                Router.push(`/brand/${organization._id}`)
+                                                            }
+                                                            setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                                                            showMiniDialog(true)
+                                                        }} size='small' color='secondary'>
+                                                            Удалить
+                                                        </Button>
                                                     </>
                                             }
                                         </div>

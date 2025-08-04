@@ -212,22 +212,19 @@ const CardItem = React.memo((props) => {
                             }} size='small' color={status==='active'?'primary':'secondary'}>
                                 {status==='active'?'Отключить':'Включить'}
                             </Button>
-                            {
-                                'admin'===profile.role?
-                                    <Button onClick={async () => {
-                                        const action = async () => {
-                                            await deleteItem(element._id)
-                                            setList(list => {
-                                                list.splice(idx, 1)
-                                                return [...list]
-                                            })
-                                        }
-                                        setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                                        showMiniDialog(true)
-                                    }} size='small' color='secondary'>
-                                        Удалить
-                                    </Button>:null
-                            }
+                            <Button onClick={async () => {
+                                const action = async () => {
+                                    await deleteItem(element._id)
+                                    setList(list => {
+                                        list.splice(idx, 1)
+                                        return [...list]
+                                    })
+                                }
+                                setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                                showMiniDialog(true)
+                            }} size='small' color='secondary'>
+                                Удалить
+                            </Button>
                         </>
                         :
                         null
