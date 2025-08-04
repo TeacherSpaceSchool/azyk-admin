@@ -136,7 +136,7 @@ const Organization = React.memo((props) => {
                 <CardContent className={isMobileApp?classes.column:classes.row} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     {
                         router.query.id==='new'||data.organization?
-                            profile.role==='admin'||(['суперорганизация', 'организация'].includes(profile.role)&&profile.organization===data.organization._id)?
+                            profile.role==='admin'||(['суперорганизация', 'организация'].includes(profile.role)&&profile.organization===router.query.id)?
                                 <>
                                 <div className={classes.column}>
                                     <label htmlFor='contained-button-file'>
