@@ -127,7 +127,7 @@ const CardItem = React.memo((props) => {
                         {element.subBrand.name}
                     </div>:null
                 }
-                {setList?'admin' === profile.role || (['суперорганизация', 'организация'].includes(profile.role) && profile.organization === element.organization) ?
+                {setList?['admin', 'суперорганизация', 'организация'].includes(profile.role)?
                     <>
                         <div className={classes.row}>
                             <FormControl className={classes.input}>
