@@ -34,7 +34,7 @@ const ErrorsStatistic = React.memo((props) => {
                 {
                     data.errorsStatistic?
                         <>
-                        <div className={classes.rowStatic}>{`Пути: ${data.errorsStatistic.row[0].data[0]}`}</div>
+                        <div className={classes.rowStatic}>{`Пользователи: ${data.errorsStatistic.row[0].data[0]}`}</div>
                         <div className={classes.rowStatic}>{`Количество: ${data.errorsStatistic.row[0].data[1]}`}</div>
                         </>
                         :null

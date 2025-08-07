@@ -30,7 +30,8 @@ export let register = (update) => {
                     swRegistration = swReg;
 
                     /// **Принудительно обновляем SW**
-                    swRegistration.update();
+                    if(update)
+                        swRegistration.update();
 
                     swRegistration.pushManager.getSubscription()
                         .then(function (subscription) {

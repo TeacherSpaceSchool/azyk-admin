@@ -156,8 +156,8 @@ export const addOrders = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($dateDelivery: Date!, $priority: Int!, $info: String, $inv: Boolean, $unite: Boolean, $paymentMethod: String, $organization: ID!, $client: ID!) {
-                        addOrders(priority: $priority, dateDelivery: $dateDelivery, inv: $inv, unite: $unite, info: $info, paymentMethod: $paymentMethod, organization: $organization, client: $client)
+                    mutation ($dateDelivery: Date!, $info: String, $inv: Boolean, $unite: Boolean, $paymentMethod: String, $organization: ID!, $client: ID!) {
+                        addOrders(dateDelivery: $dateDelivery, inv: $inv, unite: $unite, info: $info, paymentMethod: $paymentMethod, organization: $organization, client: $client)
                     }`})
         return res.data.addOrders
     } catch(err) {

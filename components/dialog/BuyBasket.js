@@ -46,7 +46,6 @@ const BuyBasket =  React.memo(
             setDateDelivery(event.target.value)
         };
         let [deliveryDays, setDeliveryDays] = useState([true, true, true, true, true, true, false]);
-        let [priority, setPriority] = useState(0);
         let [week, setWeek] = useState([]);
         const unlock = useRef(true);
         let paymentMethods = ['Наличные', 'Перечисление', 'Консигнация']
@@ -60,7 +59,6 @@ const BuyBasket =  React.memo(
                     for(const key in basket) unawaited(() => addBasket({item: basket[key]._id, count: basket[key].count}))
                     const deliveryDate = await getDeliveryDate({client: client._id, organization: organization._id})
                     if(deliveryDate) {
-                        setPriority(deliveryDate.priority?deliveryDate.priority:0)
                         deliveryDays = deliveryDate.days
                         /*if(!agent)
                             deliveryDays[6] = false*/
@@ -187,7 +185,6 @@ const BuyBasket =  React.memo(
                                        }
                                        await addOrders({
                                            inv,
-                                           priority,
                                            unite: organization.unite,
                                            info,
                                            paymentMethod,
@@ -201,7 +198,6 @@ const BuyBasket =  React.memo(
                                        await putOfflineOrders({
                                            ...(geo?{geo: {latitude: geo.coords.latitude, longitude: geo.coords.longitude}}:{}),
                                            inv,
-                                           priority,
                                            unite: organization.unite,
                                            info,
                                            paymentMethod,
