@@ -1,5 +1,7 @@
 const regexpUA = /(Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|iOS|Mobile)/
 
+export const dayStartDefault = 3
+
 export const checkMobile = (ua) => {
     return regexpUA.exec(ua)!==null
 }

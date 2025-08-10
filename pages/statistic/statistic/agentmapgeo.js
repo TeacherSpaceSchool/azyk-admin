@@ -17,7 +17,7 @@ import { bindActionCreators } from 'redux'
 import * as appActions from '../../../redux/actions/app'
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import AgentMapGeoOrders from '../../../components/dialog/AgentMapGeoOrders'
-import {isNotEmpty, pdDatePicker} from '../../../src/lib'
+import {dayStartDefault, isNotEmpty, pdDatePicker} from '../../../src/lib'
 import pageListStyle from '../../../src/styleMUI/file/fileList'
 import { getGeoDistance } from '../../../src/lib'
 
@@ -163,7 +163,7 @@ AgentMapGeoStatistic.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     let date = new Date()
-    if(date.getHours()<3)
+    if(date.getHours()<dayStartDefault)
         date.setDate(date.getDate() - 1)
     ctx.store.getState().app.date = pdDatePicker(date)
     ctx.store.getState().app.organization = ctx.store.getState().user.profile.organization

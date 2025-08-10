@@ -14,7 +14,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../../redux/actions/app'
-import {checkInt, pdDatePicker} from '../../../src/lib'
+import {checkInt, dayStartDefault, pdDatePicker} from '../../../src/lib'
 import {getOrganizations} from '../../../src/gql/organization';
 import {getClientGqlSsr} from '../../../src/getClientGQL';
 
@@ -193,7 +193,7 @@ AgentHistoryGeo.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     let dateStart = new Date()
-    if(dateStart.getHours()<3)
+    if(dateStart.getHours()<dayStartDefault)
         dateStart.setDate(dateStart.getDate() - 1)
     return {
         data: {

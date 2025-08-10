@@ -8,7 +8,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
 import Table from '../../../components/app/Table'
-import { pdDatePicker } from '../../../src/lib'
+import {dayStartDefault, pdDatePicker} from '../../../src/lib'
 import {getStatisticUnsyncOrder, repairUnsyncOrder} from '../../../src/gql/statistic'
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../../redux/actions/app'
@@ -92,7 +92,7 @@ Unsyncorder.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     let date = new Date()
-    if(date.getHours()<3)
+    if(date.getHours()<dayStartDefault)
         date.setDate(date.getDate() - 1)
     ctx.store.getState().app.date = pdDatePicker(date)
     return {};

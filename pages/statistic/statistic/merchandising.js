@@ -9,7 +9,7 @@ import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
 import Table from '../../../components/app/Table'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
-import {handleDateRange, pdDatePicker} from '../../../src/lib'
+import {dayStartDefault, handleDateRange, pdDatePicker} from '../../../src/lib'
 import { getStatisticMerchandising } from '../../../src/gql/statistic'
 import { getOrganizations } from '../../../src/gql/organization'
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -197,7 +197,7 @@ MerchandisingStatistic.getInitialProps = async function(ctx) {
             Router.push('/contact')
 
     let dateStart = new Date()
-    if(dateStart.getHours()<3)
+    if(dateStart.getHours()<dayStartDefault)
         dateStart.setDate(dateStart.getDate() - 1)
     return {
         data: {

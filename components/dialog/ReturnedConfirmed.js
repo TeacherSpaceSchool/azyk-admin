@@ -11,7 +11,7 @@ import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Router from 'next/router'
 import Link from 'next/link';
 import { addAgentHistoryGeo } from '../../src/gql/agentHistoryGeo'
-import {getGeoDistance, unawaited} from '../../src/lib'
+import {dayStartDefault, getGeoDistance, unawaited} from '../../src/lib'
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import { getDeliveryDate } from '../../src/gql/deliveryDate';
@@ -51,10 +51,10 @@ const ReturnedConfirmed =  React.memo(
                     }
                     for (let i = 0; i < 7; i++) {
                         let day = new Date()
-                        if(day.getHours()>=3)
+                        if(day.getHours()>=dayStartDefault)
                             day.setDate(day.getDate()+1)
                         day.setDate(day.getDate()+i)
-                        day.setHours(3, 0, 0, 0)
+                        day.setHours(dayStartDefault, 0, 0, 0)
                         let dayWeek = day.getDay() === 0 ? 6 : (day.getDay() - 1)
                         week[dayWeek] = day
                         if(!dateDelivery&&dateDeliverys[dayWeek]) {

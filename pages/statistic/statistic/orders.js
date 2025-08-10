@@ -9,7 +9,7 @@ import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
 import Table from '../../../components/app/Table'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
-import {handleDateRange, pdDatePicker} from '../../../src/lib'
+import {dayStartDefault, handleDateRange, pdDatePicker} from '../../../src/lib'
 import { getStatisticOrders } from '../../../src/gql/statistic'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -153,7 +153,7 @@ OrderStatistic.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     let dateStart = new Date()
-    if(dateStart.getHours()<3)
+    if(dateStart.getHours()<dayStartDefault)
         dateStart.setDate(dateStart.getDate() - 1)
     return {
         data: {

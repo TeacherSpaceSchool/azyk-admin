@@ -15,7 +15,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../../redux/actions/app'
-import {handleDateRange, pdDatePicker} from '../../../src/lib'
+import {dayStartDefault, handleDateRange, pdDatePicker} from '../../../src/lib'
 
 const ReturnedStatistic = React.memo((props) => {
 
@@ -145,7 +145,7 @@ ReturnedStatistic.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     let dateStart = new Date()
-    if(dateStart.getHours()<3)
+    if(dateStart.getHours()<dayStartDefault)
         dateStart.setDate(dateStart.getDate() - 1)
     return {
         data: {

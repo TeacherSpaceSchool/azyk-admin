@@ -15,13 +15,13 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../../redux/actions/app'
-import {handleDateRange, pdDatePicker} from '../../../src/lib'
+import {dayStartDefault, handleDateRange, pdDatePicker} from '../../../src/lib'
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 
-const dayStarts = [{name:'03:00', value: 3}, {name:'00:00', value: 0}]
+const dayStarts = [{name:`0${dayStartDefault}:00`, value: dayStartDefault}, {name:'00:00', value: 0}]
 const filters = [{name: 'Все', value: false}, {name: 'Online', value: true}]
 
 const ItemStatistic = React.memo((props) => {
@@ -31,7 +31,7 @@ const ItemStatistic = React.memo((props) => {
     const {isMobileApp, filter, city} = props.app;
     const {profile} = props.user;
     const initialRender = useRef(true);
-    let [dayStart, setDayStart] = useState({name:'03:00', value: 3});
+    let [dayStart, setDayStart] = useState(dayStarts[0]);
     let handleDayStart =  (event) => {
         setDayStart({value: event.target.value, name: event.target.name})
     };
@@ -166,7 +166,7 @@ ItemStatistic.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     let dateStart = new Date()
-    if(dateStart.getHours()<3)
+    if(dateStart.getHours()<dayStartDefault)
         dateStart.setDate(dateStart.getDate() - 1)
     return {
         data: {

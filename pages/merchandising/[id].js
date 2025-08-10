@@ -42,7 +42,7 @@ import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import {maxImageSize} from '../../src/lib';
+import {dayStartDefault, maxImageSize} from '../../src/lib';
 
 const marks = [
     {
@@ -152,7 +152,7 @@ const Merchandising = React.memo((props) => {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
-            if(inputValue.length<3) {
+            if(inputValue.length<dayStartDefault) {
                 setClients([]);
                 if(open)
                     setOpen(false)

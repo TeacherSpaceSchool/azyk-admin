@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import pageListStyle from '../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat, isNotEmpty, unawaited} from '../src/lib';
+import {checkInt, checkFloat, isNotEmpty, unawaited, dayStartDefault} from '../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import * as snackbarActions from '../redux/actions/snackbar'
@@ -62,7 +62,7 @@ const Catalog = React.memo((props) => {
     const handleChange = event => setInputValue(event.target.value);
     const searchTimeOutClient = useRef(null);
     useEffect(() => {
-        if(inputValue.length < 3) {
+        if(inputValue.length < dayStartDefault) {
             setClients([]);
             if(open)
                 setOpen(false)

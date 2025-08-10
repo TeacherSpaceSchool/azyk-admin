@@ -8,7 +8,7 @@ import * as appActions from '../../redux/actions/app'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
-import { pdDatePicker } from '../../src/lib'
+import {dayStartDefault, pdDatePicker} from '../../src/lib'
 
 const SetDate =  React.memo(
     (props) =>{
@@ -16,7 +16,7 @@ const SetDate =  React.memo(
         let [dateChange, setDateChange] = useState(null);
         useEffect(() => {
             let dateStart = new Date()
-            if(dateStart.getHours()<3)
+            if(dateStart.getHours()<dayStartDefault)
                 dateStart.setDate(dateStart.getDate() - 1)
             setDateChange(pdDatePicker(dateStart))
         }, []);
