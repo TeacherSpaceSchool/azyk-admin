@@ -19,8 +19,7 @@ import * as appActions from '../redux/actions/app'
 import { bindActionCreators } from 'redux'
 import Badge from '@material-ui/core/Badge';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import {pdDDMMYYHHMM, unawaited} from '../src/lib';
-import Card from '@material-ui/core/Card';
+import {unawaited} from '../src/lib';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value: 'обработка'}, {name: 'Акции', value: 'акция'}, {name: 'Без геолокации', value: 'Без геолокации'}, {name: 'Не синхронизированные', value: 'Не синхронизированные'}]
 
@@ -106,26 +105,16 @@ const Orders = React.memo((props) => {
                         null
                 }
             </div>
-            <div className={classes.page} style={{justifyContent: 'flex-start', padding: 0}}>
+            <div className={classes.page}>
                 {
                     searchTimeOut?
                         <CircularProgress style={{position: 'fixed', top: '50vh'}}/>
                         :
-                        <Card className='table'>
+                        <>
                             {list?list.map((element, idx)=> {
-                                const status =
-                                    element.taken?'принят':element.cancelForwarder||element.cancelClient?'отмена':element.confirmationForwarder&&element.confirmationClient?'выполнен':'обработка'
-                                //return <CardOrder key={element._id} idx={idx} setSelected={setSelected} selected={selected} list={list} setList={setList} element={element}/>
-                                return <div key={element._id} className='tableRow'>
-                                    <div className='tableCell' style={{width: 110}} >
-                                        {pdDDMMYYHHMM(element.createdAt)}
-                                    </div>
-                                    <div className='tableCell' style={{width: 110}}>
-                                        {status}
-                                    </div>
-                                </div>
+                                return <CardOrder key={element._id} idx={idx} setSelected={setSelected} selected={selected} list={list} setList={setList} element={element}/>
                             }):null}
-                        </Card>
+                        </>
                 }
             </div>
             {profile.role==='admin'&&(selected.length||filter==='обработка')?
