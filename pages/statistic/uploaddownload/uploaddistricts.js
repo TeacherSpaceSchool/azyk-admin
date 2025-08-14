@@ -11,8 +11,8 @@ import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
+import { uploadDistricts } from '../../../src/gql/uploadDownload'
 import { getOrganizations } from '../../../src/gql/organization'
-import { uploadPlanClients } from '../../../src/gql/planClient'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
@@ -20,19 +20,15 @@ import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import Confirmation from '../../../components/dialog/Confirmation'
 import {maxFileSize} from '../../../src/lib';
 
-const UploadingPlanClients = React.memo((props) => {
-    const {profile} = props.user;
+const UploadDistricts = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
-    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
-    let [organization, setOrganization] = useState({_id: profile.organization});
-    const {city} = props.app;
-    const {isMobileApp} = props.app;
-    const {showSnackBar} = props.snackbarActions;
+    const {isMobileApp, city} = props.app;
     const initialRender = useRef(true);
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    let [organization, setOrganization] = useState(null);
+    const {showSnackBar} = props.snackbarActions;
     let [organizations, setOrganizations] = useState(data.organizations);
-    let [document, setDocument] = useState(null);
-    let documentRef = useRef(null);
     useEffect(() => {
         (async () => {
             if(initialRender.current) {
@@ -40,69 +36,63 @@ const UploadingPlanClients = React.memo((props) => {
             }
             else {
                 setOrganization(null)
-                setOrganizations(await getOrganizations({search: '', filter: '', city}))
+                setOrganizations([{name: 'AZYK.STORE', _id: 'super'}, ...await getOrganizations({search: '', filter: '', city})])
             }
         })()
     }, [city])
+    let [document, setDocument] = useState(null);
+    let documentRef = useRef(null);
     let handleChangeDocument = ((event) => {
         if(event.target.files[0].size/1024/1024<maxFileSize)
             setDocument(event.target.files[0])
         else showSnackBar('Файл слишком большой')
     })
     return (
-        <App cityShow pageName='Загрузка планов клиентов 1C'>
+        <App cityShow pageName='Загрузка районов 1C'>
             <Head>
-                <title>Загрузка планов клиентов 1C</title>
+                <title>Загрузка районов 1C</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     <div className={classes.row}>
-                        Формат xlsx: GUID клиента из 1С, посещение план, месячный план.
+                        Формат xlsx: _id клиента, _id торгового агента.
                     </div>
                     <div className={classes.row}>
-                        {
-                            !profile.organization?
-                                <Autocomplete
-                                    className={classes.input}
-                                    options={organizations}
-                                    getOptionLabel={option => option.name}
-                                    value={organization}
-                                    onChange={(event, newValue) => {
-                                        setOrganization(newValue)
-                                    }}
-                                    noOptionsText='Ничего не найдено'
-                                    renderInput={params => (
-                                        <TextField {...params} label='Организация' fullWidth />
-                                    )}
-                                />
-                                :
-                                <><br/><br/></>
-                        }
+                        <Autocomplete
+                            className={classes.input}
+                            options={organizations}
+                            getOptionLabel={option => option.name}
+                            value={organization}
+                            onChange={(event, newValue) => {
+                                setOrganization(newValue)
+                            }}
+                            noOptionsText='Ничего не найдено'
+                            renderInput={params => (
+                                <TextField {...params} label='Организация' fullWidth />
+                            )}
+                        />
                         <Button size='small' color='primary' onClick={() => documentRef.current.click()}>
                             {document?document.name:'Прикрепить файл'}
                         </Button>
                     </div>
                     <br/>
-                    {
-                        organization&&organization._id&&document?
-                            <Button variant='contained' size='small' color='primary' onClick={() => {
-                                const action = async () => {
-                                    let res = await uploadPlanClients({
-                                        organization: organization._id,
-                                        document,
-                                    });
-                                    if(res==='OK')
-                                        showSnackBar('Все данные загруженны')
-                                }
-                                setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                                showMiniDialog(true)
-                            }}>
-                                Загрузить
-                            </Button>
-                            :
-                            null
-                    }
+                    <Button variant='contained' size='small' color='primary' onClick={() => {
+                        if(organization&&document) {
+                            const action = async () => {
+                                let res = await uploadDistricts({
+                                    organization: organization._id,
+                                    document: document
+                                });
+                                if(res==='OK')
+                                    showSnackBar('Все данные загруженны')
+                            }
+                            setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                            showMiniDialog(true)
+                        }
+                    }}>
+                        Загрузить
+                    </Button>
                 </CardContent>
             </Card>
             <input
@@ -117,9 +107,9 @@ const UploadingPlanClients = React.memo((props) => {
     )
 })
 
-UploadingPlanClients.getInitialProps = async function(ctx) {
+UploadDistricts.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin', 'суперорганизация', 'организация', 'менеджер'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -128,9 +118,10 @@ UploadingPlanClients.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     return {
-        data: {
-            ...await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''},  getClientGqlSsr(ctx.req)),
-        }
+        data:
+            {
+                organizations: [{name: 'AZYK.STORE', _id: 'super'}, ...await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, getClientGqlSsr(ctx.req))]
+            }
     }
 };
 
@@ -149,4 +140,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UploadingPlanClients);
+export default connect(mapStateToProps, mapDispatchToProps)(UploadDistricts);

@@ -10,14 +10,14 @@ import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-import { getUnloadingInvoices } from '../../../src/gql/statistic'
+import { downloadInvoices } from '../../../src/gql/uploadDownload'
 import { getOrganizations } from '../../../src/gql/organization'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import * as appActions from '../../../redux/actions/app'
 
-const UnloadingInvoices = React.memo((props) => {
+const DownloadInvoices = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [date, setDate] = useState(null);
@@ -77,7 +77,7 @@ const UnloadingInvoices = React.memo((props) => {
                     <Button variant='contained' size='small' color='primary' onClick={async () => {
                         if(organization&&organization._id&&date) {
                             showLoad(true)
-                            window.open(await getUnloadingInvoices({
+                            window.open(await downloadInvoices({
                                 organization: organization._id,
                                 dateStart: date,
                                 all: all,
@@ -93,7 +93,7 @@ const UnloadingInvoices = React.memo((props) => {
     )
 })
 
-UnloadingInvoices.getInitialProps = async function(ctx) {
+DownloadInvoices.getInitialProps = async function(ctx) {
     await initialApp(ctx)
     if(!['admin'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
@@ -124,4 +124,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UnloadingInvoices);
+export default connect(mapStateToProps, mapDispatchToProps)(DownloadInvoices);

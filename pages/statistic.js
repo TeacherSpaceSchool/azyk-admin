@@ -212,80 +212,80 @@ const list = {
             role: ['admin']
         },
     ],
-    load: [
+    uploaddownload: [
         {
             name: 'Выгрузка акционных заказов',
-            link: '/statistic/load/unloadingadsorders',
+            link: '/statistic/uploaddownload/downloadadsorders',
             role: ['admin', 'суперорганизация', 'организация']
         },
         {
             name: 'Выгрузка заказов',
-            link: '/statistic/load/unloadingorders',
+            link: '/statistic/uploaddownload/downloadorders',
             role: ['admin', 'суперорганизация']
         },
         {
             name: 'Выгрузка клиентов',
-            link: '/statistic/load/unloadingclients',
+            link: '/statistic/uploaddownload/downloadclients',
             role: ['admin']
         },
         {
             name: 'Выгрузка маршрутов',
-            link: '/statistic/load/unloadingagentroutes',
+            link: '/statistic/uploaddownload/downloadagentroutes',
             role: ['admin']
         },
         {
             name: 'Выгрузка накладных',
-            link: '/statistic/load/unloadinginvoices',
+            link: '/statistic/uploaddownload/downloadinvoices',
             role: ['admin']
         },
         {
             name: 'Выгрузка оборудования',
-            link: '/statistic/load/unloadingequipments',
+            link: '/statistic/uploaddownload/downloadequipments',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер']
         },
         {
             name: 'Выгрузка планов клиентов',
-            link: '/statistic/load/unloadplanclients',
+            link: '/statistic/uploaddownload/unloadplanclients',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер']
         },
         {
             name: 'Выгрузка районов',
-            link: '/statistic/load/unloadingdistricts',
+            link: '/statistic/uploaddownload/downloaddistricts',
             role: ['admin']
         },
         {
             name: 'Выгрузка сотрудников',
-            link: '/statistic/load/unloadingemployments',
+            link: '/statistic/uploaddownload/downloademployments',
             role: ['admin']
         },
         {
             name: 'Загрузка клиентов',
-            link: '/statistic/load/uploadingclients',
+            link: '/statistic/uploaddownload/uploadclients',
             role: ['admin']
         },
         {
             name: 'Загрузка GUID клиентов',
-            link: '/statistic/load/unloadingintegrate1C',
+            link: '/statistic/uploaddownload/downloadintegrate1C',
             role: ['admin']
         },
         {
             name: 'Загрузка маршрутов',
-            link: '/statistic/load/uploadingagentroute',
+            link: '/statistic/uploaddownload/uploadagentroute',
             role: ['admin']
         },
         {
             name: 'Загрузка планов клиентов',
-            link: '/statistic/load/uploadingplanclients',
+            link: '/statistic/uploaddownload/uploadplanclients',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер']
         },
         {
             name: 'Загрузка районов',
-            link: '/statistic/load/uploadingdistricts',
+            link: '/statistic/uploaddownload/uploaddistricts',
             role: ['admin']
         },
         {
             name: 'Загрузка товаров',
-            link: '/statistic/load/uploadingitems',
+            link: '/statistic/uploaddownload/uploaditems',
             role: ['admin']
         },
     ]
@@ -306,7 +306,7 @@ const Statistic = React.memo((props) => {
             tools: [],
             administration: [],
             integrate: [],
-            load: [],
+            uploaddownload: [],
         }
         for (let i = 0; i < list.statistic.length; i++) {
             if(list.statistic[i].name.toLowerCase().includes(search.toLowerCase()) && list.statistic[i].role.includes(profile.role))
@@ -324,9 +324,9 @@ const Statistic = React.memo((props) => {
             if(list.integrate[i].name.toLowerCase().includes(search.toLowerCase()) && list.integrate[i].role.includes(profile.role))
                 showList.integrate.push(list.integrate[i])
         }
-        for (let i = 0; i < list.load.length; i++) {
-            if(list.load[i].name.toLowerCase().includes(search.toLowerCase()) && list.load[i].role.includes(profile.role))
-                showList.load.push(list.load[i])
+        for (let i = 0; i < list.uploaddownload.length; i++) {
+            if(list.uploaddownload[i].name.toLowerCase().includes(search.toLowerCase()) && list.uploaddownload[i].role.includes(profile.role))
+                showList.uploaddownload.push(list.uploaddownload[i])
         }
         setShowList({...showList})
     }, [search])
@@ -371,18 +371,18 @@ const Statistic = React.memo((props) => {
                         null
                 }
                 {
-                    showList.load&&showList.load.length?
-                        <ExpansionPanel expanded={expanded === 'load'} onChange={handleChange('load')} style={{width: 'calc(100% - 20px)', margin: 10, background: '#F5F5F5'}}>
+                    showList.uploaddownload&&showList.uploaddownload.length?
+                        <ExpansionPanel expanded={expanded === 'uploaddownload'} onChange={handleChange('uploaddownload')} style={{width: 'calc(100% - 20px)', margin: 10, background: '#F5F5F5'}}>
                             <ExpansionPanelSummary
                                 expandIcon={<ExpandMoreIcon />}
                                 aria-controls='panel1a-content'
                                 id='panel1a-header'
                                 style={{background: '#fff'}}
                             >
-                                <h3>Выгрузка</h3>
+                                <h3>Выгрузка/Загрузка</h3>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails className={classes.page}>
-                                {showList.load.map((element, idx)=>
+                                {showList.uploaddownload.map((element, idx)=>
                                     <Link key={`unload${idx}`} href={element.link}>
                                         <a>
                                             <Card className={isMobileApp?classes.cardM:classes.cardD}>

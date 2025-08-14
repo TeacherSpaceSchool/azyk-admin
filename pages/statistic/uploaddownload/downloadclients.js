@@ -10,14 +10,14 @@ import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-import { getUnloadingEmployments } from '../../../src/gql/statistic'
+import { downloadClients } from '../../../src/gql/uploadDownload'
 import { getOrganizations } from '../../../src/gql/organization'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import * as appActions from '../../../redux/actions/app'
 
-const UnloadingEmployments = React.memo((props) => {
+const DownloadClients = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [organization, setOrganization] = useState({_id: 'all'});
@@ -45,9 +45,9 @@ const UnloadingEmployments = React.memo((props) => {
         }
     }, [process.browser])
     return (
-        <App cityShow pageName='Выгрузка сотрудников'>
+        <App cityShow pageName='Выгрузка клиентов'>
             <Head>
-                <title>Выгрузка сотрудников</title>
+                <title>Выгрузка клиентов</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
@@ -71,7 +71,7 @@ const UnloadingEmployments = React.memo((props) => {
                     <Button variant='contained' size='small' color='primary' onClick={async () => {
                         if(organization&&organization._id) {
                             showLoad(true)
-                            window.open(await getUnloadingEmployments({
+                            window.open(await downloadClients({
                                 organization: organization._id
                             }), '_blank');
                             showLoad(false)
@@ -85,7 +85,7 @@ const UnloadingEmployments = React.memo((props) => {
     )
 })
 
-UnloadingEmployments.getInitialProps = async function(ctx) {
+DownloadClients.getInitialProps = async function(ctx) {
     await initialApp(ctx)
     if(!['admin'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
@@ -120,4 +120,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UnloadingEmployments);
+export default connect(mapStateToProps, mapDispatchToProps)(DownloadClients);

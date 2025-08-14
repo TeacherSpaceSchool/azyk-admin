@@ -97,13 +97,13 @@ const Plan = React.memo((props) => {
                     >
                         <MenuItem onClick={() => {
                             close()
-                            Router.push('/statistic/load/unloadplanclients')
+                            Router.push('/statistic/uploaddownload/unloadplanclients')
                         }}>
                             Выгрузить
                         </MenuItem>
                         <MenuItem onClick={() => {
                             close()
-                            Router.push('/statistic/load/uploadingplanclients')
+                            Router.push('/statistic/uploaddownload/uploadplanclients')
                         }}>
                             Загрузить
                         </MenuItem>

@@ -10,22 +10,22 @@ import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-import { getUnloadingOrders } from '../../../src/gql/statistic'
+import { downloadAdsOrders } from '../../../src/gql/uploadDownload'
 import { getOrganizations } from '../../../src/gql/organization'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import * as appActions from '../../../redux/actions/app'
 
-const UnloadingOrders = React.memo((props) => {
+const DownloadAdsOrders = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
+    const {isMobileApp, city} = props.app;
     const {profile} = props.user;
     const initialRender = useRef(true);
     let [organizations, setOrganizations] = useState(data.organizations);
     let [date, setDate] = useState(null);
-    let [organization, setOrganization] = useState(profile.organization?{_id: profile.organization}:{_id: 'all'});
-    const {isMobileApp, filter, city} = props.app;
+    let [organization, setOrganization] = useState({_id: profile.organization});
     useEffect(() => {
         if(process.browser) {
             let appBody = document.getElementsByClassName('App-body')
@@ -34,9 +34,8 @@ const UnloadingOrders = React.memo((props) => {
     }, [process.browser])
     useEffect(() => {
         (async () => {
-            if(initialRender.current) {
+            if(initialRender.current)
                 initialRender.current = false;
-            }
             else {
                 showLoad(true)
                 setOrganization(null)
@@ -46,41 +45,34 @@ const UnloadingOrders = React.memo((props) => {
         })()
     }, [city])
     const {showLoad} = props.appActions;
-    const filters = [{name: 'Дата доставки', value: 'Дата доставки'}, {name: 'Дата заказа', value: 'Дата заказа'}]
     return (
-        <App cityShow pageName='Выгрузка заказов' filters={filters}>
+        <App cityShow pageName='Выгрузка акционных заказов'>
             <Head>
-                <title>Выгрузка заказов</title>
+                <title>Выгрузка акционных заказов</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     <div className={classes.row}>
                         {
-                            !profile.organization ?
+                            profile.role==='admin'?
                                 <Autocomplete
                                     className={classes.inputHalf}
                                     options={organizations}
                                     getOptionLabel={option => option.name}
                                     value={organization}
-                                    onChange={(event, newValue) => {
-                                        setOrganization(newValue)
-                                    }}
+                                    onChange={(event, newValue) => setOrganization(newValue)}
                                     noOptionsText='Ничего не найдено'
-                                    renderInput={params => (
-                                        <TextField {...params} label='Организация' fullWidth/>
-                                    )}
+                                    renderInput={params => <TextField {...params} label='Организация' fullWidth />}
                                 />
                                 :
                                 null
                         }
                         <TextField
                             className={classes.inputHalf}
-                            label={filter}
+                            label='Дата доставки'
                             type='date'
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
+                            InputLabelProps={{shrink: true}}
                             value={date}
                             onChange={ event => setDate(event.target.value) }
                         />
@@ -89,10 +81,9 @@ const UnloadingOrders = React.memo((props) => {
                     <Button variant='contained' size='small' color='primary' onClick={async () => {
                         if(organization&&organization._id&&date) {
                             showLoad(true)
-                            window.open(await getUnloadingOrders({
+                            window.open(await downloadAdsOrders({
                                 organization: organization._id,
-                                dateStart: date,
-                                filter
+                                dateStart: date
                             }), '_blank');
                             showLoad(false)
                         }
@@ -105,10 +96,9 @@ const UnloadingOrders = React.memo((props) => {
     )
 })
 
-UnloadingOrders.getInitialProps = async function(ctx) {
+DownloadAdsOrders.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    ctx.store.getState().app.filter = 'Дата доставки'
-    if(!['admin', 'суперорганизация'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin', 'суперорганизация', 'организация'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -117,8 +107,9 @@ UnloadingOrders.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     return {
-        data:
-            await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, getClientGqlSsr(ctx.req)),
+        data: {
+            organizations: await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, getClientGqlSsr(ctx.req))
+        }
     }
 };
 
@@ -136,4 +127,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UnloadingOrders);
+export default connect(mapStateToProps, mapDispatchToProps)(DownloadAdsOrders);

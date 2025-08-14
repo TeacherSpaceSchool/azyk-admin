@@ -11,8 +11,8 @@ import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-import { uploadingClients } from '../../../src/gql/statistic'
 import { getOrganizations } from '../../../src/gql/organization'
+import { uploadPlanClients } from '../../../src/gql/planClient'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
@@ -20,11 +20,12 @@ import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import Confirmation from '../../../components/dialog/Confirmation'
 import {maxFileSize} from '../../../src/lib';
 
-const UploadingClients = React.memo((props) => {
+const UploadPlanClients = React.memo((props) => {
+    const {profile} = props.user;
     const classes = pageListStyle();
     const {data} = props;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
-    let [organization, setOrganization] = useState(null);
+    let [organization, setOrganization] = useState({_id: profile.organization});
     const {city} = props.app;
     const {isMobileApp} = props.app;
     const {showSnackBar} = props.snackbarActions;
@@ -49,43 +50,47 @@ const UploadingClients = React.memo((props) => {
         else showSnackBar('Файл слишком большой')
     })
     return (
-        <App cityShow pageName='Загрузка клиентов 1C'>
+        <App cityShow pageName='Загрузка планов клиентов 1C'>
             <Head>
-                <title>Загрузка клиентов 1C</title>
+                <title>Загрузка планов клиентов 1C</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     <div className={classes.row}>
-                        Формат xlsx: GUID клиента из 1С, название магазина клиента, адрес магазина клиента, категория клиента, ИНН клиента.
+                        Формат xlsx: GUID клиента из 1С, посещение план, месячный план.
                     </div>
                     <div className={classes.row}>
-                        <Autocomplete
-                            className={classes.input}
-                            options={organizations}
-                            getOptionLabel={option => option.name}
-                            value={organization}
-                            onChange={(event, newValue) => {
-                                setOrganization(newValue)
-                            }}
-                            noOptionsText='Ничего не найдено'
-                            renderInput={params => (
-                                <TextField {...params} label='Организация' fullWidth />
-                            )}
-                        />
+                        {
+                            !profile.organization?
+                                <Autocomplete
+                                    className={classes.input}
+                                    options={organizations}
+                                    getOptionLabel={option => option.name}
+                                    value={organization}
+                                    onChange={(event, newValue) => {
+                                        setOrganization(newValue)
+                                    }}
+                                    noOptionsText='Ничего не найдено'
+                                    renderInput={params => (
+                                        <TextField {...params} label='Организация' fullWidth />
+                                    )}
+                                />
+                                :
+                                <><br/><br/></>
+                        }
                         <Button size='small' color='primary' onClick={() => documentRef.current.click()}>
                             {document?document.name:'Прикрепить файл'}
                         </Button>
                     </div>
                     <br/>
                     {
-                        organization&&city&&document?
+                        organization&&organization._id&&document?
                             <Button variant='contained' size='small' color='primary' onClick={() => {
                                 const action = async () => {
-                                    let res = await uploadingClients({
+                                    let res = await uploadPlanClients({
                                         organization: organization._id,
                                         document,
-                                        city
                                     });
                                     if(res==='OK')
                                         showSnackBar('Все данные загруженны')
@@ -112,9 +117,9 @@ const UploadingClients = React.memo((props) => {
     )
 })
 
-UploadingClients.getInitialProps = async function(ctx) {
+UploadPlanClients.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin', 'суперорганизация', 'организация', 'менеджер'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -144,4 +149,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UploadingClients);
+export default connect(mapStateToProps, mapDispatchToProps)(UploadPlanClients);

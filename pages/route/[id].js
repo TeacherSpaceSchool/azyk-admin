@@ -4,7 +4,7 @@ import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import { getOrganizations } from '../../src/gql/organization'
 import { getOrdersForRouting } from '../../src/gql/order'
-import { getRoute, addRoute, buildRoute, listDownload, getUnloadingInvoicesFromRouting, setRoute } from '../../src/gql/route'
+import { getRoute, addRoute, buildRoute, listDownload, downloadInvoicesFromRouting, setRoute } from '../../src/gql/route'
 import { getDistricts } from '../../src/gql/district'
 import { getEcspeditors } from '../../src/gql/employment'
 import { getAutos } from '../../src/gql/auto'
@@ -344,7 +344,7 @@ const Route = React.memo((props) => {
                                                         </div>
                                                         <Button onClick={async () => {
                                                             showLoad(true)
-                                                            window.open(await getUnloadingInvoicesFromRouting({
+                                                            window.open(await downloadInvoicesFromRouting({
                                                                 organization: provider._id,
                                                                 orders: element.orders.map(order=>order._id)
                                                             }), '_blank');

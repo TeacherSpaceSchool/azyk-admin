@@ -11,7 +11,7 @@ import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-import { unloadingIntegrate1C } from '../../../src/gql/integrate1C'
+import { uploadClients } from '../../../src/gql/uploadDownload'
 import { getOrganizations } from '../../../src/gql/organization'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -20,13 +20,18 @@ import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import Confirmation from '../../../components/dialog/Confirmation'
 import {maxFileSize} from '../../../src/lib';
 
-const UnloadingIntegrate1C = React.memo((props) => {
+const UploadClients = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
-    const {isMobileApp, city} = props.app;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    let [organization, setOrganization] = useState(null);
+    const {city} = props.app;
+    const {isMobileApp} = props.app;
+    const {showSnackBar} = props.snackbarActions;
     const initialRender = useRef(true);
     let [organizations, setOrganizations] = useState(data.organizations);
+    let [document, setDocument] = useState(null);
+    let documentRef = useRef(null);
     useEffect(() => {
         (async () => {
             if(initialRender.current) {
@@ -34,29 +39,25 @@ const UnloadingIntegrate1C = React.memo((props) => {
             }
             else {
                 setOrganization(null)
-                setOrganizations([{name: 'AZYK.STORE', _id: 'super'}, ...await getOrganizations({search: '', filter: '', city})])
+                setOrganizations(await getOrganizations({search: '', filter: '', city}))
             }
         })()
     }, [city])
-    let [organization, setOrganization] = useState(null);
-    const {showSnackBar} = props.snackbarActions;
-    let [document, setDocument] = useState(null);
-    let documentRef = useRef(null);
     let handleChangeDocument = ((event) => {
-        if(event.target.files[0].size/1024/1024<maxFileSize) {
+        if(event.target.files[0].size/1024/1024<maxFileSize)
             setDocument(event.target.files[0])
-        } else showSnackBar('Файл слишком большой')
+        else showSnackBar('Файл слишком большой')
     })
     return (
-        <App cityShow pageName='Загрузка GUID клиентов 1С'>
+        <App cityShow pageName='Загрузка клиентов 1C'>
             <Head>
-                <title>Загрузка GUID клиентов 1С</title>
+                <title>Загрузка клиентов 1C</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     <div className={classes.row}>
-                        Формат xlsx: ID клиента, GUID клиента из 1С.
+                        Формат xlsx: GUID клиента из 1С, название магазина клиента, адрес магазина клиента, категория клиента, ИНН клиента.
                     </div>
                     <div className={classes.row}>
                         <Autocomplete
@@ -77,22 +78,26 @@ const UnloadingIntegrate1C = React.memo((props) => {
                         </Button>
                     </div>
                     <br/>
-                    <Button variant='contained' size='small' color='primary' onClick={() => {
-                        if(organization&&document) {
-                            const action = async () => {
-                                let res = await unloadingIntegrate1C({
-                                    organization: organization._id,
-                                    document: document
-                                });
-                                if(res==='OK')
-                                    showSnackBar('Все данные загруженны')
-                            }
-                            setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                            showMiniDialog(true)
-                        }
-                    }}>
-                        Загрузить
-                    </Button>
+                    {
+                        organization&&city&&document?
+                            <Button variant='contained' size='small' color='primary' onClick={() => {
+                                const action = async () => {
+                                    let res = await uploadClients({
+                                        organization: organization._id,
+                                        document,
+                                        city
+                                    });
+                                    if(res==='OK')
+                                        showSnackBar('Все данные загруженны')
+                                }
+                                setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                                showMiniDialog(true)
+                            }}>
+                                Загрузить
+                            </Button>
+                            :
+                            null
+                    }
                 </CardContent>
             </Card>
             <input
@@ -107,7 +112,7 @@ const UnloadingIntegrate1C = React.memo((props) => {
     )
 })
 
-UnloadingIntegrate1C.getInitialProps = async function(ctx) {
+UploadClients.getInitialProps = async function(ctx) {
     await initialApp(ctx)
     if(!['admin'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
@@ -118,10 +123,9 @@ UnloadingIntegrate1C.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     return {
-        data:
-            {
-                organizations: [{name: 'AZYK.STORE', _id: 'super'}, ...await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, getClientGqlSsr(ctx.req))]
-            }
+        data: {
+            ...await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''},  getClientGqlSsr(ctx.req)),
+        }
     }
 };
 
@@ -140,4 +144,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UnloadingIntegrate1C);
+export default connect(mapStateToProps, mapDispatchToProps)(UploadClients);

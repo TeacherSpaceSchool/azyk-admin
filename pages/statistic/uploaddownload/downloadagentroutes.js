@@ -10,32 +10,26 @@ import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-import { getUnloadingAdsOrders } from '../../../src/gql/statistic'
+import { downloadAgentRoutes } from '../../../src/gql/uploadDownload'
 import { getOrganizations } from '../../../src/gql/organization'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import * as appActions from '../../../redux/actions/app'
 
-const UnloadingAdsOrders = React.memo((props) => {
+const DownloadAgentRoutes = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
+    let [organization, setOrganization] = useState({_id: 'all'});
     const {isMobileApp, city} = props.app;
-    const {profile} = props.user;
+    const {showLoad} = props.appActions;
     const initialRender = useRef(true);
     let [organizations, setOrganizations] = useState(data.organizations);
-    let [date, setDate] = useState(null);
-    let [organization, setOrganization] = useState({_id: profile.organization});
-    useEffect(() => {
-        if(process.browser) {
-            let appBody = document.getElementsByClassName('App-body')
-            appBody[0].style.paddingBottom = '0px'
-        }
-    }, [process.browser])
     useEffect(() => {
         (async () => {
-            if(initialRender.current)
+            if(initialRender.current) {
                 initialRender.current = false;
+            }
             else {
                 showLoad(true)
                 setOrganization(null)
@@ -44,46 +38,41 @@ const UnloadingAdsOrders = React.memo((props) => {
             }
         })()
     }, [city])
-    const {showLoad} = props.appActions;
+    useEffect(() => {
+        if(process.browser) {
+            let appBody = document.getElementsByClassName('App-body')
+            appBody[0].style.paddingBottom = '0px'
+        }
+    }, [process.browser])
     return (
-        <App cityShow pageName='Выгрузка акционных заказов'>
+        <App cityShow pageName='Выгрузка маршрутов'>
             <Head>
-                <title>Выгрузка акционных заказов</title>
+                <title>Выгрузка маршрутов</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     <div className={classes.row}>
-                        {
-                            profile.role==='admin'?
-                                <Autocomplete
-                                    className={classes.inputHalf}
-                                    options={organizations}
-                                    getOptionLabel={option => option.name}
-                                    value={organization}
-                                    onChange={(event, newValue) => setOrganization(newValue)}
-                                    noOptionsText='Ничего не найдено'
-                                    renderInput={params => <TextField {...params} label='Организация' fullWidth />}
-                                />
-                                :
-                                null
-                        }
-                        <TextField
-                            className={classes.inputHalf}
-                            label='Дата доставки'
-                            type='date'
-                            InputLabelProps={{shrink: true}}
-                            value={date}
-                            onChange={ event => setDate(event.target.value) }
+                        <Autocomplete
+                            className={classes.input}
+                            options={organizations}
+                            getOptionLabel={option => option.name}
+                            value={organization}
+                            onChange={(event, newValue) => {
+                                setOrganization(newValue)
+                            }}
+                            noOptionsText='Ничего не найдено'
+                            renderInput={params => (
+                                <TextField {...params} label='Организация' fullWidth />
+                            )}
                         />
                     </div>
                     <br/>
                     <Button variant='contained' size='small' color='primary' onClick={async () => {
-                        if(organization&&organization._id&&date) {
+                        if(organization&&organization._id) {
                             showLoad(true)
-                            window.open(await getUnloadingAdsOrders({
-                                organization: organization._id,
-                                dateStart: date
+                            window.open(await downloadAgentRoutes({
+                                organization: organization._id
                             }), '_blank');
                             showLoad(false)
                         }
@@ -96,9 +85,9 @@ const UnloadingAdsOrders = React.memo((props) => {
     )
 })
 
-UnloadingAdsOrders.getInitialProps = async function(ctx) {
+DownloadAgentRoutes.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin', 'суперорганизация', 'организация'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -107,9 +96,13 @@ UnloadingAdsOrders.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     return {
-        data: {
-            organizations: await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, getClientGqlSsr(ctx.req))
-        }
+        data:
+            {
+                organizations: [
+                    {name: 'AZYK.STORE', _id: 'super'},
+                    ...await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, getClientGqlSsr(ctx.req))
+                ]
+            }
     }
 };
 
@@ -127,4 +120,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UnloadingAdsOrders);
+export default connect(mapStateToProps, mapDispatchToProps)(DownloadAgentRoutes);

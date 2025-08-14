@@ -66,7 +66,7 @@ export const getEcspeditorsIntegrate1C = async (variables, client) => {
     }
 }
 
-export const unloadingIntegrate1C = async (variables, client) => {
+export const downloadIntegrate1C = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
         const res = await client
@@ -74,10 +74,10 @@ export const unloadingIntegrate1C = async (variables, client) => {
                 variables,
                 mutation: gql`
                     mutation ($document: Upload!, $organization: ID!) {
-                        unloadingIntegrate1C(document: $document, organization: $organization)
+                        downloadIntegrate1C(document: $document, organization: $organization)
                     }`,
             })
-        return res.data.unloadingIntegrate1C
+        return res.data.downloadIntegrate1C
     } catch(err) {
         console.error(err)
     }

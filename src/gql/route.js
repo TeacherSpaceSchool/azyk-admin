@@ -176,7 +176,7 @@ export const listUnload = async (orders, client) => {
     }
 }
 
-export const getUnloadingInvoicesFromRouting = async (variables, client) => {
+export const downloadInvoicesFromRouting = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
         const res = await client
@@ -184,10 +184,10 @@ export const getUnloadingInvoicesFromRouting = async (variables, client) => {
                 variables,
                 query: gql`
                     query ($organization: ID!, $orders: [ID]!) {
-                        unloadingInvoicesFromRouting(organization: $organization, orders: $orders)
+                        downloadInvoicesFromRouting(organization: $organization, orders: $orders)
                     }`,
             })
-        return res.data.unloadingInvoicesFromRouting
+        return res.data.downloadInvoicesFromRouting
     } catch(err) {
         console.error(err)
     }

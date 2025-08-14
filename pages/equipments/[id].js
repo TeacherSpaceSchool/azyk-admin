@@ -96,7 +96,7 @@ const Equipments = React.memo((props) => {
             >
                 <MenuItem onClick={() => {
                     close()
-                    Router.push('/statistic/load/unloadingequipments')
+                    Router.push('/statistic/uploaddownload/downloadequipments')
                 }}>
                     Выгрузить
                 </MenuItem>

@@ -11,7 +11,7 @@ import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-import { uploadingItems } from '../../../src/gql/statistic'
+import { uploadItems } from '../../../src/gql/uploadDownload'
 import { getOrganizations } from '../../../src/gql/organization'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -20,7 +20,7 @@ import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import Confirmation from '../../../components/dialog/Confirmation'
 import {maxFileSize} from '../../../src/lib';
 
-const UploadingItems = React.memo((props) => {
+const UploadItems = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
@@ -82,7 +82,7 @@ const UploadingItems = React.memo((props) => {
                         city&&organization&&document?
                             <Button variant='contained' size='small' color='primary' onClick={() => {
                                 const action = async () => {
-                                    let res = await uploadingItems({
+                                    let res = await uploadItems({
                                         organization: organization._id,
                                         document,
                                         city
@@ -112,7 +112,7 @@ const UploadingItems = React.memo((props) => {
     )
 })
 
-UploadingItems.getInitialProps = async function(ctx) {
+UploadItems.getInitialProps = async function(ctx) {
     await initialApp(ctx)
     if(!['admin'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
@@ -144,4 +144,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UploadingItems);
+export default connect(mapStateToProps, mapDispatchToProps)(UploadItems);
