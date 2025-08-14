@@ -6,6 +6,23 @@ const Statistic = `
     row {_id data}
 `
 
+export const getOrdersMap = async (variables, client) => {
+    try{
+        client = client? client : new SingletonApolloClient().getClient()
+        const res = await client
+            .query({
+                variables,
+                query: gql`
+                    query ($organization: ID, $date: Date, $online: Boolean, $city: String) {
+                        ordersMap(organization: $organization, date: $date, online: $online, city: $city)
+                    }`,
+            })
+        return res.data.ordersMap
+    } catch(err) {
+        console.error(err)
+    }
+}
+
 export const getAgentMapGeos = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()

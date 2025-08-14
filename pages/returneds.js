@@ -8,7 +8,6 @@ import { connect } from 'react-redux'
 import Router from 'next/router'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
-import ClickNHold from 'react-click-n-hold';
 import Fab from '@material-ui/core/Fab';
 import SettingsIcon from '@material-ui/icons/Settings';
 import AddIcon from '@material-ui/icons/Add';
@@ -102,23 +101,8 @@ const Returneds = React.memo((props) => {
                     </div>
             <div className={classes.page}>
                 {list?list.map((element, idx)=> {
-                        return(
-                        <ClickNHold
-                            style={{background: selected.includes(element._id)?'rgba(255, 179, 0, 0.15)':null}}
-                            time={3}
-                            onClickNHold={() => {
-                                if(profile.role==='admin'&&element.orders[0].status==='отмена')
-                                    if(selected.includes(element._id)) {
-                                        setSelected(selected => selected.filter((i)=>i!==element._id))
-                                    }
-                                    else
-                                        setSelected([...selected, element._id])
-                            }} key={element._id}
-                        >
-                            <CardReturned idx={idx} setSelected={setSelected} selected={selected} list={list} setList={setList} element={element}/>
-                        </ClickNHold>
-                        )}
-                ):null}
+                        return <CardReturned key={element._id} idx={idx} setSelected={setSelected} selected={selected} list={list} setList={setList} element={element}/>
+                }):null}
             </div>
             {selected.length?
                 <Fab onClick={open} color='primary' className={classes.fab}>

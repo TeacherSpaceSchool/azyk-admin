@@ -8,7 +8,6 @@ import { connect } from 'react-redux'
 import Router from 'next/router'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
-import ClickNHold from 'react-click-n-hold';
 import Fab from '@material-ui/core/Fab';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Menu from '@material-ui/core/Menu';
@@ -20,7 +19,8 @@ import * as appActions from '../redux/actions/app'
 import { bindActionCreators } from 'redux'
 import Badge from '@material-ui/core/Badge';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import {unawaited} from '../src/lib';
+import {pdDDMMYYHHMM, unawaited} from '../src/lib';
+import Card from '@material-ui/core/Card';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value: 'обработка'}, {name: 'Акции', value: 'акция'}, {name: 'Без геолокации', value: 'Без геолокации'}, {name: 'Не синхронизированные', value: 'Не синхронизированные'}]
 
@@ -93,48 +93,39 @@ const Orders = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count' onClick={()=>setShowStat(!showStat)}>
-                        {
-                            `Заказов: ${simpleStatistic[0]}`
-                        }
-                        {
-                            showStat?
-                                <>
-                                <br/>
-                                {`Сумма: ${simpleStatistic[1]} сом`}
-                                    <br/>
-                                {`Тоннаж: ${simpleStatistic[2]} кг`}
-                                </>
-                                :
-                                null
-                        }
-                    </div>
-            <div className={classes.page}>
+                Заказов: {simpleStatistic[0]}
+                {
+                    showStat?
+                        <>
+                            <br/>
+                            Сумма: {simpleStatistic[1]} сом
+                            <br/>
+                            Тоннаж: {simpleStatistic[2]} кг
+                        </>
+                        :
+                        null
+                }
+            </div>
+            <div className={classes.page} style={{justifyContent: 'flex-start', padding: 0}}>
                 {
                     searchTimeOut?
                         <CircularProgress style={{position: 'fixed', top: '50vh'}}/>
                         :
-                        list?list.map((element, idx)=> {
-                            return(
-                                <ClickNHold
-                                    key={element._id}
-                                    style={{background: selected.includes(element._id)?'rgba(255, 179, 0, 0.15)':null}}
-                                    time={3}
-                                    onClickNHold={() => {
-                                        if(profile.role==='admin'&&(element.cancelClient||element.cancelForwarder))
-                                            if(selected.includes(element._id)) {
-                                                setSelected(selected => {
-                                                    selected.splice(selected.indexOf(element._id), 1)
-                                                    return [...selected]
-                                                })
-                                            }
-                                            else
-                                                setSelected(selected => [...selected, element._id])
-
-                                    }}
-                                >
-                                    <CardOrder idx={idx} setSelected={setSelected} selected={selected} list={list} setList={setList} element={element}/>
-                                </ClickNHold>
-                            )}):null
+                        <Card className='table'>
+                            {list?list.map((element, idx)=> {
+                                const status =
+                                    element.taken?'принят':element.cancelForwarder||element.cancelClient?'отмена':element.confirmationForwarder&&element.confirmationClient?'выполнен':'обработка'
+                                //return <CardOrder key={element._id} idx={idx} setSelected={setSelected} selected={selected} list={list} setList={setList} element={element}/>
+                                return <div key={element._id} className='tableRow'>
+                                    <div className='tableCell' style={{width: 110}} >
+                                        {pdDDMMYYHHMM(element.createdAt)}
+                                    </div>
+                                    <div className='tableCell' style={{width: 110}}>
+                                        {status}
+                                    </div>
+                                </div>
+                            }):null}
+                        </Card>
                 }
             </div>
             {profile.role==='admin'&&(selected.length||filter==='обработка')?

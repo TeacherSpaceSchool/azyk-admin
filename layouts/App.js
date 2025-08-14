@@ -10,6 +10,7 @@ import * as userActions from '../redux/actions/user'
 import * as appActions from '../redux/actions/app'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import '../scss/app.scss'
+import '../scss/table.scss'
 import '../scss/ticket.scss'
 import 'react-awesome-lightbox/build/style.css';
 import Router from 'next/router'

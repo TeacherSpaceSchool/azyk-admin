@@ -86,7 +86,7 @@ const CardAuto = React.memo((props) => {
                                 let editElement = {_id: element._id}
                                 if(tonnage&&tonnage!=element.tonnage) editElement.tonnage = checkInt(tonnage)
                                 if(number&&number!==element.number) editElement.number = number
-                                if(!element.employment||employment&&employment._id!==element.employment._id) editElement.employment = employment._id
+                                if((employment&&employment._id)!==(element.employment&&element.employment._id)) editElement.employment = employment&&employment._id
                                 const action = async () => await setAuto(editElement)
                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                 showMiniDialog(true)

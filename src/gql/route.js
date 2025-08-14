@@ -1,10 +1,7 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 
-const Route = `
-    _id
-    createdAt
-    deliverys {
+const Delivery = `
         legs
         lengthInMeters
         orders{
@@ -51,7 +48,12 @@ const Route = `
             dateDelivery
         }
         tonnage
-    }
+`
+
+const Route = `
+    _id
+    createdAt
+    deliverys {${Delivery}}
     provider {_id name}
     selectProdusers {_id name}
     selectDistricts {_id name}
@@ -198,7 +200,7 @@ export const buildRoute = async (variables) => {
             variables,
             mutation : gql`
                     mutation ($autoTonnage: Int!, $orders: [ID]!, $provider: ID!, $length: Int) {
-                        buildRoute(autoTonnage: $autoTonnage, orders: $orders, provider: $provider, length: $length) {${Route}}
+                        buildRoute(autoTonnage: $autoTonnage, orders: $orders, provider: $provider, length: $length) {${Delivery}}
                     }`})
         return res.data.buildRoute
     } catch(err) {

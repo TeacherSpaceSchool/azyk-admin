@@ -210,7 +210,7 @@ export const cities = ['Бишкек', 'Баткен', 'Балыкчы', 'Бок
 
 export const checkDate = (date) => {
     const parsed = new Date(date);
-    return Number.isNaN(parsed) ? new Date() : parsed;
+    return Number.isNaN(parsed)||parsed=='Invalid Date' ? new Date() : parsed;
 };
 
 export const handleDateRange = ({type, value, setDateRange,  maxMonthPeriod = 12}) => {
