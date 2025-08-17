@@ -53,7 +53,7 @@ const Warehouse = React.memo((props) => {
             </div>
             <div className={classes.page}>
                 <CardWarehouse list={list} setList={setList} organization={router.query.id}/>
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     if(idx<pagination)
                         return <CardWarehouse idx={idx} key={element._id} organization={router.query.id} list={list} setList={setList} element={element}/>
                 }):null}

@@ -188,7 +188,7 @@ const DiscountClient = React.memo((props) => {
                 </CardContent>
             </Card>
             <div className={classes.listInvoices}>
-                {filteredClients?filteredClients.map((element, idx)=> {
+                {filteredClients?filteredClients.map((element, idx) => {
                     if(idx<pagination) {
                         return (
                             <div key={element._id} className={classes.column1}>

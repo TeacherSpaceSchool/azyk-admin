@@ -9,7 +9,7 @@ const StatisticTable =  React.memo(
     (props) =>{
         const {columns, row, filterHeight/*, type*/} = props;
         const {isMobileApp} = props.app;
-        let data = row.map((row, idx)=>[idx+1, ...row.data])
+        let data = row.map((row, idx) =>[idx+1, ...row.data])
         const muiTheme = useMemo(() => createMuiTheme({
             overrides: {
                 MUIDataTable: {responsiveScroll: {maxHeight: `calc(100vh - (${isMobileApp?56:64}px + 40px + ${isNotEmpty(filterHeight)?filterHeight:99}px + ${isMobileApp?56:64}px + 53px + 8px))`, textOverflow: 'ellipsis', width: '100%', fontSize: 12, overflow: 'auto'}},

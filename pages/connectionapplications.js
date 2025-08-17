@@ -64,7 +64,7 @@ const ConnectionApplications = React.memo((props) => {
                         null
                 }
                 {
-                    list?list.map((element, idx)=> {
+                    list?list.map((element, idx) => {
                             return(
                                 <CardConnectionApplications key={element._id} idx={idx} element={element} list={list} setList={setList}/>
                             )}

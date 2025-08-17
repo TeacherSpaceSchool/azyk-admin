@@ -80,7 +80,7 @@ const CardPlanClient = React.memo((props) => {
                             :
                             process.browser?<Autocomplete
                                 style={{marginBottom: 10}}
-                                onClose={()=>setOpen(false)}
+                                onClose={() =>setOpen(false)}
                                 open={open}
                                 disableOpenOnFocus
                                 className={classes.input}

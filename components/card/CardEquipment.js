@@ -125,7 +125,7 @@ const CardEquipment = React.memo((props) => {
                         <FormControl className={classes.input} error={!model}>
                             <InputLabel>Модель</InputLabel>
                             <Select value={model} onChange={handleModel}>
-                                {models.map((element)=>
+                                {models.map((element) =>
                                     <MenuItem key={element} value={element}>{element}</MenuItem>
                                 )}
                             </Select>
@@ -136,7 +136,7 @@ const CardEquipment = React.memo((props) => {
                     process.browser?
                         <>
                             <Autocomplete
-                                onClose={()=>setOpen(false)}
+                                onClose={() =>setOpen(false)}
                                 open={open}
                                 disableOpenOnFocus
                                 className={classes.input}

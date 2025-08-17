@@ -70,7 +70,7 @@ const Employment = React.memo((props) => {
             <div className='count'>
                 Всего: {formatAmount(count)}
             </div>
-            <div className={classes.page}>
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
                 {list?viewMode===viewModes.card?
                         list.map((element, idx) => <CardEmployment idx={idx} key={element._id} list={list} setList={setList} element={element}/>)
                         :

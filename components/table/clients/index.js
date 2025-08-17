@@ -13,7 +13,7 @@ const Tables =  React.memo(({list, buy, app, user}) =>{
     ]
     return <Table
         columns = {columns}
-        rows = {list?list.map((element, idx)=> <Row key={`row${idx}`} element={element} idx={idx} columns={columns} buy={buy}/>):[]}
+        rows = {list?list.map((element, idx) => <Row key={`row${idx}`} element={element} idx={idx} columns={columns} buy={buy}/>):[]}
     />;
 })
 

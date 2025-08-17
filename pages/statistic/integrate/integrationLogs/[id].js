@@ -49,7 +49,7 @@ const IntegrationLog = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className={classes.page}>
-                {list?list.map((element)=> {
+                {list?list.map((element) => {
                     return(
                         <CardIntegrationLog element={element} key={element._id}/>
                     )}

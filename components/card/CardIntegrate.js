@@ -134,7 +134,7 @@ const CardIntegrate = React.memo((props) => {
                                 value={type}
                                 onChange={handleType}
                             >
-                                {types?types.map((element)=>
+                                {types?types.map((element) =>
                                     <MenuItem key={element} value={element}>{element}</MenuItem>
                                 ):null}
                             </Select>
@@ -238,7 +238,7 @@ const CardIntegrate = React.memo((props) => {
                                 </Button>
                             </>
                             :
-                            option&&guid?<Button onClick={async ()=> {
+                            option&&guid?<Button onClick={async () => {
                                 const action = async () => {
                                     let element = {
                                         guid, organization, [type==='агент'?'agent':type==='товар'?'item':type==='клиент'?'client':'ecspeditor']: option._id

@@ -63,7 +63,7 @@ const SetDiscountClient =  React.memo(
         return (
             <div className={classes.main}>
                 <Autocomplete
-                    onClose={()=>setOpen(false)}
+                    onClose={() =>setOpen(false)}
                     open={open}
                     disableOpenOnFocus
                     className={classes.input}

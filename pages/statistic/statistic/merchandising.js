@@ -113,7 +113,7 @@ const MerchandisingStatistic = React.memo((props) => {
                         <FormControl className={inputClass}>
                             <InputLabel>Тип полок</InputLabel>
                             <Select value={type.value} onChange={handleType}>
-                                {types.map((element)=>
+                                {types.map((element) =>
                                     <MenuItem key={element.value} value={element.value}>{element.name}</MenuItem>
                                 )}
                             </Select>
@@ -157,7 +157,7 @@ const MerchandisingStatistic = React.memo((props) => {
                     }
                 </CardContent>
             </Card>
-            <div className='count' onClick={()=>setShowStat(!showStat)}>
+            <div className='count' onClick={() =>setShowStat(!showStat)}>
                 {
                     statisticMerchandising?
                         !(agent&&agent._id)?

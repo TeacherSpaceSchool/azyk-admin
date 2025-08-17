@@ -86,7 +86,7 @@ const IntegrateOutShoro = React.memo((props) => {
                 <title>Выгрузка интеграции 1С</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className='count' onClick={()=>setShowStat(!showStat)}>
+            <div className='count' onClick={() =>setShowStat(!showStat)}>
                         Выполнено: {formatAmount(simpleStatistic[0])}
                         {
                             showStat?
@@ -101,7 +101,7 @@ const IntegrateOutShoro = React.memo((props) => {
                         }
                     </div>
             <div className={classes.page}>
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     return(
                         <CardIntegrateOutShoro idx={idx} type={type} element={element} list={list} setList={setList} key={element._id}/>
                     )}

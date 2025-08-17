@@ -36,7 +36,7 @@ export const getRepairEquipments = async (variables, client) => {
     }
 }
 
-export const getRepairEquipment = async (_id, client)=> {
+export const getRepairEquipment = async (_id, client) => {
     try {
         client = client? client : new SingletonApolloClient().getClient()
         const res = await client

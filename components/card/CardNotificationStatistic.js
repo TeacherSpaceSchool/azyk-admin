@@ -90,7 +90,7 @@ const NotificationStatistic = React.memo((props) => {
                             />
                             </CardContent>
                         <CardActions>
-                            <Button onClick={async ()=> {
+                            <Button onClick={async () => {
                                 if(text.length && title) {
                                     setTitle('')
                                     setText('')

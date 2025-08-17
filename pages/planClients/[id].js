@@ -110,7 +110,7 @@ const Plan = React.memo((props) => {
                     </Menu>
                 </>:null}
                 {
-                    list?list.map((element, idx)=> {
+                    list?list.map((element, idx) => {
                         return <CardPlanClient
                             key={element._id} list={list} setList={setList} setCount={setCount} organization={data.organization} idx={idx} element={element}
                         />

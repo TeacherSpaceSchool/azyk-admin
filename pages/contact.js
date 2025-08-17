@@ -124,7 +124,7 @@ const Contact = React.memo((props) => {
                                                 className={classes.input}
                                                 onChange={(event) => {setName(event.target.value)}}
                                         />
-                                        {address.map((element, idx)=>
+                                        {address.map((element, idx) =>
                                             <FormControl  key={`address${idx}`} className={classes.input}>
                                                 <InputLabel>Адрес</InputLabel>
                                                 <Input
@@ -150,7 +150,7 @@ const Contact = React.memo((props) => {
                                         </Button>
                                         <br/>
                                         <br/>
-                                        {email.map((element, idx)=>
+                                        {email.map((element, idx) =>
                                             <FormControl  key={`email${idx}`} className={classes.input}>
                                                 <InputLabel>Email</InputLabel>
                                                 <Input
@@ -173,7 +173,7 @@ const Contact = React.memo((props) => {
                                         </Button>
                                         <br/>
                                         <br/>
-                                        {phone.map((element, idx)=>
+                                        {phone.map((element, idx) =>
                                             <FormControl key={`phone${idx}`} className={classes.input}>
                                                 <InputLabel>Телефон</InputLabel>
                                                 <Input
@@ -243,7 +243,7 @@ const Contact = React.memo((props) => {
                                                             Адрес:&nbsp;
                                                         </div>
                                                         <div className={classes.column}>
-                                                            {address.map((element, idx)=>
+                                                            {address.map((element, idx) =>
                                                                 <div key={`address${idx}`} className={classes.value}>
                                                                     {element}
                                                                 </div>

@@ -65,7 +65,7 @@ const Merchandisings = React.memo((props) => {
             </Head>
             <div className={classes.page}>
                 {
-                    list?list.map((element)=> {
+                    list?list.map((element) => {
                             return(
                                 <CardMerchandising key={element._id} templateMerchandising={router.query.id} element={element} />
                             )}

@@ -316,7 +316,7 @@ const Organization = React.memo((props) => {
                                             <div className={classes.row}>
                                                 {
                                                     data.organization&&data.organization.catalog?
-                                                        <Button onClick={()=> {
+                                                        <Button onClick={() => {
                                                             window.open(data.organization.catalog, '_blank');
                                                         }} size='small' color='primary'>
                                                             Открыть каталог
@@ -324,7 +324,7 @@ const Organization = React.memo((props) => {
                                                         :
                                                         null
                                                 }
-                                                <Button onClick={()=> {
+                                                <Button onClick={() => {
                                                     catalogInput.current.click()
                                                 }} size='small' color={catalog?'primary':'secondary'}>
                                                     Загрузить каталог
@@ -404,7 +404,7 @@ const Organization = React.memo((props) => {
                                         onChange={(event) => {setPass(event.target.value)}}
                                         inputProps={{readOnly: profile.role!=='admin',}}
                                     />
-                                    {address.map((element, idx)=>
+                                    {address.map((element, idx) =>
                                         <FormControl  key={`address${idx}`} className={isMobileApp?classes.inputM:classes.inputD}>
                                             <InputLabel>Адрес{idx+1}</InputLabel>
                                             <Input
@@ -427,7 +427,7 @@ const Organization = React.memo((props) => {
                                     }} size='small' color={address[0]?'primary':'secondary'}>
                                         Добавить адрес
                                     </Button>
-                                    {email.map((element, idx)=>
+                                    {email.map((element, idx) =>
                                         <FormControl  key={`email${idx}`} className={isMobileApp?classes.inputM:classes.inputD}>
                                             <InputLabel>Email{idx+1}</InputLabel>
                                             <Input
@@ -453,7 +453,7 @@ const Organization = React.memo((props) => {
                                     }} size='small' color='primary'>
                                         Добавить email
                                     </Button>
-                                    {phone.map((element, idx)=>
+                                    {phone.map((element, idx) =>
                                         <FormControl  key={`phone${idx}`} className={isMobileApp?classes.inputM:classes.inputD}>
                                             <InputLabel>Телефон{idx+1}</InputLabel>
                                             <Input
@@ -620,7 +620,7 @@ const Organization = React.memo((props) => {
                                                 Адрес:&nbsp;
                                             </div>
                                             <div className={classes.column}>
-                                                {address.map((element, idx)=>
+                                                {address.map((element, idx) =>
                                                     <div key={`address${idx}`} className={classes.value}>
                                                         {element}
                                                     </div>
@@ -632,7 +632,7 @@ const Organization = React.memo((props) => {
                                                 Телефон:&nbsp;
                                             </div>
                                             <div className={classes.column}>
-                                                {phone.map((element, idx)=>
+                                                {phone.map((element, idx) =>
                                                     <a href={`tel:${element}`} key={`phone${idx}`} className={classes.value}>
                                                         {element}
                                                     </a>
@@ -644,7 +644,7 @@ const Organization = React.memo((props) => {
                                                 E-mail:&nbsp;
                                             </div>
                                             <div className={classes.column}>
-                                                {email.map((element, idx)=>
+                                                {email.map((element, idx) =>
                                                     <a href={`mailto:${element}`} key={`email${idx}`} className={classes.value}>
                                                         {element}
                                                     </a>

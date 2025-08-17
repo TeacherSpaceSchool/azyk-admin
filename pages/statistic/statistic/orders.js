@@ -118,7 +118,7 @@ const OrderStatistic = React.memo((props) => {
                     }
                 </CardContent>
             </Card>
-            <div className='count' onClick={()=>setShowStat(!showStat)}>
+            <div className='count' onClick={() =>setShowStat(!showStat)}>
                 {
                     statisticOrder?
                         <>

@@ -130,7 +130,7 @@ const AgentRoute = React.memo((props) => {
                             <FormControl error={!organization} className={isMobileApp?classes.inputM:classes.inputDF}>
                                 <InputLabel>Организация</InputLabel>
                                 <Select value={organization&&organization._id} onChange={handleOrganization}>
-                                    {organizations.map((element)=>
+                                    {organizations.map((element) =>
                                         <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                     )}
                                 </Select>
@@ -142,7 +142,7 @@ const AgentRoute = React.memo((props) => {
                             <FormControl error={!district} className={isMobileApp?classes.inputM:classes.inputDF}>
                                 <InputLabel>Район</InputLabel>
                                 <Select value={district&&district._id} onChange={handleDistrict}>
-                                    {districts.map((element)=>
+                                    {districts.map((element) =>
                                         <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                     )}
                                 </Select>
@@ -193,7 +193,7 @@ const AgentRoute = React.memo((props) => {
                             </div>
                             <br/>
                             <div className={classes.listInvoices}>
-                                {filtredClient?filtredClient.map((element, idx)=> {
+                                {filtredClient?filtredClient.map((element, idx) => {
                                     if(idx<pagination && element) {
                                         let selected = clients[dayWeek].includes(element._id)
                                         return (

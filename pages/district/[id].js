@@ -175,7 +175,7 @@ const District = React.memo((props) => {
                             router.query.id==='new'?<FormControl  inputProps={{readOnly: router.query.id!=='new'}} error={!organization} className={isMobileApp?classes.inputM:classes.inputDF}>
                                 <InputLabel>Организация</InputLabel>
                                 <Select value={organization&&organization._id} onChange={handleOrganization}>
-                                    {organizations.map((element)=>
+                                    {organizations.map((element) =>
                                         <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                     )}
                                 </Select>
@@ -207,7 +207,7 @@ const District = React.memo((props) => {
                             <FormControl className={isMobileApp?classes.inputM:classes.inputDF}>
                                 <InputLabel>Агент</InputLabel>
                                 <Select value={agent&&agent._id} onChange={handleAgent}>
-                                    {agents.map((element)=>
+                                    {agents.map((element) =>
                                         <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                     )}
                                 </Select>
@@ -224,7 +224,7 @@ const District = React.memo((props) => {
                             <FormControl className={isMobileApp?classes.inputM:classes.inputDF}>
                                 <InputLabel>Экспедитор</InputLabel>
                                 <Select value={ecspeditor&&ecspeditor._id} onChange={handleEcspeditor}>
-                                    {ecspeditors.map((element)=>
+                                    {ecspeditors.map((element) =>
                                         <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                     )}
                                 </Select>
@@ -241,7 +241,7 @@ const District = React.memo((props) => {
                             <FormControl className={isMobileApp?classes.inputM:classes.inputDF}>
                                 <InputLabel>Склад</InputLabel>
                                 <Select value={warehouse&&warehouse._id} onChange={handleWarehouse}>
-                                    {warehouses.map((element)=>
+                                    {warehouses.map((element) =>
                                         <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                     )}
                                 </Select>
@@ -272,7 +272,7 @@ const District = React.memo((props) => {
                         }
                         <br/>
                         <div className={classes.listInvoices}>
-                            {filtredClient?filtredClient.map((element, idx)=> {
+                            {filtredClient?filtredClient.map((element, idx) => {
                                 if(idx<pagination)
                                     return (
                                         <div key={element._id} style={isMobileApp ? {alignItems: 'baseline'} : {}}

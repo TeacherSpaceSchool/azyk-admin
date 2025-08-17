@@ -47,7 +47,7 @@ const Faqs = React.memo((props) => {
                     Всего: {formatAmount(list.length)}
                 </div>
                 {profile.role==='admin'?<CardFaq list={list} setList={setList}/>:null}
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                         if(idx<pagination)
                             return(
                                 <CardFaq idx={idx} list={list} setList={setList} key={element._id} element={element}/>

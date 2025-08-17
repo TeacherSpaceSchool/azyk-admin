@@ -349,7 +349,7 @@ const CardAds = React.memo((props) => {
                                         </Button>
                                         </>
                                         :
-                                        <Button onClick={async ()=> {
+                                        <Button onClick={async () => {
                                             if(item && count && image && title) {
                                                 const action = async () => {
                                                     const element = {

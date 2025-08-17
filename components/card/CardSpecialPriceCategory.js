@@ -86,7 +86,7 @@ const CardSpecialPriceCategory = React.memo((props) => {
                             </Button>
                             </>
                             :
-                            <Button onClick={async ()=> {
+                            <Button onClick={async () => {
                                 if(price&&item) {
                                     const action = async () => {
                                         let element = {

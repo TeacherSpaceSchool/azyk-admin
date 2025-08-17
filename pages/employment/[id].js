@@ -139,7 +139,7 @@ const Client = React.memo((props) => {
                                         className={classes.input}
                                         onChange={(event) => {setName(event.target.value)}}
                                     />
-                                    {phone?phone.map((element, idx)=>
+                                    {phone?phone.map((element, idx) =>
                                         <FormControl key={`phone${idx}`} className={classes.input}>
                                             <InputLabel color={validPhone(element)?'primary':'secondary'}>Телефон. Формат: +996555780861</InputLabel>
                                             <Input
@@ -173,7 +173,7 @@ const Client = React.memo((props) => {
                                         <FormControl error={!organization} className={classes.input}>
                                             <InputLabel>Организация</InputLabel>
                                             <Select value={organization&&organization._id}onChange={handleOrganization}>
-                                                {organizations.map((element)=>
+                                                {organizations.map((element) =>
                                                     <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                                 )}
                                             </Select>

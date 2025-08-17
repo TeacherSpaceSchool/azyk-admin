@@ -36,7 +36,7 @@ const Organization = React.memo((props) => {
             else {
                 if(searchTimeOut.current)
                     clearTimeout(searchTimeOut.current)
-                searchTimeOut.current = setTimeout(()=>unawaited(getList), 500)
+                searchTimeOut.current = setTimeout(() =>unawaited(getList), 500)
             }
     }, [search])
     //установка pwa
@@ -95,7 +95,7 @@ const Organization = React.memo((props) => {
                     null
             }
             <div className={classes.page}>
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     if(idx<pagination)
                         return(
                             <CardBrand key={element._id} element={element} idx={idx} list={list} setList={setList} type={type}/>

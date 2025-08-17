@@ -101,7 +101,7 @@ const ItemStatistic = React.memo((props) => {
                         <FormControl className={profile.role==='admin'?classes.inputHalf:classes.input}>
                             <InputLabel>Начало дня</InputLabel>
                             <Select value={dayStart.value} onChange={handleDayStart}>
-                                {dayStarts.map((element)=>
+                                {dayStarts.map((element) =>
                                     <MenuItem key={element.value} value={element.value}>{element.name}</MenuItem>
                                 )}
                             </Select>
@@ -132,7 +132,7 @@ const ItemStatistic = React.memo((props) => {
                     }
                 </CardContent>
             </Card>
-            <div className='count' onClick={()=>setShowStat(!showStat)}>
+            <div className='count' onClick={() =>setShowStat(!showStat)}>
                 {
                     statisticItem?
                         <>

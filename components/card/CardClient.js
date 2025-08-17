@@ -74,7 +74,7 @@ const CardOrganization = React.memo((props) => {
                                         Телефон:&nbsp;
                                     </div>
                                     <div>
-                                        {element.phone.map((phone, idx)=>
+                                        {element.phone.map((phone, idx) =>
                                             idx<4?
                                                 <div key={`phone${idx}`} className={classes.value}>
                                                     {phone}
@@ -103,7 +103,7 @@ const CardOrganization = React.memo((props) => {
                                     Адрес:&nbsp;
                                 </div>
                                 <div>
-                                    {element.address.map((addres, idx)=>
+                                    {element.address.map((addres, idx) =>
                                         idx<4?
                                             <div style={{color: addres[1]?'rgba(0, 0, 0, 0.87)':'red'}} key={`addres${idx}`} className={classes.value}>
                                                 {getClientTitle({address: [addres]})}

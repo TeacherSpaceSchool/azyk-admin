@@ -51,7 +51,7 @@ const Geo =  React.memo(
                                 <Map onLoad={() => {setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48} defaultState={{ center: ['42.8700000', '74.5900000'], zoom: 12 }}
                                      state={{ center: geo, zoom: 18 }}>
                                     <TrafficControl options={{ float: 'right' }} />
-                                    {clients.map((client, idx)=> {
+                                    {clients.map((client, idx) => {
                                             if(client.user.status==='active'&&client.address[0]&&client.address[0][1])
                                                 return <Placemark
                                                     onClick={() => {
@@ -83,7 +83,7 @@ const Geo =  React.memo(
                             <div style={{display: load?'none':'block'}}>
                                 <Map onLoad={() => {setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48} defaultState={{ center: ['42.8700000', '74.5900000'], zoom: 12 }}>
                                     <TrafficControl options={{ float: 'right' }} />
-                                    {clients.map((client, idx)=> {
+                                    {clients.map((client, idx) => {
                                         if(client.user.status==='active'&&client.address[0]&&client.address[0][1]) return <Placemark
                                             onClick={() => {
                                                 if(['агент', 'суперагент'].includes(profile.role)) {
@@ -127,7 +127,7 @@ const Geo =  React.memo(
                         </Button>
                     </center>
                 </div>
-                <Fab color={follow?'primary':'secondary'} className={classes.fabGeo} onClick={()=>setFollow(!follow)}>
+                <Fab color={follow?'primary':'secondary'} className={classes.fabGeo} onClick={() =>setFollow(!follow)}>
                     <GpsFixed/>
                 </Fab>
             </YMaps>

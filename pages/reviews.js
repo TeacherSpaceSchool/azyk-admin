@@ -58,7 +58,7 @@ const Reviews = React.memo((props) => {
                         null
                 }
                 {
-                    list?list.map((element, idx)=> {
+                    list?list.map((element, idx) => {
                             return(
                                 <CardReviews key={element._id} idx={idx} element={element} organizations={data.organizations} list={list} setList={setList}/>
                             )}

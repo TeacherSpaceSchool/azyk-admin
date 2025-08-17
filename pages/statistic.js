@@ -350,7 +350,7 @@ const Statistic = React.memo((props) => {
                                 <h3>Администрирование</h3>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails className={classes.page} >
-                                {showList.administration.map((element, idx)=>
+                                {showList.administration.map((element, idx) =>
                                     <Link key={`tool${idx}`} href={element.link}>
                                         <a>
                                             <Card className={isMobileApp?classes.cardM:classes.cardD}>
@@ -382,7 +382,7 @@ const Statistic = React.memo((props) => {
                                 <h3>Выгрузка/Загрузка</h3>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails className={classes.page}>
-                                {showList.uploaddownload.map((element, idx)=>
+                                {showList.uploaddownload.map((element, idx) =>
                                     <Link key={`unload${idx}`} href={element.link}>
                                         <a>
                                             <Card className={isMobileApp?classes.cardM:classes.cardD}>
@@ -414,7 +414,7 @@ const Statistic = React.memo((props) => {
                                 <h3>Инструменты</h3>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails className={classes.page} >
-                                {showList.tools.map((element, idx)=>
+                                {showList.tools.map((element, idx) =>
                                     <Link key={`tool${idx}`} href={element.link}>
                                         <a>
                                             <Card className={isMobileApp?classes.cardM:classes.cardD}>
@@ -446,7 +446,7 @@ const Statistic = React.memo((props) => {
                                 <h3>Интеграция</h3>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails className={classes.page} >
-                                {showList.integrate.map((element, idx)=>
+                                {showList.integrate.map((element, idx) =>
                                     <Link key={`integrate${idx}`} href={element.link}>
                                         <a>
                                             <Card className={isMobileApp?classes.cardM:classes.cardD}>
@@ -478,7 +478,7 @@ const Statistic = React.memo((props) => {
                                 <h3>Статистика</h3>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails className={classes.page} >
-                                {showList.statistic.map((element, idx)=>
+                                {showList.statistic.map((element, idx) =>
                                     <Link key={`stat${idx}`} href={element.link}>
                                         <a>
                                             <Card className={isMobileApp?classes.cardM:classes.cardD}>

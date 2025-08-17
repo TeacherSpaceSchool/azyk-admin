@@ -134,7 +134,7 @@ const BuyBasket =  React.memo(
                         <FormControl style={{width: width}} className={isMobileApp?classes.inputM:classes.inputD}>
                             <InputLabel>Способ оплаты</InputLabel>
                             <Select value={paymentMethod} onChange={handlePaymentMethod}>
-                                {paymentMethods.map((element)=>
+                                {paymentMethods.map((element) =>
                                     <MenuItem key={element} value={element} >{element}</MenuItem>
                                 )}
                             </Select>

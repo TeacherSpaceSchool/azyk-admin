@@ -70,7 +70,7 @@ const Integrate = React.memo((props) => {
             <div className={classes.page}>
                 {
                     simpleStatistic?
-                        <div className='count' onClick={()=>setShowStat(!showStat)}>
+                        <div className='count' onClick={() =>setShowStat(!showStat)}>
                             Всего: {formatAmount(simpleStatistic[0])}
                             {
                                 showStat?
@@ -101,7 +101,7 @@ const Integrate = React.memo((props) => {
                 }
                 <CardIntegrate setSimpleStatistic={setSimpleStatistic} organization={router.query.id} list={list} setList={setList}/>
                 {
-                    list?list.map((element, idx)=> {
+                    list?list.map((element, idx) => {
 
                         return(
                             <CardIntegrate setSimpleStatistic={setSimpleStatistic} key={element._id} idx={idx} element={element} organization={router.query.id} list={list} setList={setList}/>

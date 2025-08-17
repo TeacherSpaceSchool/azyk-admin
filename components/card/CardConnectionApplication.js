@@ -140,7 +140,7 @@ const CardConnectionApplication = React.memo((props) => {
                         :
                         !element&&!profile.role?
                             <CardActions>
-                                <Button onClick={async ()=> {
+                                <Button onClick={async () => {
                                     if(name&&phone) {
                                         const action = async () => {
                                             const res = await addConnectionApplication({name, phone, address, whereKnow})

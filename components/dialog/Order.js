@@ -266,7 +266,7 @@ const Order =  React.memo(
                     <div className={classes.nameField}>Акции:&nbsp;</div>
                     <div style={{cursor: 'pointer', ...(!adss[0]?{color: 'red'}:{color: '#ffb300'})}}>
                         {adss.length?
-                            adss.map((ads, idx)=>
+                            adss.map((ads, idx) =>
                                 idx<4? <div key={`ads${idx}`} className={classes.value}>
                                         {ads.title}
                                     </div>

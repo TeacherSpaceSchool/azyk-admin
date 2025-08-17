@@ -64,7 +64,7 @@ const Routes = React.memo((props) => {
                 Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     return(
                         <CardRoute idx={idx} list={list} setList={setList} key={element._id} element={element}/>
                     )}

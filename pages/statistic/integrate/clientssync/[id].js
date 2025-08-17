@@ -69,7 +69,7 @@ const ClientsSync = React.memo((props) => {
                     Интеграций: {formatAmount(simpleStatistic)}
                 </div>
                 {
-                    list?list.map((element  )=> {
+                    list?list.map((element  ) => {
                             return(
                                 <CardClient element={element}/>
                             )}

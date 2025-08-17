@@ -17,7 +17,7 @@ import SyncOff from '@material-ui/icons/SyncDisabled';
 
 const CardReturned = React.memo((props) => {
     const classes = cardReturnedStyle();
-    const {element, setList, setSelected, selected, idx} = props;
+    const {element, setList, idx} = props;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {profile, authenticated} = props.user;
     const {isMobileApp} = props.app;
@@ -39,18 +39,8 @@ const CardReturned = React.memo((props) => {
                     null
             }
             <CardActionArea onClick={() => {
-                if(!selected.length) {
-                    setMiniDialog('Возврат', <Returned idx={idx} element={element} setList={setList}/>);
-                    showMiniDialog(true)
-                }
-                else {
-                    if(element.cancelForwarder) {
-                        if(selected.includes(element._id))
-                            setSelected(selected => selected.filter((i) => i !== element._id))
-                        else
-                            setSelected(selected => [...selected, element._id])
-                    }
-                }
+                setMiniDialog('Возврат', <Returned idx={idx} element={element} setList={setList}/>);
+                showMiniDialog(true)
             }}>
                 <CardContent className={classes.column}>
                     <div className={classes.row}>
@@ -147,7 +137,7 @@ const CardReturned = React.memo((props) => {
             </CardActionArea>
             <CardActions>
                 {
-                    element.del!=='deleted'&&status==='отмена'&&profile.role==='admin'&&!selected.length ?
+                    element.del!=='deleted'&&status==='отмена'&&profile.role==='admin' ?
                         <Button onClick={async () => {
                             const action = async () => {
                                 await deleteReturneds([element._id])

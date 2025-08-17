@@ -86,7 +86,7 @@ const CardSpecialPriceClient = React.memo((props) => {
                             </Button>
                             </>
                             :
-                            <Button onClick={()=> {
+                            <Button onClick={() => {
                                 if(price&&item) {
                                     const action = async () => {
                                         let element = {

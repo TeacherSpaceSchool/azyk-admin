@@ -12,7 +12,7 @@ const Tables =  React.memo(({list, app}) =>{
     ]
     return <Table
         columns = {columns}
-        rows = {list?list.map((element, idx)=> <Row key={`row${idx}`} element={element} idx={idx} columns={columns}/>):[]}
+        rows = {list?list.map((element, idx) => <Row key={`row${idx}`} element={element} idx={idx} columns={columns}/>):[]}
     />;
 })
 

@@ -66,10 +66,10 @@ const DownloadInvoices = React.memo((props) => {
                     </div>
                     <br/>
                     <div className={classes.row}>
-                        <Button style={{width: 50, margin: 5}} variant='contained' onClick={()=>setAll(true)} size='small' color={all?'primary':''}>
+                        <Button style={{width: 50, margin: 5}} variant='contained' onClick={() =>setAll(true)} size='small' color={all?'primary':''}>
                             Все
                         </Button>
-                        <Button style={{width: 50, margin: 5}} variant='contained' onClick={()=>setAll(false)} size='small' color={!all?'primary':''}>
+                        <Button style={{width: 50, margin: 5}} variant='contained' onClick={() =>setAll(false)} size='small' color={!all?'primary':''}>
                             Свои
                         </Button>
                     </div>

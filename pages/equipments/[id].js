@@ -73,7 +73,7 @@ const Equipments = React.memo((props) => {
             </div>
             <div className={classes.page}>
                 <CardEquipment organization={data.organization} list={list} setList={setList} agents={data.agents}/>
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     return <CardEquipment organization={data.organization} idx={idx} key={element._id} list={list} setList={setList} element={element} agents={data.agents}/>
                 }):null}
             </div>

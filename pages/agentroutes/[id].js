@@ -51,7 +51,7 @@ const AgentRoutes = React.memo((props) => {
                 Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     if(idx<pagination)
                         return <CardAgentRoute idx={idx} list={list} setList={setList} key={element._id} element={element}/>
                 }):null}

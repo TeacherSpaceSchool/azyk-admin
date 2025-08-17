@@ -114,7 +114,7 @@ const CardStock = React.memo((props) => {
                                 </Button>
                             </>
                             :
-                            <Button onClick={async ()=> {
+                            <Button onClick={async () => {
                                 if(organization&&item) {
                                     const action = async () => {
                                         let element = {

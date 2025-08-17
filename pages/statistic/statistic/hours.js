@@ -114,7 +114,7 @@ const HoursStatistic = React.memo((props) => {
             </Card>
             {
                 statisticHours?
-                    <div className='count' onClick={()=>setShowStat(!showStat)}>
+                    <div className='count' onClick={() =>setShowStat(!showStat)}>
                         <div className={classes.rowStatic}>Выручка: {statisticHours.row[0].data[0]} сом</div>
                         {
                             showStat?

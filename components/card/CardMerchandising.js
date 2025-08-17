@@ -43,7 +43,7 @@ const CardMerchandising = React.memo((props) => {
                                 <div className={classes.nameField}>Оценка ФХО:&nbsp;</div>
                                 <div style={{color: 'black'}}>
                                     {
-                                        element.fhos.map((fho, idx)=><div key={`fho${idx}${element._id}`} className={classes.value}>{fho.state}</div>)
+                                        element.fhos.map((fho, idx) =><div key={`fho${idx}${element._id}`} className={classes.value}>{fho.state}</div>)
                                     }
                                 </div>
                             </div>

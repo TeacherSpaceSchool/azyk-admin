@@ -212,7 +212,7 @@ const LogistiOorder = React.memo((props) => {
                         />
                     </div>
                     <div className={classes.listInvoices}>
-                        {orders?orders.map((element, idx)=> {
+                        {orders?orders.map((element, idx) => {
                             if(idx<pagination)
                                 return (
                                     <div key={element._id} style={isMobileApp ? {alignItems: 'baseline'} : {}}
@@ -295,7 +295,7 @@ const LogistiOorder = React.memo((props) => {
                     close()
                 }}>Отменить выбор</MenuItem>
             </Menu>
-            <div className='count' onClick={()=>setShowStat(!showStat)}>
+            <div className='count' onClick={() =>setShowStat(!showStat)}>
                 {
                     selectedOrders?
                         <>

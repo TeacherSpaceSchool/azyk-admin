@@ -69,7 +69,7 @@ const AgentMapGeoStatistic = React.memo((props) => {
                                 <Map onLoad={() => {setLoad(false)}} height={window.innerHeight-64} width={isMobileApp?window.innerWidth:window.innerWidth-300}
                                          state={{ center: index?agentMapGeos[index][1].split(', '):[42.8700000, 74.5900000], zoom: index?15:12 }}
                                     >
-                                    {agentMapGeos.map((address, idx)=> {
+                                    {agentMapGeos.map((address, idx) => {
                                         if(!index||index===idx||(index-1)===idx)
                                             return <Placemark
                                                 onClick={() => {
@@ -119,7 +119,7 @@ const AgentMapGeoStatistic = React.memo((props) => {
                 <div className='count'>
                     Заказов: {formatAmount(agentMapGeos.length/2)}
                 </div>
-                <Fab color={isNotEmpty(index)?'secondary':'primary'} className={classes.fab} onClick={()=> {
+                <Fab color={isNotEmpty(index)?'secondary':'primary'} className={classes.fab} onClick={() => {
                     if(isNotEmpty(index)) {
                         setIndex(null)
                     }

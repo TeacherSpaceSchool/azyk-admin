@@ -109,7 +109,7 @@ const CardBlog = React.memo((props) => {
                                 </Button>
                                 </>
                                 :
-                                <Button onClick={async ()=> {
+                                <Button onClick={async () => {
                                     if(image && text && title) {
                                         setImage(null)
                                         setPreview('/static/add.png')

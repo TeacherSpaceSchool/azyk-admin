@@ -90,7 +90,7 @@ const Orders = React.memo((props) => {
                 <title>Заказы</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className='count' onClick={()=>setShowStat(!showStat)}>
+            <div className='count' onClick={() =>setShowStat(!showStat)}>
                 Заказов: {formatAmount(simpleStatistic[0])}
                 {
                     showStat?
@@ -110,7 +110,7 @@ const Orders = React.memo((props) => {
                         <CircularProgress style={{position: 'fixed', top: '50vh'}}/>
                         :
                         list?viewMode===viewModes.card?
-                            list.map((element, idx)=> <CardOrder key={element._id} idx={idx} list={list} setList={setList} element={element}/>)
+                            list.map((element, idx) => <CardOrder key={element._id} idx={idx} list={list} setList={setList} element={element}/>)
                             :
                             <Table list={list} setList={setList}/>
                         :null

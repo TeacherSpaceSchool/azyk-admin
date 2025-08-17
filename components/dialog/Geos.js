@@ -26,7 +26,7 @@ const Geos =  React.memo(
                                  state={{ center: geos[0].geo.split(', '), zoom: 12 }}
                             >
                                 {
-                                    geos.map((geo, idx)=>
+                                    geos.map((geo, idx) =>
                                         <Placemark
                                             key={`${geo.name}${geo.geo}${idx}`}
                                             options={{iconColor: '#ffb300'}}

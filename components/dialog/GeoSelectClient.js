@@ -157,7 +157,7 @@ const GeoSelectClient =  React.memo(
                         </Button>
                     </center>
                 </div>
-                <Fab color={show?'primary':'secondary'} className={classes.fabGeo} onClick={()=>setShow(!show)}>
+                <Fab color={show?'primary':'secondary'} className={classes.fabGeo} onClick={() =>setShow(!show)}>
                     {show?<Visibility/>:<VisibilityOff/>}
                 </Fab>
             </YMaps>

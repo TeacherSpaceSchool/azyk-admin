@@ -44,7 +44,7 @@ const Files = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className={classes.page}>
-                {data.files?data.files.map((element, idx)=> {
+                {data.files?data.files.map((element, idx) => {
                     if(idx<pagination)
                         return(
                             <CardFile key={element._id} element={element}/>

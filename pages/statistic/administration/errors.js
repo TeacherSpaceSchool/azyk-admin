@@ -30,7 +30,7 @@ const Errors = React.memo((props) => {
                 <div className='count'>
                     Всего: {formatAmount(list.length)}
                 </div>
-                {list?list.map((element)=>
+                {list?list.map((element) =>
                     <CardError element={element}/>
                 ):null}
             </div>

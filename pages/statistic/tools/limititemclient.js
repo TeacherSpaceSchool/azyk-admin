@@ -142,7 +142,7 @@ const DiscountClient = React.memo((props) => {
                         {
                             organization?
                                 <Autocomplete
-                                    onClose={()=>setOpen(false)}
+                                    onClose={() =>setOpen(false)}
                                     open={open}
                                     disableOpenOnFocus
                                     className={inputClass}
@@ -184,7 +184,7 @@ const DiscountClient = React.memo((props) => {
                             client={client}
                             setItems={setItems}
                         />
-                        {limitItemClients?limitItemClients.map((element, idx)=> {
+                        {limitItemClients?limitItemClients.map((element, idx) => {
                             return (
                                 <CardLimitItemClient
                                     idx={idx} key={element._id}

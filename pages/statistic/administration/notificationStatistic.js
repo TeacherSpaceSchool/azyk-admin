@@ -42,7 +42,7 @@ const NotificationStatistic = React.memo((props) => {
             </div>
             <div className={classes.page}>
                 <CardNotificationStatistic list={list} setList={setList}/>
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                         if(idx<pagination)
                             return(
                                 <CardNotificationStatistic key={element._id} list={list} setList={setList} element={element}/>

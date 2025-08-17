@@ -148,7 +148,7 @@ const SubBrand = React.memo((props) => {
                                     router.query.id==='new'?<FormControl  inputProps={{readOnly: router.query.id!=='new'}} error={!organization} className={isMobileApp?classes.inputM:classes.inputDF}>
                                         <InputLabel>Организация</InputLabel>
                                         <Select value={organization&&organization._id} onChange={handleOrganization}>
-                                            {organizations.map((element)=>
+                                            {organizations.map((element) =>
                                                 <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                             )}
                                         </Select>

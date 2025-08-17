@@ -65,7 +65,7 @@ const CardWarehouse = React.memo((props) => {
                                 </Button>
                             </>
                             :
-                            <Button onClick={async ()=> {
+                            <Button onClick={async () => {
                                 if(name) {
                                     const action = async () => {
                                         const element = {name, organization, guid}

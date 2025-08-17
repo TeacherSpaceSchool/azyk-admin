@@ -27,7 +27,7 @@ const OrderAdss =  React.memo(
         const {showFullDialog} = props.mini_dialogActions;
         return (
             <div className={classes.main}>
-                {allAdss?allAdss.map((element)=> {
+                {allAdss?allAdss.map((element) => {
                     let index=null;
                     for(let i=0; i<selectedAdss.length; i++) {
                         if(selectedAdss[i]._id===element._id)

@@ -145,7 +145,7 @@ const ClientStatistic = React.memo((props) => {
                     }
                 </CardContent>
             </Card>
-            <div className='count' onClick={()=>setShowStat(!showStat)}>
+            <div className='count' onClick={() =>setShowStat(!showStat)}>
                 {
                     statisticClients?
                         <>

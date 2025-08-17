@@ -57,7 +57,7 @@ const Unsyncorder = React.memo((props) => {
             {
                 statisticUnsyncOrder&&statisticUnsyncOrder.row.length?
                     <>
-                        <div className='count' onClick={()=>setShowStat(!showStat)}>
+                        <div className='count' onClick={() =>setShowStat(!showStat)}>
                             {formatAmount(statisticUnsyncOrder.row.length)}
                         </div>
                         <Fab onClick={() => {

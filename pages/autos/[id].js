@@ -55,7 +55,7 @@ const Autos = React.memo((props) => {
             </div>
             <div className={classes.page}>
                 <CardAuto organization={router.query.id} employments={data.ecspeditors} list={list} setList={setList}/>
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     if(idx<pagination)
                         return(
                             <CardAuto organization={router.query.id} employments={data.ecspeditors} idx={idx} key={element._id} list={list} setList={setList} element={element}/>

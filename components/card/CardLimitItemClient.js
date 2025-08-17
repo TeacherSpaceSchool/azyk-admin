@@ -80,7 +80,7 @@ const CardLimitItemClient = React.memo((props) => {
                             </Button>
                             </>
                             :
-                            <Button onClick={async ()=> {
+                            <Button onClick={async () => {
                                 if(limit&&item) {
                                     const action = async () => {
                                         let element = {

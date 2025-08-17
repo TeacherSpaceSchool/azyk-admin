@@ -91,7 +91,7 @@ const CardOutXMLAds = React.memo((props) => {
                                 </Button>
                                 </>
                                 :
-                                <Button onClick={()=> {
+                                <Button onClick={() => {
                                     if(district && guid) {
                                         const action = async () => {
                                             const res = await addOutXMLAdsShoro({organization, guid, district: district._id})

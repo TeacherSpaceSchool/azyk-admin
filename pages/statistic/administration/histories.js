@@ -59,7 +59,7 @@ const History = React.memo((props) => {
                 <div className='count'>
                     Всего: {formatAmount(list.length)}
                 </div>
-                {list.map((element)=>
+                {list.map((element) =>
                     <CardHistory key={element._id} element={element}/>
                 )}
             </div>

@@ -51,7 +51,7 @@ const Ads = React.memo((props) => {
                     Всего: {formatAmount(list.length)}
                 </div>
                 {['суперорганизация', 'организация', 'admin'].includes(profile.role)?<CardAds edit items={data.brands} organization={router.query.id} list={list} setList={setList}/>:null}
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     if(idx<pagination)
                         return(
                             <CardAds edit idx={idx}  items={data.brands} organization={router.query.id} list={list} setList={setList} key={element._id} element={element}/>

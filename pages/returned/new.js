@@ -162,7 +162,7 @@ const Catalog = React.memo((props) => {
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     <Autocomplete
-                        onClose={()=>setOpen(false)}
+                        onClose={() =>setOpen(false)}
                         open={open}
                         disableOpenOnFocus
                         className={classes.input}

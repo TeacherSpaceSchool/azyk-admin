@@ -201,7 +201,7 @@ const Merchandising = React.memo((props) => {
                                         value={type}
                                         onChange={handleType}
                                     >
-                                        {types?types.map((element)=>
+                                        {types?types.map((element) =>
                                             <MenuItem key={element} value={element}>{element}</MenuItem>
                                         ):null}
                                     </Select>
@@ -226,7 +226,7 @@ const Merchandising = React.memo((props) => {
                             {router.query.id==='new'&&profile.role!=='client'?
                                 <>
                                 <Autocomplete
-                                    onClose={()=>setOpen(false)}
+                                    onClose={() =>setOpen(false)}
                                     open={open}
                                     disableOpenOnFocus
                                     className={classes.input}
@@ -498,7 +498,7 @@ const Merchandising = React.memo((props) => {
                                     <Slider
                                         className={classes.slider1}
                                         value={fho.filling}
-                                        getAriaValueText={()=>`${fho.filling}%`}
+                                        getAriaValueText={() =>`${fho.filling}%`}
                                         step={25}
                                         onChange={(event, newValue) => {
                                             if(router.query.id==='new') {

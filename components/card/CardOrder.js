@@ -133,7 +133,7 @@ const CardOrder = React.memo((props) => {
                             <div className={classes.row}>
                                 <div className={classes.nameField}>Акции:&nbsp;</div>
                                 <div>
-                                    {element.adss.map((ads, idx)=>
+                                    {element.adss.map((ads, idx) =>
                                         idx<4?
                                             <div key={`ads${idx}`} className={classes.value}>
                                                 {ads.title}

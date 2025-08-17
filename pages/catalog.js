@@ -288,7 +288,7 @@ const Catalog = React.memo((props) => {
                                 />
                                 :
                                 <Autocomplete
-                                    onClose={()=>setOpen(false)}
+                                    onClose={() =>setOpen(false)}
                                     open={open}
                                     disableOpenOnFocus
                                     className={classes.input}

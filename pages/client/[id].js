@@ -72,7 +72,7 @@ const Client = React.memo((props) => {
     };
 
     //привести к геолокации
-    if(data.client&&data.client.address.length&&!Array.isArray(data.client.address[0])) data.client.address.map((addres)=>[addres])
+    if(data.client&&data.client.address.length&&!Array.isArray(data.client.address[0])) data.client.address.map((addres) =>[addres])
 
     let [address, setAddress] = useState(data.client?data.client.address:[['']]);
     let [city, setCity] = useState(data.client?data.client.city:profile.city?profile.city:'Бишкек');
@@ -184,7 +184,7 @@ const Client = React.memo((props) => {
                                     <FormControl className={classes.input}>
                                         <InputLabel>Категория</InputLabel>
                                         <Select value={category} onChange={handleCategory}>
-                                            {categorys.map((element)=>
+                                            {categorys.map((element) =>
                                                 <MenuItem key={element} value={element} ola={element}>{element}</MenuItem>
                                             )}
                                         </Select>
@@ -225,13 +225,13 @@ const Client = React.memo((props) => {
                                             <FormControl className={classes.input}>
                                                 <InputLabel>Город</InputLabel>
                                                 <Select value={city} onChange={handleCity}>
-                                                    {cities.map((element)=>
+                                                    {cities.map((element) =>
                                                         <MenuItem key={element} value={element} ola={element}>{element}</MenuItem>
                                                     )}
                                                 </Select>
                                             </FormControl>
                                     }
-                                    {address?address.map((element, idx)=>
+                                    {address?address.map((element, idx) =>
                                             <div key={`address${idx}`}>
                                                 <TextField
                                                     label='Название магазина'
@@ -261,7 +261,7 @@ const Client = React.memo((props) => {
                                             </div>
                                         ):
                                         <br/>}
-                                    {phone?phone.map((element, idx)=>
+                                    {phone?phone.map((element, idx) =>
                                         <div key={`phone${idx}`}>
                                             <FormControl className={classes.input}>
                                                 <InputLabel color={validPhone(element)?'primary':'secondary'}>Телефон. Формат: +996555780861</InputLabel>
@@ -431,7 +431,7 @@ const Client = React.memo((props) => {
                                             Адрес:&nbsp;
                                         </div>
                                         <div className={classes.column}>
-                                            {address?address.map((element, idx)=>
+                                            {address?address.map((element, idx) =>
                                                 <div key={`address${idx}`}>
                                                 <div className={classes.value}>
                                                     {`${element[2]?`${element[2]}, `:''}${element[0]}`}
@@ -475,7 +475,7 @@ const Client = React.memo((props) => {
                                         </div>
                                         <div className={classes.value}>
                                             <div className={classes.column}>
-                                                {phone?phone.map((element, idx)=>
+                                                {phone?phone.map((element, idx) =>
                                                     <div className={classes.value} key={`phone${idx}`}>
                                                         {element}
                                                     </div>

@@ -145,7 +145,7 @@ const AddOrder =  React.memo(
                         </>
                         :
                         <div className={classes.listInvoices}>
-                            {orders?orders.map((element, idx)=> {
+                            {orders?orders.map((element, idx) => {
                                 if(idx<pagination)
                                     return(
                                         <div key={element._id} style={isMobileApp ? {alignItems: 'baseline'} : {}}

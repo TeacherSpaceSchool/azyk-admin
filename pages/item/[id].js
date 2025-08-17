@@ -263,7 +263,7 @@ const Item = React.memo((props) => {
                                             router.query.id==='new'?<FormControl error={!organization} className={isMobileApp?classes.inputM:classes.inputD}>
                                                 <InputLabel>Организация</InputLabel>
                                                 <Select value={organization&&organization._id} onChange={handleOrganization}>
-                                                    {data.organizations.map((element)=>
+                                                    {data.organizations.map((element) =>
                                                         <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                                     )}
                                                 </Select>
@@ -279,7 +279,7 @@ const Item = React.memo((props) => {
                                         <FormControl className={isMobileApp?classes.inputM:classes.inputD}>
                                             <InputLabel>Подбренд</InputLabel>
                                             <Select value={subBrand&&subBrand._id} onChange={handleSubBrand}>
-                                                {subBrands.map((element)=>
+                                                {subBrands.map((element) =>
                                                     <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                                 )}
                                             </Select>

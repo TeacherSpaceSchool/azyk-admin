@@ -39,7 +39,7 @@ const CardEmployment = React.memo((props) => {
                                                 Телефон:&nbsp;
                                             </div>
                                             <div>
-                                                {element.phone.map((phone, idx)=>
+                                                {element.phone.map((phone, idx) =>
                                                     idx<4?
                                                         <div key={`phone${idx}`} className={classes.value}>
                                                             {phone}

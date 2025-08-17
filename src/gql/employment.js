@@ -45,7 +45,7 @@ export const getEmploymentsCount = async (variables, client) => {
     }
 }
 
-export const getEmployment = async (_id, client)=> {
+export const getEmployment = async (_id, client) => {
     try {
         client = client? client : new SingletonApolloClient().getClient()
         const res = await client

@@ -55,12 +55,12 @@ const MyDrawer = React.memo((props) => {
         <Drawer
             disableSwipeToOpen = {true}
             disableBackdropTransition = {true}
-            onOpen={()=>showDrawer(true)}
+            onOpen={() =>showDrawer(true)}
             disableDiscovery
             variant= {variant}
             className={classes.drawer}
             open={open}
-            onClose={()=>showDrawer(false)}
+            onClose={() =>showDrawer(false)}
             classes={{paper: classes.drawerPaper,}}
         >
             {

@@ -29,7 +29,7 @@ const CardIntegrationLog = React.memo((props) => {
                         {element.path}
                     </div>
                 </div>
-                <Button onClick={async ()=> {
+                <Button onClick={async () => {
                     setFullDialog(element.title, <TextViewer text={element.xml}/>)
                     showFullDialog(true)
                 }} size='small' color='primary'>

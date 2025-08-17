@@ -70,7 +70,7 @@ const Geo =  React.memo(
                                 <Map onLoad={() => {setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48} defaultState={{ center: ['42.8700000', '74.5900000'], zoom: 12 }}
                                      state={{ center: geo, zoom: 18 }}>
                                     <TrafficControl options={{ float: 'right' }} />
-                                    {legs.map((leg, idx)=> {
+                                    {legs.map((leg, idx) => {
                                         if(!navigation||idx===unacceptedIdx||(unacceptedIdx===-1&&idx===legs.length-1))
                                             return(
                                                 <Polyline
@@ -106,7 +106,7 @@ const Geo =  React.memo(
                                             :
                                             null
                                     }
-                                    {_list.map((invoice, idx)=> {
+                                    {_list.map((invoice, idx) => {
                                         if(!navigation||idx===unacceptedIdx||idx===unacceptedIdx-1||(unacceptedIdx===-1&&idx===_list.length-1))
                                             return(
                                                 <Placemark
@@ -147,7 +147,7 @@ const Geo =  React.memo(
                             <div style={{display: load?'none':'block'}}>
                                 <Map onLoad={() => {setLoad(false)}} height={window.innerHeight-128} width={window.innerWidth-48} defaultState={{ center: ['42.8700000', '74.5900000'], zoom: 12 }} >
                                     <TrafficControl options={{ float: 'right' }} />
-                                    {legs.map((leg, idx)=> {
+                                    {legs.map((leg, idx) => {
                                         if(!navigation||idx===unacceptedIdx||(unacceptedIdx===-1&&idx===legs.length-1))
                                             return(
                                                 <Polyline
@@ -186,7 +186,7 @@ const Geo =  React.memo(
                                             :
                                             null
                                     }
-                                    {_list.map((invoice, idx)=> {
+                                    {_list.map((invoice, idx) => {
                                         if(!navigation||idx===unacceptedIdx||idx===unacceptedIdx-1||(unacceptedIdx===-1&&idx===_list.length-1))
                                             return(
                                                 <Placemark
@@ -231,10 +231,10 @@ const Geo =  React.memo(
                             Закрыть
                         </Button>
                     </center>
-                    <Fab color={navigation?'primary':'secondary'} className={classes.fabNavigation} onClick={()=>setNavigation(!navigation)}>
+                    <Fab color={navigation?'primary':'secondary'} className={classes.fabNavigation} onClick={() =>setNavigation(!navigation)}>
                         <Navigation/>
                     </Fab>
-                    <Fab color={follow?'primary':'secondary'} className={classes.fabGeo} onClick={()=>setFollow(!follow)}>
+                    <Fab color={follow?'primary':'secondary'} className={classes.fabGeo} onClick={() =>setFollow(!follow)}>
                         <GpsFixed/>
                     </Fab>
                 </div>

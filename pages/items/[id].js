@@ -54,7 +54,7 @@ const Items = React.memo((props) => {
                     Всего: {formatAmount(list.length)}
                 </div>
 
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     if(idx<pagination)
                         return(
                             <CardItem idx={idx} list={list} setList={setList} key={element._id} element={element}/>

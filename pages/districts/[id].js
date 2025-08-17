@@ -23,7 +23,7 @@ const Districts = React.memo((props) => {
     const {search, sort} = props.app;
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
-    const getList = async ()=> {
+    const getList = async () => {
         setList(await getDistricts({organization: router.query.id, search, sort}))
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
@@ -56,7 +56,7 @@ const Districts = React.memo((props) => {
                 Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     if(idx<pagination)
                         return <CardDistrict idx={idx} list={list} setList={setList} key={element._id} element={element}/>
                 }):null}

@@ -7,11 +7,10 @@ const Tables =  React.memo(({list, setList, app}) =>{
     const {isMobileApp} = app;
     const columns = [
         {title: 'Номер\nСтатус', style: {width: 100}},
-        {title: 'Заказ\nДоставка', style: {width: 80}},
+        {title: 'Возврат\nДоставка', style: {width: 80}},
         {title: 'Сумма', style: {width: 50}},
         {title: 'Адрес', style: {width: isMobileApp?200:300}},
-        {title: 'Организация\nАгент', style: {width: 300}},
-        {title: 'Акции', style: {width: 50}},
+        {title: 'Организация\nАгент', style: {width: 300}}
     ]
     return <Table
         columns = {columns}

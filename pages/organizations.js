@@ -98,7 +98,7 @@ const Organization = React.memo((props) => {
                         </Link>
                         :null
                 }
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     if(idx<pagination)
                         return(
                             <Link key={element._id} href={`/${path}/[id]`} as={`/${path}/${element._id}`}>

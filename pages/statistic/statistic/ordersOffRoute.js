@@ -121,7 +121,7 @@ const OrderOffRouteStatistic = React.memo((props) => {
                         <FormControl className={inputClass}>
                             <InputLabel>Тип</InputLabel>
                             <Select value={type.value} onChange={handleType}>
-                                {types.map((element)=>
+                                {types.map((element) =>
                                     <MenuItem key={element.value} value={element.value}>{element.name}</MenuItem>
                                 )}
                             </Select>
@@ -165,7 +165,7 @@ const OrderOffRouteStatistic = React.memo((props) => {
                     }
                 </CardContent>
             </Card>
-            <div className='count' onClick={()=>setShowStat(!showStat)}>
+            <div className='count' onClick={() =>setShowStat(!showStat)}>
                 {
                     statisticOrdersOffRoute?
                         <>

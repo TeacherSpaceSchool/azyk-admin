@@ -57,7 +57,7 @@ const RepairEquipments = React.memo((props) => {
                 Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     if(idx<pagination)
                         return(
                             <CardRepairEquipment idx={idx} key={element._id} list={list} setList={setList} element={element}/>

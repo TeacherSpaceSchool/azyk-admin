@@ -57,7 +57,7 @@ const OutXMLAds = React.memo((props) => {
             </div>
             <div className={classes.page}>
                 {districts.length?<CardOutXMLAds organization={router.query.id} districts={districts} setDistricts={setDistricts} list={list} setList={setList}/>:null}
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                         if(idx<pagination)
                             return(
                                 <CardOutXMLAds key={element._id} setDistricts={setDistricts} list={list} setList={setList}  districts={districts} idx={idx} element={element}/>

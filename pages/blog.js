@@ -47,7 +47,7 @@ const Blog = React.memo((props) => {
             </div>
             <div className={classes.page}>
                 {profile.role==='admin'?<CardBlog list={list} setList={setList}/>:null}
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     if(idx<pagination) return <CardBlog idx={idx} key={element._id} list={list} setList={setList} element={element}/>
                 }):null}
             </div>

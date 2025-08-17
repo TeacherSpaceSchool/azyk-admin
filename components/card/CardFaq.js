@@ -62,7 +62,7 @@ const CardFaq = React.memo((props) => {
                                   value={typex}
                                   onChange={handleTypex}
                               >
-                                  {types.map((element)=>
+                                  {types.map((element) =>
                                       <MenuItem key={element} value={element}>{element}</MenuItem>
                                   )}
                               </Select>
@@ -122,7 +122,7 @@ const CardFaq = React.memo((props) => {
                                   </Button>
                                   </>
                                   :
-                                  <Button onClick={()=> {
+                                  <Button onClick={() => {
                                       if(title) {
                                           const action = async () => {
                                               const res = await addFaq({typex: typex, video: video, file: file, title})
@@ -163,7 +163,7 @@ const CardFaq = React.memo((props) => {
                                   video?
                                       <>
                                       <br/>
-                                      <Button onClick={async ()=> {
+                                      <Button onClick={async () => {
                                           setFullDialog(element.title, <VideoViewer video={element.video}/>)
                                           showFullDialog(true)
                                       }} size='small' color='primary'>
@@ -174,7 +174,7 @@ const CardFaq = React.memo((props) => {
                                       null
                               }
                               <br/>
-                              <Button onClick={async ()=> {
+                              <Button onClick={async () => {
                                   setFullDialog(element.title, <PdfViewer pdf={element.url}/>)
                                   showFullDialog(true)
                               }} size='small' color='primary'>

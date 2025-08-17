@@ -72,7 +72,7 @@ const CardReview = React.memo((props) => {
                             <FormControl error={!organization} className={classes.input}>
                                 <InputLabel>Организация</InputLabel>
                                 <Select value={organization&&organization._id} onChange={handleOrganization}>
-                                    {organizations.map((element)=>
+                                    {organizations.map((element) =>
                                         <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                     )}
                                 </Select>
@@ -85,7 +85,7 @@ const CardReview = React.memo((props) => {
                                     value={type}
                                     onChange={handleType}
                                 >
-                                    {types?types.map((element)=>
+                                    {types?types.map((element) =>
                                         <MenuItem key={element} value={element}>{element}</MenuItem>
                                     ):null}
                                 </Select>
@@ -137,7 +137,7 @@ const CardReview = React.memo((props) => {
                         :
                         !element&&profile.role==='client'?
                             <CardActions>
-                                <Button onClick={()=> {
+                                <Button onClick={() => {
                                     if(organization&&text) {
                                         const action = async () => {
                                             let res = await addReview({organization: organization._id, text, type: type})

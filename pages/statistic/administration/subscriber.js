@@ -41,7 +41,7 @@ const Subscriber = React.memo((props) => {
                 <title>Подписчики</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className='count' onClick={()=>setShowStat(!showStat)}>
+            <div className='count' onClick={() =>setShowStat(!showStat)}>
                 Всего: {formatAmount(list.length)}
                 {
                     showStat?
@@ -56,7 +56,7 @@ const Subscriber = React.memo((props) => {
                 }
             </div>
             <div className={classes.page}>
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     if(idx<pagination)
                         return <CardSubscriber key={element._id} list={list} setList={setList} element={element}/>
                 }):null}

@@ -54,7 +54,7 @@ const Brand = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className={classes.page}>
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     if(idx<pagination)
                         return(
                             <CardItem idx={idx} list={list} setList={setList} key={element._id} element={element}/>

@@ -140,7 +140,7 @@ const DiscountClient = React.memo((props) => {
                         {
                             organization?
                                 <Autocomplete
-                                    onClose={()=>setOpen(false)}
+                                    onClose={() =>setOpen(false)}
                                     open={open}
                                     disableOpenOnFocus
                                     className={inputClass}
@@ -181,7 +181,7 @@ const DiscountClient = React.memo((props) => {
                             items={items}
                             setItems={setItems}
                             client={client}/>
-                        {specialPriceClients?specialPriceClients.map((element, idx)=> {
+                        {specialPriceClients?specialPriceClients.map((element, idx) => {
                             return (
                                 <CardSpecialPriceClient
                                     idx={idx} key={element._id}

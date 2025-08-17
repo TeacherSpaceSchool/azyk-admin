@@ -255,7 +255,7 @@ const MyAppBar = React.memo((props) => {
                                                 open={openFilter}
                                                 onClose={handleCloseFilter}
                                             >
-                                                {filters.map((elem, idx)=><MenuItem key={'filter'+idx} style={{background: filter===elem.value?'rgba(255, 179, 0, 0.15)': '#fff'}}  onClick={() => {setFilter(elem.value);handleCloseFilter();handleCloseMobileMenu();}}>{elem.name}</MenuItem>)}
+                                                {filters.map((elem, idx) =><MenuItem key={'filter'+idx} style={{background: filter===elem.value?'rgba(255, 179, 0, 0.15)': '#fff'}}  onClick={() => {setFilter(elem.value);handleCloseFilter();handleCloseMobileMenu();}}>{elem.name}</MenuItem>)}
                                             </Menu>
                                         ]
                                         :null
@@ -302,7 +302,7 @@ const MyAppBar = React.memo((props) => {
                                                 open={openSort}
                                                 onClose={handleCloseSort}
                                             >
-                                                {sorts.map((elem, idx)=><MenuItem style={{background: sort===elem.field||`-${elem.field}`===sort?'rgba(255, 179, 0, 0.15)': '#fff'}} key={'sort'+idx} onClick={() => {sort===`-${elem.field}`?setSort(elem.field):setSort(`-${elem.field}`);handleCloseSort();handleCloseMobileMenu()}}>{sort===`-${elem.field}`?<ArrowDownward />:sort===elem.field?<ArrowUpward />:<div style={{width: '24px'}}/>}{elem.name}</MenuItem>)}
+                                                {sorts.map((elem, idx) =><MenuItem style={{background: sort===elem.field||`-${elem.field}`===sort?'rgba(255, 179, 0, 0.15)': '#fff'}} key={'sort'+idx} onClick={() => {sort===`-${elem.field}`?setSort(elem.field):setSort(`-${elem.field}`);handleCloseSort();handleCloseMobileMenu()}}>{sort===`-${elem.field}`?<ArrowDownward />:sort===elem.field?<ArrowUpward />:<div style={{width: '24px'}}/>}{elem.name}</MenuItem>)}
                                             </Menu>
                                         ]
                                         :null
@@ -781,7 +781,7 @@ const MyAppBar = React.memo((props) => {
                                             open={openFilter}
                                             onClose={handleCloseFilter}
                                         >
-                                            {filters.map((elem, idx)=><MenuItem key={'filter'+idx} style={{background: filter===elem.value?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setFilter(elem.value);handleCloseFilter();}}>{elem.name}</MenuItem>)}
+                                            {filters.map((elem, idx) =><MenuItem key={'filter'+idx} style={{background: filter===elem.value?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setFilter(elem.value);handleCloseFilter();}}>{elem.name}</MenuItem>)}
                                         </Menu>
                                         &nbsp;
                                     </>
@@ -814,7 +814,7 @@ const MyAppBar = React.memo((props) => {
                                             onClose={handleCloseSort}
                                             key='sort'
                                         >
-                                            {sorts.map((elem, idx)=><MenuItem key={'sort'+idx} onClick={() => {sort===`-${elem.field}`?setSort(elem.field):setSort(`-${elem.field}`);handleCloseSort();}}>{sort===`-${elem.field}`?<ArrowDownward />:sort===elem.field?<ArrowUpward />:<div style={{width: '24px'}}/>}{elem.name}</MenuItem>)}
+                                            {sorts.map((elem, idx) =><MenuItem key={'sort'+idx} onClick={() => {sort===`-${elem.field}`?setSort(elem.field):setSort(`-${elem.field}`);handleCloseSort();}}>{sort===`-${elem.field}`?<ArrowDownward />:sort===elem.field?<ArrowUpward />:<div style={{width: '24px'}}/>}{elem.name}</MenuItem>)}
                                         </Menu>
                                         &nbsp;
                                     </>

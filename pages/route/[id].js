@@ -299,7 +299,7 @@ const Route = React.memo((props) => {
                                     </div>
                                     <br/>
                                     {
-                                        deliverys?deliverys.map((element, idx)=>
+                                        deliverys?deliverys.map((element, idx) =>
                                             <ExpansionPanel key={`рейс${idx}`}>
                                                 <ExpansionPanelSummary
                                                     expandIcon={<ExpandMoreIcon />}
@@ -390,7 +390,7 @@ const Route = React.memo((props) => {
                                     </>
                                     :
                                     <div className={classes.listInvoices}>
-                                        {orders?orders.map((element, idx)=> {
+                                        {orders?orders.map((element, idx) => {
                                             if(idx<pagination)
                                                 return(
                                                     <div key={element._id} style={isMobileApp ? {alignItems: 'baseline'} : {}}
@@ -553,7 +553,7 @@ const Route = React.memo((props) => {
                     </Card>
                     {
                         selectedOrders&&selectedOrders.length?
-                            <div className='count' onClick={()=>setShowStat(!showStat)}>
+                            <div className='count' onClick={() =>setShowStat(!showStat)}>
                                 Заказов: {formatAmount(selectedOrders.length)}
                                 {
                                     showStat?

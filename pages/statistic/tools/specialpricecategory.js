@@ -106,7 +106,7 @@ const SpecialPriceCategory = React.memo((props) => {
                         <FormControl className={inputClass}>
                             <InputLabel>Категория</InputLabel>
                             <Select value={category} onChange={handleCategory}>
-                                {categorys.map((element)=>
+                                {categorys.map((element) =>
                                     <MenuItem key={element} value={element} ola={element}>{element}</MenuItem>
                                 )}
                             </Select>
@@ -124,7 +124,7 @@ const SpecialPriceCategory = React.memo((props) => {
                             category={category}
                             setItems={setItems}
                         />
-                        {specialPriceCategories?specialPriceCategories.map((element, idx)=> {
+                        {specialPriceCategories?specialPriceCategories.map((element, idx) => {
                             return (
                                 <CardSpecialPriceCategory
                                     idx={idx} key={element._id}

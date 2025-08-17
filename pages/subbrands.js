@@ -57,7 +57,7 @@ const SubBrands = React.memo((props) => {
                 <div className='count'>
                     Всего: {formatAmount(list.length)}
                 </div>
-                {list?list.map((element, idx)=> {
+                {list?list.map((element, idx) => {
                     if(idx<pagination)
                         return(
                             <CardSubBrand idx={idx}  key={element._id} list={list} setList={setList} element={element} organizations={data.organizations}/>

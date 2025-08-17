@@ -135,7 +135,7 @@ const RepairEquipment = React.memo((props) => {
                         {
                             router.query.id==='new'||profile.role!=='ремонтник'&&!data.repairEquipment.accept&&!data.repairEquipment.cancel?
                                 <Autocomplete
-                                    onClose={()=>setOpen(false)}
+                                    onClose={() =>setOpen(false)}
                                     open={open}
                                     disableOpenOnFocus
                                     className={classes.input}
@@ -204,7 +204,7 @@ const RepairEquipment = React.memo((props) => {
                                 </h3>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails className={classes.column}>
-                                {defect?defect.map((element, idx)=>
+                                {defect?defect.map((element, idx) =>
                                     <div className={classes.input} key={`defect${idx}`}>
                                         <FormControl className={classes.input}>
                                             <InputLabel>{`Неисправность ${idx+1}`}</InputLabel>
@@ -258,7 +258,7 @@ const RepairEquipment = React.memo((props) => {
                                         </h3>
                                     </ExpansionPanelSummary>
                                     <ExpansionPanelDetails className={classes.column}>
-                                        {repair?repair.map((element, idx)=>
+                                        {repair?repair.map((element, idx) =>
                                             <div className={classes.input} key={`repair${idx}`}>
                                                 <FormControl className={classes.input}>
                                                     <InputLabel>{`Ремонт ${idx+1}`}</InputLabel>
