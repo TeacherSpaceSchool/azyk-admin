@@ -149,20 +149,20 @@ const ClientStatistic = React.memo((props) => {
                 {
                     statisticClients?
                         <>
-                        <div className={classes.rowStatic}>{`Клиентов: ${parseInt(statisticClients.row[0].data[0])}`}</div>
+                        <div className={classes.rowStatic}>Клиентов: {statisticClients.row[0].data[0]}</div>
                             {
                                 showStat?
                                     <>
-                                        <div className={classes.rowStatic}> {`Выручка: ${statisticClients.row[0].data[1]} сом`}</div>
+                                        <div className={classes.rowStatic}>Выручка: {statisticClients.row[0].data[1]} сом</div>
                                         {statisticClients.row[0].data[2]?
-                                            <div className={classes.rowStatic}> {`Выручка online: ${statisticClients.row[0].data[2]} сом`}</div>:null}
+                                            <div className={classes.rowStatic}>Выручка online: {statisticClients.row[0].data[2]} сом</div>:null}
                                         {statisticClients.row[0].data[3]?
-                                            <div className={classes.rowStatic}> {`Выручка offline: ${statisticClients.row[0].data[3]} сом`}</div>:null}
-                                        <div className={classes.rowStatic}> {`Выполнено: ${statisticClients.row[0].data[4]} шт`}</div>
+                                            <div className={classes.rowStatic}>Выручка offline: {statisticClients.row[0].data[3]} сом</div>:null}
+                                        <div className={classes.rowStatic}>Выполнено: {statisticClients.row[0].data[4]} шт`}</div>
                                         {statisticClients.row[0].data[5]?
-                                            <div className={classes.rowStatic}> {`Выполнено online: ${statisticClients.row[0].data[5]} шт`}</div>:null}
+                                            <div className={classes.rowStatic}>Выполнено online: {statisticClients.row[0].data[5]} шт</div>:null}
                                         {statisticClients.row[0].data[6]?
-                                            <div className={classes.rowStatic}> {`Выполнено offline: ${statisticClients.row[0].data[6]} шт`}</div>:null}
+                                            <div className={classes.rowStatic}>Выполнено offline: {statisticClients.row[0].data[6]} шт</div>:null}
                                     </>
                                     :
                                     null

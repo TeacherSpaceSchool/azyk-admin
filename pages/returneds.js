@@ -19,7 +19,7 @@ import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import { bindActionCreators } from 'redux'
 import Badge from '@material-ui/core/Badge';
 import Link from 'next/link';
-import {unawaited} from '../src/lib';
+import {formatAmount, unawaited} from '../src/lib';
 
 const Returneds = React.memo((props) => {
     const classes = pageListStyle();
@@ -85,15 +85,15 @@ const Returneds = React.memo((props) => {
             </Head>
             <div className='count' onClick={()=>setShowStat(!showStat)}>
                         {
-                            `Возвратов: ${simpleStatistic[0]}`
+                            `Возвратов: ${formatAmount(simpleStatistic[0])}`
                         }
                         {
                             showStat?
                                 <>
                                 <br/>
-                                {`Сумма: ${simpleStatistic[1]} сом`}
+                                {`Сумма: ${formatAmount(simpleStatistic[1])} сом`}
                                 <br/>
-                                {`Тоннаж: ${simpleStatistic[2]} кг`}
+                                {`Тоннаж: ${formatAmount(simpleStatistic[2])} кг`}
                                 </>
                                 :
                                 null

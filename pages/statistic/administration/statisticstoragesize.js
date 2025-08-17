@@ -41,7 +41,7 @@ const StatisticStorageSize = React.memo((props) => {
             </Card>
             <div className='count'>
                 <div className={classes.rowStatic}>{`Вес: ${data.statisticStorageSize.row[0].data[0]} MB`}</div>
-                <div className={classes.rowStatic}>{`Объектов: ${data.statisticStorageSize.row[0].data[1]} штук`}</div>
+                <div className={classes.rowStatic}>{`Объектов: ${data.statisticStorageSize.row[0].data[1]} шт`}</div>
             </div>
         </App>
     )

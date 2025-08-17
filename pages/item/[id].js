@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { getSubBrands } from '../../src/gql/subBrand'
 import { getOrganizations } from '../../src/gql/organization'
 import { getItem, addItem, setItem, onoffItem, deleteItem } from '../../src/gql/items'
-import {checkInt, checkFloat, inputInt, inputFloat, maxImageSize} from '../../src/lib'
+import {checkInt, checkFloat, inputInt, inputFloat, maxImageSize, formatAmount} from '../../src/lib'
 import itemStyle from '../../src/styleMUI/item/item'
 import { useRouter } from 'next/router'
 import Card from '@material-ui/core/Card';
@@ -397,7 +397,7 @@ const Item = React.memo((props) => {
                                         <br/>
                                         <div className={classes.row}>
                                             <div className={classes.price}>
-                                                {data.item.price}&nbsp;сом
+                                                {formatAmount(data.item.price)}&nbsp;сом
                                             </div>
                                         </div>
                                         <br/>

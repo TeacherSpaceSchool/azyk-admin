@@ -8,7 +8,15 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
-import {pdDDMMYYHHMM, pdDDMMYYHHMMCancel, pdDDMMYYYYWW, checkFloat, isNotEmpty, getClientTitle} from '../../src/lib'
+import {
+    pdDDMMYYHHMM,
+    pdDDMMYYHHMMCancel,
+    pdDDMMYYYYWW,
+    checkFloat,
+    isNotEmpty,
+    getClientTitle,
+    formatAmount
+} from '../../src/lib'
 import Confirmation from './Confirmation'
 import Geo from '../../components/dialog/Geo'
 import OrderAdss from '../../components/dialog/OrderAdss'
@@ -283,7 +291,7 @@ const Order =  React.memo(
                 }
                 <div className={classes.row}>
                     <div className={classes.nameField}>Сумма{priceAfterReturn!==allPrice?' (факт./итого)':''}:&nbsp;</div>
-                    <div className={classes.value}>{priceAfterReturn!==allPrice?`${priceAfterReturn} сом/${allPrice} сом`:`${allPrice} сом`}</div>
+                    <div className={classes.value}>{priceAfterReturn!==allPrice?`${formatAmount(priceAfterReturn)} сом/${formatAmount(allPrice)} сом`:`${formatAmount(allPrice)} сом`}</div>
                 </div>
                 {
                     authenticated&&profile.role!=='client'?

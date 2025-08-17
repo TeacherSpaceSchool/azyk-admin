@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import pageListStyle from '../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat, isNotEmpty, unawaited, dayStartDefault} from '../src/lib';
+import {checkInt, checkFloat, isNotEmpty, unawaited, dayStartDefault, formatAmount} from '../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import * as snackbarActions from '../redux/actions/snackbar'
@@ -331,7 +331,7 @@ const Catalog = React.memo((props) => {
                                     </div>
                                     <div className={classes.valueField} style={{marginBottom: 0}}>
                                         <div className={classes.row}>
-                                            {planClient.current} сом / <div style={{color: planClient.current<planClient.month?'orange':'green'}}>{planClient.month} сом</div>
+                                            {formatAmount(planClient.current)} сом / <div style={{color: planClient.current<planClient.month?'orange':'green'}}>{formatAmount(planClient.month)} сом</div>
                                         </div>
                                     </div>
                                 </div>
@@ -383,7 +383,7 @@ const Catalog = React.memo((props) => {
                                                 <div className={classes.column} style={{width: 'calc(100% - 142px)'}}>
                                                     <div className={classes.value}>{row.name}</div>
                                                     <b className={classes.value}>
-                                                        {`${price} сом`}
+                                                        {formatAmount(price)} сом
                                                     </b>
                                                     <div className={classes.line}>
                                                         <div className={classes.counter}>
@@ -434,9 +434,9 @@ const Catalog = React.memo((props) => {
                 <div className={isMobileApp?classes.allPriceM:classes.allPriceD}>
                     <div className={isMobileApp?classes.value:classes.priceAllText}>Общая стоимость</div>
                     <div className={classes.row} style={{alignItems: 'baseline'}}>
-                        <div className={isMobileApp?classes.nameM:classes.priceAll}>{`${allPrice} сом`}</div>
+                        <div className={isMobileApp?classes.nameM:classes.priceAll}>{formatAmount(allPrice)} сом</div>
                         {
-                            planClient?<>&nbsp;/&nbsp;<div style={{color: allPrice<planClient.visit?'orange':'green'}}>{planClient.visit} сом</div></>:null
+                            planClient?<>&nbsp;/&nbsp;<div style={{color: allPrice<planClient.visit?'orange':'green'}}>{formatAmount(planClient.visit)} сом</div></>:null
                         }
                     </div>
                 </div>

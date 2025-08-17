@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import pageListStyle from '../../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat, isNotEmpty, isEmpty, unawaited} from '../../src/lib';
+import {checkInt, checkFloat, isNotEmpty, isEmpty, unawaited, formatAmount} from '../../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
@@ -268,7 +268,7 @@ const Catalog = React.memo((props) => {
                                                 <div className={classes.column} style={{width: 'calc(100% - 142px)'}}>
                                                     <div className={classes.value}>{row.name}</div>
                                                     <b className={classes.value}>
-                                                        {`${price} сом`}
+                                                        {formatAmount(price)} сом
                                                     </b>
                                                     <div className={classes.line}>
                                                         <div className={classes.counter}>
@@ -306,7 +306,7 @@ const Catalog = React.memo((props) => {
             <div className={isMobileApp?classes.bottomBasketM:classes.bottomBasketD}>
                 <div className={isMobileApp?classes.allPriceM:classes.allPriceD}>
                     <div className={isMobileApp?classes.value:classes.priceAllText}>Общая стоимость</div>
-                    <div className={isMobileApp?classes.nameM:classes.priceAll}>{`${allPrice} сом`}</div>
+                    <div className={isMobileApp?classes.nameM:classes.priceAll}>{formatAmount(allPrice)} сом</div>
                 </div>
                 <div className={isMobileApp?classes.buyM:classes.buyD} onClick={() => {
                     if(allPrice>0) {

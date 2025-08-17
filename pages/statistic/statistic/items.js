@@ -136,12 +136,12 @@ const ItemStatistic = React.memo((props) => {
                 {
                     statisticItem?
                         <>
-                        <div className={classes.rowStatic}>{`Товаров: ${statisticItem.row[0].data[0]}`}</div>
+                        <div className={classes.rowStatic}>Товаров: ${statisticItem.row[0].data[0]}</div>
                         {
                             showStat?
                                 <>
-                                <div className={classes.rowStatic}>{`Выручка: ${statisticItem.row[0].data[1]} сом`}</div>
-                                <div className={classes.rowStatic}>{`Заказов: ${statisticItem.row[0].data[2]} шт`}</div>
+                                <div className={classes.rowStatic}>Выручка: ${statisticItem.row[0].data[1]} сом</div>
+                                <div className={classes.rowStatic}>Заказов: ${statisticItem.row[0].data[2]} шт</div>
                                 </>
                                 :
                                 null

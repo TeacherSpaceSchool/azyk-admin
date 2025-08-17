@@ -18,7 +18,7 @@ import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import * as appActions from '../redux/actions/app'
 import { bindActionCreators } from 'redux'
 import CircularProgress from '@material-ui/core/CircularProgress';
-import {unawaited} from '../src/lib';
+import {formatAmount, unawaited} from '../src/lib';
 import OrdersTable from '../components/table/OrdersTable';
 import {viewModes} from '../src/enum';
 
@@ -91,14 +91,14 @@ const Orders = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count' onClick={()=>setShowStat(!showStat)}>
-                Заказов: {simpleStatistic[0]}
+                Заказов: {formatAmount(simpleStatistic[0])}
                 {
                     showStat?
                         <>
                             <br/>
-                            Сумма: {simpleStatistic[1]} сом
+                            Сумма: {formatAmount(simpleStatistic[1])} сом
                             <br/>
-                            Тоннаж: {simpleStatistic[2]} кг
+                            Тоннаж: {formatAmount(simpleStatistic[2])} кг
                         </>
                         :
                         null

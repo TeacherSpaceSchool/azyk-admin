@@ -21,7 +21,7 @@ import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Confirmation from '../../components/dialog/Confirmation'
-import {checkInt, inputInt, maxFileSize, maxImageSize} from '../../src/lib'
+import {checkInt, formatAmount, inputInt, maxFileSize, maxImageSize} from '../../src/lib'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -658,7 +658,7 @@ const Organization = React.memo((props) => {
                                                         Минимальный заказ:&nbsp;
                                                     </div>
                                                     <div className={classes.value}>
-                                                        {minimumOrder}&nbsp;сом
+                                                        {formatAmount(minimumOrder)}&nbsp;сом
                                                     </div>
                                                 </div>
                                                 :

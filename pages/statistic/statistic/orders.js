@@ -122,13 +122,13 @@ const OrderStatistic = React.memo((props) => {
                 {
                     statisticOrder?
                         <>
-                        <div className={classes.rowStatic}>{`${organization?'Районов':'Компаний'}: ${statisticOrder.row[0].data[0]}`}</div>
+                        <div className={classes.rowStatic}>{organization?'Районов':'Компаний'}: {statisticOrder.row[0].data[0]}</div>
                         {
                             showStat?
                                 <>
-                                <div className={classes.rowStatic}> {`Выручка: ${statisticOrder.row[0].data[1]} сом`}</div>
-                                <div className={classes.rowStatic}> {`Выполнено: ${statisticOrder.row[0].data[2]} шт`}</div>
-                                <div className={classes.rowStatic}>{`Отказов: ${statisticOrder.row[0].data[3]} сом`}</div>
+                                <div className={classes.rowStatic}>Выручка: {statisticOrder.row[0].data[1]} сом</div>
+                                <div className={classes.rowStatic}>Выполнено: {statisticOrder.row[0].data[2]} шт</div>
+                                <div className={classes.rowStatic}>Отказов: {statisticOrder.row[0].data[3]} сом</div>
                                 </>
                                 :
                                 null

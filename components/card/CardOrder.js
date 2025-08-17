@@ -8,7 +8,7 @@ import cardOrderStyle from '../../src/styleMUI/orders/cardOrder'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
-import {getClientTitle, pdDDMMYYHHMM, pdDDMMYYYYWW} from '../../src/lib'
+import {formatAmount, getClientTitle, pdDDMMYYHHMM, pdDDMMYYYYWW} from '../../src/lib'
 import Order from '../dialog/Order'
 import Confirmation from '../../components/dialog/Confirmation'
 import { deleteOrders } from '../../src/gql/order'
@@ -161,7 +161,7 @@ const CardOrder = React.memo((props) => {
                     <div className={classes.row}>
                         <div className={classes.nameField}>Сумма{element.returnedPrice?' (факт./итого)':''}:</div>
                         <div className={classes.value}>
-                            {element.returnedPrice?`${element.allPrice-element.returnedPrice} сом/${element.allPrice} сом`:`${element.allPrice} сом`}
+                            {element.returnedPrice?`${formatAmount(element.allPrice-element.returnedPrice)} сом/${formatAmount(element.allPrice)} сом`:`${formatAmount(element.allPrice)} сом`}
                         </div>
                     </div>
                     {

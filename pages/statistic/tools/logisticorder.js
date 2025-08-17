@@ -12,7 +12,7 @@ import CardOrder from '../../../components/card/CardOrder'
 import CardReturned from '../../../components/card/CardReturned'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import { getOrganizations } from '../../../src/gql/organization'
-import {checkInt, isNotEmpty} from '../../../src/lib'
+import {checkInt, formatAmount, isNotEmpty} from '../../../src/lib'
 import { getEcspeditors } from '../../../src/gql/employment'
 import { getDistricts } from '../../../src/gql/district'
 import { getOrdersFromDistrict, setInvoicesLogic } from '../../../src/gql/order'
@@ -299,19 +299,19 @@ const LogistiOorder = React.memo((props) => {
                 {
                     selectedOrders?
                         <>
-                        {`${'Всего'}: ${lengthList}`}
+                        {`Всего: ${formatAmount(lengthList)}`}
                         {
                             showStat?
                                 <>
                                 {price?<>
                                 <br/>
                                 <br/>
-                                {`Сумма: ${price} сом`}
+                                {`Сумма: ${formatAmount(price)} сом`}
                                 </>:null}
                                 {weight?<>
                                 <br/>
                                 <br/>
-                                {`Тоннаж: ${weight} кг`}
+                                {`Тоннаж: ${formatAmount(weight)} кг`}
                                 </>:null}
                                 </>
                                 :

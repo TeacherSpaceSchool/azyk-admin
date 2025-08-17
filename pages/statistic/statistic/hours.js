@@ -115,15 +115,15 @@ const HoursStatistic = React.memo((props) => {
             {
                 statisticHours?
                     <div className='count' onClick={()=>setShowStat(!showStat)}>
-                        <div className={classes.rowStatic}> {`Выручка: ${statisticHours.row[0].data[0]} сом`}</div>
+                        <div className={classes.rowStatic}>Выручка: {statisticHours.row[0].data[0]} сом</div>
                         {
                             showStat?
                                 <>
-                                <div className={classes.rowStatic}> {`Выручка online: ${statisticHours.row[0].data[1]} сом`}</div>
-                                <div className={classes.rowStatic}> {`Выручка offline: ${statisticHours.row[0].data[2]} сом`}</div>
-                                <div className={classes.rowStatic}> {`Выполнено: ${statisticHours.row[0].data[3]} шт`}</div>
-                                <div className={classes.rowStatic}> {`Выполнено online: ${statisticHours.row[0].data[4]} шт`}</div>
-                                <div className={classes.rowStatic}> {`Выполнено offline: ${statisticHours.row[0].data[5]} шт`}</div>
+                                <div className={classes.rowStatic}>Выручка online: {statisticHours.row[0].data[1]} сом</div>
+                                <div className={classes.rowStatic}>Выручка offline: {statisticHours.row[0].data[2]} сом</div>
+                                <div className={classes.rowStatic}>Выполнено: {statisticHours.row[0].data[3]} шт</div>
+                                <div className={classes.rowStatic}>Выполнено online: {statisticHours.row[0].data[4]} шт</div>
+                                <div className={classes.rowStatic}>Выполнено offline: {statisticHours.row[0].data[5]} шт</div>
                                 </>
                                 :
                                 null

@@ -36,7 +36,7 @@ import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import {pdDatePicker, checkInt, checkFloat, inputInt} from '../../src/lib'
+import {pdDatePicker, checkInt, checkFloat, inputInt, formatAmount} from '../../src/lib'
 import ListOrder from '../../components/dialog/ListOrder'
 import GeoRoute from '../../components/dialog/GeoRoute'
 import ItemList from '../../components/dialog/ItemList'
@@ -565,7 +565,7 @@ const Route = React.memo((props) => {
                                                 <>
                                                 <br/>
                                                 <br/>
-                                                {`Сумма${allReturnedPrice?' (факт./итого)':''}: ${allReturnedPrice?`${allPrice-allReturnedPrice}/${allPrice}`:allPrice} сом`}
+                                                {`Сумма${allReturnedPrice?' (факт./итого)':''}: ${allReturnedPrice?`${formatAmount(allPrice-allReturnedPrice)}/${formatAmount(allPrice)}`:formatAmount(allPrice)} сом`}
                                                 </>
                                                 :
                                                 null

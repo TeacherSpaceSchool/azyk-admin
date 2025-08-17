@@ -12,7 +12,7 @@ import Confirmation from '../dialog/Confirmation';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {getClientsForPlanClients, setPlanClient, deletePlanClient} from '../../src/gql/planClient';
-import {getClientTitle, inputInt} from '../../src/lib';
+import {formatAmount, getClientTitle, inputInt} from '../../src/lib';
 import * as snackbarActions from '../../redux/actions/snackbar';
 import {checkInt} from '../../redux/constants/other';
 
@@ -69,12 +69,12 @@ const CardPlanClient = React.memo((props) => {
                     {
                         element?
                             <>
-                                {element.client?<div style={{marginBottom: 5, lineHeight: 1.5, fontSize: 14, fontWeight: 'bold'}}>
+                                <div style={{marginBottom: 5, lineHeight: 1.5, fontSize: 14, fontWeight: 'bold'}}>
                                     {getClientTitle(element.client)}
-                                </div>:null}
+                                </div>
                                 <div className={classes.row}>
                                     <div className={classes.nameField}>Прогресс:&nbsp;</div>
-                                    <div className={classes.value}>{element.current} сом</div>
+                                    <div className={classes.value}>{formatAmount(element.current)} сом</div>
                                 </div>
                             </>
                             :
@@ -127,11 +127,11 @@ const CardPlanClient = React.memo((props) => {
                             <>
                                 <div className={classes.row}>
                                     <div className={classes.nameField}>Посещение план:&nbsp;</div>
-                                    <div className={classes.value}>{visit} сом</div>
+                                    <div className={classes.value}>{formatAmount(visit)} сом</div>
                                 </div>
                                 <div className={classes.row}>
                                     <div className={classes.nameField} style={{marginBottom: 0}}>Месячный план:&nbsp;</div>
-                                    <div className={classes.value} style={{marginBottom: 0, color: element.current<month?'orange':'green'}}>{month} сом</div>
+                                    <div className={classes.value} style={{marginBottom: 0, color: element.current<month?'orange':'green'}}>{formatAmount(month)} сом</div>
                                 </div>
                             </>
                     }

@@ -169,12 +169,12 @@ const OrderOffRouteStatistic = React.memo((props) => {
                 {
                     statisticOrdersOffRoute?
                         <>
-                            <div className={classes.rowStatic}> {`Выполнено: ${statisticOrdersOffRoute.row[0].data[0]} шт`}</div>
+                            <div className={classes.rowStatic}>Выполнено: ${statisticOrdersOffRoute.row[0].data[0]} шт</div>
                             {
                             showStat?
                                 <>
-                                <div className={classes.rowStatic}> {`Выручка: ${statisticOrdersOffRoute.row[0].data[1]} сом`}</div>
-                                <div className={classes.rowStatic}>{`Отказов: ${statisticOrdersOffRoute.row[0].data[2]} сом`}</div>
+                                <div className={classes.rowStatic}>Выручка: ${statisticOrdersOffRoute.row[0].data[1]} сом</div>
+                                <div className={classes.rowStatic}>Отказов: ${statisticOrdersOffRoute.row[0].data[2]} сом</div>
                                 </>
                                 :
                                 null

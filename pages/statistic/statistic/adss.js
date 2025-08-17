@@ -75,7 +75,7 @@ const AdssStatistic = React.memo((props) => {
                         {
                             profile.role==='admin'?
                                 <Autocomplete
-                                    className={isMobileApp?classes.inputThird:classes.inputHalf}
+                                    className={isMobileApp?classes.input:classes.inputThird}
                                     options={organizations}
                                     getOptionLabel={option => option.name}
                                     value={organization}
@@ -118,13 +118,13 @@ const AdssStatistic = React.memo((props) => {
                 {
                     statisticAdss?
                         <>
-                        <div className={classes.rowStatic}>{`Акций: ${statisticAdss.row[0].data[0]}`}</div>
+                        <div className={classes.rowStatic}>Акций: {statisticAdss.row[0].data[0]}</div>
                         {
                             showStat?
                                 <>
-                                <div className={classes.rowStatic}> {`Выручка: ${statisticAdss.row[0].data[1]} сом`}</div>
-                                <div className={classes.rowStatic}>{`Выполнено: ${statisticAdss.row[0].data[2]} шт`}</div>
-                                <div className={classes.rowStatic}>{`Отказов: ${statisticAdss.row[0].data[3]} сом`}</div>
+                                <div className={classes.rowStatic}>Выручка: {statisticAdss.row[0].data[1]} сом</div>
+                                <div className={classes.rowStatic}>Выполнено: {statisticAdss.row[0].data[2]} шт</div>
+                                <div className={classes.rowStatic}>Отказов: {statisticAdss.row[0].data[3]} сом</div>
                                 </>
                                 :
                                 null

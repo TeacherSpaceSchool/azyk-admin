@@ -11,7 +11,7 @@ import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Router from 'next/router'
 import Link from 'next/link';
 import { addAgentHistoryGeo } from '../../src/gql/agentHistoryGeo'
-import {dayStartDefault, getGeoDistance, unawaited} from '../../src/lib'
+import {dayStartDefault, formatAmount, getGeoDistance, unawaited} from '../../src/lib'
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import { getDeliveryDate } from '../../src/gql/deliveryDate';
@@ -108,7 +108,7 @@ const ReturnedConfirmed =  React.memo(
                     control={<Checkbox/>}
                     label={'Cчет фактура'}
                 />
-                <div style={{width: width}} className={classes.itogo}><b>Итого:</b>{` ${allPrice} сом`}</div>
+                <div style={{width: width}} className={classes.itogo}><b>Итого:</b>&nbsp;{formatAmount(allPrice)}&nbsp;сом</div>
                 <br/>
                 <div>
                     <Button variant='contained' color='primary' onClick={async () => {

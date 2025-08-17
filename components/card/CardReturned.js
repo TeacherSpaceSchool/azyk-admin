@@ -8,7 +8,7 @@ import cardReturnedStyle from '../../src/styleMUI/returned/cardReturned'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
-import {getClientTitle, pdDDMMYYHHMM, pdDDMMYYYYWW} from '../../src/lib'
+import {formatAmount, getClientTitle, pdDDMMYYHHMM, pdDDMMYYYYWW} from '../../src/lib'
 import Returned from '../dialog/Returned'
 import Confirmation from '../../components/dialog/Confirmation'
 import { deleteReturneds } from '../../src/gql/returned'
@@ -125,7 +125,7 @@ const CardReturned = React.memo((props) => {
                     </div>
                     <div className={classes.row}>
                         <div className={classes.nameField}>Сумма: &nbsp;</div>
-                        <div className={classes.value}>{`${element.allPrice} сом`}</div>
+                        <div className={classes.value}>{formatAmount(element.allPrice)} сом</div>
                     </div>
                     {
                         authenticated&&profile.role!=='client'?

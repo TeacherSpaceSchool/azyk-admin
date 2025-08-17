@@ -21,7 +21,7 @@ import Link from 'next/link';
 import WhatshotIcon from '@material-ui/icons/Whatshot';
 import { addBasket } from '../../src/gql/basket';
 import { addAgentHistoryGeo } from '../../src/gql/agentHistoryGeo'
-import {dayStartDefault, getGeoDistance, unawaited} from '../../src/lib'
+import {dayStartDefault, formatAmount, getGeoDistance, unawaited} from '../../src/lib'
 import { getDeliveryDate } from '../../src/gql/deliveryDate';
 import { pdDDMMYYYYWW } from '../../src/lib';
 import { putOfflineOrders } from '../../src/service/idb/offlineOrders';
@@ -147,7 +147,7 @@ const BuyBasket =  React.memo(
                 {
                     !agent&&organization.minimumOrder?
                         <>
-                        <div style={{width: width}} className={classes.itogo}><b>Минимальный заказ:</b>{` ${organization.minimumOrder} сом`}</div>
+                        <div style={{width: width}} className={classes.itogo}><b>Минимальный заказ:</b>&nbsp;{formatAmount(organization.minimumOrder)}&nbsp;сом</div>
                         </>
                         :null
                 }
@@ -164,7 +164,7 @@ const BuyBasket =  React.memo(
                         :
                         null
                 }
-                <div style={{width: width}} className={classes.itogo}><b>Итого:</b>&nbsp;{allPrice} сом</div>
+                <div style={{width: width}} className={classes.itogo}><b>Итого:</b>&nbsp;{formatAmount(allPrice)} сом</div>
                 <br/>
                 <div>
                     <Button variant='contained' color='primary' onClick={async () => {
@@ -207,7 +207,7 @@ const BuyBasket =  React.memo(
                                            basket,
                                            address: client.address[0],
                                            name: client.name,
-                                           allPrice: `${allPrice} сом`
+                                           allPrice: `${formatAmount(allPrice)} сом`
                                        })
                                        Router.push('/statistic/tools/offlineorder')
                                    }

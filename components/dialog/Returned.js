@@ -8,7 +8,7 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
-import {pdDDMMYYHHMM, checkFloat, pdDDMMYYYYWW, getClientTitle} from '../../src/lib'
+import {pdDDMMYYHHMM, checkFloat, pdDDMMYYYYWW, getClientTitle, formatAmount} from '../../src/lib'
 import Confirmation from './Confirmation'
 import Geo from '../../components/dialog/Geo'
 import HistoryReturned from '../../components/dialog/HistoryReturned'
@@ -150,7 +150,7 @@ const Returned =  React.memo(
                 }
                 <div className={classes.row}>
                     <div className={classes.nameField}>Сумма:&nbsp;</div>
-                    <div className={classes.value}>{`${allPrice} сом`}</div>
+                    <div className={classes.value}>{formatAmount(allPrice)}&nbsp;сом</div>
                 </div>
                 {
                     authenticated&&profile.role!=='client'?
@@ -202,7 +202,7 @@ const Returned =  React.memo(
                                         </div>
                                         <div className={classes.row}>
                                             <div className={classes.nameField}>Общая стоимость:&nbsp;</div>
-                                            <div className={classes.value}>{item.allPrice}&nbsp;сом</div>
+                                            <div className={classes.value}>{formatAmount(item.allPrice)}&nbsp;сом</div>
                                         </div>
                                      </div>
                                 )
@@ -217,14 +217,12 @@ const Returned =  React.memo(
                                         </a>
                                         <div className={classes.row}>
                                             <div className={classes.nameField}>Количество:&nbsp;</div>
-                                            <div className={classes.value}>{`${item.count} шт`}</div>
+                                            <div className={classes.value}>{formatAmount(item.count)} шт</div>
                                         </div>
                                         <div className={classes.row}>
                                             <div className={classes.nameField}>Сумма:&nbsp;</div>
                                             <div className={classes.value}>
-                                                {
-                                                    `${item.allPrice} сом`
-                                                }
+                                                {formatAmount(item.allPrice)} сом
                                             </div>
                                         </div>
                                         <br/>
