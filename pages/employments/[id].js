@@ -13,6 +13,8 @@ import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
 import {formatAmount, unawaited} from '../../src/lib';
 import {getEmployments, getEmploymentsCount} from '../../src/gql/employment';
+import {viewModes} from '../../src/enum';
+import Table from '../../components/table/employments';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Агент', value: 'агент'}, {name: 'Менеджер', value: 'менеджер'}, {name: 'Экспедитор', value: 'экспедитор'}, {name: 'Организация', value: 'организация'}]
 
@@ -23,7 +25,7 @@ const Employment = React.memo((props) => {
     let [list, setList] = useState(data.employments);
     let [count, setCount] = useState('');
     const getCount = async () => setCount(await getEmploymentsCount({organization: router.query.id, search, filter}))
-    const {search, filter, sort} = props.app;
+    const {search, filter, sort, viewMode} = props.app;
     const router = useRouter()
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
@@ -69,7 +71,11 @@ const Employment = React.memo((props) => {
                 Всего: {formatAmount(count)}
             </div>
             <div className={classes.page}>
-                {list?list.map((element, idx) => <CardEmployment idx={idx} key={element._id} list={list} setList={setList} element={element}/>):null}
+                {list?viewMode===viewModes.card?
+                        list.map((element, idx) => <CardEmployment idx={idx} key={element._id} list={list} setList={setList} element={element}/>)
+                        :
+                        <Table list={list}/>
+                    :null}
             </div>
             {['admin'].includes(profile.role)?
                 <Link href={`/employment/[id]`} as={`/employment/new`}>

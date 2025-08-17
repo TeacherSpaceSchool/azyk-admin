@@ -9,7 +9,7 @@ const Tables =  React.memo(({list, buy, app, user}) =>{
     const columns = [
         {title: 'Регистрация\nСтатус', style: {width: 100}},
         {title: 'Имя\nАдрес', style: {width: ['агент', 'суперагент'].includes(profile.role)&&buy&&isMobileApp?200:300}},
-        ['агент', 'суперагент'].includes(profile.role)&&buy?{title: '', style: {width: 70}}:null
+        ...['агент', 'суперагент'].includes(profile.role)&&buy?[{title: '', style: {width: 70}}]:[]
     ]
     return <Table
         columns = {columns}

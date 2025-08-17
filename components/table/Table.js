@@ -10,9 +10,8 @@ const Table =  React.memo(({columns, rows}) =>{
                     <div className='tableCell' style={column.style}>
                         {column.title}
                     </div>
-                        {idx!==columns.length-1?<div className='tableBorder'/>:null}
-
-                    </React.Fragment>:null
+                    {idx!==columns.length-1?<div className='tableBorder'/>:null}
+                </React.Fragment>:null
             })}
         </div>
         <Card className='table'>

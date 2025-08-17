@@ -548,18 +548,18 @@ const MyAppBar = React.memo((props) => {
                             </Paper>
                             :
                             <>
+                                <Tooltip title={viewMode===viewModes.card?'Карточки':'Таблица'}>
+                                    <IconButton
+                                        aria-owns={openCities ? 'menu-appbar' : null}
+                                        aria-haspopup='true'
+                                        onClick={() => handleViewMode(viewMode===viewModes.card?viewModes.table:viewModes.card)}
+                                        color='inherit'
+                                    >
+                                        {viewMode===viewModes.card?<DashboardIcon/>:<ReorderIcon/>}
+                                    </IconButton>
+                                </Tooltip>
                                 {cityShow&&['admin'].includes(profile.role)?
                                     <>
-                                        <Tooltip title={viewMode===viewModes.card?'Карточки':'Таблица'}>
-                                            <IconButton
-                                                aria-owns={openCities ? 'menu-appbar' : null}
-                                                aria-haspopup='true'
-                                                onClick={() => handleViewMode(viewMode===viewModes.card?viewModes.table:viewModes.card)}
-                                                color='inherit'
-                                            >
-                                                {viewMode===viewModes.card?<DashboardIcon/>:<ReorderIcon/>}
-                                            </IconButton>
-                                        </Tooltip>
                                         <Tooltip title='Город'>
                                             <IconButton
                                                 style={{background: city?'rgba(51, 143, 255, 0.29)': 'transparent'}}
