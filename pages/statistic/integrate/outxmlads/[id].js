@@ -9,7 +9,7 @@ import { getClientGqlSsr } from '../../../../src/getClientGQL'
 import initialApp from '../../../../src/initialApp'
 import Router from 'next/router'
 import { useRouter } from 'next/router'
-import {unawaited} from '../../../../src/lib';
+import {formatAmount, unawaited} from '../../../../src/lib';
 
 const OutXMLAds = React.memo((props) => {
     const router = useRouter()
@@ -53,7 +53,7 @@ const OutXMLAds = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${list.length}`}
+                Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
                 {districts.length?<CardOutXMLAds organization={router.query.id} districts={districts} setDistricts={setDistricts} list={list} setList={setList}/>:null}

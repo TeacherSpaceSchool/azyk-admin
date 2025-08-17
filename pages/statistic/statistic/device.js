@@ -7,7 +7,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
-import Table from '../../../components/app/StatisticTable'
+import StatisticTable from '../../../components/app/StatisticTable'
 import { getStatisticDevice } from '../../../src/gql/statistic'
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../../redux/actions/app'
@@ -41,7 +41,7 @@ const DeviceStatistic = React.memo((props) => {
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     {
                         statisticDevice?
-                            <Table type='item' row={statisticDevice.row} filterHeight={0} columns={statisticDevice.columns}/>
+                            <StatisticTable type='item' row={statisticDevice.row} filterHeight={0} columns={statisticDevice.columns}/>
                             :null
                     }
                 </CardContent>

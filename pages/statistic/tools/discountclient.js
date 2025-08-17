@@ -23,7 +23,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import * as snackbarActions from '../../../redux/actions/snackbar'
 import dynamic from 'next/dynamic'
-import { checkInt } from '../../../src/lib'
+import {checkInt, formatAmount} from '../../../src/lib'
 import {getOrganizations} from '../../../src/gql/organization';
 
 const Confirmation = dynamic(() => import('../../../components/dialog/Confirmation'))
@@ -274,7 +274,7 @@ const DiscountClient = React.memo((props) => {
                 }}>Отменить выбор</MenuItem>
             </Menu>
             <div className='count'>
-                {`Клиентов: ${selectedClients.length}`}
+                Клиентов: {formatAmount(selectedClients.length)}
             </div>
         </App>
     )

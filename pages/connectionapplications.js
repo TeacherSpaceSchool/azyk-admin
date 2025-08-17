@@ -11,7 +11,7 @@ import Router from 'next/router'
 import Sign from '../components/dialog/Sign';
 import {bindActionCreators} from 'redux';
 import * as mini_dialogActions from '../redux/actions/mini_dialog';
-import {unawaited} from '../src/lib';
+import {formatAmount, unawaited} from '../src/lib';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value: 'обработка'}]
 
@@ -74,7 +74,7 @@ const ConnectionApplications = React.memo((props) => {
             {
                 profile.role==='admin'?
                     <div className='count'>
-                        {`Всего: ${simpleStatistic}`}
+                        Всего: {formatAmount(simpleStatistic)}
                     </div>
                     :
                     !profile.role?

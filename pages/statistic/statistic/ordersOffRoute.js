@@ -7,7 +7,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
-import Table from '../../../components/app/StatisticTable'
+import StatisticTable from '../../../components/app/StatisticTable'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import {dayStartDefault, handleDateRange, pdDatePicker} from '../../../src/lib'
 import { getStatisticOrdersOffRoute } from '../../../src/gql/statistic'
@@ -160,7 +160,7 @@ const OrderOffRouteStatistic = React.memo((props) => {
                     </div>
                     {
                         statisticOrdersOffRoute?
-                            <Table filterHeight={filterHeight} type='item' row={(statisticOrdersOffRoute.row).slice(1)} columns={statisticOrdersOffRoute.columns}/>
+                            <StatisticTable filterHeight={filterHeight} type='item' row={(statisticOrdersOffRoute.row).slice(1)} columns={statisticOrdersOffRoute.columns}/>
                             :null
                     }
                 </CardContent>

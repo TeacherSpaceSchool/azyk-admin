@@ -8,6 +8,7 @@ import { connect } from 'react-redux'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
+import {formatAmount} from '../src/lib';
 
 const Blog = React.memo((props) => {
     const classes = pageListStyle();
@@ -42,7 +43,7 @@ const Blog = React.memo((props) => {
                 <meta name='robots' content='index, follow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${list.length}`}
+                Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
                 {profile.role==='admin'?<CardBlog list={list} setList={setList}/>:null}

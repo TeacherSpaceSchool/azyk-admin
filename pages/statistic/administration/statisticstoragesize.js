@@ -7,11 +7,12 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
-import Table from '../../../components/app/StatisticTable'
+import StatisticTable from '../../../components/app/StatisticTable'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import { getStatisticStorageSize } from '../../../src/gql/statistic'
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../../redux/actions/app'
+import {formatAmount} from '../../../src/lib';
 
 const StatisticStorageSize = React.memo((props) => {
 
@@ -34,14 +35,14 @@ const StatisticStorageSize = React.memo((props) => {
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     {
                         data.statisticStorageSize?
-                            <Table type='item' filterHeight={0} row={(data.statisticStorageSize.row).slice(1)} columns={data.statisticStorageSize.columns}/>
+                            <StatisticTable type='item' filterHeight={0} row={(data.statisticStorageSize.row).slice(1)} columns={data.statisticStorageSize.columns}/>
                             :null
                     }
                 </CardContent>
             </Card>
             <div className='count'>
-                <div className={classes.rowStatic}>{`Вес: ${data.statisticStorageSize.row[0].data[0]} MB`}</div>
-                <div className={classes.rowStatic}>{`Объектов: ${data.statisticStorageSize.row[0].data[1]} шт`}</div>
+                <div className={classes.rowStatic}>Вес: {formatAmount(data.statisticStorageSize.row[0].data[0])} MB</div>
+                <div className={classes.rowStatic}>Объектов: {formatAmount(data.statisticStorageSize.row[0].data[1])} шт</div>
             </div>
         </App>
     )

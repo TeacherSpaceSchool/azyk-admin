@@ -10,7 +10,7 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
 import {getWarehouses} from '../../src/gql/warehouse';
-import {unawaited} from '../../src/lib';
+import {formatAmount, unawaited} from '../../src/lib';
 
 const defaultWarehouse = {name: 'Основной'}
 
@@ -52,7 +52,7 @@ const Stock = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${list.length}`}
+                Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
                 {

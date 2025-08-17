@@ -554,9 +554,7 @@ const Route = React.memo((props) => {
                     {
                         selectedOrders&&selectedOrders.length?
                             <div className='count' onClick={()=>setShowStat(!showStat)}>
-                                {
-                                    `Заказов: ${selectedOrders.length}`
-                                }
+                                Заказов: {formatAmount(selectedOrders.length)}
                                 {
                                     showStat?
                                         <>

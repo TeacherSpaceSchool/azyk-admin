@@ -7,7 +7,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
-import Table from '../../../components/app/StatisticTable'
+import StatisticTable from '../../../components/app/StatisticTable'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import { getStatisticAdss } from '../../../src/gql/statistic'
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -109,7 +109,7 @@ const AdssStatistic = React.memo((props) => {
                     </div>
                     {
                         statisticAdss?
-                            <Table type='item' row={(statisticAdss.row).slice(1)} columns={statisticAdss.columns}/>
+                            <StatisticTable type='item' row={(statisticAdss.row).slice(1)} columns={statisticAdss.columns}/>
                             :null
                     }
                 </CardContent>

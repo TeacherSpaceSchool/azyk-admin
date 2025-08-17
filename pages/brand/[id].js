@@ -12,7 +12,7 @@ import Link from 'next/link';
 import initialApp from '../../src/initialApp'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import Router from 'next/router'
-import {unawaited} from '../../src/lib';
+import {formatAmount, unawaited} from '../../src/lib';
 import {getOrganization} from '../../src/gql/organization';
 
 const Brand = React.memo((props) => {
@@ -71,9 +71,7 @@ const Brand = React.memo((props) => {
                 null
             }
             <div className='count'>
-                {
-                    `Всего: ${list.length}`
-                }
+                Всего: {formatAmount(list.length)}
             </div>
         </App>
     )

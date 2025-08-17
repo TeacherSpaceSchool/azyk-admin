@@ -14,7 +14,7 @@ import Fab from '@material-ui/core/Fab';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import {unawaited} from '../../src/lib';
+import {formatAmount, unawaited} from '../../src/lib';
 import {getOrganization} from '../../src/gql/organization';
 
 const Equipments = React.memo((props) => {
@@ -69,7 +69,7 @@ const Equipments = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${count}`}
+                Всего: {formatAmount(count)}
             </div>
             <div className={classes.page}>
                 <CardEquipment organization={data.organization} list={list} setList={setList} agents={data.agents}/>

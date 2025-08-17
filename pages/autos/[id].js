@@ -10,7 +10,7 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import Router from 'next/router'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
-import {unawaited} from '../../src/lib';
+import {formatAmount, unawaited} from '../../src/lib';
 
 const sorts = [{name: 'Тоннаж', field: 'tonnage'}]
 
@@ -51,7 +51,7 @@ const Autos = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${list.length}`}
+                Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
                 <CardAuto organization={router.query.id} employments={data.ecspeditors} list={list} setList={setList}/>

@@ -19,7 +19,7 @@ import * as appActions from '../redux/actions/app'
 import { bindActionCreators } from 'redux'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {formatAmount, unawaited} from '../src/lib';
-import OrdersTable from '../components/table/OrdersTable';
+import Table from '../components/table/orders';
 import {viewModes} from '../src/enum';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value: 'обработка'}, {name: 'Акции', value: 'акция'}, {name: 'Без геолокации', value: 'Без геолокации'}, {name: 'Не синхронизированные', value: 'Не синхронизированные'}]
@@ -104,7 +104,7 @@ const Orders = React.memo((props) => {
                         null
                 }
             </div>
-            <div className={classes.page} style={{paddingTop: 0}}>
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
                 {
                     searchTimeOut?
                         <CircularProgress style={{position: 'fixed', top: '50vh'}}/>
@@ -112,7 +112,7 @@ const Orders = React.memo((props) => {
                         list?viewMode===viewModes.card?
                             list.map((element, idx)=> <CardOrder key={element._id} idx={idx} list={list} setList={setList} element={element}/>)
                             :
-                            <OrdersTable list={list} setList={setList}/>
+                            <Table list={list} setList={setList}/>
                         :null
                 }
             </div>

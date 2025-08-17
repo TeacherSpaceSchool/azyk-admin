@@ -9,7 +9,7 @@ import Router from 'next/router'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
-import {unawaited} from '../../src/lib';
+import {formatAmount, unawaited} from '../../src/lib';
 
 const Warehouse = React.memo((props) => {
     const classes = pageListStyle();
@@ -49,7 +49,7 @@ const Warehouse = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${list.length}`}
+                Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
                 <CardWarehouse list={list} setList={setList} organization={router.query.id}/>

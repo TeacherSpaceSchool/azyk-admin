@@ -11,7 +11,7 @@ import initialApp from '../../src/initialApp'
 import Link from 'next/link';
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import Router from 'next/router'
-import {unawaited} from '../../src/lib';
+import {formatAmount, unawaited} from '../../src/lib';
 
 const Items = React.memo((props) => {
     const classes = pageListStyle();
@@ -51,7 +51,7 @@ const Items = React.memo((props) => {
             </Head>
             <div className={classes.page}>
                 <div className='count'>
-                    {`Всего: ${list.length}`}
+                    Всего: {formatAmount(list.length)}
                 </div>
 
                 {list?list.map((element, idx)=> {

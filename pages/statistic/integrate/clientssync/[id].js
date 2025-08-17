@@ -15,6 +15,7 @@ import RemoveIcon from '@material-ui/icons/Clear';
 import Confirmation from '../../../../components/dialog/Confirmation'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../../../redux/actions/mini_dialog'
+import {formatAmount} from '../../../../src/lib';
 
 const ClientsSync = React.memo((props) => {
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
@@ -65,7 +66,7 @@ const ClientsSync = React.memo((props) => {
             </Head>
             <div className={classes.page}>
                 <div className='count'>
-                    {`Интеграций: ${simpleStatistic}`}
+                    Интеграций: {formatAmount(simpleStatistic)}
                 </div>
                 {
                     list?list.map((element  )=> {

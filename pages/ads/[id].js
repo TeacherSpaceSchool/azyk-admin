@@ -11,6 +11,7 @@ import { getOrganization } from '../../src/gql/organization'
 import { useRouter } from 'next/router'
 import Router from 'next/router'
 import {getBrands} from '../../src/gql/items';
+import {formatAmount} from '../../src/lib';
 
 const Ads = React.memo((props) => {
     const initialRender = useRef(true);
@@ -47,7 +48,7 @@ const Ads = React.memo((props) => {
             </Head>
             <div className={classes.page}>
                 <div className='count'>
-                    {`Всего: ${list.length}`}
+                    Всего: {formatAmount(list.length)}
                 </div>
                 {['суперорганизация', 'организация', 'admin'].includes(profile.role)?<CardAds edit items={data.brands} organization={router.query.id} list={list} setList={setList}/>:null}
                 {list?list.map((element, idx)=> {

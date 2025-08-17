@@ -10,6 +10,7 @@ import CardNotificationStatistic from '../../../components/card/CardNotification
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
+import {formatAmount} from '../../../src/lib';
 
 const NotificationStatistic = React.memo((props) => {
     const classes = pageListStyle();
@@ -37,7 +38,7 @@ const NotificationStatistic = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${list.length}`}
+                Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
                 <CardNotificationStatistic list={list} setList={setList}/>

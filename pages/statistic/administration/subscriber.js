@@ -10,6 +10,7 @@ import CardSubscriber from '../../../components/card/CardSubscriber'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
+import {formatAmount} from '../../../src/lib';
 
 const Subscriber = React.memo((props) => {
     const classes = pageListStyle();
@@ -41,16 +42,14 @@ const Subscriber = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count' onClick={()=>setShowStat(!showStat)}>
-                {`Всего: ${list.length}`}
+                Всего: {formatAmount(list.length)}
                 {
                     showStat?
                         <>
                         <br/>
+                        Доставлено: {delivered}
                         <br/>
-                        {`Доставлено: ${delivered}`}
-                        <br/>
-                        <br/>
-                        {`Провалено: ${failed}`}
+                        Провалено: {failed}
                         </>
                         :
                         null

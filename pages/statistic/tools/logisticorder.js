@@ -299,17 +299,15 @@ const LogistiOorder = React.memo((props) => {
                 {
                     selectedOrders?
                         <>
-                        {`Всего: ${formatAmount(lengthList)}`}
+                        Всего: {formatAmount(lengthList)}
                         {
                             showStat?
                                 <>
                                 {price?<>
                                 <br/>
-                                <br/>
                                 {`Сумма: ${formatAmount(price)} сом`}
                                 </>:null}
                                 {weight?<>
-                                <br/>
                                 <br/>
                                 {`Тоннаж: ${formatAmount(weight)} кг`}
                                 </>:null}

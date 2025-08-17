@@ -7,7 +7,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
-import Table from '../../../components/app/StatisticTable'
+import StatisticTable from '../../../components/app/StatisticTable'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import { getStatisticReturned } from '../../../src/gql/statistic'
 import { getOrganizations } from '../../../src/gql/organization'
@@ -107,7 +107,7 @@ const ReturnedStatistic = React.memo((props) => {
                     </div>
                     {
                         statisticReturned?
-                            <Table type='item' row={(statisticReturned.row).slice(1)} columns={statisticReturned.columns}/>
+                            <StatisticTable type='item' row={(statisticReturned.row).slice(1)} columns={statisticReturned.columns}/>
                             :null
                     }
                 </CardContent>

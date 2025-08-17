@@ -13,6 +13,7 @@ import RemoveIcon from '@material-ui/icons/Clear';
 import Confirmation from '../../../components/dialog/Confirmation'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
+import {formatAmount} from '../../../src/lib';
 
 const Errors = React.memo((props) => {
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
@@ -27,7 +28,7 @@ const Errors = React.memo((props) => {
             </Head>
             <div className={classes.page}>
                 <div className='count'>
-                    {`Всего: ${list.length}`}
+                    Всего: {formatAmount(list.length)}
                 </div>
                 {list?list.map((element)=>
                     <CardError element={element}/>

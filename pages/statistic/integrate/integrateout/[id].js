@@ -16,7 +16,7 @@ import Confirmation from '../../../../components/dialog/Confirmation'
 import * as mini_dialogActions from '../../../../redux/actions/mini_dialog'
 import { bindActionCreators } from 'redux'
 import { useRouter } from 'next/router'
-import {unawaited} from '../../../../src/lib';
+import {formatAmount, unawaited} from '../../../../src/lib';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Создан', value: 'create'}, {name: 'Обновлен', value: 'update'}, {name: 'На удаление', value: 'del'}, {name: 'Выполнен', value: 'check'}, {name: 'Ошибка', value: 'error'}]
 
@@ -87,16 +87,14 @@ const IntegrateOutShoro = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count' onClick={()=>setShowStat(!showStat)}>
-                        {
-                            `Выполнено: ${simpleStatistic[0]}`
-                        }
+                        Выполнено: {formatAmount(simpleStatistic[0])}
                         {
                             showStat?
                                 <>
                                     <br/>
-                                    {`Обработка: ${simpleStatistic[1]}`}
+                                    Обработка: {formatAmount(simpleStatistic[1])}
                                     <br/>
-                                    {`Ошибка: ${simpleStatistic[2]}`}
+                                    Ошибка: {formatAmount(simpleStatistic[2])}
                                 </>
                                 :
                                 null

@@ -12,6 +12,7 @@ import Confirmation from '../../../components/dialog/Confirmation'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import { clearAllOfflineOrders, getAllOfflineOrders } from '../../../src/service/idb/offlineOrders';
+import {formatAmount} from '../../../src/lib';
 
 const OfflineOrder = React.memo((props) => {
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
@@ -36,7 +37,7 @@ const OfflineOrder = React.memo((props) => {
                 {list?
                     <>
                     <div className='count'>
-                        {`Всего: ${list.length}`}
+                        Всего: {formatAmount(list.length)}
                     </div>
                     {
                         list.map((element, idx) =>

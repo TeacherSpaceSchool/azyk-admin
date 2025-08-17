@@ -16,7 +16,7 @@ import {bindActionCreators} from 'redux';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import {unawaited} from '../../src/lib';
+import {formatAmount, unawaited} from '../../src/lib';
 
 const Plan = React.memo((props) => {
     const classes = pageListStyle();
@@ -71,7 +71,7 @@ const Plan = React.memo((props) => {
             </Head>
             <div className={classes.page}>
                 <div className='count'>
-                    Всего: {count}
+                    Всего: {formatAmount(count)}
                 </div>
                 {['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?<>
                     <CardPlanClient

@@ -84,9 +84,7 @@ const Returneds = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count' onClick={()=>setShowStat(!showStat)}>
-                        {
-                            `Возвратов: ${formatAmount(simpleStatistic[0])}`
-                        }
+                        Возвратов: {formatAmount(simpleStatistic[0])}
                         {
                             showStat?
                                 <>

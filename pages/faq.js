@@ -8,6 +8,7 @@ import { connect } from 'react-redux'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
+import {formatAmount} from '../src/lib';
 
 const Faqs = React.memo((props) => {
     const classes = pageListStyle();
@@ -43,7 +44,7 @@ const Faqs = React.memo((props) => {
             </Head>
             <div className={classes.page}>
                 <div className='count'>
-                    {`Всего: ${list.length}`}
+                    Всего: {formatAmount(list.length)}
                 </div>
                 {profile.role==='admin'?<CardFaq list={list} setList={setList}/>:null}
                 {list?list.map((element, idx)=> {

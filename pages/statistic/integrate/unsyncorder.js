@@ -7,8 +7,8 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
-import Table from '../../../components/app/StatisticTable'
-import {dayStartDefault, pdDatePicker} from '../../../src/lib'
+import StatisticTable from '../../../components/app/StatisticTable'
+import {dayStartDefault, formatAmount, pdDatePicker} from '../../../src/lib'
 import {getStatisticUnsyncOrder, repairUnsyncOrder} from '../../../src/gql/statistic'
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../../redux/actions/app'
@@ -49,7 +49,7 @@ const Unsyncorder = React.memo((props) => {
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     {
                         statisticUnsyncOrder?
-                            <Table type='item' row={statisticUnsyncOrder.row} columns={statisticUnsyncOrder.columns}/>
+                            <StatisticTable type='item' row={statisticUnsyncOrder.row} columns={statisticUnsyncOrder.columns}/>
                             :null
                     }
                 </CardContent>
@@ -58,7 +58,7 @@ const Unsyncorder = React.memo((props) => {
                 statisticUnsyncOrder&&statisticUnsyncOrder.row.length?
                     <>
                         <div className='count' onClick={()=>setShowStat(!showStat)}>
-                            {statisticUnsyncOrder.row.length}
+                            {formatAmount(statisticUnsyncOrder.row.length)}
                         </div>
                         <Fab onClick={() => {
                             const action = async () => {

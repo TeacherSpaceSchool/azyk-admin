@@ -8,7 +8,7 @@ import CardBrand from '../components/card/CardBrand'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
-import {isNotTestUser, isPWA, unawaited} from '../src/lib';
+import {formatAmount, isNotTestUser, isPWA, unawaited} from '../src/lib';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Активные', value: 'active'}, {name: 'Неактивные', value: 'deactive'}]
 
@@ -74,7 +74,7 @@ const Organization = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${list.length}`}
+                Всего: {formatAmount(list.length)}
             </div>
             {
                 isNotTestUser(profile)&&isMobileApp&&(profile.role!=='client'||deferredPrompt&&!isPWA())?

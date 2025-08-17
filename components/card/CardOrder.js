@@ -93,7 +93,7 @@ const CardOrder = React.memo((props) => {
                             {getClientTitle({address: [element.address]})}{element.city?` (${element.city})`:''}
                         </div>
                     </div>
-                    {element.address[2]!==element.client.name?<div className={classes.row}>
+                    {element.client.name!==element.address[2]?<div className={classes.row}>
                         <div className={classes.nameField}>Получатель:&nbsp;</div>
                         <div className={classes.value}>{element.client.name}</div>
                     </div>:null}

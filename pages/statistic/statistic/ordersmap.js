@@ -75,7 +75,7 @@ const OrdersMap = React.memo((props) => {
             </App>
         </YMaps>
             <div className='count'>
-                {`Заказов: ${geos.length}`}
+                Заказов: {geos.length}
             </div>
         </>
     )

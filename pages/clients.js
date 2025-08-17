@@ -11,7 +11,9 @@ import initialApp from '../src/initialApp'
 import Link from 'next/link';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
-import {unawaited} from '../src/lib';
+import {formatAmount, unawaited} from '../src/lib';
+import {viewModes} from '../src/enum';
+import Table from '../components/table/clients';
 
 const sorts = [{name: 'Имя', field: 'name'}, {name: 'Регистрация', field: 'createdAt'}, {name: 'Активность', field: 'lastActive'}]
 const filters = [{name: 'Все', value: ''}, {name: 'Без геолокации', value: 'Без геолокации'}, {name: 'Включенные', value: 'Включенные'}, {name: 'Выключенные', value: 'Выключенные'}, {name: 'Horeca', value: 'Horeca'}, {name: 'A', value: 'A'}, {name: 'B', value: 'B'}, {name: 'C', value: 'C'}, {name: 'D', value: 'D'}]
@@ -20,7 +22,7 @@ const Client = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [list, setList] = useState(data.clients);
-    let [simpleStatistic, setSimpleStatistic] = useState();
+    let [simpleStatistic, setSimpleStatistic] = useState('');
     const getSimpleStatistic = async () => setSimpleStatistic(await getClientsSimpleStatistic({search, filter, date, city}))
     const paginationWork = useRef(true);
     const getList = async () => {
@@ -30,7 +32,7 @@ const Client = React.memo((props) => {
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
         paginationWork.current = true;
     }
-    const {search, filter, sort, date, city} = props.app;
+    const {search, filter, sort, date, city, viewMode} = props.app;
     const {profile} = props.user;
     const initialRender = useRef(true);
     const searchTimeOut = useRef(null);
@@ -65,14 +67,14 @@ const Client = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${simpleStatistic}`}
+                Всего: {formatAmount(simpleStatistic)}
             </div>
-            <div className={classes.page}>
-                {list?list.map((element, idx)=> {
-                    return(
-                        <CardClient buy idx={idx} key={element._id} list={list} setList={setList} element={element}/>
-                    )}
-                ):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                    list.map((element, idx) => <CardClient buy idx={idx} key={element._id} list={list} setList={setList} element={element}/>)
+                        :
+                    <Table list={list} buy/>
+                :null}
             </div>
             {profile.role==='admin'||(profile.addedClient&&['суперорганизация', 'организация', 'агент'].includes(profile.role))?
                 <Link href='/client/[id]' as={`/client/new`}>

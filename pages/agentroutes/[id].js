@@ -12,6 +12,7 @@ import Router from 'next/router'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import { useRouter } from 'next/router'
 import initialApp from '../../src/initialApp'
+import {formatAmount} from '../../src/lib';
 
 const AgentRoutes = React.memo((props) => {
     const {profile} = props.user;
@@ -47,7 +48,7 @@ const AgentRoutes = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${list.length}`}
+                Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
                 {list?list.map((element, idx)=> {

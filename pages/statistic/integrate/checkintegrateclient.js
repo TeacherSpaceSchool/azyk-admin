@@ -7,7 +7,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
-import Table from '../../../components/app/StatisticTable'
+import StatisticTable from '../../../components/app/StatisticTable'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import {checkIntegrateClient} from '../../../src/gql/statistic'
 import { getOrganizations } from '../../../src/gql/organization'
@@ -123,7 +123,7 @@ const CheckIntegrateClient = React.memo((props) => {
                         :null}
                     {
                         checkClient?
-                            <Table filterHeight={58} type='item' row={checkClient.row} columns={checkClient.columns}/>
+                            <StatisticTable filterHeight={58} type='item' row={checkClient.row} columns={checkClient.columns}/>
                             :null
                     }
                 </CardContent>

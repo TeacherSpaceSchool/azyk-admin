@@ -7,7 +7,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
-import Table from '../../../components/app/StatisticTable'
+import StatisticTable from '../../../components/app/StatisticTable'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import { getStatisticClientCity } from '../../../src/gql/statistic'
 import { bindActionCreators } from 'redux'
@@ -35,7 +35,7 @@ const ClientCity = React.memo((props) => {
                     {
                         data.statisticClientCity?
                             <>
-                            <Table type='item' filterHeight={0} row={(data.statisticClientCity.row).slice(1)} columns={data.statisticClientCity.columns}/>
+                            <StatisticTable type='item' filterHeight={0} row={(data.statisticClientCity.row).slice(1)} columns={data.statisticClientCity.columns}/>
                             <div className='count'>
                                 <div className={classes.rowStatic}>{`Всего: ${data.statisticClientCity.row[0].data[0]} шт`}</div>
                             </div>

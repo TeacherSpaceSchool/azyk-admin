@@ -12,7 +12,7 @@ import initialApp from '../../../../src/initialApp'
 import Router from 'next/router'
 import * as appActions from '../../../../redux/actions/app'
 import {bindActionCreators} from 'redux';
-import {isNotEmpty, unawaited} from '../../../../src/lib';
+import {formatAmount, isNotEmpty, unawaited} from '../../../../src/lib';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Агент', value: 'агент'}, {name: 'Экспедитор', value: 'экспедитор'}, {name: 'Товар', value: 'товар'}, {name: 'Клиент', value: 'клиент'}, {name: 'Менеджер', value: 'менеджер'}]
 
@@ -71,25 +71,25 @@ const Integrate = React.memo((props) => {
                 {
                     simpleStatistic?
                         <div className='count' onClick={()=>setShowStat(!showStat)}>
-                            {`Всего: ${simpleStatistic[0]}`}
+                            Всего: {formatAmount(simpleStatistic[0])}
                             {
                                 showStat?
                                     <>
                                         {isNotEmpty(simpleStatistic[1])?<>
                                             <br/>
-                                            {`Осталось агентов: ${simpleStatistic[1]}`}
+                                            Осталось агентов: {formatAmount(simpleStatistic[1])}
                                         </>:null}
                                         {isNotEmpty(simpleStatistic[2])?<>
                                             <br/>
-                                            {`Осталось экспедиторов: ${simpleStatistic[2]}`}
+                                            Осталось экспедиторов: {formatAmount(simpleStatistic[2])}
                                         </>:null}
                                         {isNotEmpty(simpleStatistic[3])?<>
                                             <br/>
-                                            {`Осталось товаров: ${simpleStatistic[3]}`}
+                                            Осталось товаров: {formatAmount(simpleStatistic[3])}
                                         </>:null}
                                         {isNotEmpty(simpleStatistic[4])?<>
                                             <br/>
-                                            {`Осталось клиентов: ${simpleStatistic[4]}`}
+                                            Осталось клиентов: {formatAmount(simpleStatistic[4])}
                                         </>:null}
                                     </>
                                     :

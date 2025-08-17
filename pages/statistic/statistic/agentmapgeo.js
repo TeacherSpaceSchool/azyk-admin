@@ -17,7 +17,7 @@ import { bindActionCreators } from 'redux'
 import * as appActions from '../../../redux/actions/app'
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import AgentMapGeoOrders from '../../../components/dialog/AgentMapGeoOrders'
-import {dayStartDefault, isNotEmpty, pdDatePicker} from '../../../src/lib'
+import {dayStartDefault, formatAmount, isNotEmpty, pdDatePicker} from '../../../src/lib'
 import pageListStyle from '../../../src/styleMUI/file/fileList'
 import { getGeoDistance } from '../../../src/lib'
 
@@ -117,7 +117,7 @@ const AgentMapGeoStatistic = React.memo((props) => {
             agentMapGeos?
                 <>
                 <div className='count'>
-                    {`Заказов: ${agentMapGeos.length/2}`}
+                    Заказов: {formatAmount(agentMapGeos.length/2)}
                 </div>
                 <Fab color={isNotEmpty(index)?'secondary':'primary'} className={classes.fab} onClick={()=> {
                     if(isNotEmpty(index)) {

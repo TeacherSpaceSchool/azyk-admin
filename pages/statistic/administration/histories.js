@@ -10,7 +10,7 @@ import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
-import {unawaited} from '../../../src/lib';
+import {formatAmount, unawaited} from '../../../src/lib';
 
 const filters = [{name: 'Все', value: ''}, {name: 'SubBrandAzyk', value: 'SubBrandAzyk'}, {name: 'ClientAzyk', value: 'ClientAzyk'}, {name: 'DistrictAzyk', value: 'DistrictAzyk'}, {name: 'EmploymentAzyk', value: 'EmploymentAzyk'}, {name: 'ItemAzyk', value: 'ItemAzyk'}, {name: 'OrganizationAzyk', value: 'OrganizationAzyk'},]
 
@@ -57,7 +57,7 @@ const History = React.memo((props) => {
             </Head>
             <div className={classes.page}>
                 <div className='count'>
-                    {`Всего: ${list.length}`}
+                    Всего: {formatAmount(list.length)}
                 </div>
                 {list.map((element)=>
                     <CardHistory key={element._id} element={element}/>

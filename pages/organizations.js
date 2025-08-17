@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router, {useRouter} from 'next/router'
-import {getQueryParam, unawaited} from '../src/lib';
+import {formatAmount, getQueryParam, unawaited} from '../src/lib';
 import {getAdsOrganizations} from '../src/gql/ads';
 
 const adsPath = 'ads'
@@ -86,7 +86,7 @@ const Organization = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${list.length}`}
+                Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
                 {

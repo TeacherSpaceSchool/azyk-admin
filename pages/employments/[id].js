@@ -11,7 +11,7 @@ import Router from 'next/router'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
-import {unawaited} from '../../src/lib';
+import {formatAmount, unawaited} from '../../src/lib';
 import {getEmployments, getEmploymentsCount} from '../../src/gql/employment';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Агент', value: 'агент'}, {name: 'Менеджер', value: 'менеджер'}, {name: 'Экспедитор', value: 'экспедитор'}, {name: 'Организация', value: 'организация'}]
@@ -66,7 +66,7 @@ const Employment = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${count}`}
+                Всего: {formatAmount(count)}
             </div>
             <div className={classes.page}>
                 {list?list.map((element, idx) => <CardEmployment idx={idx} key={element._id} list={list} setList={setList} element={element}/>):null}

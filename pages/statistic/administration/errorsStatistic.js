@@ -6,9 +6,10 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
-import Table from '../../../components/app/StatisticTable'
+import StatisticTable from '../../../components/app/StatisticTable'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import {getErrorsStatistic} from '../../../src/gql/error';
+import {formatAmount} from '../../../src/lib';
 
 const ErrorsStatistic = React.memo((props) => {
     const classes = pageListStyle();
@@ -27,16 +28,16 @@ const ErrorsStatistic = React.memo((props) => {
             </Head>
             <Card className={classes.page}>
                 <CardContent className={classes.column}>
-                    <Table filterHeight={0} type='item' row={(data.errorsStatistic.row).slice(1)} columns={data.errorsStatistic.columns}/>
+                    <StatisticTable filterHeight={0} type='item' row={(data.errorsStatistic.row).slice(1)} columns={data.errorsStatistic.columns}/>
                 </CardContent>
             </Card>
             <div className='count'>
                 {
                     data.errorsStatistic?
                         <>
-                            <div className={classes.rowStatic}>{`Количество: ${data.errorsStatistic.row[0].data[0]}`}</div>
-                            <div className={classes.rowStatic}>{`Клиенты: ${data.errorsStatistic.row[0].data[1]}`}</div>
-                            <div className={classes.rowStatic}>{`Сотрудники: ${data.errorsStatistic.row[0].data[2]}`}</div>
+                            <div className={classes.rowStatic}>{`Количество: ${formatAmount(data.errorsStatistic.row[0].data[0])}`}</div>
+                            <div className={classes.rowStatic}>{`Клиенты: ${formatAmount(data.errorsStatistic.row[0].data[1])}`}</div>
+                            <div className={classes.rowStatic}>{`Сотрудники: ${formatAmount(data.errorsStatistic.row[0].data[2])}`}</div>
                         </>
                         :null
                 }

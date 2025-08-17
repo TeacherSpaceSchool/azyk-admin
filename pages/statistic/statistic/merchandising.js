@@ -7,7 +7,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
-import Table from '../../../components/app/StatisticTable'
+import StatisticTable from '../../../components/app/StatisticTable'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import {dayStartDefault, handleDateRange, pdDatePicker} from '../../../src/lib'
 import { getStatisticMerchandising } from '../../../src/gql/statistic'
@@ -152,7 +152,7 @@ const MerchandisingStatistic = React.memo((props) => {
                     </div>
                     {
                         statisticMerchandising?
-                            <Table filterHeight={filterHeight} type='item' row={(statisticMerchandising.row).slice(1)} columns={statisticMerchandising.columns}/>
+                            <StatisticTable filterHeight={filterHeight} type='item' row={(statisticMerchandising.row).slice(1)} columns={statisticMerchandising.columns}/>
                             :null
                     }
                 </CardContent>

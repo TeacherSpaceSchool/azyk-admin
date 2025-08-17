@@ -12,7 +12,7 @@ import Router from 'next/router'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import { useRouter } from 'next/router'
 import initialApp from '../../src/initialApp'
-import {unawaited} from '../../src/lib';
+import {formatAmount, unawaited} from '../../src/lib';
 
 const Districts = React.memo((props) => {
     const {profile} = props.user;
@@ -53,7 +53,7 @@ const Districts = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count'>
-                {`Всего: ${list.length}`}
+                Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
                 {list?list.map((element, idx)=> {

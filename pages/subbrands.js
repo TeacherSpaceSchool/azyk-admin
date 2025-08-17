@@ -9,7 +9,7 @@ import CardSubBrand from '../components/card/CardSubBrand'
 import Router from 'next/router'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
-import {unawaited} from '../src/lib';
+import {formatAmount, unawaited} from '../src/lib';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Link from 'next/link';
@@ -55,7 +55,7 @@ const SubBrands = React.memo((props) => {
             </Head>
             <div className={classes.page}>
                 <div className='count'>
-                    {`Всего: ${list.length}`}
+                    Всего: {formatAmount(list.length)}
                 </div>
                 {list?list.map((element, idx)=> {
                     if(idx<pagination)
