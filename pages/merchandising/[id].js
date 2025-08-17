@@ -231,7 +231,7 @@ const Merchandising = React.memo((props) => {
                                     disableOpenOnFocus
                                     className={classes.input}
                                     options={clients}
-                                    getOptionLabel={option => `${option.name}${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
+                                    getOptionLabel={option => `${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
                                     onChange={(event, newValue) => {
                                         handleClient(newValue)
                                     }}
@@ -264,7 +264,7 @@ const Merchandising = React.memo((props) => {
                                 </>
                                 :
                                 <a href={`/client/${client._id}`} target='_blank'>
-                                    <div className={classes.value}>{`${client.name}${client.address&&client.address[0]?` (${client.address[0][2]?`${client.address[0][2]}, `:''}${client.address[0][0]})`:''}`}</div>
+                                    <div className={classes.value}>{`${client.address&&client.address[0]?` (${client.address[0][2]?`${client.address[0][2]}, `:''}${client.address[0][0]})`:''}`}</div>
                                 </a>
                             }
                             <div className={classes.box}>

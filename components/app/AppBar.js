@@ -25,6 +25,8 @@ import Sort from '@material-ui/icons/SortRounded';
 import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
 import GroupIcon from '@material-ui/icons/Group';
 import LocationCityIcon from '@material-ui/icons/LocationCity';
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import ReorderIcon from '@material-ui/icons/Reorder';
 import FilterList from '@material-ui/icons/FilterListRounded';
 import DateRange from '@material-ui/icons/DateRange';
 import PermIdentity from '@material-ui/icons/PermIdentity';
@@ -39,22 +41,28 @@ import SetAgent from '../dialog/SetAgent'
 import SetCities from '../dialog/SetCities'
 import { getOrganizations } from '../../src/gql/organization'
 import { getAgents } from '../../src/gql/employment'
-import {isNotTestUser, setCityCookie} from '../../src/lib'
+import {isNotTestUser, setCityCookie, setViewModeCookie} from '../../src/lib'
 import {pdDDMMYY} from '../../src/lib'
 import {getDistricts} from '../../src/gql/district';
 import SetDistrict from '../dialog/SetDistrict';
+import {setViewMode} from '../../redux/actions/app';
+import {viewModes} from '../../src/enum';
 
 const MyAppBar = React.memo((props) => {
     //props
     const initialRender = useRef(true);
     const classes = appbarStyle();
     const {filters, sorts, pageName, dates, searchShow, unread, defaultOpenSearch, organizations, cityShow, agents, showDistrict, cities} = props
-    const {drawer, search, filter, sort, isMobileApp, date, organization, agent, district, city} = props.app;
-    const {showDrawer, setSearch, setFilter, setSort, setDate, setOrganization, setAgent, setDistrict, setCity} = props.appActions;
+    const {drawer, search, filter, sort, isMobileApp, date, organization, agent, district, city, viewMode} = props.app;
+    const {showDrawer, setSearch, setFilter, setSort, setDate, setOrganization, setAgent, setDistrict, setCity, setViewMode} = props.appActions;
     const {authenticated, profile} = props.user;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {logout} = props.userActions;
     //state
+    const handleViewMode = (viewMode) => {
+        setViewMode(viewMode);
+        setViewModeCookie(viewMode)
+    }
     const [anchorElMobileMenu, setAnchorElMobileMenu] = React.useState(null);
     const openMobileMenu = Boolean(anchorElMobileMenu);
     let handleMobileMenu = (event) => {
@@ -532,6 +540,16 @@ const MyAppBar = React.memo((props) => {
                             <>
                             {cityShow&&['admin'].includes(profile.role)?
                                 <>
+                                <Tooltip title={viewMode===viewModes.card?'Карточки':'Таблица'}>
+                                    <IconButton
+                                        aria-owns={openCities ? 'menu-appbar' : null}
+                                        aria-haspopup='true'
+                                        onClick={() => handleViewMode(viewMode===viewModes.card?viewModes.table:viewModes.card)}
+                                        color='inherit'
+                                    >
+                                        {viewMode===viewModes.card?<DashboardIcon/>:<ReorderIcon/>}
+                                    </IconButton>
+                                </Tooltip>
                                 <Tooltip title='Город'>
                                     <IconButton
                                         style={{background: city?'rgba(51, 143, 255, 0.29)': 'transparent'}}

@@ -15,7 +15,7 @@ import { getOrganizations } from '../../../src/gql/organization'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import * as appActions from '../../../redux/actions/app'
-import Table from '../../../components/app/Table'
+import Table from '../../../components/app/StatisticTable'
 
 const CheckAgentRoute = React.memo((props) => {
     const {profile} = props.user;

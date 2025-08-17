@@ -11,8 +11,15 @@ import {
     SET_COUNT_BASKET,
     SET_DATE,
     SET_ORGANIZATION,
-    SET_DISTRICT
+    SET_DISTRICT, SET_VIEW_MODE
 } from '../constants/app'
+
+export function setViewMode(data) {
+    return {
+        type: SET_VIEW_MODE,
+        payload: data
+    }
+}
 
 export function setCity(data) {
     return {

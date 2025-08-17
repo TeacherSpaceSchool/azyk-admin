@@ -13,13 +13,14 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Confirmation from '../components/dialog/Confirmation'
-import { deleteOrders, getInvoicesSimpleStatistic, acceptOrders } from '../src/gql/order'
+import { getInvoicesSimpleStatistic, acceptOrders } from '../src/gql/order'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import * as appActions from '../redux/actions/app'
 import { bindActionCreators } from 'redux'
-import Badge from '@material-ui/core/Badge';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {unawaited} from '../src/lib';
+import OrdersTable from '../components/table/OrdersTable';
+import {viewModes} from '../src/enum';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value: 'обработка'}, {name: 'Акции', value: 'акция'}, {name: 'Без геолокации', value: 'Без геолокации'}, {name: 'Не синхронизированные', value: 'Не синхронизированные'}]
 
@@ -32,7 +33,7 @@ const Orders = React.memo((props) => {
     let [list, setList] = useState(data.orders);
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {showLoad} = props.appActions;
-    const {search, filter, sort, date, organization, city} = props.app;
+    const {search, filter, sort, date, organization, city, viewMode} = props.app;
     const {profile} = props.user;
     const paginationWork = useRef(true);
     const checkPagination = useCallback(async () => {
@@ -46,7 +47,6 @@ const Orders = React.memo((props) => {
         }
     }, [search, sort, filter, date, organization, city, list])
     const getList = async () => {
-        setSelected([])
         unawaited(getSimpleStatistic)
         const orders = await getOrders({search, sort, filter, date, skip: 0, organization, city})
         setList(orders);
@@ -79,7 +79,6 @@ const Orders = React.memo((props) => {
         })()
     }, [search])
     let [showStat, setShowStat] = useState(false);
-    let [selected, setSelected] = useState([]);
     let [anchorEl, setAnchorEl] = useState(null);
     let open = event => {
         setAnchorEl(event.currentTarget);
@@ -105,23 +104,21 @@ const Orders = React.memo((props) => {
                         null
                 }
             </div>
-            <div className={classes.page}>
+            <div className={classes.page} style={{paddingTop: 0}}>
                 {
                     searchTimeOut?
                         <CircularProgress style={{position: 'fixed', top: '50vh'}}/>
                         :
-                        <>
-                            {list?list.map((element, idx)=> {
-                                return <CardOrder key={element._id} idx={idx} setSelected={setSelected} selected={selected} list={list} setList={setList} element={element}/>
-                            }):null}
-                        </>
+                        list?viewMode===viewModes.card?
+                            list.map((element, idx)=> <CardOrder key={element._id} idx={idx} list={list} setList={setList} element={element}/>)
+                            :
+                            <OrdersTable list={list} setList={setList}/>
+                        :null
                 }
             </div>
-            {profile.role==='admin'&&(selected.length||filter==='обработка')?
+            {profile.role==='admin'&&filter==='обработка'?
                 <Fab onClick={open} color='primary' className={classes.fab}>
-                    <Badge color='secondary' badgeContent={selected.length}>
-                        <SettingsIcon />
-                    </Badge>
+                    <SettingsIcon />
                 </Fab>
                 :
                 null
@@ -140,31 +137,12 @@ const Orders = React.memo((props) => {
                     horizontal: 'left',
                 }}
             >
-                {filter==='обработка' ?
-                    <MenuItem onClick={() => {
-                        const action = async () => await acceptOrders()
-                        setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                        showMiniDialog(true);
-                        setSelected([])
-                        close()
-                    }}>Принять</MenuItem>
-                    :
-                    null
-                }
-                {selected.length ?
-                    <MenuItem style={{color: 'red'}} onClick={() => {
-                        const action = async () => {
-                            await deleteOrders(selected)
-                            setList(list => list.filter(order => !selected.includes(order._id)))
-                        }
-                        setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                        showMiniDialog(true);
-                        setSelected([])
-                        close()
-                    }}>Удалить</MenuItem>
-                    :
-                    null
-                }
+                <MenuItem onClick={() => {
+                    const action = async () => await acceptOrders()
+                    setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                    showMiniDialog(true);
+                    close()
+                }}>Принять</MenuItem>
             </Menu>
         </App>
     )

@@ -18,7 +18,7 @@ import {getOrder} from '../../src/gql/order'
 
 const CardOrder = React.memo((props) => {
     const classes = cardOrderStyle();
-    const {element, setList, route, setSelected, selected, idx} = props;
+    const {element, setList, route, idx} = props;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {profile, authenticated} = props.user;
     const {isMobileApp} = props.app;
@@ -42,24 +42,10 @@ const CardOrder = React.memo((props) => {
                     null
             }
             <CardActionArea onClick={async () => {
-                if(!selected||!selected.length) {
-                    let _element = await getOrder(element._id)
-                    if(_element) {
-                        setMiniDialog('Заказ', <Order idx={idx} route={route} element={_element} setList={setList}/>);
-                        showMiniDialog(true)
-                    }
-                }
-                else {
-                    if(element.cancelForwarder||element.cancelClient) {
-                        if(selected.includes(element._id)) {
-                            setSelected(selected => {
-                                selected.splice(selected.indexOf(element._id), 1)
-                                return [...selected]
-                            })
-                        }
-                        else
-                            setSelected(selected => [...selected, element._id])
-                    }
+                let _element = await getOrder(element._id)
+                if(_element) {
+                    setMiniDialog('Заказ', <Order idx={idx} route={route} element={_element} setList={setList}/>);
+                    showMiniDialog(true)
                 }
             }}>
                 <CardContent className={classes.column}>
@@ -196,7 +182,7 @@ const CardOrder = React.memo((props) => {
             </CardActionArea>
             <CardActions>
                 {
-                    element.del!=='deleted'&&status==='отмена'&&profile.role==='admin'&&!selected.length ?
+                    element.del!=='deleted'&&status==='отмена'&&profile.role==='admin' ?
                         <Button onClick={() => {
                             const action = async () => {
                                 await deleteOrders([element._id])

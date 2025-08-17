@@ -1,3 +1,5 @@
+import {viewModes} from './enum';
+
 const regexpUA = /(Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|iOS|Mobile)/
 
 export const dayStartDefault = 3
@@ -6,59 +8,56 @@ export const checkMobile = (ua) => {
     return regexpUA.exec(ua)!==null
 }
 export const getJWT = (cookie) => {
-    let name = 'jwt=';
-    let decodedCookie = decodeURIComponent(cookie);
-    let ca = decodedCookie.split(';');
-    for(let i = 0; i <ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) === ' ') {
-            c = c.substring(1);
-        }
-        if(c.indexOf(name) === 0) {
-            let jwt = c.substring(name.length, c.length)
-            if(process.browser) {
-                const now = new Date()
-                let needExtended = true
-                if(localStorage.extendedJWT) {
-                    const extendedJWT = new Date(localStorage.extendedJWT)
-                    if(!isNaN(extendedJWT.getTime()))
-                        needExtended = ((now - extendedJWT)/1000/60/60/24)>30
-                }
-                if(needExtended) {
-                    localStorage.extendedJWT = now
-                    document.cookie = `jwt=${jwt};expires=Sun, 31 May 2048 12:35:23 GMT;path=/;SameSite=Lax;secure=true`;
-                }
+    if (!cookie) return null;
+    // достаём jwt напрямую
+    const jwt = cookie.split('; ')
+        .find(c => c.startsWith('jwt='))?.split('=')[1];
+    if (!jwt) return null;
+    if (typeof window !== 'undefined') { // вместо process.browser
+        const now = new Date();
+        let needExtended = true;
+        if (localStorage.extendedJWT) {
+            const extendedJWT = new Date(localStorage.extendedJWT);
+            if (!isNaN(extendedJWT.getTime())) {
+                needExtended = ((now - extendedJWT) / 1000 / 60 / 60 / 24) > 30;
             }
-            return jwt;
+        }
+        if (needExtended) {
+            localStorage.extendedJWT = now;
+            document.cookie = `jwt=${jwt};expires=Sun, 31 May 2048 12:35:23 GMT;path=/;SameSite=Lax;secure=true`;
         }
     }
-    return null;
+    return decodeURIComponent(jwt);
 }
 export const getCityCookie = (cookie) => {
-    let name = 'city=';
-    let decodedCookie = decodeURIComponent(cookie);
-    let ca = decodedCookie.split(';');
-    for(let i = 0; i <ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) === ' ') {
-            c = c.substring(1);
-        }
-        if(c.indexOf(name) === 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return null;
+    if (!cookie) return null;
+    return decodeURIComponent(
+        cookie.split('; ')
+            .find(c => c.startsWith('city='))?.split('=')[1] || ''
+    ) || null;
 }
+export const setCityCookie = (city) => {
+    const days = 10000; // срок жизни в днях
+    const date = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+    document.cookie = `city=${encodeURIComponent(city)}; expires=${date}; path=/; SameSite=Lax`;
+}
+export const getViewModeCookie = (cookie) => {
+    if (!cookie) return null;
+    return decodeURIComponent(
+        cookie.split('; ')
+            .find(c => c.startsWith('viewMode='))?.split('=')[1] || ''
+    ) || viewModes.card;
+}
+export const setViewModeCookie = (viewMode) => {
+    const days = 10000; // срок жизни в днях
+    const date = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+    document.cookie = `viewMode=${encodeURIComponent(viewMode)}; expires=${date}; path=/; SameSite=Lax`;
+};
 export const isNotTestUser = (profile) => {
     return !profile||!profile.login||!profile.login.toLowerCase().includes('test')
 }
 export const isTestUser = (profile) => {
     return profile&&profile.login&&profile.login.toLowerCase().includes('test')
-}
-export const setCityCookie = (city) => {
-    let date = new Date(Date.now() + 10000*24*60*60*1000);
-    date = date.toUTCString();
-    document.cookie = `city=${encodeURI(city)}; expires=` + date;
 }
 export const countdown = (date) => {
     date = new Date(date).getTime()
@@ -167,6 +166,18 @@ export const pdDDMMYYHHMM = (date) =>
 {
     date = new Date(date)
     date = `${date.getDate()<10?'0':''}${date.getDate()}.${date.getMonth()<9?'0':''}${date.getMonth()+1}.${date.getYear()-100} ${date.getHours()<10?'0':''}${date.getHours()}:${date.getMinutes()<10?'0':''}${date.getMinutes()}`
+    return date
+}
+export const pdDDMMHHMM = (date) =>
+{
+    date = new Date(date)
+    date = `${date.getDate()<10?'0':''}${date.getDate()}.${date.getMonth()<9?'0':''}${date.getMonth()+1} ${date.getHours()<10?'0':''}${date.getHours()}:${date.getMinutes()<10?'0':''}${date.getMinutes()}`
+    return date
+}
+export const pdDDMM = (date) =>
+{
+    date = new Date(date)
+    date = `${date.getDate()<10?'0':''}${date.getDate()}.${date.getMonth()<9?'0':''}${date.getMonth()+1}`
     return date
 }
 export const pdDDMMYYHHMMCancel = (date) =>

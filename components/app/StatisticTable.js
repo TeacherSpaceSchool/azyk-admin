@@ -5,7 +5,7 @@ import {exportToExcel} from '../../src/excel';
 import {connect} from 'react-redux';
 import {isNotEmpty} from '../../src/lib';
 
-const MyTable =  React.memo(
+const StatisticTable =  React.memo(
     (props) =>{
         const {columns, row, filterHeight/*, type*/} = props;
         const {isMobileApp} = props.app;
@@ -63,5 +63,5 @@ function mapStateToProps (state) {
     }
 }
 
-export default connect(mapStateToProps)(MyTable)
+export default connect(mapStateToProps)(StatisticTable)
 

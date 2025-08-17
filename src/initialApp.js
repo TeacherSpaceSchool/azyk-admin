@@ -1,6 +1,6 @@
 import { getProfile } from '../redux/actions/user'
 import { setClient } from './gql/client'
-import {getJWT, checkMobile, getCityCookie, unawaited} from './lib'
+import {getJWT, checkMobile, getCityCookie, unawaited, getViewModeCookie} from './lib'
 import uaParserJs from 'ua-parser-js';
 import { getClientGqlSsr } from './getClientGQL'
 
@@ -12,6 +12,8 @@ export default async (ctx) => {
         ctx.store.getState().app.device = ua.device
         //проверка аутентификации
         ctx.store.getState().user.authenticated = getJWT(ctx.req.headers.cookie)
+        //тип отображения
+        ctx.store.getState().app.viewMode = getViewModeCookie(ctx.req.headers.cookie)
         //пройдена аутентификации
         if(ctx.store.getState().user.authenticated) {
             //получения профиля

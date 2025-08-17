@@ -11,8 +11,9 @@ import {
     SET_COUNT_BASKET,
     SET_DATE,
     SET_ORGANIZATION,
-    SET_DISTRICT
+    SET_DISTRICT, SET_VIEW_MODE
 } from '../constants/app'
+import {viewModes} from '../../src/enum';
 
 const initialState = {
     showAppBar: true,
@@ -24,6 +25,7 @@ const initialState = {
     countBasket: 0,
     date: '',
     city: 'Бишкек',
+    viewMode: viewModes.card,
 }
 
 export default function mini_dialog(state = initialState, action) {
@@ -40,6 +42,8 @@ export default function mini_dialog(state = initialState, action) {
             return {...state, filter: action.payload}
         case SET_SEARCH:
             return {...state, search: action.payload}
+        case SET_VIEW_MODE:
+            return {...state, viewMode: action.payload}
         case SET_IS_MOBILE_APP:
             return {...state, isMobileApp: action.payload}
         case SHOW_LOAD:

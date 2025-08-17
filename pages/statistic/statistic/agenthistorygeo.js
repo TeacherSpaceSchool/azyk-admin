@@ -7,7 +7,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
-import Table from '../../../components/app/Table'
+import Table from '../../../components/app/StatisticTable'
 import { getAgentHistoryGeos } from '../../../src/gql/agentHistoryGeo'
 import { getAgents } from '../../../src/gql/employment'
 import Autocomplete from '@material-ui/lab/Autocomplete';

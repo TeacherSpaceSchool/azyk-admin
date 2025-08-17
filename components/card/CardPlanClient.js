@@ -70,7 +70,7 @@ const CardPlanClient = React.memo((props) => {
                         element?
                             <>
                                 <div style={{marginBottom: 5, lineHeight: 1.5, fontSize: 14, fontWeight: 'bold'}}>
-                                    {element.client.name}{element.client.address&&element.client.address[0]?` (${element.client.address[0][2]?`${element.client.address[0][2]}, `:''}${element.client.address[0][0]})`:''}
+                                    {element.client.address&&element.client.address[0]?` (${element.client.address[0][2]?`${element.client.address[0][2]}, `:''}${element.client.address[0][0]})`:''}
                                 </div>
                                 <div className={classes.row}>
                                     <div className={classes.nameField}>Прогресс:&nbsp;</div>
@@ -85,7 +85,7 @@ const CardPlanClient = React.memo((props) => {
                                 disableOpenOnFocus
                                 className={classes.input}
                                 options={clients}
-                                getOptionLabel={option => `${option.name}${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
+                                getOptionLabel={option => `${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
                                 onChange={(event, newValue) => handleClient(newValue)}
                                 noOptionsText='Ничего не найдено'
                                 renderInput={params => (

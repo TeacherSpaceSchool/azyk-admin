@@ -167,7 +167,7 @@ const Catalog = React.memo((props) => {
                         disableOpenOnFocus
                         className={classes.input}
                         options={clients}
-                        getOptionLabel={option => `${option.name}${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
+                        getOptionLabel={option => `${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
                         onChange={(event, newValue) => {
                             handleClient(newValue)
                         }}

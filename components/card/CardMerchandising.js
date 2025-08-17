@@ -31,7 +31,7 @@ const CardMerchandising = React.memo((props) => {
                     </div>
                     <div className={classes.row}>
                         <div className={classes.nameField}>Клиент:&nbsp;</div>
-                        <div className={classes.value} style={{color: 'black'}}>{`${element.client.name}${element.client.address&&element.client.address[0]?` (${element.client.address[0][2]?`${element.client.address[0][2]}, `:''}${element.client.address[0][0]})`:''}`}</div>
+                        <div className={classes.value} style={{color: 'black'}}>{`${element.client.address&&element.client.address[0]?` (${element.client.address[0][2]?`${element.client.address[0][2]}, `:''}${element.client.address[0][0]})`:''}`}</div>
                     </div>
                     <div className={classes.row}>
                         <div className={classes.nameField}>Оценка:&nbsp;</div>

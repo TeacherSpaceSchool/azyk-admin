@@ -69,7 +69,7 @@ const CardRepairEquipment = React.memo((props) => {
                                         Клиент:&nbsp;
                                     </div>
                                     <div className={classes.value}>
-                                        {`${element.client.name}${element.client.address&&element.client.address[0]?` (${element.client.address[0][2]?`${element.client.address[0][2]}, `:''}${element.client.address[0][0]})`:''}`}
+                                        {`${element.client.address&&element.client.address[0]?` (${element.client.address[0][2]?`${element.client.address[0][2]}, `:''}${element.client.address[0][0]})`:''}`}
                                     </div>
                                 </div>
                                 :null
