@@ -12,7 +12,7 @@ import Confirmation from '../dialog/Confirmation';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {getClientsForPlanClients, setPlanClient, deletePlanClient} from '../../src/gql/planClient';
-import {inputInt} from '../../src/lib';
+import {getClientTitle, inputInt} from '../../src/lib';
 import * as snackbarActions from '../../redux/actions/snackbar';
 import {checkInt} from '../../redux/constants/other';
 
@@ -69,9 +69,9 @@ const CardPlanClient = React.memo((props) => {
                     {
                         element?
                             <>
-                                <div style={{marginBottom: 5, lineHeight: 1.5, fontSize: 14, fontWeight: 'bold'}}>
-                                    {element.client.address&&element.client.address[0]?` (${element.client.address[0][2]?`${element.client.address[0][2]}, `:''}${element.client.address[0][0]})`:''}
-                                </div>
+                                {element.client?<div style={{marginBottom: 5, lineHeight: 1.5, fontSize: 14, fontWeight: 'bold'}}>
+                                    {getClientTitle(element.client)}
+                                </div>:null}
                                 <div className={classes.row}>
                                     <div className={classes.nameField}>Прогресс:&nbsp;</div>
                                     <div className={classes.value}>{element.current} сом</div>
@@ -85,7 +85,7 @@ const CardPlanClient = React.memo((props) => {
                                 disableOpenOnFocus
                                 className={classes.input}
                                 options={clients}
-                                getOptionLabel={option => `${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
+                                getOptionLabel={option => getClientTitle(option)}
                                 onChange={(event, newValue) => handleClient(newValue)}
                                 noOptionsText='Ничего не найдено'
                                 renderInput={params => (

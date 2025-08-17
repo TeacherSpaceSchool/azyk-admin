@@ -14,7 +14,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { getClients } from '../../src/gql/client'
 import Confirmation from './Confirmation'
 import { saveDiscountClients } from '../../src/gql/discountClient'
-import { checkInt } from '../../src/lib'
+import {checkInt, getClientTitle} from '../../src/lib'
 
 const SetDiscountClient =  React.memo(
     (props) =>{
@@ -68,7 +68,7 @@ const SetDiscountClient =  React.memo(
                     disableOpenOnFocus
                     className={classes.input}
                     options={clients}
-                    getOptionLabel={option => `${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
+                    getOptionLabel={option => getClientTitle(option)}
                     onChange={(event, newValue) => {
                         handleClient(newValue)
                     }}

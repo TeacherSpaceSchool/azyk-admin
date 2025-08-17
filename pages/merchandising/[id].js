@@ -42,7 +42,7 @@ import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import {dayStartDefault, maxImageSize} from '../../src/lib';
+import {dayStartDefault, getClientTitle, maxImageSize} from '../../src/lib';
 
 const marks = [
     {
@@ -231,7 +231,7 @@ const Merchandising = React.memo((props) => {
                                     disableOpenOnFocus
                                     className={classes.input}
                                     options={clients}
-                                    getOptionLabel={option => `${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
+                                    getOptionLabel={option => getClientTitle(option)}
                                     onChange={(event, newValue) => {
                                         handleClient(newValue)
                                     }}
@@ -264,7 +264,7 @@ const Merchandising = React.memo((props) => {
                                 </>
                                 :
                                 <a href={`/client/${client._id}`} target='_blank'>
-                                    <div className={classes.value}>{`${client.address&&client.address[0]?` (${client.address[0][2]?`${client.address[0][2]}, `:''}${client.address[0][0]})`:''}`}</div>
+                                    <div className={classes.value}>{getClientTitle(client)}</div>
                                 </a>
                             }
                             <div className={classes.box}>

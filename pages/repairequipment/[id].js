@@ -32,6 +32,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {getOrganizations} from '../../src/gql/organization';
+import {getClientTitle} from '../../src/lib';
 
 const RepairEquipment = React.memo((props) => {
     const {profile} = props.user;
@@ -139,7 +140,7 @@ const RepairEquipment = React.memo((props) => {
                                     disableOpenOnFocus
                                     className={classes.input}
                                     options={clients}
-                                    getOptionLabel={option => `${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
+                                    getOptionLabel={option => getClientTitle(option)}
                                     onChange={(event, newValue) => handleClient(newValue)}
                                     value={client}
                                     noOptionsText='Ничего не найдено'
@@ -161,7 +162,7 @@ const RepairEquipment = React.memo((props) => {
                                 :
                                 <TextField
                                     label='Клиент'
-                                    value={`${client.address&&client.address[0]?` (${client.address[0][2]?`${client.address[0][2]}, `:''}${client.address[0][0]})`:''}`}
+                                    value={getClientTitle(client)}
                                     className={classes.input}
                                     inputProps={{readOnly: true}}
                                 />

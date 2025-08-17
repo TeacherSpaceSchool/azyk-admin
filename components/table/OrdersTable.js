@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import SyncOn from '@material-ui/icons/Sync';
 import SyncOff from '@material-ui/icons/SyncDisabled';
-import {pdDDMMHHMM, pdDDMMYYYY} from '../../src/lib';
+import {getClientTitle, pdDDMMHHMM, pdDDMMYYYY} from '../../src/lib';
 import Table from './Table';
 import {getOrder} from '../../src/gql/order';
 import Order from '../dialog/Order';
@@ -58,7 +58,7 @@ const OrdersTable =  React.memo(({list, setList, app, user, mini_dialogActions})
                 </div>
                 <div className='tableBorder'/>
                 <div className='tableCell' style={{...columns[3].style, ...!element.address[1]?{color: 'red'}:{}}}>
-                    {`${element.address[2]?`${element.address[2]}, `:''}${element.address[0]}${element.city?` (${element.city})`:''}`}
+                    {getClientTitle({address: [element.address]})}{['admin', 'суперагент'].includes(profile.role)&&element.city?` (${element.city})`:''}
                 </div>
                 <div className='tableBorder'/>
                 <div className='tableCell' style={columns[4].style}>

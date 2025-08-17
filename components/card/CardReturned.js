@@ -8,7 +8,7 @@ import cardReturnedStyle from '../../src/styleMUI/returned/cardReturned'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
-import { pdDDMMYYHHMM, pdDDMMYYYYWW } from '../../src/lib'
+import {getClientTitle, pdDDMMYYHHMM, pdDDMMYYYYWW} from '../../src/lib'
 import Returned from '../dialog/Returned'
 import Confirmation from '../../components/dialog/Confirmation'
 import { deleteReturneds } from '../../src/gql/returned'
@@ -111,12 +111,14 @@ const CardReturned = React.memo((props) => {
                     }
                     <div className={classes.row}>
                         <div className={classes.nameField}>Адрес:&nbsp;</div>
-                        <div className={classes.value}>{`${element.address[2]?`${element.address[2]}, `:''}${element.address[0]}${element.city?` (${element.city})`:''}`}</div>
+                        <div className={classes.value}>
+                            {getClientTitle({address: [element.address]})}{element.city?` (${element.city})`:''}
+                        </div>
                     </div>
-                    <div className={classes.row}>
+                    {element.address[2]!==element.client.name?<div className={classes.row}>
                         <div className={classes.nameField}>Клиент:&nbsp;</div>
                         <div className={classes.value}>{element.client.name}</div>
-                    </div>
+                    </div>:null}
                     <div className={classes.row}>
                         <div className={classes.nameField}>Организация:&nbsp;</div>
                         <div className={classes.value}>{element.organization.name}</div>

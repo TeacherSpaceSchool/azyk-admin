@@ -224,6 +224,8 @@ export const checkDate = (date) => {
     return Number.isNaN(parsed)||parsed=='Invalid Date' ? new Date() : parsed;
 };
 
+export const getClientTitle = (client) => client?`${client.address&&client.address[0]?`${client.address[0][2]?`${client.address[0][2]}, `:''}${client.address[0][0]}`:''}`:'';
+
 export const handleDateRange = ({type, value, setDateRange,  maxMonthPeriod = 12}) => {
     setDateRange(dateRange => {
         let start = dateRange.start;

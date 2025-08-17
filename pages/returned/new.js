@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import pageListStyle from '../../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat, unawaited} from '../../src/lib';
+import {checkInt, checkFloat, unawaited, getClientTitle} from '../../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
@@ -167,7 +167,7 @@ const Catalog = React.memo((props) => {
                         disableOpenOnFocus
                         className={classes.input}
                         options={clients}
-                        getOptionLabel={option => `${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
+                        getOptionLabel={option => getClientTitle(option)}
                         onChange={(event, newValue) => {
                             handleClient(newValue)
                         }}

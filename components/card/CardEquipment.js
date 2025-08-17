@@ -23,7 +23,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Lightbox from 'react-awesome-lightbox';
 import HistoryAgents from '../dialog/HistoryAgents';
 import History from '@material-ui/icons/History';
-import {maxImageSize} from '../../src/lib';
+import {getClientTitle, maxImageSize} from '../../src/lib';
 
 const models = ['USS175', 'USS374', 'USS440', 'Super FD']
 
@@ -141,7 +141,7 @@ const CardEquipment = React.memo((props) => {
                                 disableOpenOnFocus
                                 className={classes.input}
                                 options={clients}
-                                getOptionLabel={option => `${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
+                                getOptionLabel={option => getClientTitle(option)}
                                 onChange={(event, newValue) => {
                                     handleClient(newValue)
                                 }}

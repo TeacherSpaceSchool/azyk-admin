@@ -183,281 +183,291 @@ const MyAppBar = React.memo((props) => {
                             </Paper>
                             :
                             <>
-                            {
-                                cityShow||dates||searchShow||filters||sorts?
+                                <Tooltip title={viewMode===viewModes.card?'Карточки':'Таблица'}>
                                     <IconButton
-                                        style={{background: date||organization||agent||showDistrict||city||filter?'rgba(51, 143, 255, 0.29)': 'transparent'}}
-                                        aria-owns={openMobileMenu ? 'menu-appbar' : null}
+                                        aria-owns={openCities ? 'menu-appbar' : null}
                                         aria-haspopup='true'
-                                        onClick={handleMobileMenu}
+                                        onClick={() => handleViewMode(viewMode===viewModes.card?viewModes.table:viewModes.card)}
                                         color='inherit'
                                     >
-                                        <Search />
+                                        {viewMode===viewModes.card?<DashboardIcon/>:<ReorderIcon/>}
                                     </IconButton>
-                                    :
-                                    null
-                            }
-                            <Menu
-                                id='menu-appbar'
-                                anchorEl={anchorElMobileMenu}
-                                anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'right',
-                                }}
-                                transformOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'right',
-                                }}
-                                open={openMobileMenu}
-                                onClose={handleCloseMobileMenu}
-                            >
+                                </Tooltip>
                                 {
-                                    searchShow?
-                                        <MenuItem key='search' onClick={() => {
-                                            setOpenSearch(true);handleCloseMobileMenu()
-                                        }}>
-                                            <div style={{display: 'flex', color: '#606060'}}>
-                                                <Search/>&nbsp;Поиск
-                                            </div>
-                                        </MenuItem>
+                                    cityShow||dates||searchShow||filters||sorts?
+                                        <IconButton
+                                            style={{background: date||organization||agent||showDistrict||city||filter?'rgba(51, 143, 255, 0.29)': 'transparent'}}
+                                            aria-owns={openMobileMenu ? 'menu-appbar' : null}
+                                            aria-haspopup='true'
+                                            onClick={handleMobileMenu}
+                                            color='inherit'
+                                        >
+                                            <Search />
+                                        </IconButton>
                                         :
                                         null
                                 }
-                                {filters&&filters.length?
-                                    [
-                                        <MenuItem key='filterMenu' onClick={handleMenuFilter} style={{background: filter?'rgba(255, 179, 0, 0.15)': '#fff'}}>
-                                            <div style={{display: 'flex', color: '#606060'}}>
-                                                <FilterList/>&nbsp;{filter?(filters.find(elem=>filter===elem.value))?(filters.find(elem=>filter===elem.value)).name:'Фильтр':'Фильтр'}
-                                            </div>
-                                        </MenuItem>,
-                                        <Menu
-                                            key='filter'
-                                            id='menu-appbar'
-                                            anchorEl={anchorElFilter}
-                                            anchorOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'right',
-                                            }}
-                                            transformOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'right',
-                                            }}
-                                            open={openFilter}
-                                            onClose={handleCloseFilter}
-                                        >
-                                            {filters.map((elem, idx)=><MenuItem key={'filter'+idx} style={{background: filter===elem.value?'rgba(255, 179, 0, 0.15)': '#fff'}}  onClick={() => {setFilter(elem.value);handleCloseFilter();handleCloseMobileMenu();}}>{elem.name}</MenuItem>)}
-                                        </Menu>
-                                    ]
-                                    :null
-                                }
-                                {sorts&&sorts.length?
-                                    [
-                                        <MenuItem key='sortMenu' onClick={handleMenuSort} style={{background: sort?'rgba(255, 179, 0, 0.15)': '#fff'}}>
-                                            <div style={{display: 'flex', color: '#606060'}}>
-                                                {
-                                                    sort?
-                                                        <>
-                                                        {sort[0]==='-'?<ArrowDownward />:<ArrowUpward/>}&nbsp;
-                                                        {
-                                                            (sorts.find(elem=>{
-                                                                return sort===elem.field||`-${elem.field}`===sort?elem.name:null
-                                                            }))?
-                                                                (sorts.find(elem=>{
-                                                                    return sort===elem.field||`-${elem.field}`===sort?elem.name:null
-                                                                })).name
-                                                                :
-                                                                'Сортировка'
-                                                        }
-                                                        </>
-                                                        :
-                                                        <>
-                                                        <Sort/>&nbsp;
-                                                        Сортировка
-                                                        </>
-                                                }
-                                            </div>
-                                        </MenuItem>,
-                                        <Menu
-                                            key='sort'
-                                            id='menu-appbar'
-                                            anchorEl={anchorElSort}
-                                            anchorOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'left',
-                                            }}
-                                            transformOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'left',
-                                            }}
-                                            open={openSort}
-                                            onClose={handleCloseSort}
-                                        >
-                                            {sorts.map((elem, idx)=><MenuItem style={{background: sort===elem.field||`-${elem.field}`===sort?'rgba(255, 179, 0, 0.15)': '#fff'}} key={'sort'+idx} onClick={() => {sort===`-${elem.field}`?setSort(elem.field):setSort(`-${elem.field}`);handleCloseSort();handleCloseMobileMenu()}}>{sort===`-${elem.field}`?<ArrowDownward />:sort===elem.field?<ArrowUpward />:<div style={{width: '24px'}}/>}{elem.name}</MenuItem>)}
-                                        </Menu>
-                                    ]
-                                    :null
-                                }
-                                {dates?
-                                    [
-                                        <MenuItem key='dateMenu' onClick={handleMenuDate} style={{background: date?'rgba(255, 179, 0, 0.15)': '#fff'}}>
-                                            <div style={{display: 'flex', color: '#606060'}}>
-                                                <DateRange/>&nbsp;{date?pdDDMMYY(date):'Дата'}
-                                            </div>
-                                        </MenuItem>,
-                                        <Menu
-                                            key='date'
-                                            id='menu-appbar'
-                                            anchorEl={anchorElDate}
-                                            anchorOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'right',
-                                            }}
-                                            transformOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'right',
-                                            }}
-                                            open={openDate}
-                                            onClose={handleCloseDate}
-                                        >
-                                            <MenuItem key='onDate' style={{background: date?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setMiniDialog('Дата', <SetDate/>);showMiniDialog(true);handleCloseDate();handleCloseMobileMenu();}}>
-                                                По дате
+                                <Menu
+                                    id='menu-appbar'
+                                    anchorEl={anchorElMobileMenu}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'right',
+                                    }}
+                                    transformOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'right',
+                                    }}
+                                    open={openMobileMenu}
+                                    onClose={handleCloseMobileMenu}
+                                >
+                                    {
+                                        searchShow?
+                                            <MenuItem key='search' onClick={() => {
+                                                setOpenSearch(true);handleCloseMobileMenu()
+                                            }}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    <Search/>&nbsp;Поиск
+                                                </div>
                                             </MenuItem>
-                                            <MenuItem key='allDate' style={{background: !date?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setDate('');handleCloseDate();handleCloseMobileMenu();}}>
-                                                Все
-                                            </MenuItem>
-                                        </Menu>
-                                    ]
-                                    :null
-                                }
-                                {organizations&&['суперагент', 'admin', 'client'].includes(profile.role)?
-                                    [
-                                        <MenuItem key='organizationsMenu' onClick={handleMenuOrganizations} style={{background: organization?'rgba(255, 179, 0, 0.15)': '#fff'}}>
-                                            <div style={{display: 'flex', color: '#606060'}}>
-                                                <BusinessCenterIcon/>&nbsp;Организации
-                                            </div>
-                                        </MenuItem>,
-                                        <Menu
-                                            key='organizations'
-                                            id='menu-appbar'
-                                            anchorEl={anchorElOrganizations}
-                                            anchorOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'right',
-                                            }}
-                                            transformOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'right',
-                                            }}
-                                            open={openOrganizations}
-                                            onClose={handleCloseOrganizations}
-                                        >
-                                            <MenuItem key='onOrganizations' style={{background: organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let organizations = await getOrganizations({search: '', filter: '', city});setMiniDialog('Организации', <SetOrganizations organizations={organizations}/>);showMiniDialog(true);handleCloseOrganizations();handleCloseMobileMenu();}}>
-                                                По организации
-                                            </MenuItem>
-                                            <MenuItem key='allOrganizations' style={{background: !organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setOrganization(null);handleCloseOrganizations();handleCloseMobileMenu();}}>
-                                                Все
-                                            </MenuItem>
-                                        </Menu>
-                                    ]
-                                    :null
-                                }
-                                {organization&&agents&&['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
-                                    [
-                                        <MenuItem key='agentssMenu' onClick={handleMenuAgents} style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}}>
-                                            <div style={{display: 'flex', color: '#606060'}}>
-                                                <GroupIcon/>&nbsp;Агенты
-                                            </div>
-                                        </MenuItem>,
-                                        <Menu
-                                            key='agents'
-                                            id='menu-appbar'
-                                            anchorEl={anchorElAgents}
-                                            anchorOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'right',
-                                            }}
-                                            transformOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'right',
-                                            }}
-                                            open={openAgents}
-                                            onClose={handleCloseAgents}
-                                        >
-                                            <MenuItem key='onAgents' style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let agents = await getAgents(organization);let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();handleCloseMobileMenu();}}>
-                                                По агенту
-                                            </MenuItem>
-                                            <MenuItem key='allAgents' style={{background: !agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setAgent(null);handleCloseAgents();handleCloseMobileMenu();}}>
-                                                Все
-                                            </MenuItem>
-                                        </Menu>
-                                    ]
-                                    :null
-                                }
-                                {organization&&showDistrict&&['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
-                                    [
-                                        <MenuItem key='districtMenu' onClick={handleMenuDistricts} style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}}>
-                                            <div style={{display: 'flex', color: '#606060'}}>
-                                                <GroupIcon/>&nbsp;Агенты
-                                            </div>
-                                        </MenuItem>,
-                                        <Menu
-                                            key='districts'
-                                            id='menu-appbar'
-                                            anchorEl={anchorElDistricts}
-                                            anchorOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'right',
-                                            }}
-                                            transformOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'right',
-                                            }}
-                                            open={openDistricts}
-                                            onClose={handleCloseDistricts}
-                                        >
-                                            <MenuItem key='onDistrict' style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let districts = await getDistricts({_id: organization, search: '', sort: '-createdAt'});setMiniDialog('Район', <SetDistrict setDistrict={setDistrict} districts={districts}/>);showMiniDialog(true);handleCloseDistricts();handleCloseMobileMenu();}}>
-                                                По району
-                                            </MenuItem>
-                                            <MenuItem key='allDistricts' style={{background: !district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setDistrict(null);handleCloseDistricts();handleCloseMobileMenu();}}>
-                                                Все
-                                            </MenuItem>
-                                        </Menu>
-                                    ]
-                                    :null
-                                }
-                                {cityShow&&['admin'].includes(profile.role)?
-                                    [
-                                        <MenuItem key='cityMenu' onClick={handleMenuCities} style={{background: city?'rgba(255, 179, 0, 0.15)': '#fff'}}>
-                                            <div style={{display: 'flex', color: '#606060'}}>
-                                                <LocationCityIcon/>&nbsp;{city?city:'Город'}
-                                            </div>
-                                        </MenuItem>,
-                                        <Menu
-                                            key='city'
-                                            id='menu-appbar'
-                                            anchorEl={anchorElCities}
-                                            anchorOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'right',
-                                            }}
-                                            transformOrigin={{
-                                                vertical: 'top',
-                                                horizontal: 'right',
-                                            }}
-                                            open={openCities}
-                                            onClose={handleCloseCities}
-                                        >
-                                            <MenuItem key='onCity' style={{background: city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {setMiniDialog('Город', <SetCities cities={cities}/>);showMiniDialog(true);handleCloseCities();handleCloseMobileMenu();}}>
-                                                По городу
-                                            </MenuItem>
-                                            <MenuItem key='allCity' style={{background: !city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setCity(null);setCityCookie('');handleCloseCities();handleCloseMobileMenu();}}>
-                                                Все
-                                            </MenuItem>
-                                        </Menu>
-                                    ]
-                                    :null
-                                }
-                            </Menu>
+                                            :
+                                            null
+                                    }
+                                    {filters&&filters.length?
+                                        [
+                                            <MenuItem key='filterMenu' onClick={handleMenuFilter} style={{background: filter?'rgba(255, 179, 0, 0.15)': '#fff'}}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    <FilterList/>&nbsp;{filter?(filters.find(elem=>filter===elem.value))?(filters.find(elem=>filter===elem.value)).name:'Фильтр':'Фильтр'}
+                                                </div>
+                                            </MenuItem>,
+                                            <Menu
+                                                key='filter'
+                                                id='menu-appbar'
+                                                anchorEl={anchorElFilter}
+                                                anchorOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                transformOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                open={openFilter}
+                                                onClose={handleCloseFilter}
+                                            >
+                                                {filters.map((elem, idx)=><MenuItem key={'filter'+idx} style={{background: filter===elem.value?'rgba(255, 179, 0, 0.15)': '#fff'}}  onClick={() => {setFilter(elem.value);handleCloseFilter();handleCloseMobileMenu();}}>{elem.name}</MenuItem>)}
+                                            </Menu>
+                                        ]
+                                        :null
+                                    }
+                                    {sorts&&sorts.length?
+                                        [
+                                            <MenuItem key='sortMenu' onClick={handleMenuSort} style={{background: sort?'rgba(255, 179, 0, 0.15)': '#fff'}}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    {
+                                                        sort?
+                                                            <>
+                                                                {sort[0]==='-'?<ArrowDownward />:<ArrowUpward/>}&nbsp;
+                                                                {
+                                                                    (sorts.find(elem=>{
+                                                                        return sort===elem.field||`-${elem.field}`===sort?elem.name:null
+                                                                    }))?
+                                                                        (sorts.find(elem=>{
+                                                                            return sort===elem.field||`-${elem.field}`===sort?elem.name:null
+                                                                        })).name
+                                                                        :
+                                                                        'Сортировка'
+                                                                }
+                                                            </>
+                                                            :
+                                                            <>
+                                                                <Sort/>&nbsp;
+                                                                Сортировка
+                                                            </>
+                                                    }
+                                                </div>
+                                            </MenuItem>,
+                                            <Menu
+                                                key='sort'
+                                                id='menu-appbar'
+                                                anchorEl={anchorElSort}
+                                                anchorOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'left',
+                                                }}
+                                                transformOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'left',
+                                                }}
+                                                open={openSort}
+                                                onClose={handleCloseSort}
+                                            >
+                                                {sorts.map((elem, idx)=><MenuItem style={{background: sort===elem.field||`-${elem.field}`===sort?'rgba(255, 179, 0, 0.15)': '#fff'}} key={'sort'+idx} onClick={() => {sort===`-${elem.field}`?setSort(elem.field):setSort(`-${elem.field}`);handleCloseSort();handleCloseMobileMenu()}}>{sort===`-${elem.field}`?<ArrowDownward />:sort===elem.field?<ArrowUpward />:<div style={{width: '24px'}}/>}{elem.name}</MenuItem>)}
+                                            </Menu>
+                                        ]
+                                        :null
+                                    }
+                                    {dates?
+                                        [
+                                            <MenuItem key='dateMenu' onClick={handleMenuDate} style={{background: date?'rgba(255, 179, 0, 0.15)': '#fff'}}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    <DateRange/>&nbsp;{date?pdDDMMYY(date):'Дата'}
+                                                </div>
+                                            </MenuItem>,
+                                            <Menu
+                                                key='date'
+                                                id='menu-appbar'
+                                                anchorEl={anchorElDate}
+                                                anchorOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                transformOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                open={openDate}
+                                                onClose={handleCloseDate}
+                                            >
+                                                <MenuItem key='onDate' style={{background: date?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setMiniDialog('Дата', <SetDate/>);showMiniDialog(true);handleCloseDate();handleCloseMobileMenu();}}>
+                                                    По дате
+                                                </MenuItem>
+                                                <MenuItem key='allDate' style={{background: !date?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setDate('');handleCloseDate();handleCloseMobileMenu();}}>
+                                                    Все
+                                                </MenuItem>
+                                            </Menu>
+                                        ]
+                                        :null
+                                    }
+                                    {organizations&&['суперагент', 'admin', 'client'].includes(profile.role)?
+                                        [
+                                            <MenuItem key='organizationsMenu' onClick={handleMenuOrganizations} style={{background: organization?'rgba(255, 179, 0, 0.15)': '#fff'}}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    <BusinessCenterIcon/>&nbsp;Организации
+                                                </div>
+                                            </MenuItem>,
+                                            <Menu
+                                                key='organizations'
+                                                id='menu-appbar'
+                                                anchorEl={anchorElOrganizations}
+                                                anchorOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                transformOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                open={openOrganizations}
+                                                onClose={handleCloseOrganizations}
+                                            >
+                                                <MenuItem key='onOrganizations' style={{background: organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let organizations = await getOrganizations({search: '', filter: '', city});setMiniDialog('Организации', <SetOrganizations organizations={organizations}/>);showMiniDialog(true);handleCloseOrganizations();handleCloseMobileMenu();}}>
+                                                    По организации
+                                                </MenuItem>
+                                                <MenuItem key='allOrganizations' style={{background: !organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setOrganization(null);handleCloseOrganizations();handleCloseMobileMenu();}}>
+                                                    Все
+                                                </MenuItem>
+                                            </Menu>
+                                        ]
+                                        :null
+                                    }
+                                    {organization&&agents&&['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
+                                        [
+                                            <MenuItem key='agentssMenu' onClick={handleMenuAgents} style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    <GroupIcon/>&nbsp;Агенты
+                                                </div>
+                                            </MenuItem>,
+                                            <Menu
+                                                key='agents'
+                                                id='menu-appbar'
+                                                anchorEl={anchorElAgents}
+                                                anchorOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                transformOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                open={openAgents}
+                                                onClose={handleCloseAgents}
+                                            >
+                                                <MenuItem key='onAgents' style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let agents = await getAgents(organization);let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();handleCloseMobileMenu();}}>
+                                                    По агенту
+                                                </MenuItem>
+                                                <MenuItem key='allAgents' style={{background: !agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setAgent(null);handleCloseAgents();handleCloseMobileMenu();}}>
+                                                    Все
+                                                </MenuItem>
+                                            </Menu>
+                                        ]
+                                        :null
+                                    }
+                                    {organization&&showDistrict&&['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
+                                        [
+                                            <MenuItem key='districtMenu' onClick={handleMenuDistricts} style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    <GroupIcon/>&nbsp;Агенты
+                                                </div>
+                                            </MenuItem>,
+                                            <Menu
+                                                key='districts'
+                                                id='menu-appbar'
+                                                anchorEl={anchorElDistricts}
+                                                anchorOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                transformOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                open={openDistricts}
+                                                onClose={handleCloseDistricts}
+                                            >
+                                                <MenuItem key='onDistrict' style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let districts = await getDistricts({_id: organization, search: '', sort: '-createdAt'});setMiniDialog('Район', <SetDistrict setDistrict={setDistrict} districts={districts}/>);showMiniDialog(true);handleCloseDistricts();handleCloseMobileMenu();}}>
+                                                    По району
+                                                </MenuItem>
+                                                <MenuItem key='allDistricts' style={{background: !district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setDistrict(null);handleCloseDistricts();handleCloseMobileMenu();}}>
+                                                    Все
+                                                </MenuItem>
+                                            </Menu>
+                                        ]
+                                        :null
+                                    }
+                                    {cityShow&&['admin'].includes(profile.role)?
+                                        [
+                                            <MenuItem key='cityMenu' onClick={handleMenuCities} style={{background: city?'rgba(255, 179, 0, 0.15)': '#fff'}}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    <LocationCityIcon/>&nbsp;{city?city:'Город'}
+                                                </div>
+                                            </MenuItem>,
+                                            <Menu
+                                                key='city'
+                                                id='menu-appbar'
+                                                anchorEl={anchorElCities}
+                                                anchorOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                transformOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                open={openCities}
+                                                onClose={handleCloseCities}
+                                            >
+                                                <MenuItem key='onCity' style={{background: city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {setMiniDialog('Город', <SetCities cities={cities}/>);showMiniDialog(true);handleCloseCities();handleCloseMobileMenu();}}>
+                                                    По городу
+                                                </MenuItem>
+                                                <MenuItem key='allCity' style={{background: !city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setCity(null);setCityCookie('');handleCloseCities();handleCloseMobileMenu();}}>
+                                                    Все
+                                                </MenuItem>
+                                            </Menu>
+                                        ]
+                                        :null
+                                    }
+                                </Menu>
                                 <Tooltip title='Профиль'>
                                     <IconButton
                                         aria-owns='menu-appbar'
@@ -468,56 +478,56 @@ const MyAppBar = React.memo((props) => {
                                         <PermIdentity/>
                                     </IconButton>
                                 </Tooltip>
-                            <Menu
-                                id='menu-appbar'
-                                anchorEl={anchorElProfile}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={openProfile}
-                                onClose={handleCloseProfile}
-                            >
-                                {
-                                    isNotTestUser(profile)&&profile.role==='client'?
-                                        <MenuItem key='profile'>
-                                            <Link href={`/${profile.role==='client'?'client':'employment'}/[id]`} as={`/${profile.role==='client'?'client':'employment'}/${profile._id}`}>
-                                                <a style={{display: 'flex', color: '#606060'}}>
-                                                    <AssignmentInd/>&nbsp;Профиль
-                                                </a>
-                                            </Link>
-                                        </MenuItem>
-                                        :
-                                        null
-                                }
-                                {
-                                    authenticated?
-                                        <MenuItem key='outProfile' onClick={() => {
-                                            handleCloseProfile()
-                                            const action = async () => logout(true)
-                                            setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                                            showMiniDialog(true)
-                                        }}>
-                                            <div style={{display: 'flex', color: '#606060'}}>
-                                                <ExitToApp/>&nbsp;Выйти
-                                            </div>
-                                        </MenuItem>
-                                        :
-                                        <MenuItem key='enterProfile' onClick={() => {
-                                            handleCloseProfile()
-                                            setMiniDialog('Вход', <Sign isMobileApp={isMobileApp}/>)
-                                            showMiniDialog(true)
-                                        }}>
-                                            <div style={{display: 'flex', color: '#606060'}}>
-                                                <ExitToApp/>&nbsp;Войти
-                                            </div>
-                                        </MenuItem>
-                                }
-                            </Menu>
+                                <Menu
+                                    id='menu-appbar'
+                                    anchorEl={anchorElProfile}
+                                    anchorOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    open={openProfile}
+                                    onClose={handleCloseProfile}
+                                >
+                                    {
+                                        isNotTestUser(profile)&&profile.role==='client'?
+                                            <MenuItem key='profile'>
+                                                <Link href={`/${profile.role==='client'?'client':'employment'}/[id]`} as={`/${profile.role==='client'?'client':'employment'}/${profile._id}`}>
+                                                    <a style={{display: 'flex', color: '#606060'}}>
+                                                        <AssignmentInd/>&nbsp;Профиль
+                                                    </a>
+                                                </Link>
+                                            </MenuItem>
+                                            :
+                                            null
+                                    }
+                                    {
+                                        authenticated?
+                                            <MenuItem key='outProfile' onClick={() => {
+                                                handleCloseProfile()
+                                                const action = async () => logout(true)
+                                                setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                                                showMiniDialog(true)
+                                            }}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    <ExitToApp/>&nbsp;Выйти
+                                                </div>
+                                            </MenuItem>
+                                            :
+                                            <MenuItem key='enterProfile' onClick={() => {
+                                                handleCloseProfile()
+                                                setMiniDialog('Вход', <Sign isMobileApp={isMobileApp}/>)
+                                                showMiniDialog(true)
+                                            }}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    <ExitToApp/>&nbsp;Войти
+                                                </div>
+                                            </MenuItem>
+                                    }
+                                </Menu>
 
                             </>
                         :
@@ -538,94 +548,94 @@ const MyAppBar = React.memo((props) => {
                             </Paper>
                             :
                             <>
-                            {cityShow&&['admin'].includes(profile.role)?
-                                <>
-                                <Tooltip title={viewMode===viewModes.card?'Карточки':'Таблица'}>
-                                    <IconButton
-                                        aria-owns={openCities ? 'menu-appbar' : null}
-                                        aria-haspopup='true'
-                                        onClick={() => handleViewMode(viewMode===viewModes.card?viewModes.table:viewModes.card)}
-                                        color='inherit'
-                                    >
-                                        {viewMode===viewModes.card?<DashboardIcon/>:<ReorderIcon/>}
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title='Город'>
-                                    <IconButton
-                                        style={{background: city?'rgba(51, 143, 255, 0.29)': 'transparent'}}
-                                        aria-owns={openCities ? 'menu-appbar' : null}
-                                        aria-haspopup='true'
-                                        onClick={handleMenuCities}
-                                        color='inherit'
-                                    >
-                                        <LocationCityIcon/>
-                                    </IconButton>
-                                </Tooltip>
-                                <Menu
-                                    key='Cities'
-                                    id='menu-appbar'
-                                    anchorEl={anchorElCities}
-                                    anchorOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    open={openCities}
-                                    onClose={handleCloseCities}
-                                >
-                                    <MenuItem style={{background: city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {setMiniDialog('Город', <SetCities cities={cities}/>);showMiniDialog(true);handleCloseCities();}}>
-                                        По городу
-                                    </MenuItem>
-                                    <MenuItem style={{background: !city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setCity(null);setCityCookie('');handleCloseCities();}}>
-                                        Все
-                                    </MenuItem>
-                                </Menu>
-                                &nbsp;
-                                </>
-                                :null
-                            }
-                            {organizations&&['суперагент', 'admin', 'client'].includes(profile.role)?
-                                <>
-                                <Tooltip title='Организации'>
-                                    <IconButton
-                                        style={{background: organization?'rgba(51, 143, 255, 0.29)': 'transparent'}}
-                                        aria-owns={openOrganizations ? 'menu-appbar' : null}
-                                        aria-haspopup='true'
-                                        onClick={handleMenuOrganizations}
-                                        color='inherit'
-                                    >
-                                        <BusinessCenterIcon/>
-                                    </IconButton>
-                                </Tooltip>
-                                <Menu
-                                    key='Organizations'
-                                    id='menu-appbar'
-                                    anchorEl={anchorElOrganizations}
-                                    anchorOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    open={openOrganizations}
-                                    onClose={handleCloseOrganizations}
-                                >
-                                    <MenuItem style={{background: organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let organizations = await getOrganizations({search: '', filter: '', city});setMiniDialog('Организация', <SetOrganizations organizations={organizations}/>);showMiniDialog(true);handleCloseOrganizations();}}>
-                                        По организации
-                                    </MenuItem>
-                                    <MenuItem style={{background: !organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setOrganization(null);handleCloseOrganizations();}}>
-                                        Все
-                                    </MenuItem>
-                                </Menu>
-                                &nbsp;
-                                </>
-                                :null
-                            }
+                                {cityShow&&['admin'].includes(profile.role)?
+                                    <>
+                                        <Tooltip title={viewMode===viewModes.card?'Карточки':'Таблица'}>
+                                            <IconButton
+                                                aria-owns={openCities ? 'menu-appbar' : null}
+                                                aria-haspopup='true'
+                                                onClick={() => handleViewMode(viewMode===viewModes.card?viewModes.table:viewModes.card)}
+                                                color='inherit'
+                                            >
+                                                {viewMode===viewModes.card?<DashboardIcon/>:<ReorderIcon/>}
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title='Город'>
+                                            <IconButton
+                                                style={{background: city?'rgba(51, 143, 255, 0.29)': 'transparent'}}
+                                                aria-owns={openCities ? 'menu-appbar' : null}
+                                                aria-haspopup='true'
+                                                onClick={handleMenuCities}
+                                                color='inherit'
+                                            >
+                                                <LocationCityIcon/>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Menu
+                                            key='Cities'
+                                            id='menu-appbar'
+                                            anchorEl={anchorElCities}
+                                            anchorOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            open={openCities}
+                                            onClose={handleCloseCities}
+                                        >
+                                            <MenuItem style={{background: city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {setMiniDialog('Город', <SetCities cities={cities}/>);showMiniDialog(true);handleCloseCities();}}>
+                                                По городу
+                                            </MenuItem>
+                                            <MenuItem style={{background: !city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setCity(null);setCityCookie('');handleCloseCities();}}>
+                                                Все
+                                            </MenuItem>
+                                        </Menu>
+                                        &nbsp;
+                                    </>
+                                    :null
+                                }
+                                {organizations&&['суперагент', 'admin', 'client'].includes(profile.role)?
+                                    <>
+                                        <Tooltip title='Организации'>
+                                            <IconButton
+                                                style={{background: organization?'rgba(51, 143, 255, 0.29)': 'transparent'}}
+                                                aria-owns={openOrganizations ? 'menu-appbar' : null}
+                                                aria-haspopup='true'
+                                                onClick={handleMenuOrganizations}
+                                                color='inherit'
+                                            >
+                                                <BusinessCenterIcon/>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Menu
+                                            key='Organizations'
+                                            id='menu-appbar'
+                                            anchorEl={anchorElOrganizations}
+                                            anchorOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            open={openOrganizations}
+                                            onClose={handleCloseOrganizations}
+                                        >
+                                            <MenuItem style={{background: organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let organizations = await getOrganizations({search: '', filter: '', city});setMiniDialog('Организация', <SetOrganizations organizations={organizations}/>);showMiniDialog(true);handleCloseOrganizations();}}>
+                                                По организации
+                                            </MenuItem>
+                                            <MenuItem style={{background: !organization?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setOrganization(null);handleCloseOrganizations();}}>
+                                                Все
+                                            </MenuItem>
+                                        </Menu>
+                                        &nbsp;
+                                    </>
+                                    :null
+                                }
                                 {organization&&agents&&['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
                                     <>
                                         <Tooltip title='Агенты'>
@@ -704,128 +714,128 @@ const MyAppBar = React.memo((props) => {
                                     </>
                                     :null
                                 }
-                            {dates?
-                                <>
-                                <Tooltip title='Дата'>
-                                    <IconButton
-                                        style={{background: date?'rgba(51, 143, 255, 0.29)': 'transparent'}}
-                                        aria-owns={openDate ? 'menu-appbar' : null}
-                                        aria-haspopup='true'
-                                        onClick={handleMenuDate}
-                                        color='inherit'
-                                    >
-                                        <DateRange/>
-                                    </IconButton>
-                                </Tooltip>
-                                <Menu
-                                    key='Date'
-                                    id='menu-appbar'
-                                    anchorEl={anchorElDate}
-                                    anchorOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    open={openDate}
-                                    onClose={handleCloseDate}
-                                >
-                                    <MenuItem style={{background: date!==''?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setMiniDialog('Дата', <SetDate/>);showMiniDialog(true);handleCloseDate();}}>
-                                        По дате
-                                    </MenuItem>
-                                    <MenuItem style={{background: date===''?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setDate('');handleCloseDate();}}>
-                                        Все
-                                    </MenuItem>
-                                </Menu>
-                                &nbsp;
-                                </>
-                                :null
-                            }
-                            {filters&&filters.length?
-                                <>
-                                <Tooltip title='Фильтр'>
-                                    <IconButton
-                                        style={{background: filter?'rgba(51, 143, 255, 0.29)': 'transparent'}}
-                                        aria-owns={openFilter ? 'menu-appbar' : null}
-                                        aria-haspopup='true'
-                                        onClick={handleMenuFilter}
-                                        color='inherit'
-                                    >
-                                        <FilterList/>
-                                    </IconButton>
-                                </Tooltip>
-                                <Menu
-                                    id='menu-appbar'
-                                    key='filter'
-                                    anchorEl={anchorElFilter}
-                                    anchorOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    open={openFilter}
-                                    onClose={handleCloseFilter}
-                                >
-                                    {filters.map((elem, idx)=><MenuItem key={'filter'+idx} style={{background: filter===elem.value?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setFilter(elem.value);handleCloseFilter();}}>{elem.name}</MenuItem>)}
-                                </Menu>
-                                &nbsp;
-                                </>
-                                :null
-                            }
-                            {sorts&&sorts.length?
-                                <>
-                                <Tooltip title='Сортировка'>
-                                    <IconButton
-                                        aria-owns={openSort ? 'menu-appbar' : null}
-                                        aria-haspopup='true'
-                                        onClick={handleMenuSort}
-                                        color='inherit'
-                                    >
-                                        <Sort />
-                                    </IconButton>
-                                </Tooltip>
-                                <Menu
-                                    id='menu-appbar'
-                                    anchorEl={anchorElSort}
-                                    anchorOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    open={openSort}
-                                    onClose={handleCloseSort}
-                                    key='sort'
-                                >
-                                    {sorts.map((elem, idx)=><MenuItem key={'sort'+idx} onClick={() => {sort===`-${elem.field}`?setSort(elem.field):setSort(`-${elem.field}`);handleCloseSort();}}>{sort===`-${elem.field}`?<ArrowDownward />:sort===elem.field?<ArrowUpward />:<div style={{width: '24px'}}/>}{elem.name}</MenuItem>)}
-                                </Menu>
-                                &nbsp;
-                                </>
-                                :null
-                            }
-                            {
-                                searchShow?
-                                    <Tooltip title='Поиск'>
-                                        <IconButton
-                                            aria-owns={openSearch ? 'menu-appbar' : null}
-                                            aria-haspopup='true'
-                                            onClick={() => {
-                                                setOpenSearch(true)}}
-                                            color='inherit'
+                                {dates?
+                                    <>
+                                        <Tooltip title='Дата'>
+                                            <IconButton
+                                                style={{background: date?'rgba(51, 143, 255, 0.29)': 'transparent'}}
+                                                aria-owns={openDate ? 'menu-appbar' : null}
+                                                aria-haspopup='true'
+                                                onClick={handleMenuDate}
+                                                color='inherit'
+                                            >
+                                                <DateRange/>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Menu
+                                            key='Date'
+                                            id='menu-appbar'
+                                            anchorEl={anchorElDate}
+                                            anchorOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            open={openDate}
+                                            onClose={handleCloseDate}
                                         >
-                                            <Search />
-                                        </IconButton>
-                                    </Tooltip>
-                                    :
-                                    null
-                            }
+                                            <MenuItem style={{background: date!==''?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setMiniDialog('Дата', <SetDate/>);showMiniDialog(true);handleCloseDate();}}>
+                                                По дате
+                                            </MenuItem>
+                                            <MenuItem style={{background: date===''?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setDate('');handleCloseDate();}}>
+                                                Все
+                                            </MenuItem>
+                                        </Menu>
+                                        &nbsp;
+                                    </>
+                                    :null
+                                }
+                                {filters&&filters.length?
+                                    <>
+                                        <Tooltip title='Фильтр'>
+                                            <IconButton
+                                                style={{background: filter?'rgba(51, 143, 255, 0.29)': 'transparent'}}
+                                                aria-owns={openFilter ? 'menu-appbar' : null}
+                                                aria-haspopup='true'
+                                                onClick={handleMenuFilter}
+                                                color='inherit'
+                                            >
+                                                <FilterList/>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Menu
+                                            id='menu-appbar'
+                                            key='filter'
+                                            anchorEl={anchorElFilter}
+                                            anchorOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            open={openFilter}
+                                            onClose={handleCloseFilter}
+                                        >
+                                            {filters.map((elem, idx)=><MenuItem key={'filter'+idx} style={{background: filter===elem.value?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setFilter(elem.value);handleCloseFilter();}}>{elem.name}</MenuItem>)}
+                                        </Menu>
+                                        &nbsp;
+                                    </>
+                                    :null
+                                }
+                                {sorts&&sorts.length?
+                                    <>
+                                        <Tooltip title='Сортировка'>
+                                            <IconButton
+                                                aria-owns={openSort ? 'menu-appbar' : null}
+                                                aria-haspopup='true'
+                                                onClick={handleMenuSort}
+                                                color='inherit'
+                                            >
+                                                <Sort />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Menu
+                                            id='menu-appbar'
+                                            anchorEl={anchorElSort}
+                                            anchorOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            open={openSort}
+                                            onClose={handleCloseSort}
+                                            key='sort'
+                                        >
+                                            {sorts.map((elem, idx)=><MenuItem key={'sort'+idx} onClick={() => {sort===`-${elem.field}`?setSort(elem.field):setSort(`-${elem.field}`);handleCloseSort();}}>{sort===`-${elem.field}`?<ArrowDownward />:sort===elem.field?<ArrowUpward />:<div style={{width: '24px'}}/>}{elem.name}</MenuItem>)}
+                                        </Menu>
+                                        &nbsp;
+                                    </>
+                                    :null
+                                }
+                                {
+                                    searchShow?
+                                        <Tooltip title='Поиск'>
+                                            <IconButton
+                                                aria-owns={openSearch ? 'menu-appbar' : null}
+                                                aria-haspopup='true'
+                                                onClick={() => {
+                                                    setOpenSearch(true)}}
+                                                color='inherit'
+                                            >
+                                                <Search />
+                                            </IconButton>
+                                        </Tooltip>
+                                        :
+                                        null
+                                }
                                 <Tooltip title='Профиль'>
                                     <IconButton
                                         aria-owns='menu-appbar'
@@ -836,56 +846,56 @@ const MyAppBar = React.memo((props) => {
                                         <PermIdentity/>
                                     </IconButton>
                                 </Tooltip>
-                            <Menu
-                                id='menu-appbar'
-                                anchorEl={anchorElProfile}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={openProfile}
-                                onClose={handleCloseProfile}
-                            >
-                                {
-                                    isNotTestUser(profile)&&profile.role==='client'?
-                                        <MenuItem>
-                                            <Link href={`/${profile.role==='client'?'client':'employment'}/[id]`} as={`/${profile.role==='client'?'client':'employment'}/${profile._id}`}>
-                                                <a style={{display: 'flex', color: '#606060'}}>
-                                                    <AssignmentInd/>&nbsp;Профиль
-                                                </a>
-                                            </Link>
-                                        </MenuItem>
-                                        :
-                                        null
-                                }
-                                {
-                                    authenticated?
-                                        <MenuItem onClick={() => {
-                                            handleCloseProfile()
-                                            const action = async () => logout(true)
-                                            setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                                            showMiniDialog(true)
-                                        }}>
-                                            <div style={{display: 'flex', color: '#606060'}}>
-                                                <ExitToApp/>&nbsp;Выйти
-                                            </div>
-                                        </MenuItem>
-                                        :
-                                        <MenuItem onClick={() => {
-                                            handleCloseProfile()
-                                            setMiniDialog('Вход', <Sign isMobileApp={isMobileApp}/>)
-                                            showMiniDialog(true)
-                                        }}>
-                                            <div style={{display: 'flex', color: '#606060'}}>
-                                                <ExitToApp/>&nbsp;Войти
-                                            </div>
-                                        </MenuItem>
-                                }
-                            </Menu>
+                                <Menu
+                                    id='menu-appbar'
+                                    anchorEl={anchorElProfile}
+                                    anchorOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    open={openProfile}
+                                    onClose={handleCloseProfile}
+                                >
+                                    {
+                                        isNotTestUser(profile)&&profile.role==='client'?
+                                            <MenuItem>
+                                                <Link href={`/${profile.role==='client'?'client':'employment'}/[id]`} as={`/${profile.role==='client'?'client':'employment'}/${profile._id}`}>
+                                                    <a style={{display: 'flex', color: '#606060'}}>
+                                                        <AssignmentInd/>&nbsp;Профиль
+                                                    </a>
+                                                </Link>
+                                            </MenuItem>
+                                            :
+                                            null
+                                    }
+                                    {
+                                        authenticated?
+                                            <MenuItem onClick={() => {
+                                                handleCloseProfile()
+                                                const action = async () => logout(true)
+                                                setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                                                showMiniDialog(true)
+                                            }}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    <ExitToApp/>&nbsp;Выйти
+                                                </div>
+                                            </MenuItem>
+                                            :
+                                            <MenuItem onClick={() => {
+                                                handleCloseProfile()
+                                                setMiniDialog('Вход', <Sign isMobileApp={isMobileApp}/>)
+                                                showMiniDialog(true)
+                                            }}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    <ExitToApp/>&nbsp;Войти
+                                                </div>
+                                            </MenuItem>
+                                    }
+                                </Menu>
 
                             </>
                     }

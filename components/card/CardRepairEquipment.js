@@ -11,7 +11,7 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import Confirmation from '../../components/dialog/Confirmation'
 import {deleteRepairEquipment} from '../../src/gql/repairEquipment';
 import Link from 'next/link';
-import { pdDDMMYYYY } from '../../src/lib'
+import {getClientTitle, pdDDMMYYYY} from '../../src/lib'
 
 const CardRepairEquipment = React.memo((props) => {
     const classes = cardEquipmentStyle();
@@ -69,7 +69,7 @@ const CardRepairEquipment = React.memo((props) => {
                                         Клиент:&nbsp;
                                     </div>
                                     <div className={classes.value}>
-                                        {`${element.client.address&&element.client.address[0]?` (${element.client.address[0][2]?`${element.client.address[0][2]}, `:''}${element.client.address[0][0]})`:''}`}
+                                        {getClientTitle(element.client)}
                                     </div>
                                 </div>
                                 :null

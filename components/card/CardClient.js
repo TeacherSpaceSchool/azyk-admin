@@ -9,7 +9,7 @@ import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import { onoffClient, deleteClient } from '../../src/gql/client'
-import {pdDDMMYYHHMM, unawaited} from '../../src/lib'
+import {getClientTitle, pdDDMMYYHHMM, unawaited} from '../../src/lib'
 import CardActions from '@material-ui/core/CardActions';
 import NotificationsActive from '@material-ui/icons/NotificationsActive';
 import NotificationsOff from '@material-ui/icons/NotificationsOff';
@@ -106,7 +106,7 @@ const CardOrganization = React.memo((props) => {
                                     {element.address.map((addres, idx)=>
                                         idx<4?
                                             <div style={{color: addres[1]?'rgba(0, 0, 0, 0.87)':'red'}} key={`addres${idx}`} className={classes.value}>
-                                                {`${addres[2]?`${addres[2]}, `:''}${addres[0]}`}
+                                                {getClientTitle({address: [addres]})}
                                             </div>
                                             :
                                             idx===4?

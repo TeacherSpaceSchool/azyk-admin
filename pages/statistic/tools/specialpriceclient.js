@@ -19,6 +19,7 @@ import * as snackbarActions from '../../../redux/actions/snackbar'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { getClients } from '../../../src/gql/client'
+import {getClientTitle} from '../../../src/lib';
 
 const DiscountClient = React.memo((props) => {
     const classes = pageListStyle();
@@ -144,7 +145,7 @@ const DiscountClient = React.memo((props) => {
                                     disableOpenOnFocus
                                     className={inputClass}
                                     options={clients}
-                                    getOptionLabel={option => `${option.address&&option.address[0]?` (${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]})`:''}`}
+                                    getOptionLabel={option => getClientTitle(option)}
                                     onChange={(event, newValue) => {
                                         handleClient(newValue)
                                     }}

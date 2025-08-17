@@ -8,7 +8,7 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
-import {pdDDMMYYHHMM, pdDDMMYYHHMMCancel, pdDDMMYYYYWW, checkFloat, isNotEmpty} from '../../src/lib'
+import {pdDDMMYYHHMM, pdDDMMYYHHMMCancel, pdDDMMYYYYWW, checkFloat, isNotEmpty, getClientTitle} from '../../src/lib'
 import Confirmation from './Confirmation'
 import Geo from '../../components/dialog/Geo'
 import OrderAdss from '../../components/dialog/OrderAdss'
@@ -188,7 +188,9 @@ const Order =  React.memo(
                 }
                 <div className={classes.row}>
                     <div className={classes.nameField}>Адрес: &nbsp;</div>
-                    <div className={classes.value}>{`${element.address[2]?`${element.address[2]}, `:''}${element.address[0]}${element.city?` (${element.city})`:''}`}</div>
+                    <div className={classes.value}>
+                        {getClientTitle({address: [element.address]})}{element.city?` (${element.city})`:''}
+                    </div>
                 </div>
                 <div className={classes.geo} style={{color: element.address[1]?'#ffb300':'red'}} onClick={() => {
                     if(element.address[1]) {

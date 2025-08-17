@@ -3,7 +3,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import cardMerchandisingStyle from '../../src/styleMUI/merchandising/cardMerchandising'
 import { connect } from 'react-redux'
-import {pdDDMMYYHHMM} from '../../src/lib'
+import {getClientTitle, pdDDMMYYHHMM} from '../../src/lib'
 import Link from 'next/link';
 
 const CardMerchandising = React.memo((props) => {
@@ -29,10 +29,10 @@ const CardMerchandising = React.memo((props) => {
                         <div className={classes.nameField}>Дата проверки:&nbsp;</div>
                         <div className={classes.value}>{pdDDMMYYHHMM(element.date)}</div>
                     </div>
-                    <div className={classes.row}>
+                    {element.client?<div className={classes.row}>
                         <div className={classes.nameField}>Клиент:&nbsp;</div>
-                        <div className={classes.value} style={{color: 'black'}}>{`${element.client.address&&element.client.address[0]?` (${element.client.address[0][2]?`${element.client.address[0][2]}, `:''}${element.client.address[0][0]})`:''}`}</div>
-                    </div>
+                        <div className={classes.value} style={{color: 'black'}}>{getClientTitle(element.client)}</div>
+                    </div>:null}
                     <div className={classes.row}>
                         <div className={classes.nameField}>Оценка:&nbsp;</div>
                         <div className={classes.value} style={{color: 'black'}}>{element.stateProduct}</div>
