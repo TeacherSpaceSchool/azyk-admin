@@ -19,7 +19,6 @@ export default async (ctx) => {
             //получения профиля
             ctx.store.getState().user.profile = await getProfile(getClientGqlSsr(ctx.req))
             //если админ
-            console.log(getCityCookie(ctx.req.headers.cookie))
             if(ctx.store.getState().user.profile.role==='admin')
                 ctx.store.getState().app.city = getCityCookie(ctx.req.headers.cookie)
             //если клиент
