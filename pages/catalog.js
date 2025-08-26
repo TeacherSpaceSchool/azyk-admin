@@ -53,8 +53,9 @@ const Catalog = React.memo((props) => {
     let [client, setClient] = useState(data.client);
     let handleClient = async (client) => {
         setClient(client)
-        setBasket({})
-        unawaited(deleteBasketAll)
+        sessionStorage.client = JSON.stringify(client)
+        /*setBasket({})
+        unawaited(deleteBasketAll)*/
         setOpen(false)
     };
     const [clients, setClients] = useState([]);
@@ -64,24 +65,30 @@ const Catalog = React.memo((props) => {
     const handleChange = event => setInputValue(event.target.value);
     const searchTimeOutClient = useRef(null);
     useEffect(() => {
-        if(inputValue.length < dayStartDefault) {
-            setClients([]);
-            if(open)
-                setOpen(false)
-            if(loading)
-                setLoading(false)
-        }
-        else {
-            if(!loading)
-                setLoading(true)
-            if(searchTimeOutClient.current)
-                clearTimeout(searchTimeOutClient.current)
-            searchTimeOutClient.current = setTimeout(async () => {
-                setClients(await getClients({search: inputValue, sort: '-name', filter: 'Включенные', catalog: true}))
-                if(!open)
-                    setOpen(true)
-                setLoading(false)
-            }, 500)
+        if(initialRender.current) {
+            if (inputValue.length < dayStartDefault) {
+                setClients([]);
+                if (open)
+                    setOpen(false)
+                if (loading)
+                    setLoading(false)
+            } else {
+                if (!loading)
+                    setLoading(true)
+                if (searchTimeOutClient.current)
+                    clearTimeout(searchTimeOutClient.current)
+                searchTimeOutClient.current = setTimeout(async () => {
+                    setClients(await getClients({
+                        search: inputValue,
+                        sort: '-name',
+                        filter: 'Включенные',
+                        catalog: true
+                    }))
+                    if (!open)
+                        setOpen(true)
+                    setLoading(false)
+                }, 500)
+            }
         }
     }, [inputValue]);
     //план клиента
@@ -138,6 +145,14 @@ const Catalog = React.memo((props) => {
                 getSpecialPriceCategories({category: client.category, organization: organization._id}),
                 getDiscountClient({client: client._id, organization: organization._id})
             ]);
+            //очистка корзины
+            if(
+                initialRender.current&&(limitItemClients&&limitItemClients.length||stocks&&stocks.length||specialPricesData&&specialPricesData.length||
+                specialPriceCategoriesData&&specialPriceCategoriesData.length||discountClient&&discountClient.discount)
+            ) {
+                setBasket({})
+                unawaited(deleteBasketAll)
+            }
             //план клиента
             planClient = planClientData
             //перебор лимитов
@@ -150,12 +165,14 @@ const Catalog = React.memo((props) => {
                     stockClient[stock.item._id] = stock.count
             //спец цена клиента
             const specialPrices = {}
-            for(const specialPrice of specialPricesData)
-                specialPrices[specialPrice.item._id] = specialPrice.price
+            if(specialPricesData&&specialPricesData.length)
+                for(const specialPrice of specialPricesData)
+                    specialPrices[specialPrice.item._id] = specialPrice.price
             //спец цена категории
             const specialPriceCategories = {}
-            for(const specialPriceCategory of specialPriceCategoriesData)
-                specialPriceCategories[specialPriceCategory.item._id] = specialPriceCategory.price
+            if(specialPriceCategoriesData&&specialPriceCategoriesData.length)
+                for(const specialPriceCategory of specialPriceCategoriesData)
+                    specialPriceCategories[specialPriceCategory.item._id] = specialPriceCategory.price
             //скидка
             const discount = discountClient?discountClient.discount:0
             //перебор списка товаров и задание цены
@@ -249,6 +266,12 @@ const Catalog = React.memo((props) => {
             //возобнавление корзины
             if(sessionStorage.catalog&&sessionStorage.catalog!=='{}')
                 setBasket(JSON.parse(sessionStorage.catalog))
+            //возобновление клиента
+            if(!data.client&&sessionStorage.client) {
+                client = JSON.parse(sessionStorage.client)
+                setClient(client)
+                setInputValue(client.name)
+            }
             //первозапуск окончен
             initialRender.current = false;
         }
@@ -301,6 +324,7 @@ const Catalog = React.memo((props) => {
                                     onClose={() =>setOpen(false)}
                                     open={open}
                                     disableOpenOnFocus
+                                    inputValue={inputValue}
                                     className={classes.input}
                                     options={clients}
                                     getOptionLabel={option => `${option.address&&option.address[0]?`${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]}`:''}`}
