@@ -293,7 +293,7 @@ const District = React.memo((props) => {
                                                 :
                                                 null
                                             }
-                                            <CardClient style={{width: 'calc(100% - 42px)'}} buy={client.includes(element)} list={filtredClient} element={element}/>
+                                            <CardClient style={isMobileApp?{width: 'calc(100% - 42px)'}:{}} buy={client.includes(element)} list={filtredClient} element={element}/>
                                         </div>
                                     )
                                 else return null
