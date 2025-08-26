@@ -40,6 +40,8 @@ const Catalog = React.memo((props) => {
     const {profile} = props.user;
     const {data} = props;
     const router = useRouter();
+    //canClearBasket
+    const canClearBasket = useRef(false);
     //первый рендер
     const initialRender = useRef(true);
     //лимиты клиента
@@ -52,27 +54,38 @@ const Catalog = React.memo((props) => {
     //клиент
     let [client, setClient] = useState(data.client);
     let handleClient = async (client) => {
+        //разрешаем очищать корзину
+        canClearBasket.current = true
+        //задаем клиента
         setClient(client)
-        sessionStorage.client = JSON.stringify(client)
+        //полностью прописываем ввод
+        handleInputValue(client?client.name:'', false)
+        //сохраняем или удаляем клиента
+        if(client)
+            sessionStorage.client = JSON.stringify(client)
+        else
+            sessionStorage.removeItem('client')
         /*setBasket({})
         unawaited(deleteBasketAll)*/
+        //закрываем поиск
         setOpen(false)
     };
     const [clients, setClients] = useState([]);
     const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [inputValue, setInputValue] = useState('');
-    const handleChange = event => setInputValue(event.target.value);
     const searchTimeOutClient = useRef(null);
-    useEffect(() => {
-        if(initialRender.current) {
-            if (inputValue.length < dayStartDefault) {
+    const handleInputValue = (inputValue, search = true) => {
+        setInputValue(inputValue);
+        if(search) {
+            if (inputValue.length < 3) {
                 setClients([]);
                 if (open)
                     setOpen(false)
                 if (loading)
                     setLoading(false)
-            } else {
+            }
+            else {
                 if (!loading)
                     setLoading(true)
                 if (searchTimeOutClient.current)
@@ -90,7 +103,7 @@ const Catalog = React.memo((props) => {
                 }, 500)
             }
         }
-    }, [inputValue]);
+    }
     //план клиента
     let [planClient, setPlanClient] = useState(null);
     //корзина
@@ -145,9 +158,9 @@ const Catalog = React.memo((props) => {
                 getSpecialPriceCategories({category: client.category, organization: organization._id}),
                 getDiscountClient({client: client._id, organization: organization._id})
             ]);
-            //очистка корзины
+            //очистка корзины если есть новые данные
             if(
-                initialRender.current&&(limitItemClients&&limitItemClients.length||stocks&&stocks.length||specialPricesData&&specialPricesData.length||
+                canClearBasket.current&&(limitItemClients&&limitItemClients.length||stocks&&stocks.length||specialPricesData&&specialPricesData.length||
                 specialPriceCategoriesData&&specialPriceCategoriesData.length||discountClient&&discountClient.discount)
             ) {
                 setBasket({})
@@ -263,14 +276,14 @@ const Catalog = React.memo((props) => {
             //нахождение организации пользователя
             if(profile.organization)
                 setOrganization(data.brandOrganizations.find(elem=>elem._id===profile.organization))
-            //возобнавление корзины
+            //возобновление корзины
             if(sessionStorage.catalog&&sessionStorage.catalog!=='{}')
                 setBasket(JSON.parse(sessionStorage.catalog))
             //возобновление клиента
-            if(!data.client&&sessionStorage.client) {
+            if(!data.client&&sessionStorage.client&&sessionStorage.client!=='null') {
                 client = JSON.parse(sessionStorage.client)
                 setClient(client)
-                setInputValue(client.name)
+                handleInputValue(client.name, false)
             }
             //первозапуск окончен
             initialRender.current = false;
@@ -324,6 +337,7 @@ const Catalog = React.memo((props) => {
                                     onClose={() =>setOpen(false)}
                                     open={open}
                                     disableOpenOnFocus
+                                    value={client}
                                     inputValue={inputValue}
                                     className={classes.input}
                                     options={clients}
@@ -332,7 +346,7 @@ const Catalog = React.memo((props) => {
                                     noOptionsText='Ничего не найдено'
                                     renderInput={params => (
                                         <TextField {...params} label='Выберите клиента' fullWidth variant='outlined'
-                                                   onChange={handleChange}
+                                                   onChange={event => handleInputValue(event.target.value)}
                                                    InputProps={{
                                                        ...params.InputProps,
                                                        endAdornment: (

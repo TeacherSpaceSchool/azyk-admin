@@ -175,7 +175,8 @@ const BuyBasket =  React.memo(
                                    showMiniDialog(false);
                                    showLoad(true)
                                    sessionStorage.catalog = '{}'
-                                   sessionStorage.catalogID = null
+                                   sessionStorage.removeItem('catalogID')
+                                   sessionStorage.removeItem('client')
                                    if(navigator.onLine) {
                                        if(agent&&geo&&client.address[0][1].includes(', ')) {
                                            let distance = getGeoDistance(geo.coords.latitude, geo.coords.longitude, ...(client.address[0][1].split(', ')))
