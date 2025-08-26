@@ -79,7 +79,7 @@ const CardOrder = React.memo((props) => {
 
                     }
                     {
-                        ['admin', 'организация', 'менеджер'].includes(profile.role)&&element.updatedAt!==element.createdAt?
+                        ['admin', 'суперорганизация', 'организация'].includes(profile.role)&&element.updatedAt!==element.createdAt?
                             <div className={classes.row}>
                                 <div className={classes.nameField}>Изменен:&nbsp;</div>
                                 <div className={classes.value} style={{whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden'}}>{`${pdDDMMYYHHMM(element.updatedAt)}${element.editor?`, ${element.editor}`:''}`}</div>

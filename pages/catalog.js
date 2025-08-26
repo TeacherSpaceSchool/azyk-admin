@@ -9,7 +9,7 @@ import {checkInt, checkFloat, isNotEmpty, unawaited, dayStartDefault, formatAmou
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import * as snackbarActions from '../redux/actions/snackbar'
-import Router from 'next/router'
+import Router, {useRouter} from 'next/router'
 import BuyBasket from '../components/dialog/BuyBasket'
 import SetPackage from '../components/dialog/SetPackage'
 import { getClient, getClients } from '../src/gql/client'
@@ -30,6 +30,7 @@ import {getStocks} from '../src/gql/stock';
 import {getDiscountClient} from '../src/gql/discountClient';
 import Info from '@material-ui/icons/Info';
 import IconButton from '@material-ui/core/IconButton';
+import {getFhoClient} from '../src/gql/fhoClient';
 
 const Catalog = React.memo((props) => {
     const {search, isMobileApp} = props.app;
@@ -38,6 +39,7 @@ const Catalog = React.memo((props) => {
     const {showSnackBar} = props.snackbarActions;
     const {profile} = props.user;
     const {data} = props;
+    const router = useRouter();
     //первый рендер
     const initialRender = useRef(true);
     //лимиты клиента
@@ -267,6 +269,14 @@ const Catalog = React.memo((props) => {
     useEffect(() => {
         setList([...brands.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))])
     }, [search, brands])
+    //изображения фхо
+    const [fhoClient, setFhoClient] = useState(null);
+    useEffect(() => {(async () => {
+        let fhoClient = null
+        if(client)
+            fhoClient = await getFhoClient({_id: client._id})
+        setFhoClient(fhoClient)
+    })()}, [client])
     //рендер
     return (
         <App checkPagination={checkPagination} searchShow pageName='Каталог'>
@@ -322,20 +332,26 @@ const Catalog = React.memo((props) => {
                         }
                     </div>
                     {
-                        planClient&&planClient.current&&planClient.month?
+                        isMobileApp&&fhoClient||planClient&&planClient.current&&planClient.month?
                             <>
-                                <Divider style={{marginTop: 10, marginBottom: 5}}/>
-                                <div className={classes.row} style={{justifyContent: 'center'}}>
-                                    <div className={classes.nameField} style={{marginBottom: 0}}>
-                                        План на месяц:&nbsp;
-                                    </div>
-                                    <div className={classes.valueField} style={{marginBottom: 0}}>
-                                        <div className={classes.row}>
-                                            {formatAmount(planClient.current)} сом / <div style={{color: planClient.current<planClient.month?'orange':'green'}}>{formatAmount(planClient.month)} сом</div>
+                                <Divider style={{marginTop: 10, marginBottom: 10}}/>
+                                {planClient&&planClient.current&&planClient.month?<>
+                                    <div className={classes.row} style={{justifyContent: 'center'}}>
+                                        <div className={classes.nameField} style={{marginBottom: 0}}>
+                                            План на месяц:&nbsp;
                                         </div>
-                                    </div>
-                                </div>
-                                <Divider style={{marginTop: 5, marginBottom: 15}}/>
+                                        <div className={classes.valueField} style={{marginBottom: 0}}>
+                                            <div className={classes.row}>
+                                                {formatAmount(planClient.current)} сом / <div style={{color: planClient.current<planClient.month?'orange':'green'}}>{formatAmount(planClient.month)} сом</div>
+                                            </div>
+                                        </div>
+                                    </div></>:null}
+                                {isMobileApp&&fhoClient&&planClient&&planClient.current&&planClient.month?<Divider style={{marginTop: 10, marginBottom: 10}}/>:null}
+                                {isMobileApp&&fhoClient?<center style={{ fontWeight: 'bold', width: '100%', cursor: 'pointer', color: fhoClient.images.length?'#ffb300':'red'}}
+                                onClick={() => router.push(`/fhoclient/${fhoClient._id}`)}>
+                                    📷&nbsp;{fhoClient.images.length?'Изменить':'Добавить'} фото полки или фхо
+                                </center>:null}
+                                <Divider style={{marginTop: 10, marginBottom: 10}}/>
                             </>
                             :
                             <div style={{height: 10}}/>
@@ -441,22 +457,23 @@ const Catalog = React.memo((props) => {
                     </div>
                 </div>
                 <div className={isMobileApp?classes.buyM:classes.buyD} onClick={() => {
-                    if(allPrice) {
-                        if(client) {
-                            setMiniDialog('Купить', <BuyBasket
-                                geo={geo.current}
-                                agent
-                                client={client}
-                                basket = {Object.values(basket)}
-                                allPrice={allPrice}
-                                organization={organization}/>)
-                            showMiniDialog(true)
-                        }
-                        else
-                            showSnackBar('Пожалуйста выберите клиента')
-                    }
-                    else
-                        showSnackBar('Добавьте товар в корзину')
+                    if(!fhoClient||fhoClient.images.length) {
+                        if (allPrice) {
+                            if (client) {
+                                setMiniDialog('Купить', <BuyBasket
+                                    geo={geo.current}
+                                    agent
+                                    client={client}
+                                    basket={Object.values(basket)}
+                                    allPrice={allPrice}
+                                    organization={organization}/>)
+                                showMiniDialog(true)
+                            } else
+                                showSnackBar('Пожалуйста выберите клиента')
+                        } else
+                            showSnackBar('Добавьте товар в корзину')
+                    } else
+                        showSnackBar('Сначала загрузите фото ФХО')
                 }}>
                     КУПИТЬ
                 </div>

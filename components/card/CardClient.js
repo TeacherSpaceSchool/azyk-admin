@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardContent from '@material-ui/core/CardContent';
 import cardOrganizationStyle from '../../src/styleMUI/client/cardClient'
 import { connect } from 'react-redux'
 import Link from 'next/link';
@@ -10,7 +8,6 @@ import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import { onoffClient, deleteClient } from '../../src/gql/client'
 import {getClientTitle, pdDDMMYYHHMM, unawaited} from '../../src/lib'
-import CardActions from '@material-ui/core/CardActions';
 import NotificationsActive from '@material-ui/icons/NotificationsActive';
 import NotificationsOff from '@material-ui/icons/NotificationsOff';
 import Confirmation from '../../components/dialog/Confirmation'
@@ -18,21 +15,21 @@ import * as snackbarActions from '../../redux/actions/snackbar'
 import { addAgentHistoryGeo } from '../../src/gql/agentHistoryGeo'
 import {getGeoDistance} from '../../src/lib'
 import Router from 'next/router'
+import {viewModes} from '../../src/enum';
 
 const CardOrganization = React.memo((props) => {
     const classes = cardOrganizationStyle();
-    const {element, setList, idx, buy} = props;
-    const {isMobileApp} = props.app;
+    const {element, setList, idx, buy, style} = props;
+    const {isMobileApp, viewMode} = props.app;
     const {profile} = props.user;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     let [status, setStatus] = useState(element.user?element.user.status:'');
     const {showSnackBar} = props.snackbarActions;
     return (
-        <Card className={isMobileApp?classes.cardM:classes.cardD}>
-               <CardActionArea>
-                    <CardContent className={classes.line}>
+        <Card className={isMobileApp?classes.cardM:classes.cardD} style={{...style||{}, ...viewMode === viewModes.card ? {} : {margin: 1}}}>
+                    <div className={classes.line} style={{margin: viewMode===viewModes.card?10:5, ...buy||setList?{marginBottom: 0}:{}}}>
                         {
-                            profile.role==='admin'?
+                            viewMode===viewModes.card&&profile.role==='admin'?
                                 element.notification?
                                     <NotificationsActive color='primary' className={classes.notification}/>
                                     :
@@ -40,7 +37,7 @@ const CardOrganization = React.memo((props) => {
                                 :
                                 null
                         }
-                        <Link href='/client/[id]' as={`/client/${element._id}`}>
+                        {viewMode===viewModes.card?<Link href='/client/[id]' as={`/client/${element._id}`}>
                             <a>
                                 <img
                                     className={classes.media}
@@ -49,125 +46,61 @@ const CardOrganization = React.memo((props) => {
                                     loading='lazy'
                                 />
                             </a>
-                        </Link>
+                        </Link>:null}
                         <Link href='/client/[id]' as={`/client/${element._id}`}>
-                        <div style={{width: 'calc(100% - 70px)'}}>
-                            <div className={classes.row}>
-                                <div className={classes.nameField}>
-                                    Имя:&nbsp;
-                                </div>
-                                <div className={classes.value}>
-                                    {element.name}
-                                </div>
-                            </div>
-                            <div className={classes.row}>
-                                <div className={classes.nameField}>
-                                    Категория:&nbsp;
-                                </div>
-                                <div className={classes.value}>
-                                    {element.category}
-                                </div>
-                            </div>
-                            {element.phone.length&&element.phone[0]?
+                            <div style={{width: viewMode===viewModes.card?'calc(100% - 70px)':'100%'}}>
+                                {element.name!==element.address[0][2]?<div className={classes.row}>
+                                    <div className={classes.nameField} style={
+                                        !(profile.role==='admin'&&viewMode===viewModes.card)?{marginBottom: 5}:{}
+                                    }>
+                                        Имя:&nbsp;
+                                    </div>
+                                    <div className={classes.value} style={
+                                        !(profile.role==='admin'&&viewMode===viewModes.card)?{marginBottom: 5}:{}
+                                    }>
+                                        {element.name}
+                                    </div>
+                                </div>:null}
                                 <div className={classes.row}>
-                                    <div className={classes.nameField}>
-                                        Телефон:&nbsp;
-                                    </div>
-                                    <div>
-                                        {element.phone.map((phone, idx) =>
-                                            idx<4?
-                                                <div key={`phone${idx}`} className={classes.value}>
-                                                    {phone}
-                                                </div>
-                                                :
-                                                idx===4?
-                                                    '...'
-                                                    :
-                                                    null
-                                        )}
+                                    {profile.role==='admin'&&viewMode===viewModes.card||element.name!==element.address[0][2]?<div className={classes.nameField} style={
+                                        !(profile.role==='admin'&&viewMode===viewModes.card)?{marginBottom: 0}:{}
+                                    }>
+                                        Адрес:&nbsp;
+                                    </div>:null}
+                                    <div style={{
+                                        ...!(profile.role==='admin'&&viewMode===viewModes.card)?{marginBottom: 0, width: '100%'}:{},
+                                        color: element.address[0][1]?'rgba(0, 0, 0, 0.87)':'red'
+                                    }} className={classes.value}>
+                                        {getClientTitle({address: element.address})}{['admin', 'суперагент'].includes(profile.role)&&element.city?` (${element.city})`:''}
                                     </div>
                                 </div>
-                                :
-                                null
-                            }
-                            <div className={classes.row}>
-                                <div className={classes.nameField}>
-                                    Город:&nbsp;
-                                </div>
-                                <div className={classes.value}>
-                                    {element.city}
-                                </div>
-                            </div>
-                            <div className={classes.row}>
-                                <div className={classes.nameField}>
-                                    Адрес:&nbsp;
-                                </div>
-                                <div>
-                                    {element.address.map((addres, idx) =>
-                                        idx<4?
-                                            <div style={{color: addres[1]?'rgba(0, 0, 0, 0.87)':'red'}} key={`addres${idx}`} className={classes.value}>
-                                                {getClientTitle({address: [addres]})}
+                                {viewMode===viewModes.card&&profile.role==='admin'?
+                                    <>
+                                        <div className={classes.row}>
+                                            <div className={classes.nameField}>
+                                                Регистрация:&nbsp;
                                             </div>
-                                            :
-                                            idx===4?
-                                                '...'
-                                                :
-                                                null
-                                    )}
-                                </div>
+                                            <div className={classes.value}>
+                                                {pdDDMMYYHHMM(new Date(element.createdAt))}
+                                            </div>
+                                        </div>
+                                        {element.lastActive?<div className={classes.row}>
+                                            <div className={classes.nameField}>
+                                                Активность:&nbsp;
+                                            </div>
+                                            <div className={classes.value}>
+                                                {pdDDMMYYHHMM(new Date(element.lastActive))}
+                                            </div>
+                                        </div>:null}
+                                    </>
+                                    :
+                                    null
+                                }
                             </div>
-                            {profile.role==='admin'?
-                                <div className={classes.row}>
-                                    <div className={classes.nameField}>
-                                        Регистрация:&nbsp;
-                                    </div>
-                                    <div className={classes.value}>
-                                        {pdDDMMYYHHMM(new Date(element.createdAt))}
-                                    </div>
-                                </div>
-                                :
-                                null
-                            }
-                            {profile.role==='admin'&&element.updatedAt?
-                                <div className={classes.row}>
-                                    <div className={classes.nameField}>
-                                        Изменен:&nbsp;
-                                    </div>
-                                    <div className={classes.value}>
-                                        {pdDDMMYYHHMM(new Date(element.updatedAt))}
-                                    </div>
-                                </div>
-                                :
-                                null
-                            }
-                            {
-                                profile.role==='admin'&&element.lastActive?
-                                    <div className={classes.row}>
-                                        <div className={classes.nameField}>
-                                            Активность:&nbsp;
-                                        </div>
-                                        <div className={classes.value}>
-                                            {pdDDMMYYHHMM(new Date(element.lastActive))}
-                                        </div>
-                                    </div>
-                                    :
-                                    null
-                            }
-                            {
-                                profile.role==='admin'&&element.device?
-                                    <div className={classes.row}>
-                                        <div className={classes.value}>
-                                            {element.device}
-                                        </div>
-                                    </div>
-                                    :
-                                    null
-                            }
-                        </div>
                         </Link>
-                    </CardContent>
-            </CardActionArea>
-            {buy||setList? <CardActions style={isMobileApp?{flexDirection: 'row-reverse'}:{}}>
+                    </div>
+            {buy||setList?
+                <div style={{marginLeft: 5, marginRight: 5, marginBottom: 5, ...isMobileApp?{display: 'flex', flexDirection: 'row-reverse'}:{}}}>
                 {
                     ['агент', 'суперагент'].includes(profile.role)&&buy ?
                         <>
@@ -179,24 +112,20 @@ const CardOrganization = React.memo((props) => {
                                 </Button>
                             </Link>
                             <Button onClick={async () => {
-                                const action = () => {
-                                    if(navigator.geolocation&&element.address[0][1].includes(', ')) {
-                                        navigator.geolocation.getCurrentPosition(async(position) => {
-                                            let distance = getGeoDistance(position.coords.latitude, position.coords.longitude, ...(element.address[0][1].split(', ')))
-                                            if(distance<1000) {
-                                                unawaited(() => addAgentHistoryGeo({client: element._id, geo: `${position.coords.latitude}, ${position.coords.longitude}`}))
-                                                //window.open(`/catalog?client=${element._id}`, '_blank');
-                                                Router.push(`/catalog?client=${element._id}`)
-                                            }
-                                            else
-                                                showSnackBar('Вы слишком далеко')
-                                        });
-                                    } else {
-                                        showSnackBar('Геолокация не поддерживается')
-                                    }
+                                if(navigator.geolocation&&element.address[0][1].includes(', ')) {
+                                    navigator.geolocation.getCurrentPosition(async(position) => {
+                                        let distance = getGeoDistance(position.coords.latitude, position.coords.longitude, ...(element.address[0][1].split(', ')))
+                                        if(distance<1000) {
+                                            unawaited(() => addAgentHistoryGeo({client: element._id, geo: `${position.coords.latitude}, ${position.coords.longitude}`}))
+                                            //window.open(`/catalog?client=${element._id}`, '_blank');
+                                            Router.push(`/catalog?client=${element._id}`)
+                                        }
+                                        else
+                                            showSnackBar('Вы слишком далеко')
+                                    });
+                                } else {
+                                    showSnackBar('Геолокация не поддерживается')
                                 }
-                                setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                                showMiniDialog(true)
                             }} size='small' color='primary'>
                                 Посетил
                             </Button>
@@ -237,7 +166,7 @@ const CardOrganization = React.memo((props) => {
                         :
                         null
                 }
-            </CardActions>:null}
+            </div>:null}
             </Card>
     );
 })

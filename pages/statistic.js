@@ -141,7 +141,7 @@ const list = {
         },
         {
             name: 'Подписчики',
-            link: '/statistic/administration/subscriber',
+            link: '/statistic/administration/subscribers',
             role: ['admin']
         },
         {

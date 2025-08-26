@@ -16,6 +16,8 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import {formatAmount, unawaited} from '../../src/lib';
 import {getOrganization} from '../../src/gql/organization';
+import {viewModes} from '../../src/enum';
+import Table from '../../components/table/equipments';
 
 const Equipments = React.memo((props) => {
     const classes = pageListStyle();
@@ -23,7 +25,7 @@ const Equipments = React.memo((props) => {
     let [list, setList] = useState(data.equipments);
     let [count, setCount] = useState('');
     const getCount = async () => setCount(await getEquipmentsCount({organization: router.query.id, search, ...agent?{agent}:{}}))
-    const {search, agent} = props.app;
+    const {search, agent, viewMode} = props.app;
     const router = useRouter()
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
@@ -71,11 +73,17 @@ const Equipments = React.memo((props) => {
             <div className='count'>
                 Всего: {formatAmount(count)}
             </div>
-            <div className={classes.page}>
-                <CardEquipment organization={data.organization} list={list} setList={setList} agents={data.agents}/>
-                {list?list.map((element, idx) => {
-                    return <CardEquipment organization={data.organization} idx={idx} key={element._id} list={list} setList={setList} element={element} agents={data.agents}/>
-                }):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        <>
+                            <CardEquipment organization={data.organization} list={list} setList={setList} agents={data.agents}/>
+                            {list.map((element, idx) => <CardEquipment
+                                organization={data.organization} idx={idx} key={element._id} list={list} setList={setList} element={element} agents={data.agents}
+                            />)}
+                        </>
+                        :
+                        <Table list={list}/>
+                :null}
             </div>
             <Fab onClick={open} color='primary' className={classes.fab}>
                 <SettingsIcon />

@@ -107,6 +107,8 @@ export const getOrderHistorys = async (invoice, client) => {
                         orderHistorys(invoice: $invoice) {
                             createdAt
                             editor
+                            status
+                            orders {item count returned}
                         }
                     }`,
             })

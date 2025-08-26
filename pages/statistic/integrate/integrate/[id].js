@@ -13,8 +13,10 @@ import Router from 'next/router'
 import * as appActions from '../../../../redux/actions/app'
 import {bindActionCreators} from 'redux';
 import {formatAmount, isNotEmpty, unawaited} from '../../../../src/lib';
+import {viewModes} from '../../../../src/enum';
+import Table from '../../../../components/table/integrate';
 
-const filters = [{name: 'Все', value: ''}, {name: 'Агент', value: 'агент'}, {name: 'Экспедитор', value: 'экспедитор'}, {name: 'Товар', value: 'товар'}, {name: 'Клиент', value: 'клиент'}, {name: 'Менеджер', value: 'менеджер'}]
+const filters = [{name: 'Все', value: ''}, {name: 'Агент', value: 'агент'}, {name: 'Экспедитор', value: 'экспедитор'}, {name: 'Товар', value: 'товар'}, {name: 'Клиент', value: 'клиент'}, {name: 'Супервайзер', value: 'менеджер'}]
 
 const Integrate = React.memo((props) => {
     const classes = pageListStyle();
@@ -25,7 +27,7 @@ const Integrate = React.memo((props) => {
     let [list, setList] = useState(data.integrate1Cs);
     let [simpleStatistic, setSimpleStatistic] = useState(null);
     const getSimpleStatistic = async () => setSimpleStatistic(await getIntegrate1CsSimpleStatistic({search, filter, organization: router.query.id}))
-    const {search, filter} = props.app;
+    const {search, filter, viewMode} = props.app;
     let [showStat, setShowStat] = useState(false);
     const searchTimeOut = useRef(null);
     const paginationWork = useRef(true);
@@ -67,7 +69,17 @@ const Integrate = React.memo((props) => {
                 <title>{data.organization?data.organization.name:'AZYK.STORE'}</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className={classes.page}>
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                    <>
+                        <CardIntegrate setSimpleStatistic={setSimpleStatistic} organization={router.query.id} list={list} setList={setList}/>
+                        {list.map((element, idx) => {
+                            return <CardIntegrate setSimpleStatistic={setSimpleStatistic} key={element._id} idx={idx} element={element} organization={router.query.id} list={list} setList={setList}/>
+                        })}
+                        </>
+                        :
+                        <Table list={list}/>
+                    :null}
                 {
                     simpleStatistic?
                         <div className='count' onClick={() =>setShowStat(!showStat)}>
@@ -98,15 +110,6 @@ const Integrate = React.memo((props) => {
                         </div>
                         :
                         null
-                }
-                <CardIntegrate setSimpleStatistic={setSimpleStatistic} organization={router.query.id} list={list} setList={setList}/>
-                {
-                    list?list.map((element, idx) => {
-
-                        return(
-                            <CardIntegrate setSimpleStatistic={setSimpleStatistic} key={element._id} idx={idx} element={element} organization={router.query.id} list={list} setList={setList}/>
-                        )}
-                    ):null
                 }
             </div>
         </App>

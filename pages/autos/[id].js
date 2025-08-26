@@ -11,6 +11,8 @@ import Router from 'next/router'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
 import {formatAmount, unawaited} from '../../src/lib';
+import {viewModes} from '../../src/enum';
+import Table from '../../components/table/autos';
 
 const sorts = [{name: 'Тоннаж', field: 'tonnage'}]
 
@@ -18,7 +20,7 @@ const Autos = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [list, setList] = useState(data.autos);
-    const {search, sort} = props.app;
+    const {search, sort, viewMode} = props.app;
     const router = useRouter()
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
@@ -53,14 +55,18 @@ const Autos = React.memo((props) => {
             <div className='count'>
                 Всего: {formatAmount(list.length)}
             </div>
-            <div className={classes.page}>
-                <CardAuto organization={router.query.id} employments={data.ecspeditors} list={list} setList={setList}/>
-                {list?list.map((element, idx) => {
-                    if(idx<pagination)
-                        return(
-                            <CardAuto organization={router.query.id} employments={data.ecspeditors} idx={idx} key={element._id} list={list} setList={setList} element={element}/>
-                        )
-                }):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        <>
+                            <CardAuto organization={router.query.id} employments={data.ecspeditors} list={list} setList={setList}/>
+                            {list?list.map((element, idx) => {
+                                if(idx<pagination)
+                                    return <CardAuto organization={router.query.id} employments={data.ecspeditors} idx={idx} key={element._id} list={list} setList={setList} element={element}/>
+                            }):null}
+                        </>
+                        :
+                        <Table list={list} pagination={pagination}/>
+                    :null}
             </div>
         </App>
     )

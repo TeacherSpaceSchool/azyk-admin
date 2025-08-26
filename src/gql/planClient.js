@@ -35,8 +35,8 @@ export const getClientsForPlanClients = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($search: String!, $organization: ID!, $city: String, $district: ID) {
-                        clientsForPlanClients(search: $search, organization: $organization, city: $city, district: $district) {
+                    query ($search: String!, $organization: ID!, $district: ID) {
+                        clientsForPlanClients(search: $search, organization: $organization, district: $district) {
                             _id
                             createdAt
                             name

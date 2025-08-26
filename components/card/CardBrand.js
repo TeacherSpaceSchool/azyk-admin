@@ -17,12 +17,12 @@ import CardActions from '@material-ui/core/CardActions';
 
 const CardBrand = React.memo((props) => {
     const classes = cardOrganizationStyle();
-    const {element, idx, setList, type} = props;
+    const {element, idx, setList} = props;
     const {isMobileApp} = props.app;
     const {profile} = props.user;
     let [priotiry, setPriotiry] = useState(element.priotiry);
     return (
-        isMobileApp&&(profile.role==='client'||type==='👁')?
+        isMobileApp&&profile.role==='client'?
             <Link href={`/${profile.role==='client'?'catalog':'brand'}/[id]`} as={`/${profile.role==='client'?'catalog':'brand'}/${element._id}`}>
                 <Card className={classes.cardBrand}>
                     <img

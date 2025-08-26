@@ -1,15 +1,20 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {getClientTitle, pdDDMMYYHHMM} from '../../../src/lib';
+import {getClientTitle, getGeoDistance, pdDDMMYY, unawaited} from '../../../src/lib';
 import Link from 'next/link';
 import Button from '@material-ui/core/Button';
+import {addAgentHistoryGeo} from '../../../src/gql/agentHistoryGeo';
+import Router from 'next/router';
+import {bindActionCreators} from 'redux';
+import * as snackbarActions from '../../../redux/actions/snackbar';
 
-const Tables =  React.memo(({element, columns, user, buy}) =>{
+const Tables =  React.memo(({element, columns, user, buy, snackbarActions}) =>{
     const {profile} = user;
+    const {showSnackBar} = snackbarActions;
     return <Link href='/client/[id]' as={`/client/${element._id}`}>
         <div className='tableRow tablePointer'>
             <div className='tableCell' style={columns[0].style}>
-                {pdDDMMYYHHMM(element.createdAt)}<br/>
+                {pdDDMMYY(element.createdAt)}<br/>
                 <span style={{color: element.user.status==='active'?'green':'red'}}>
                     {element.user.status==='active'?'Активный':'Неактивный'}
                 </span>
@@ -27,6 +32,24 @@ const Tables =  React.memo(({element, columns, user, buy}) =>{
                             Купить
                         </Button>
                     </Link>
+                    {/*<Button onClick={async () => {
+                        if(navigator.geolocation&&element.address[0][1].includes(', ')) {
+                            navigator.geolocation.getCurrentPosition(async(position) => {
+                                let distance = getGeoDistance(position.coords.latitude, position.coords.longitude, ...(element.address[0][1].split(', ')))
+                                if(distance<1000) {
+                                    unawaited(() => addAgentHistoryGeo({client: element._id, geo: `${position.coords.latitude}, ${position.coords.longitude}`}))
+                                    //window.open(`/catalog?client=${element._id}`, '_blank');
+                                    Router.push(`/catalog?client=${element._id}`)
+                                }
+                                else
+                                    showSnackBar('Вы слишком далеко')
+                            });
+                        } else {
+                            showSnackBar('Геолокация не поддерживается')
+                        }
+                    }} size='small' color='primary'>
+                        Посетил
+                    </Button>*/}
                 </div>
             </>:null}
         </div>
@@ -39,5 +62,11 @@ function mapStateToProps (state) {
     }
 }
 
-export default connect(mapStateToProps)(Tables)
+function mapDispatchToProps(dispatch) {
+    return {
+        snackbarActions: bindActionCreators(snackbarActions, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Tables)
 

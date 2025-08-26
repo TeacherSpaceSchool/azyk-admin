@@ -38,6 +38,7 @@ import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import IconButton from '@material-ui/core/IconButton';
 import RemoveIcon from '@material-ui/icons/Remove';
+import DeleteIcon from '@material-ui/icons/Delete';
 import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
 import Select from '@material-ui/core/Select';
@@ -358,7 +359,7 @@ const Merchandising = React.memo((props) => {
                             }
                                 <div className={classes.box}>
                                     <Typography component='legend'>Фотографии</Typography>
-                                    <GridList className={classes.gridList} cols={2.5}>
+                                    <GridList className={classes.gridList} cols={isMobileApp?2.5:6.5}>
                                         {router.query.id === 'new' ?
                                             <GridListTile
                                                 onClick={() => {
@@ -387,22 +388,21 @@ const Merchandising = React.memo((props) => {
                                                 }}/>
                                                 {router.query.id === 'new' ?
                                                     <GridListTileBar
+                                                        title={'Удалить'}
+                                                        style={{cursor: 'pointer'}}
+                                                        onClick={() => {
+                                                            previews = [...previews]
+                                                            previews.splice(idx, 1)
+                                                            setPreviews(previews)
+                                                            images = [...images]
+                                                            images.splice(idx, 1)
+                                                            setImages(images)
+                                                        }}
                                                         classes={{
                                                             root: classes.titleBar,
                                                             title: classes.title,
                                                         }}
-                                                        actionIcon={
-                                                            <IconButton>
-                                                                <RemoveIcon onClick={() => {
-                                                                    previews = [...previews]
-                                                                    previews.splice(idx, 1)
-                                                                    setPreviews(previews)
-                                                                    images = [...images]
-                                                                    images.splice(idx, 1)
-                                                                    setImages(images)
-                                                                }} className={classes.title}/>
-                                                            </IconButton>
-                                                        }
+                                                        actionIcon={<DeleteIcon className={classes.title}/>}
                                                     />
                                                     :
                                                     null
@@ -448,7 +448,7 @@ const Merchandising = React.memo((props) => {
                                                                 setFhos([...fhos])
                                                             }
                                                         }}
-                                                                                                            >
+                                                    >
                                                         <RemoveIcon/>
                                                     </IconButton>
                                                 </InputAdornment>
@@ -509,7 +509,7 @@ const Merchandising = React.memo((props) => {
                                         marks={marks}
                                         valueLabelDisplay='auto'
                                     />
-                                    <GridList className={classes.gridList} cols={2.5}>
+                                    <GridList className={classes.gridList} cols={isMobileApp?2.5:6.5}>
                                         {router.query.id === 'new' ?
                                             <GridListTile
                                                 onClick={() => {
@@ -538,19 +538,18 @@ const Merchandising = React.memo((props) => {
                                                 }}/>
                                                 {router.query.id === 'new' ?
                                                     <GridListTileBar
+                                                        title={'Удалить'}
+                                                        style={{cursor: 'pointer'}}
+                                                        onClick={() => {
+                                                            fhos[idx].previews.splice(idx1, 1)
+                                                            fhos[idx].images.splice(idx1, 1)
+                                                            setFhos([...fhos])
+                                                        }}
                                                         classes={{
                                                             root: classes.titleBar,
                                                             title: classes.title,
                                                         }}
-                                                        actionIcon={
-                                                            <IconButton>
-                                                                <RemoveIcon onClick={() => {
-                                                                    fhos[idx].previews.splice(idx1, 1)
-                                                                    fhos[idx].images.splice(idx1, 1)
-                                                                    setFhos([...fhos])
-                                                                }} className={classes.title}/>
-                                                            </IconButton>
-                                                        }
+                                                        actionIcon={<DeleteIcon className={classes.title}/>}
                                                     />
                                                     :
                                                     null

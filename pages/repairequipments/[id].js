@@ -13,6 +13,8 @@ import Router from 'next/router'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
 import {formatAmount, unawaited} from '../../src/lib';
+import {viewModes} from '../../src/enum';
+import Table from '../../components/table/repairequipments';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value: 'обработка'}, {name: 'Отмена', value: 'отмена'}, {name: 'Принят', value: 'принят'}, {name: 'Выполнен', value: 'выполнен'}]
 
@@ -20,7 +22,7 @@ const RepairEquipments = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [list, setList] = useState(data.repairEquipments);
-    const {search, filter} = props.app;
+    const {search, filter, viewMode} = props.app;
     const {profile} = props.user;
     const router = useRouter()
     const searchTimeOut = useRef(null);
@@ -56,13 +58,17 @@ const RepairEquipments = React.memo((props) => {
             <div className='count'>
                 Всего: {formatAmount(list.length)}
             </div>
-            <div className={classes.page}>
-                {list?list.map((element, idx) => {
-                    if(idx<pagination)
-                        return(
-                            <CardRepairEquipment idx={idx} key={element._id} list={list} setList={setList} element={element}/>
-                        )}
-                ):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        <>
+                            {list.map((element, idx) => {
+                                if(idx<pagination)
+                                    return <CardRepairEquipment idx={idx} key={element._id} list={list} setList={setList} element={element}/>
+                            })}
+                        </>
+                        :
+                        <Table list={list} pagination={pagination}/>
+                    :null}
             </div>
             {['admin', 'суперорганизация', 'организация', 'агент', 'менеджер'].includes(profile.role)?
                 <Link href='/repairequipment/[id]' as={`/repairequipment/new`}>

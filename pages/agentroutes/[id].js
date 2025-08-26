@@ -13,6 +13,8 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import { useRouter } from 'next/router'
 import initialApp from '../../src/initialApp'
 import {formatAmount} from '../../src/lib';
+import {viewModes} from '../../src/enum';
+import Table from '../../components/table/agentroutes';
 
 const AgentRoutes = React.memo((props) => {
     const {profile} = props.user;
@@ -20,7 +22,7 @@ const AgentRoutes = React.memo((props) => {
     const router = useRouter()
     const {data} = props;
     let [list, setList] = useState(data.agentRoutes);
-    const {search} = props.app;
+    const {search, viewMode} = props.app;
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
     useEffect(() => {
@@ -50,11 +52,15 @@ const AgentRoutes = React.memo((props) => {
             <div className='count'>
                 Всего: {formatAmount(list.length)}
             </div>
-            <div className={classes.page}>
-                {list?list.map((element, idx) => {
-                    if(idx<pagination)
-                        return <CardAgentRoute idx={idx} list={list} setList={setList} key={element._id} element={element}/>
-                }):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        list.map((element, idx) => {
+                            if(idx<pagination)
+                                return <CardAgentRoute idx={idx} list={list} setList={setList} key={element._id} element={element}/>
+                        })
+                        :
+                        <Table list={list} pagination={pagination}/>
+                    :null}
             </div>
             {['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role)?
                 <Link href='/agentroute/[id]' as={`/agentroute/new`}>

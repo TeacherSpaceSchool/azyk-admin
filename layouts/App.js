@@ -101,9 +101,9 @@ const App = React.memo(props => {
             if(appBodyRef.current&&checkPagination&&appBodyRef.current.clientHeight<appBodyRef.current.scrollHeight) {
                 const scrolledTop = appBodyRef.current.scrollHeight - (appBodyRef.current.offsetHeight + appBodyRef.current.scrollTop)
                 if (scrolledTop<=300) {
-                    setReloadPage(true)
+                    ///setReloadPage(true)
                     await checkPagination()
-                    setReloadPage(false)
+                    ///setReloadPage(false)
                 }
             }
         };

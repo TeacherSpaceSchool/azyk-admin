@@ -1,12 +1,12 @@
 import React from 'react';
-import {pdDDMMYYHHMM} from '../../../src/lib';
+import {pdDDMMYY} from '../../../src/lib';
 import Link from 'next/link';
 
 const Tables =  React.memo(({element, columns}) =>{
     return <Link href='/employment/[id]' as={`/employment/${element.user._id}`}>
         <div className='tableRow tablePointer'>
             <div className='tableCell' style={columns[0].style}>
-                {pdDDMMYYHHMM(element.createdAt)}<br/>
+                {pdDDMMYY(element.createdAt)}<br/>
                 <span style={{color: element.user.status==='active'?'green':'red'}}>
                     {element.user.status==='active'?'Активный':'Неактивный'}
                 </span>

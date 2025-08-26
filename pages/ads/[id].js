@@ -12,13 +12,15 @@ import { useRouter } from 'next/router'
 import Router from 'next/router'
 import {getBrands} from '../../src/gql/items';
 import {formatAmount} from '../../src/lib';
+import {viewModes} from '../../src/enum';
+import Table from '../../components/table/ads';
 
 const Ads = React.memo((props) => {
     const initialRender = useRef(true);
     const classes = pageListStyle();
     const {data} = props;
     let [list, setList] = useState(data.adss);
-    const {search} = props.app;
+    const {search, viewMode} = props.app;
     const {profile} = props.user;
     const searchTimeOut = useRef(null);
     useEffect(() => {
@@ -46,17 +48,21 @@ const Ads = React.memo((props) => {
                 <title>Акции{data.organization?` ${data.organization.name}`:''}</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className={classes.page}>
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
                 <div className='count'>
                     Всего: {formatAmount(list.length)}
                 </div>
-                {['суперорганизация', 'организация', 'admin'].includes(profile.role)?<CardAds edit items={data.brands} organization={router.query.id} list={list} setList={setList}/>:null}
-                {list?list.map((element, idx) => {
-                    if(idx<pagination)
-                        return(
-                            <CardAds edit idx={idx}  items={data.brands} organization={router.query.id} list={list} setList={setList} key={element._id} element={element}/>
-                        )}
-                ):null}
+                {list?viewMode===viewModes.card?
+                        <>
+                            {['суперорганизация', 'организация', 'admin'].includes(profile.role)?<CardAds edit items={data.brands} organization={router.query.id} list={list} setList={setList}/>:null}
+                            {list.map((element, idx) => {
+                                if(idx<pagination)
+                                    return <CardAds edit idx={idx} items={data.brands} organization={router.query.id} list={list} setList={setList} key={element._id} element={element}/>
+                            })}
+                        </>
+                        :
+                        <Table list={list} pagination={pagination}/>
+                    :null}
             </div>
         </App>
     )

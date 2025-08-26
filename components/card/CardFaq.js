@@ -26,19 +26,11 @@ const CardFaq = React.memo((props) => {
     const {profile} = props.user;
     const {isMobileApp} = props.app;
     //addCard
-    let [file, setFile] = useState(null);
-    let handleChangeFile = ((event) => {
-        if(event.target.files[0].size/1024/1024<maxFileSize) {
-            setFile(event.target.files[0])
-            setUrl(true)
-        } else showSnackBar('Файл слишком большой')
-    })
     let [title, setTitle] = useState(element&&element.title?element.title:'');
     let [video, setVideo] = useState(element&&element.video?element.video:'');
     let handleVideo =  (event) => {
         setVideo(event.target.value)
     };
-    let [url, setUrl] = useState(element&&element.url?element.url:false);
     let handleTitle =  (event) => {
         setTitle(event.target.value)
     };
@@ -78,16 +70,7 @@ const CardFaq = React.memo((props) => {
                           />
                           <br/>
                           <br/>
-                          <TextField
-                              error={!url&&!video}
-                              label='Видео'
-                              value={video}
-                              className={classes.input}
-                              onChange={handleVideo}
-                          />
-                          <br/>
-                          <br/>
-                          <Button size='small' color={url||video?'primary':'secondary'} onClick={async () => {faqRef.current.click()}}>
+                          <Button size='small' color={video?'primary':'secondary'} onClick={async () => {faqRef.current.click()}}>
                               Загрузить инструкцию
                           </Button>
                       </CardContent>
@@ -99,7 +82,6 @@ const CardFaq = React.memo((props) => {
                                       let editElement = {_id: element._id}
                                       if(title&&title!==element.title)editElement.title = title
                                       if(video!==element.video)editElement.video = video
-                                      if(file)editElement.file = file
                                       if(typex!==element.typex)editElement.typex = typex
                                       const action = async () => await setFaq(editElement)
                                       setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
@@ -125,14 +107,12 @@ const CardFaq = React.memo((props) => {
                                   <Button onClick={() => {
                                       if(title) {
                                           const action = async () => {
-                                              const res = await addFaq({typex: typex, video: video, file: file, title})
+                                              const res = await addFaq({typex: typex, video: video, title})
                                               setList(list => [res, ...list])
                                           }
-                                          setFile(null)
                                           setTitle('')
                                           setTypex('клиенты')
                                           setVideo('')
-                                          setUrl(false)
                                           setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                           showMiniDialog(true)
                                       } else {
@@ -143,44 +123,20 @@ const CardFaq = React.memo((props) => {
                                   </Button>
                           }
                       </CardActions>
-                      <input
-                          accept='application/pdf'
-                          style={{ display: 'none' }}
-                          ref={faqRef}
-                          type='file'
-                          onChange={handleChangeFile}
-                      />
                   </Card>
                   :
                   element?
                       <Card className={isMobileApp?classes.cardM:classes.cardD}>
                           <CardActionArea>
-                          <CardContent>
-                              <h3 className={classes.input}>
-                                  {element.title}
-                              </h3>
-                              {
-                                  video?
-                                      <>
-                                      <br/>
-                                      <Button onClick={async () => {
-                                          setFullDialog(element.title, <VideoViewer video={element.video}/>)
-                                          showFullDialog(true)
-                                      }} size='small' color='primary'>
-                                          Просмотреть видео инструкцию
-                                      </Button>
-                                      </>
-                                      :
-                                      null
-                              }
-                              <br/>
-                              <Button onClick={async () => {
-                                  setFullDialog(element.title, <PdfViewer pdf={element.url}/>)
-                                  showFullDialog(true)
-                              }} size='small' color='primary'>
-                                  Прочитать инструкцию
-                              </Button>
-                          </CardContent>
+                              <CardContent>
+                                  <h3 className={classes.input}>
+                                      {element.title}
+                                  </h3>
+                                  <br/>
+                                  <Button onClick={() => window.open(element.video)} size='small' color='primary'>
+                                      Просмотреть видео инструкцию
+                                  </Button>
+                              </CardContent>
                           </CardActionArea>
                       </Card>
                       :null

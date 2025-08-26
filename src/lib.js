@@ -39,7 +39,7 @@ export const getCityCookie = (cookie) => {
 export const setCityCookie = (city) => {
     const days = 10000; // срок жизни в днях
     const date = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-    document.cookie = `city=${encodeURIComponent(city)}; expires=${date}; path=/; SameSite=Lax`;
+    document.cookie = `city=${encodeURIComponent(city)}; expires=${date}; path=/;`;
 }
 export const getViewModeCookie = (cookie) => {
     if (!cookie) return null;
@@ -51,7 +51,7 @@ export const getViewModeCookie = (cookie) => {
 export const setViewModeCookie = (viewMode) => {
     const days = 10000; // срок жизни в днях
     const date = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-    document.cookie = `viewMode=${encodeURIComponent(viewMode)}; expires=${date}; path=/; SameSite=Lax`;
+    document.cookie = `viewMode=${encodeURIComponent(viewMode)}; expires=${date}; path=/;`;
 };
 export const isNotTestUser = (profile) => {
     return !profile||!profile.login||!profile.login.toLowerCase().includes('test')

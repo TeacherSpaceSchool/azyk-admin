@@ -13,6 +13,8 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import { useRouter } from 'next/router'
 import initialApp from '../../src/initialApp'
 import {formatAmount, unawaited} from '../../src/lib';
+import {viewModes} from '../../src/enum';
+import Table from '../../components/table/districts';
 
 const Districts = React.memo((props) => {
     const {profile} = props.user;
@@ -20,7 +22,7 @@ const Districts = React.memo((props) => {
     const router = useRouter()
     const {data} = props;
     let [list, setList] = useState(data.districts);
-    const {search, sort} = props.app;
+    const {search, sort, viewMode} = props.app;
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
     const getList = async () => {
@@ -55,11 +57,15 @@ const Districts = React.memo((props) => {
             <div className='count'>
                 Всего: {formatAmount(list.length)}
             </div>
-            <div className={classes.page}>
-                {list?list.map((element, idx) => {
-                    if(idx<pagination)
-                        return <CardDistrict idx={idx} list={list} setList={setList} key={element._id} element={element}/>
-                }):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        list.map((element, idx) => {
+                            if(idx<pagination)
+                                return <CardDistrict idx={idx} list={list} setList={setList} key={element._id} element={element}/>
+                        })
+                        :
+                        <Table list={list} pagination={pagination}/>
+                    :null}
             </div>
             {['admin', 'суперорганизация', 'организация'].includes(profile.role)?
                 <Link href='/district/[id]' as={`/district/new`}>

@@ -17,6 +17,8 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import {formatAmount, unawaited} from '../../src/lib';
+import {viewModes} from '../../src/enum';
+import Table from '../../components/table/planClients';
 
 const Plan = React.memo((props) => {
     const classes = pageListStyle();
@@ -27,7 +29,7 @@ const Plan = React.memo((props) => {
     let [list, setList] = useState(data.planClients);
     let [count, setCount] = useState('');
     const getCount = async () => setCount(await getPlanClientsCount({search, skip: 0, city, organization: router.query.id, ...district?{district}:{}}))
-    const {search, city, district} = props.app;
+    const {search, city, district, viewMode} = props.app;
     const searchTimeOut = useRef(null);
     const paginationWork = useRef(true);
     const checkPagination = useCallback(async () => {
@@ -69,15 +71,24 @@ const Plan = React.memo((props) => {
                 <title>{data.organization.name}</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className={classes.page}>
-                <div className='count'>
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+            <div className='count'>
                     Всего: {formatAmount(count)}
                 </div>
+                {list?viewMode===viewModes.card?
+                        <>
+                            {['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?<CardPlanClient
+                                list={list} setList={setList} setCount={setCount}
+                                organization={data.organization} district={district}
+                            />:null}
+                            {list.map((element, idx) => <CardPlanClient
+                                key={element._id} list={list} setList={setList} setCount={setCount} organization={data.organization} idx={idx} element={element}/>
+                            )}
+                        </>
+                        :
+                        <Table list={list}/>
+                    :null}
                 {['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?<>
-                    <CardPlanClient
-                        list={list} setList={setList} setCount={setCount}
-                        organization={data.organization} district={district}
-                    />
                     <Fab onClick={open} color='primary' className={classes.fab}>
                         <SettingsIcon />
                     </Fab>
@@ -109,13 +120,6 @@ const Plan = React.memo((props) => {
                         </MenuItem>
                     </Menu>
                 </>:null}
-                {
-                    list?list.map((element, idx) => {
-                        return <CardPlanClient
-                            key={element._id} list={list} setList={setList} setCount={setCount} organization={data.organization} idx={idx} element={element}
-                        />
-                    }):null
-                }
             </div>
         </App>
     )

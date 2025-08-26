@@ -3,6 +3,7 @@ import { SingletonApolloClient } from '../singleton/client';
 
 const Ads = `
     _id
+    createdAt
     image
     url
     xid

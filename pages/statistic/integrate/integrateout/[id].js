@@ -17,6 +17,8 @@ import * as mini_dialogActions from '../../../../redux/actions/mini_dialog'
 import { bindActionCreators } from 'redux'
 import { useRouter } from 'next/router'
 import {formatAmount, unawaited} from '../../../../src/lib';
+import {viewModes} from '../../../../src/enum';
+import Table from '../../../../components/table/integrate';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Создан', value: 'create'}, {name: 'Обновлен', value: 'update'}, {name: 'На удаление', value: 'del'}, {name: 'Выполнен', value: 'check'}, {name: 'Ошибка', value: 'error'}]
 
@@ -31,7 +33,7 @@ const IntegrateOutShoro = React.memo((props) => {
     const searchTimeOut = useRef(null);
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const router = useRouter()
-    const {search, filter} = props.app;
+    const {search, filter, viewMode} = props.app;
     let [type, setType] = useState('Заказы');
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
@@ -100,12 +102,12 @@ const IntegrateOutShoro = React.memo((props) => {
                                 null
                         }
                     </div>
-            <div className={classes.page}>
-                {list?list.map((element, idx) => {
-                    return(
-                        <CardIntegrateOutShoro idx={idx} type={type} element={element} list={list} setList={setList} key={element._id}/>
-                    )}
-                ):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        list.map((element, idx) => <CardIntegrateOutShoro idx={idx} type={type} element={element} list={list} setList={setList} key={element._id}/>)
+                        :
+                        <Table list={list}/>
+                    :null}
             </div>
             <Fab onClick={open} color='primary' className={classes.fab}>
                 <SettingsIcon />

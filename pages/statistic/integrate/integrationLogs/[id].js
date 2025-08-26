@@ -12,13 +12,15 @@ import { bindActionCreators } from 'redux'
 import { useRouter } from 'next/router'
 import CardIntegrationLog from '../../../../components/card/CardIntegrationLog';
 import {unawaited} from '../../../../src/lib';
+import {viewModes} from '../../../../src/enum';
+import Table from '../../../../components/table/integrationLogs';
 
 const filters = [{name: 'Все', value: ''}, {name: '/:pass/put/item', value: '/:pass/put/item'}, {name: '/:pass/put/warehouse', value: '/:pass/put/warehouse'}, {name: '/:pass/put/stock', value: '/:pass/put/stock'}, {name: '/:pass/put/client', value: '/:pass/put/client'}, {name: '/:pass/put/employment', value: '/:pass/put/employment'}, {name: '/:pass/put/specialpriceclient', value: '/:pass/put/specialpriceclient'}, {name: '/:pass/put/limititemclient', value: '/:pass/put/limititemclient'}, {name: '/:pass/put/specialpricecategory', value: '/:pass/put/specialpricecategory'}]
 
 const IntegrationLog = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
-    const {filter} = props.app;
+    const {filter, viewMode} = props.app;
     let [list, setList] = useState(data.integrationLogs);
     const paginationWork = useRef(true);
     const initialRender = useRef(true);
@@ -48,12 +50,12 @@ const IntegrationLog = React.memo((props) => {
                 <title>Логи 1С</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className={classes.page}>
-                {list?list.map((element) => {
-                    return(
-                        <CardIntegrationLog element={element} key={element._id}/>
-                    )}
-                ):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        list.map(element => <CardIntegrationLog element={element} key={element._id}/>)
+                        :
+                        <Table list={list}/>
+                    :null}
             </div>
         </App>
     )

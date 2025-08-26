@@ -11,6 +11,8 @@ import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
 import {getWarehouses} from '../../src/gql/warehouse';
 import {formatAmount, unawaited} from '../../src/lib';
+import {viewModes} from '../../src/enum';
+import Table from '../../components/table/stocks';
 
 const defaultWarehouse = {name: 'Основной'}
 
@@ -19,7 +21,7 @@ const Stock = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [list, setList] = useState(data.stocks);
-    const {search} = props.app;
+    const {search, viewMode} = props.app;
     const router = useRouter()
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
@@ -54,19 +56,23 @@ const Stock = React.memo((props) => {
             <div className='count'>
                 Всего: {formatAmount(list.length)}
             </div>
-            <div className={classes.page}>
-                {
-                    ['admin', 'суперорганизация', 'организация'].includes(profile.role)?
-                        <CardStock list={list} setList={setList} warehouses={data.warehouses} organization={router.query.id}/>
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        <>
+                            {
+                                ['admin', 'суперорганизация', 'организация'].includes(profile.role)?
+                                    <CardStock list={list} setList={setList} warehouses={data.warehouses} organization={router.query.id}/>
+                                    :
+                                    null
+                            }
+                            {list?list.map((element, idx) => {
+                                if(idx<pagination)
+                                    return <CardStock idx={idx} key={element._id} warehouses={data.warehouses} organization={router.query.id} list={list} setList={setList} element={element}/>
+                            }):null}
+                        </>
                         :
-                        null
-                }
-                {list?list.map((element, idx) => {
-                    if(idx<pagination)
-                        return(
-                            <CardStock idx={idx} key={element._id} warehouses={data.warehouses} organization={router.query.id} list={list} setList={setList} element={element}/>
-                        )
-                }):null}
+                        <Table list={list} pagination={pagination}/>
+                    :null}
             </div>
         </App>
     )

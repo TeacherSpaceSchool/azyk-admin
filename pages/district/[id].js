@@ -188,7 +188,7 @@ const District = React.memo((props) => {
                             />:null}
                         {['admin', 'суперорганизация', 'организация'].includes(profile.role)?
                             <FormControl className={isMobileApp ? classes.inputM : classes.inputDF}>
-                                <InputLabel>Менеджер</InputLabel>
+                                <InputLabel>Супервайзер</InputLabel>
                                 <Select value={manager&&manager._id} onChange={handleManager}>
                                     {managers.map((element) =>
                                         <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
@@ -197,7 +197,7 @@ const District = React.memo((props) => {
                             </FormControl>
                             :
                             <TextField
-                                label='Менеджер'
+                                label='Супервайзер'
                                 value={manager&&manager.name}
                                 className={isMobileApp?classes.inputM:classes.inputDF}
                                 inputProps={{readOnly: true}}
@@ -275,8 +275,8 @@ const District = React.memo((props) => {
                             {filtredClient?filtredClient.map((element, idx) => {
                                 if(idx<pagination)
                                     return (
-                                        <div key={element._id} style={isMobileApp ? {alignItems: 'baseline'} : {}}
-                                             className={isMobileApp ? classes.column : classes.row}>
+                                        <div key={element._id} style={isMobileApp ? {alignItems: 'center', width: '100%'} : {}}
+                                             className={classes.row}>
                                             {['admin', 'суперорганизация', 'агент', 'организация', 'менеджер'].includes(profile.role)?
                                                 <Checkbox checked={client.includes(element)}
                                                           onChange={() => {
@@ -293,7 +293,7 @@ const District = React.memo((props) => {
                                                 :
                                                 null
                                             }
-                                            <CardClient buy={client.includes(element)} list={filtredClient} element={element}/>
+                                            <CardClient style={{width: 'calc(100% - 42px)'}} buy={client.includes(element)} list={filtredClient} element={element}/>
                                         </div>
                                     )
                                 else return null

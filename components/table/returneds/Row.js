@@ -11,11 +11,10 @@ const Tables =  React.memo(({element, idx, columns, setList, user, mini_dialogAc
     const {setMiniDialog, showMiniDialog} = mini_dialogActions;
     const {profile} = user;
     const isShowSync = ['admin', 'организация', 'суперорганизация', 'экспедитор', 'суперагент', 'менеджер', 'агент'].includes(profile.role)
-    const status = element.taken?'принят':element.cancelForwarder||element.cancelClient?'отмена':element.confirmationForwarder&&element.confirmationClient?'выполнен':'обработка'
+    const status = element.cancelForwarder?'отмена':element.confirmationForwarder?'принят':'обработка'
     const statusColor = {
         'обработка': 'orange',
-        'принят': 'blue',
-        'выполнен': 'green',
+        'принят': 'green',
         'отмена': 'red'
     }
     const onCLick = async () => {

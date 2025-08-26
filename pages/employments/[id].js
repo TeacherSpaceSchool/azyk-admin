@@ -16,7 +16,7 @@ import {getEmployments, getEmploymentsCount} from '../../src/gql/employment';
 import {viewModes} from '../../src/enum';
 import Table from '../../components/table/employments';
 
-const filters = [{name: 'Все', value: ''}, {name: 'Агент', value: 'агент'}, {name: 'Менеджер', value: 'менеджер'}, {name: 'Экспедитор', value: 'экспедитор'}, {name: 'Организация', value: 'организация'}]
+const filters = [{name: 'Все', value: ''}, {name: 'Агент', value: 'агент'}, {name: 'Супервайзер', value: 'менеджер'}, {name: 'Экспедитор', value: 'экспедитор'}, {name: 'Организация', value: 'организация'}]
 
 const Employment = React.memo((props) => {
     const {profile} = props.user;

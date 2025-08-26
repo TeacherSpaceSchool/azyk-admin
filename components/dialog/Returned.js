@@ -11,7 +11,6 @@ import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import {pdDDMMYYHHMM, checkFloat, pdDDMMYYYYWW, getClientTitle, formatAmount} from '../../src/lib'
 import Confirmation from './Confirmation'
 import Geo from '../../components/dialog/Geo'
-import HistoryReturned from '../../components/dialog/HistoryReturned'
 import IconButton from '@material-ui/core/IconButton';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -30,7 +29,11 @@ const Returned =  React.memo(
         let [cancelForwarder, setCancelForwarder] = useState(element.cancelForwarder);
         const width = isMobileApp? (window.innerWidth-112) : 500;
         const {showSnackBar} = props.snackbarActions;
-        //подсчет общей суммы
+        const statusColor = {
+            'обработка': 'orange',
+            'принят': 'green',
+            'отмена': 'red'
+        } //подсчет общей суммы
         useEffect(() => {
             allTonnage=0
             allPrice=0
@@ -75,7 +78,7 @@ const Returned =  React.memo(
                 </div>
                 <div className={classes.row}>
                     <div className={classes.nameField}>Статус:&nbsp;</div>
-                    <div className={classes.value}>{status}</div>
+                    <div className={classes.value} style={{color: statusColor[status]}}>{status}</div>
                 </div>
                 {
                     element.inv?
@@ -100,12 +103,10 @@ const Returned =  React.memo(
                         null
 
                 }
-                <a>
-                    <div style={{cursor: 'pointer'}} className={classes.row} onClick={() => {setMiniDialog('История', <HistoryReturned returned={element._id}/>)}}>
-                        <div className={classes.nameField}>Изменен:&nbsp;</div>
-                        <div className={classes.value}>{pdDDMMYYHHMM(element.updatedAt)}</div>
-                    </div>
-                </a>
+                <div className={classes.row}>
+                    <div className={classes.nameField}>Изменен:&nbsp;</div>
+                    <div className={classes.value}>{pdDDMMYYHHMM(element.updatedAt)}</div>
+                </div>
                 <div className={classes.row}>
                     <div className={classes.nameField}>Адрес: &nbsp;</div>
                     <div className={classes.value}>

@@ -11,13 +11,15 @@ import Router from 'next/router'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import {formatAmount, unawaited} from '../../../src/lib';
+import {viewModes} from '../../../src/enum';
+import Table from '../../../components/table/histories';
 
 const filters = [{name: 'Все', value: ''}, {name: 'SubBrandAzyk', value: 'SubBrandAzyk'}, {name: 'ClientAzyk', value: 'ClientAzyk'}, {name: 'DistrictAzyk', value: 'DistrictAzyk'}, {name: 'EmploymentAzyk', value: 'EmploymentAzyk'}, {name: 'ItemAzyk', value: 'ItemAzyk'}, {name: 'OrganizationAzyk', value: 'OrganizationAzyk'},]
 
 const History = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
-    const {search, filter} = props.app;
+    const {search, filter, viewMode} = props.app;
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
     let [list, setList] = useState(data.histories);
@@ -55,13 +57,15 @@ const History = React.memo((props) => {
                 <title>История</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className={classes.page}>
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        list.map(element => <CardHistory key={element._id} element={element}/>)
+                        :
+                        <Table list={list}/>
+                    :null}
                 <div className='count'>
                     Всего: {formatAmount(list.length)}
                 </div>
-                {list.map((element) =>
-                    <CardHistory key={element._id} element={element}/>
-                )}
             </div>
         </App>
     )

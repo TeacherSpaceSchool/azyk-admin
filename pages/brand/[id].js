@@ -14,13 +14,15 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import Router from 'next/router'
 import {formatAmount, unawaited} from '../../src/lib';
 import {getOrganization} from '../../src/gql/organization';
+import {viewModes} from '../../src/enum';
+import Table from '../../components/table/items';
 
 const Brand = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     const router = useRouter()
     let [list, setList] = useState(data.brands);
-    const {search, filter, city} = props.app;
+    const {search, filter, city, viewMode} = props.app;
     const {profile} = props.user;
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
@@ -53,13 +55,15 @@ const Brand = React.memo((props) => {
                 <title>{data.organization?data.organization.name:'Ничего не найдено'}</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className={classes.page}>
-                {list?list.map((element, idx) => {
-                    if(idx<pagination)
-                        return(
-                            <CardItem idx={idx} list={list} setList={setList} key={element._id} element={element}/>
-                        )}
-                ):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?profile.role==='client'||viewMode===viewModes.card?
+                        list.map((element, idx) => {
+                            if(idx<pagination)
+                                return <CardItem idx={idx} list={list} setList={setList} key={element._id} element={element}/>
+                        })
+                        :
+                        <Table list={list} pagination={pagination}/>
+                    :null}
             </div>
             {['admin', 'суперорганизация', 'организация'].includes(profile.role)?
                 <Link href='/item/[id]' as={`/item/new`}>

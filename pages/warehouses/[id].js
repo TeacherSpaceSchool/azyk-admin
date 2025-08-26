@@ -10,12 +10,14 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
 import {formatAmount, unawaited} from '../../src/lib';
+import {viewModes} from '../../src/enum';
+import Table from '../../components/table/warehouses';
 
 const Warehouse = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [list, setList] = useState(data.warehouses);
-    const {search} = props.app;
+    const {search, viewMode} = props.app;
     const router = useRouter()
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
@@ -51,12 +53,18 @@ const Warehouse = React.memo((props) => {
             <div className='count'>
                 Всего: {formatAmount(list.length)}
             </div>
-            <div className={classes.page}>
-                <CardWarehouse list={list} setList={setList} organization={router.query.id}/>
-                {list?list.map((element, idx) => {
-                    if(idx<pagination)
-                        return <CardWarehouse idx={idx} key={element._id} organization={router.query.id} list={list} setList={setList} element={element}/>
-                }):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        <>
+                            <CardWarehouse list={list} setList={setList} organization={router.query.id}/>
+                            {list?list.map((element, idx) => {
+                                if(idx<pagination)
+                                    return <CardWarehouse idx={idx} key={element._id} organization={router.query.id} list={list} setList={setList} element={element}/>
+                            }):null}
+                        </>
+                        :
+                        <Table list={list} pagination={pagination}/>
+                    :null}
             </div>
         </App>
     )

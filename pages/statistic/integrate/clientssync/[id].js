@@ -16,6 +16,8 @@ import Confirmation from '../../../../components/dialog/Confirmation'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../../../redux/actions/mini_dialog'
 import {formatAmount} from '../../../../src/lib';
+import {viewModes} from '../../../../src/enum';
+import Table from '../../../../components/table/clients';
 
 const ClientsSync = React.memo((props) => {
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
@@ -23,7 +25,7 @@ const ClientsSync = React.memo((props) => {
     const {data} = props;
     const router = useRouter()
     let [list, setList] = useState(data.clientsSync);
-    const {search, city} = props.app;
+    const {search, city, viewMode} = props.app;
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
     const paginationWork = useRef(true);
@@ -48,8 +50,8 @@ const ClientsSync = React.memo((props) => {
             searchTimeOut.current = setTimeout(async () => {
                 // eslint-disable-next-line no-undef
                 const [clientsSync, clientsSyncStatistic] = await Promise.all([
-                    getClientsSync({search, organization: router.query.id, skip: 0, city}),
-                    getClientsSyncStatistic({search, organization: router.query.id, city})
+                    getClientsSync({search, organization: router.query.id, skip: 0}),
+                    getClientsSyncStatistic({search, organization: router.query.id})
                 ])
                 setList(clientsSync)
                 setSimpleStatistic(clientsSyncStatistic)
@@ -64,17 +66,15 @@ const ClientsSync = React.memo((props) => {
                 <title>{data.organization.name}</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className={classes.page}>
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        list.map(element => <CardClient element={element} key={element._id}/>)
+                        :
+                        <Table list={list}/>
+                    :null}
                 <div className='count'>
                     Интеграций: {formatAmount(simpleStatistic)}
                 </div>
-                {
-                    list?list.map((element  ) => {
-                            return(
-                                <CardClient element={element}/>
-                            )}
-                    ):null
-                }
             </div>
             <Fab onClick={() => {
                 const action = async () => {

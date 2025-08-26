@@ -15,9 +15,12 @@ import RemoveIcon from '@material-ui/icons/Clear';
 import Confirmation from '../../../components/dialog/Confirmation'
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import {checkFloat} from '../../../src/lib'
+import {viewModes} from '../../../src/enum';
+import Table from '../../../components/table/files';
 
 const Files = React.memo((props) => {
     const {data} = props;
+    const {viewMode} = props.app;
     const classes = pageListStyle();
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const initialRender = useRef(true);
@@ -43,13 +46,15 @@ const Files = React.memo((props) => {
                 <title>Файловое хранилище</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className={classes.page}>
-                {data.files?data.files.map((element, idx) => {
-                    if(idx<pagination)
-                        return(
-                            <CardFile key={element._id} element={element}/>
-                        )}
-                ):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {data.files?viewMode===viewModes.card?
+                        data.files.map((element, idx) => {
+                            if(idx<pagination)
+                                return <CardFile key={element._id} element={element}/>
+                        })
+                        :
+                        <Table list={data.files} pagination={pagination}/>
+                    :null}
             </div>
             {data.files.length?<Fab onClick={() => {
                 const action = async () => await clearAllDeactiveFiles()

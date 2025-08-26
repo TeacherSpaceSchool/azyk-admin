@@ -32,6 +32,7 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import {checkInt, maxImageSize} from '../../src/lib';
 import CardItem from '../../components/card/CardItem';
+import {viewModes} from '../../src/enum';
 
 const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
 
@@ -42,7 +43,7 @@ const SubBrand = React.memo((props) => {
     const classes = subBrandStyle();
     const {data} = props;
     const router = useRouter()
-    const {search, isMobileApp, city} = props.app;
+    const {search, isMobileApp, city, viewMode} = props.app;
     const initialRender = useRef(true);
     useEffect(() => {(async () => {
         if(initialRender.current)
@@ -214,7 +215,7 @@ const SubBrand = React.memo((props) => {
                                                 className={isMobileApp ? classes.column : classes.row}>
                                         <Checkbox checked={selectType==='Выбранные'}
                                                         onChange={() => handleFiltredItems(item._id)}
-                                    /> <CardItem key={item._id} element={item}/> </div>
+                                    /> <CardItem short={viewMode===viewModes.table} key={item._id} element={item}/> </div>
                             })}</div>
                         </>:null}
                         <div className={isMobileApp?classes.bottomRouteM:classes.bottomRouteD}>

@@ -9,17 +9,18 @@ import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
 import {formatAmount, isNotTestUser, isPWA, unawaited} from '../src/lib';
+import {viewModes} from '../src/enum';
+import Table from '../components/table/organizations';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Активные', value: 'active'}, {name: 'Неактивные', value: 'deactive'}]
 
 const Organization = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
-     const {search, filter, sort, isMobileApp, city, device} = props.app;
+     const {search, filter, sort, isMobileApp, city, device, viewMode} = props.app;
     const {profile} = props.user;
     let [list, setList] = useState(data.brandOrganizations);
     const searchTimeOut = useRef(null);
-    let [type, setType] = useState('👁');
     const initialRender = useRef(true);
     const getList = async () => {
         setList(await getBrandOrganizations({search, sort, filter, city}));
@@ -77,30 +78,25 @@ const Organization = React.memo((props) => {
                 Всего: {formatAmount(list.length)}
             </div>
             {
-                isNotTestUser(profile)&&isMobileApp&&(profile.role!=='client'||deferredPrompt&&!isPWA())?
-                    <div className={classes.scrollDown} onClick={() => {
-                        if(profile.role==='client') {
-                            prompt()
-                        }
-                        else {
-                            setType(type==='👁'?'⚙':'👁')
-                        }
-                    }}>
+                isNotTestUser(profile)&&isMobileApp&&deferredPrompt&&!isPWA()?
+                    <div className={classes.scrollDown} onClick={prompt}>
                         <div className={classes.scrollDownContainer}>
-                            {profile.role==='client'?'📲УСТАНОВИТЬ ПРИЛОЖЕНИЕ':type}
+                            📲УСТАНОВИТЬ ПРИЛОЖЕНИЕ
                             <div className={classes.scrollDownDiv}/>
                         </div>
                     </div>
                     :
                     null
             }
-            <div className={classes.page}>
-                {list?list.map((element, idx) => {
-                    if(idx<pagination)
-                        return(
-                            <CardBrand key={element._id} element={element} idx={idx} list={list} setList={setList} type={type}/>
-                        )
-                }):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?profile.role==='client'||viewMode===viewModes.card?
+                        list.map((element, idx) => {
+                            if(idx<pagination)
+                                return <CardBrand key={element._id} element={element} idx={idx} list={list} setList={setList}/>
+                        })
+                        :
+                        <Table pagination={pagination} path='brand' list={list}/>
+                    :null}
             </div>
         </App>
     )

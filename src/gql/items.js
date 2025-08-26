@@ -42,6 +42,8 @@ export const getBrandOrganizations = async (variables, client) => {
                             unite
                             autoAcceptAgent
                             organization {_id}
+                            createdAt
+                            status
                         }
                     }`,
             })

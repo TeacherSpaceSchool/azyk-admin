@@ -13,6 +13,8 @@ import initialApp from '../src/initialApp'
 import Router, {useRouter} from 'next/router'
 import {formatAmount, getQueryParam, unawaited} from '../src/lib';
 import {getAdsOrganizations} from '../src/gql/ads';
+import {viewModes} from '../src/enum';
+import Table from '../components/table/organizations';
 
 const adsPath = 'ads'
 
@@ -29,7 +31,7 @@ const Organization = React.memo((props) => {
     const title = router.query.title||defaultTitle
     const showSuperOrganization = profile.role==='admin'&&path!==defaultPath&&router.query.super
     let [list, setList] = useState(data.organizations);
-    const {search, filter, city} = props.app;
+    const {search, filter, city, viewMode} = props.app;
     const prevPath = useRef(null);
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
@@ -89,25 +91,29 @@ const Organization = React.memo((props) => {
                 Всего: {formatAmount(list.length)}
             </div>
             <div className={classes.page}>
-                {
-                    showSuperOrganization?
-                        <Link href={`/${path}/[id]`} as={`/${path}/super`}>
-                            <a>
-                                <CardOrganization element={{name: 'AZYK.STORE', image: '/static/512x512.png'}}/>
-                            </a>
-                        </Link>
-                        :null
-                }
-                {list?list.map((element, idx) => {
-                    if(idx<pagination)
-                        return(
-                            <Link key={element._id} href={`/${path}/[id]`} as={`/${path}/${element._id}`}>
-                                <a>
-                                    <CardOrganization list={list} setList={setList} element={element}/>
-                                </a>
-                            </Link>
-                        )}
-                ):null}
+                {list?viewMode===viewModes.card?
+                        <>
+                            {
+                                showSuperOrganization?
+                                    <Link href={`/${path}/[id]`} as={`/${path}/super`}>
+                                        <a>
+                                            <CardOrganization element={{name: 'AZYK.STORE', image: '/static/512x512.png'}}/>
+                                        </a>
+                                    </Link>
+                                    :null
+                            }
+                            {list?list.map((element, idx) => {
+                                if(idx<pagination)
+                                    return <Link key={element._id} href={`/${path}/[id]`} as={`/${path}/${element._id}`}>
+                                        <a>
+                                            <CardOrganization list={list} setList={setList} element={element}/>
+                                        </a>
+                                    </Link>
+                            }):null}
+                        </>
+                        :
+                        <Table path={path} pagination={pagination} list={[...showSuperOrganization?[{_id: 'super', name: 'AZYK.STORE'}]:[], ...list]}/>
+                    :null}
             </div>
             {profile.role==='admin'&&path===defaultPath?
                 <Link href='/organization/[id]' as={`/organization/new`}>

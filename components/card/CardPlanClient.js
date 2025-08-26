@@ -43,7 +43,7 @@ const CardPlanClient = React.memo((props) => {
                 if(searchTimeOut.current)
                     clearTimeout(searchTimeOut.current)
                 searchTimeOut.current = setTimeout(async () => {
-                    setClients(await getClientsForPlanClients({city: organization.cities[0], search: inputValue, organization: organization._id, district}))
+                    setClients(await getClientsForPlanClients({search: inputValue, organization: organization._id, district}))
                     if(!open)
                         setOpen(true)
                     setLoading(false)

@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import React, { useState } from 'react';
+import React, {useCallback, useState} from 'react';
 import App from '../../../layouts/App';
 import CardError from '../../../components/card/CardError';
 import pageListStyle from '../../../src/styleMUI/error/errorList'
@@ -14,25 +14,38 @@ import Confirmation from '../../../components/dialog/Confirmation'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import {formatAmount} from '../../../src/lib';
+import {viewModes} from '../../../src/enum';
+import Table from '../../../components/table/errors';
 
 const Errors = React.memo((props) => {
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const classes = pageListStyle();
     const {data} = props;
+    const {viewMode} = props.app;
     let [list, setList] = useState(data.errors);
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, list])
     return (
-        <App pageName='Сбои'>
+        <App checkPagination={checkPagination} pageName='Сбои'>
             <Head>
                 <title>Сбои</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className={classes.page}>
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        list.map((element, idx) => {
+                            if(idx<pagination)
+                                return <CardError element={element}/>
+                        })
+                        :
+                        <Table list={list} pagination={pagination}/>
+                    :null}
                 <div className='count'>
                     Всего: {formatAmount(list.length)}
                 </div>
-                {list?list.map((element) =>
-                    <CardError element={element}/>
-                ):null}
             </div>
             {list.length?<Fab onClick={() => {
                 const action = async () => {

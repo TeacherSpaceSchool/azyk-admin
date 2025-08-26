@@ -22,7 +22,7 @@ import {checkFloat, inputFloat, checkInt, inputInt, formatAmount} from '../../sr
 
 const CardItem = React.memo((props) => {
     const classes = cardItemStyle();
-    const {element, setList, idx} = props;
+    const {element, setList, idx, short} = props;
     const {isMobileApp} = props.app;
     const {profile} = props.user;
     let [status, setStatus] = useState(element?element.status:'');
@@ -33,8 +33,8 @@ const CardItem = React.memo((props) => {
     let [price, setPrice] = useState(element.price);
     let [priotiry, setPriotiry] = useState(element.priotiry);
     return (
-        <Card className={classes.card}>
-            <CardContent className={classes.column}>
+        <Card className={classes.card} style={{margin: short?2.5:10}}>
+            <div className={classes.column} style={{margin: short?5:'16px 16px 24px 16px'}}>
                 <div className={classes.chipList}>{
                     setList?element.del!=='deleted'&&profile.role==='admin'?
                         <>
@@ -107,7 +107,7 @@ const CardItem = React.memo((props) => {
                         :null
                 }
                 </div>
-                <Link href={`/${profile.role==='client'?'catalog':'item'}/[id]`} as={`/${profile.role==='client'?'catalog':'item'}/${profile.role==='client'?element.organization:element._id}`}>
+                {!short?<Link href={`/${profile.role==='client'?'catalog':'item'}/[id]`} as={`/${profile.role==='client'?'catalog':'item'}/${profile.role==='client'?element.organization:element._id}`}>
                     <a>
                         <img
                             className={classes.media}
@@ -116,9 +116,9 @@ const CardItem = React.memo((props) => {
                             loading='lazy'
                         />
                     </a>
-                </Link>
+                </Link>:null}
                 <Link href={`/${profile.role==='client'?'catalog':'item'}/[id]`} as={`/${profile.role==='client'?'catalog':'item'}/${profile.role==='client'?element.organization:element._id}`}>
-                    <a className={classes.name} style={!setList?{height: 'auto', marginBottom: element.subBrand?10:0}:{}}>
+                    <a className={classes.name} style={!setList?{height: 'auto', marginBottom: element.subBrand?5:0}:{}}>
                         {element.name}
                     </a>
                 </Link>
@@ -231,7 +231,7 @@ const CardItem = React.memo((props) => {
                     :
                     null
                 }
-            </CardContent>
+            </div>
         </Card>
     );
 })

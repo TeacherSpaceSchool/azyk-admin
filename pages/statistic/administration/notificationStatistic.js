@@ -11,12 +11,14 @@ import { getClientGqlSsr } from '../../../src/getClientGQL'
 import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
 import {formatAmount} from '../../../src/lib';
+import {viewModes} from '../../../src/enum';
+import Table from '../../../components/table/notificationStatistic';
 
 const NotificationStatistic = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [list, setList] = useState(data.notificationStatistics);
-    const {search} = props.app;
+    const {search, viewMode} = props.app;
     const initialRender = useRef(true);
     useEffect(() => {
         if(initialRender.current)
@@ -40,14 +42,18 @@ const NotificationStatistic = React.memo((props) => {
             <div className='count'>
                 Всего: {formatAmount(list.length)}
             </div>
-            <div className={classes.page}>
-                <CardNotificationStatistic list={list} setList={setList}/>
-                {list?list.map((element, idx) => {
-                        if(idx<pagination)
-                            return(
-                                <CardNotificationStatistic key={element._id} list={list} setList={setList} element={element}/>
-                            )}
-                ):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        <>
+                            <CardNotificationStatistic list={list} setList={setList}/>
+                            {list.map((element, idx) => {
+                                if(idx<pagination)
+                                    return <CardNotificationStatistic key={element._id} list={list} setList={setList} element={element}/>
+                            })}
+                        </>
+                        :
+                        <Table list={list} pagination={pagination}/>
+                    :null}
             </div>
         </App>
     )

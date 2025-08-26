@@ -9,12 +9,14 @@ import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Router from 'next/router'
 import {formatAmount} from '../src/lib';
+import {viewModes} from '../src/enum';
+import Table from '../components/table/faqs';
 
 const Faqs = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [list, setList] = useState(data.faqs);
-    const {search,} = props.app;
+    const {search, viewMode} = props.app;
     const {profile} = props.user;
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
@@ -42,17 +44,21 @@ const Faqs = React.memo((props) => {
                 <title>Инструкции</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className={classes.page}>
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
                 <div className='count'>
                     Всего: {formatAmount(list.length)}
                 </div>
-                {profile.role==='admin'?<CardFaq list={list} setList={setList}/>:null}
-                {list?list.map((element, idx) => {
-                        if(idx<pagination)
-                            return(
-                                <CardFaq idx={idx} list={list} setList={setList} key={element._id} element={element}/>
-                            )}
-                ):null}
+                {list?viewMode===viewModes.card?
+                        <>
+                            {profile.role==='admin'?<CardFaq list={list} setList={setList}/>:null}
+                            {list.map((element, idx) => {
+                                if(idx<pagination)
+                                    return <CardFaq idx={idx} list={list} setList={setList} key={element._id} element={element}/>
+                            })}
+                        </>
+                        :
+                        <Table list={list} pagination={pagination}/>
+                    :null}
             </div>
         </App>
     )

@@ -28,15 +28,23 @@ const HistoryOrder =  React.memo(
                 {
                     historyOrders.map((historyOrder) =>
                         <>
-                        <div className={classes.row}>
-                            <div className={classes.nameField}>Изменен:&nbsp;</div>
-                            <div className={classes.value}>{pdDDMMYYHHMM(new Date(historyOrder.createdAt))}</div>
-                        </div>
-                        <div className={classes.row}>
-                            <div className={classes.nameField}>Изменил:&nbsp;</div>
-                            <div className={classes.value}>{historyOrder.editor}</div>
-                        </div>
-                        <br/>
+                            <div className={classes.row}>
+                                <div className={classes.nameField}>Изменен:&nbsp;</div>
+                                <div className={classes.value}>{pdDDMMYYHHMM(new Date(historyOrder.createdAt))}</div>
+                            </div>
+                            <div className={classes.row}>
+                                <div className={classes.nameField}>Изменил:&nbsp;</div>
+                                <div className={classes.value}>{historyOrder.editor}</div>
+                            </div>
+                            {historyOrder.status?<div className={classes.row}>
+                                <div className={classes.nameField}>Статус:&nbsp;</div>
+                                <div className={classes.value}>{historyOrder.status}</div>
+                            </div>:null}
+                            {historyOrder.orders&&historyOrder.orders.length?<div className={classes.row}>
+                                <div className={classes.nameField}>Изменено:&nbsp;</div>
+                                <div className={classes.value}>{JSON.stringify(historyOrder.orders)}</div>
+                            </div>:null}
+                            <br/>
                         </>
                     )
                 }

@@ -22,11 +22,11 @@ import ReceiptIcon from '@material-ui/icons/Receipt';
 import RateReview from '@material-ui/icons/RateReview';
 import LocationCityIcon from '@material-ui/icons/LocationCity';
 import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
-import ArtTrackIcon from '@material-ui/icons/ArtTrack';
 import EqualizerIcon from '@material-ui/icons/Build';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import ImageIcon from '@material-ui/icons/Image';
 import TargetIcon from '@material-ui/icons/TrackChanges';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import WarehousesIcon from '@material-ui/icons/Home';
@@ -292,25 +292,12 @@ const MyDrawer = React.memo((props) => {
                         <>
                             <Link href={profile.role==='admin'?'/organizations?path=autos&title=Транспорт&super=1':'/autos/[id]'}
                                   as={profile.role==='admin'?'/organizations?path=autos&title=Транспорт&super=1':`/autos/${profile.organization}`}>
-                                <ListItem style={{background: router.asPath.includes('/autos')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {setUncover(false);showDrawer(false)}}>
+                                <ListItem style={{background: router.asPath.includes('autos')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {setUncover(false);showDrawer(false)}}>
                                     <ListItemIcon><CommuteIcon color='inherit'/></ListItemIcon>
                                     <ListItemText primary='Транспорт' />
                                 </ListItem>
                             </Link>
                             <Divider/>
-                        </>
-                        :null
-                }
-                {
-                    ['admin', 'client', 'суперагент'].includes(profile.role)?
-                        <>
-                        <Link href='/blog'>
-                            <ListItem style={{background: router.pathname==='/blog'?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {setUncover(false);showDrawer(false)}}>
-                                <ListItemIcon><ArtTrackIcon color='inherit'/></ListItemIcon>
-                                <ListItemText primary='Блог' />
-                            </ListItem>
-                        </Link>
-                        <Divider/>
                         </>
                         :null
                 }
@@ -335,6 +322,20 @@ const MyDrawer = React.memo((props) => {
                                 <ListItem style={{background: router.asPath.includes('merchandising')&&!router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {setUncover(false);showDrawer(false)}}>
                                     <ListItemIcon><AssignmentIndIcon color='inherit'/></ListItemIcon>
                                     <ListItemText primary='Мерчендайзинг' />
+                                </ListItem>
+                            </Link>
+                            <Divider/>
+                        </>
+                        :null
+                }
+                {
+                    ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент', 'мерчендайзер'].includes(profile.role)?
+                        <>
+                            <Link href={profile.role==='admin'?'/organizations?path=fhoclients&title=ФХО%20клиентов':'/fhoclients/[id]'}
+                                  as={profile.role==='admin'?'/organizations?path=fhoclients&title=ФХО%20клиентов':`/fhoclients/${profile.organization}`}>
+                                <ListItem style={{background: router.asPath.includes('fhoclients')&&!router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {setUncover(false);showDrawer(false)}}>
+                                    <ListItemIcon><ImageIcon color='inherit'/></ListItemIcon>
+                                    <ListItemText primary='ФХО клиентов' />
                                 </ListItem>
                             </Link>
                             <Divider/>

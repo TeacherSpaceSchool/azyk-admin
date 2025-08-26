@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import React from 'react';
 import App from '../../layouts/App';
-import pageListStyle from '../../src/styleMUI/blog/blogList'
+import pageListStyle from '../../src/styleMUI/ads/adsList'
 import { connect } from 'react-redux'
 import initialApp from '../../src/initialApp'
 import { urlMain } from '../../redux/constants/other'

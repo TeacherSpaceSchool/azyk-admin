@@ -3,7 +3,6 @@ import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../layouts/App';
 import { connect } from 'react-redux'
 import { getSubBrands } from '../src/gql/subBrand'
-import {getOrganizations} from '../src/gql/organization'
 import pageListStyle from '../src/styleMUI/subbrand/subbrandList'
 import CardSubBrand from '../components/card/CardSubBrand'
 import Router from 'next/router'
@@ -13,12 +12,14 @@ import {formatAmount, unawaited} from '../src/lib';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Link from 'next/link';
+import {viewModes} from '../src/enum';
+import Table from '../components/table/subbrands';
 
 const SubBrands = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
     let [list, setList] = useState(data.subBrands);
-    const {search, organization, city} = props.app;
+    const {search, organization, city, viewMode} = props.app;
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
     const getList = async () => {
@@ -53,16 +54,18 @@ const SubBrands = React.memo((props) => {
                 <title>Подбренды</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className={classes.page}>
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
                 <div className='count'>
                     Всего: {formatAmount(list.length)}
                 </div>
-                {list?list.map((element, idx) => {
-                    if(idx<pagination)
-                        return(
-                            <CardSubBrand idx={idx}  key={element._id} list={list} setList={setList} element={element} organizations={data.organizations}/>
-                        )
-                }):null}
+                {list?viewMode===viewModes.card?
+                        list.map((element, idx) => {
+                            if(idx<pagination)
+                                return <CardSubBrand idx={idx}  key={element._id} list={list} setList={setList} element={element} organizations={data.organizations}/>
+                        })
+                        :
+                        <Table list={list} pagination={pagination}/>
+                    :null}
                 <Link href='/subbrand/[id]' as={`/subbrand/new`}>
                     <Fab color='primary' className={classes.fab}>
                         <AddIcon />

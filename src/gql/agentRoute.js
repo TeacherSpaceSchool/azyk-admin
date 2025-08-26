@@ -5,7 +5,7 @@ const AgentRoute = `
     _id
     createdAt
     organization {_id name}
-    district {_id name client {_id image createdAt name address lastActive category device notification city phone user {status}}}
+    district {_id name agent {_id name} client {_id image createdAt name address lastActive category device notification city phone user {status}}}
     clients
 `
 

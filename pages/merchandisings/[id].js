@@ -13,6 +13,8 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import { useRouter } from 'next/router'
 import {unawaited} from '../../src/lib';
+import {viewModes} from '../../src/enum';
+import Table from '../../components/table/merchandisings';
 
 const sorts = [{name: 'Дата', field: 'date'}, {name: 'Оценка', field: 'stateProduct'}, {name: 'Статус', field: 'check'}]
 const filters = [{name: 'Все', value: ''},{name: 'Обработка', value: 'обработка'},{name: 'Холодные полки', value: 'холодные полки'},{name: 'Теплые полки', value: 'теплые полки'}]
@@ -23,7 +25,7 @@ const Merchandisings = React.memo((props) => {
     const {profile} = props.user;
     const {data} = props;
     let [list, setList] = useState(data.merchandisings);
-    const {search, filter, sort, date, agent} = props.app;
+    const {search, filter, sort, date, agent, viewMode} = props.app;
     const initialRender = useRef(true);
     const searchTimeOut = useRef(null);
     const paginationWork = useRef(true);
@@ -63,14 +65,12 @@ const Merchandisings = React.memo((props) => {
                 <title>Мерчендайзинг</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className={classes.page}>
-                {
-                    list?list.map((element) => {
-                            return(
-                                <CardMerchandising key={element._id} templateMerchandising={router.query.id} element={element} />
-                            )}
-                    ):null
-                }
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        list.map((element) => <CardMerchandising key={element._id} templateMerchandising={router.query.id} element={element}/>)
+                        :
+                        <Table list={list}/>
+                    :null}
                 {['admin', 'суперагент', 'суперорганизация', 'организация', 'менеджер', 'агент', 'мерчендайзер'].includes(profile.role)?
                     <Link href='/merchandising/[id]' as={`/merchandising/new`}>
                         <Fab color='primary' className={classes.fab}>

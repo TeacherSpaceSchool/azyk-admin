@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../../../layouts/App';
-import pageListStyle from '../../../../src/styleMUI/blog/blogList'
+import pageListStyle from '../../../../src/styleMUI/ads/adsList'
 import {outXMLAdsShoros, districtsOutXMLAdsShoros} from '../../../../src/gql/outxmladsazyk'
 import CardOutXMLAds from '../../../../components/card/CardOutXMLAds'
 import { connect } from 'react-redux'
@@ -10,6 +10,8 @@ import initialApp from '../../../../src/initialApp'
 import Router from 'next/router'
 import { useRouter } from 'next/router'
 import {formatAmount, unawaited} from '../../../../src/lib';
+import {viewModes} from '../../../../src/enum';
+import Table from '../../../../components/table/outxmlads';
 
 const OutXMLAds = React.memo((props) => {
     const router = useRouter()
@@ -17,7 +19,7 @@ const OutXMLAds = React.memo((props) => {
     const {data} = props;
     let [list, setList] = useState(data.outXMLAdsShoros);
     let [districts, setDistricts] = useState(data.districts);
-    const {search, sort} = props.app;
+    const {search, sort, viewMode} = props.app;
     const initialRender = useRef(true);
     const searchTimeOut = useRef(null);
     const getList = async () => {
@@ -55,14 +57,19 @@ const OutXMLAds = React.memo((props) => {
             <div className='count'>
                 Всего: {formatAmount(list.length)}
             </div>
-            <div className={classes.page}>
-                {districts.length?<CardOutXMLAds organization={router.query.id} districts={districts} setDistricts={setDistricts} list={list} setList={setList}/>:null}
-                {list?list.map((element, idx) => {
-                        if(idx<pagination)
-                            return(
-                                <CardOutXMLAds key={element._id} setDistricts={setDistricts} list={list} setList={setList}  districts={districts} idx={idx} element={element}/>
-                            )}
-                ):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        <>
+                            {districts.length?<CardOutXMLAds organization={router.query.id} districts={districts} setDistricts={setDistricts} list={list} setList={setList}/>:null}
+                            {list.map((element, idx) => {
+                                if(idx<pagination)
+                                    return <CardOutXMLAds key={element._id} setDistricts={setDistricts} list={list} setList={setList}  districts={districts} idx={idx} element={element}/>
+                            })}
+                        </>
+                        :
+                        <Table pagination={pagination} list={list}/>
+                    :null}
+
             </div>
         </App>
     )

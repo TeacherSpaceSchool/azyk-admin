@@ -12,6 +12,8 @@ import Sign from '../components/dialog/Sign';
 import {bindActionCreators} from 'redux';
 import * as mini_dialogActions from '../redux/actions/mini_dialog';
 import {formatAmount, unawaited} from '../src/lib';
+import {viewModes} from '../src/enum';
+import Table from '../components/table/connectionapplications';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value: 'обработка'}]
 
@@ -23,7 +25,7 @@ const ConnectionApplications = React.memo((props) => {
     let [list, setList] = useState(data.connectionApplications);
     let [simpleStatistic, setSimpleStatistic] = useState('');
     const getSimpleStatistic = async () => setSimpleStatistic(await getConnectionApplicationsSimpleStatistic({filter}))
-    const {filter, isMobileApp} = props.app;
+    const {filter, isMobileApp, viewMode} = props.app;
     const paginationWork = useRef(true);
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
@@ -56,20 +58,20 @@ const ConnectionApplications = React.memo((props) => {
                 <title>Заявка на подключение</title>
                 <meta name='robots' content='index, follow'/>
             </Head>
-            <div className={classes.page}>
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
                 {
                     !profile.role?
                         <CardConnectionApplications list={list} setList={setList}/>
                         :
                         null
                 }
-                {
-                    list?list.map((element, idx) => {
-                            return(
-                                <CardConnectionApplications key={element._id} idx={idx} element={element} list={list} setList={setList}/>
-                            )}
-                    ):null
-                }
+                {list?!profile.role||viewMode===viewModes.card?
+                        list.map((element, idx) => {
+                            return <CardConnectionApplications key={element._id} idx={idx} element={element} list={list} setList={setList}/>
+                        })
+                        :
+                        <Table list={list}/>
+                    :null}
             </div>
             {
                 profile.role==='admin'?

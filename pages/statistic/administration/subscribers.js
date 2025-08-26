@@ -11,10 +11,13 @@ import { getClientGqlSsr } from '../../../src/getClientGQL'
 import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
 import {formatAmount} from '../../../src/lib';
+import {viewModes} from '../../../src/enum';
+import Table from '../../../components/table/subscribers';
 
-const Subscriber = React.memo((props) => {
+const Subscribers = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
+    const {viewMode} = props.app;
     let [list, setList] = useState(data.subscribers);
     let [failed, setFailed] = useState(0);
     let [delivered, setDelivered] = useState(0);
@@ -55,17 +58,21 @@ const Subscriber = React.memo((props) => {
                         null
                 }
             </div>
-            <div className={classes.page}>
-                {list?list.map((element, idx) => {
-                    if(idx<pagination)
-                        return <CardSubscriber key={element._id} list={list} setList={setList} element={element}/>
-                }):null}
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                {list?viewMode===viewModes.card?
+                        list.map((element, idx) => {
+                            if(idx<pagination)
+                                return <CardSubscriber key={element._id} list={list} setList={setList} element={element}/>
+                        })
+                        :
+                        <Table list={list} pagination={pagination}/>
+                    :null}
             </div>
         </App>
     )
 })
 
-Subscriber.getInitialProps = async function(ctx) {
+Subscribers.getInitialProps = async function(ctx) {
     await initialApp(ctx)
     if(ctx.store.getState().user.profile.role!=='admin')
         if(ctx.res) {
@@ -95,4 +102,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Subscriber);
+export default connect(mapStateToProps, mapDispatchToProps)(Subscribers);

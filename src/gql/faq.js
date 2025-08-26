@@ -3,7 +3,6 @@ import { SingletonApolloClient } from '../singleton/client';
 
 const Faq = `
     _id
-    url
     title
     video
     createdAt
@@ -48,8 +47,8 @@ export const addFaq = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($file: Upload, $title: String!, $video: String, $typex: String!) {
-                        addFaq(file: $file, title: $title, video: $video, typex: $typex) {${Faq}}
+                    mutation ($title: String!, $video: String!, $typex: String!) {
+                        addFaq(title: $title, video: $video, typex: $typex) {${Faq}}
                     }`})
         return res.data.addFaq
     } catch(err) {
@@ -63,8 +62,8 @@ export const setFaq = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($_id: ID!, $file: Upload, $title: String, $video: String, $typex: String) {
-                        setFaq(_id: $_id, file: $file, title: $title, video: $video, typex: $typex)
+                    mutation ($_id: ID!, $title: String, $video: String, $typex: String) {
+                        setFaq(_id: $_id, title: $title, video: $video, typex: $typex)
                     }`})
         return res.data.setFaq
     } catch(err) {

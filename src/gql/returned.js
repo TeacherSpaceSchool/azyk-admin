@@ -90,26 +90,6 @@ export const getReturnedsSimpleStatistic = async (variables, client) => {
     }
 }
 
-export const getReturnedHistorys = async (returned, client) => {
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        const res = await client
-            .query({
-                variables: {returned},
-                query: gql`
-                    query ($returned: ID!) {
-                        returnedHistorys(returned: $returned) {
-                            createdAt
-                            editor
-                        }
-                    }`,
-            })
-        return res.data.returnedHistorys
-    } catch(err) {
-        console.error(err)
-    }
-}
-
 export const addReturned = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
