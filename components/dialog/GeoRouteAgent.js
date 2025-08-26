@@ -65,14 +65,14 @@ const Geo =  React.memo(
                                                         draggable: false,
                                                         iconColor: '#ffb300'
                                                     }}
-                                                    properties={{iconCaption: `${client.address[0][2] ? `${client.address[0][2]}, ` : ''}${client.address[0][0]}`}}
+                                                    properties={{hintContent: `${client.address[0][2] ? `${client.address[0][2]}, ` : ''}${client.address[0][0]}`}}
                                                     geometry={client.address[0][1].split(', ')}/>
                                         }
                                     )}
                                     {geo?
                                         <Placemark
                                             options={{draggable: false, iconColor: 'indigo'}}
-                                            properties={{iconCaption: 'Я'}}
+                                            properties={{hintContent: 'Я'}}
                                             geometry={geo} />
                                         :
                                         null
@@ -96,14 +96,14 @@ const Geo =  React.memo(
                                                 draggable: false,
                                                 iconColor: '#ffb300'
                                             }}
-                                            properties={{iconCaption: `${client.address[0][2] ? `${client.address[0][2]}, ` : ''}${client.address[0][0]}`}}
+                                            properties={{hintContent: `${client.address[0][2] ? `${client.address[0][2]}, ` : ''}${client.address[0][0]}`}}
                                             geometry={client.address[0][1].split(', ')}/>
                                     }
                                     )}
                                     {geo?
                                         <Placemark
                                             options={{draggable: false, iconColor: 'indigo'}}
-                                            properties={{iconCaption: 'Я'}}
+                                            properties={{hintContent: 'Я'}}
                                             geometry={geo} />
                                         :
                                         null
