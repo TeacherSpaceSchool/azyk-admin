@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import pageListStyle from '../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat, isNotEmpty, unawaited, dayStartDefault, formatAmount} from '../src/lib';
+import {checkInt, checkFloat, isNotEmpty, unawaited, formatAmount} from '../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import * as snackbarActions from '../redux/actions/snackbar'
@@ -40,8 +40,6 @@ const Catalog = React.memo((props) => {
     const {profile} = props.user;
     const {data} = props;
     const router = useRouter();
-    //canClearBasket
-    const canClearBasket = useRef(false);
     //первый рендер
     const initialRender = useRef(true);
     //лимиты клиента
@@ -54,8 +52,6 @@ const Catalog = React.memo((props) => {
     //клиент
     let [client, setClient] = useState(data.client);
     let handleClient = async (client) => {
-        //разрешаем очищать корзину
-        canClearBasket.current = true
         //задаем клиента
         setClient(client)
         //полностью прописываем ввод
@@ -65,8 +61,6 @@ const Catalog = React.memo((props) => {
             sessionStorage.client = JSON.stringify(client)
         else
             sessionStorage.removeItem('client')
-        /*setBasket({})
-        unawaited(deleteBasketAll)*/
         //закрываем поиск
         setOpen(false)
     };
@@ -111,18 +105,8 @@ const Catalog = React.memo((props) => {
     //организация
     let [organization, setOrganization] = useState(null);
     const handleOrganization = async (newOrganization) => {
-        //очистить корзину суперагента
-        if(
-            !profile.organization&&(
-                (organization?organization.organization?organization.organization._id:organization._id:null)!==
-                (newOrganization.organization?newOrganization.organization._id:newOrganization._id)
-            )
-        ) {
-            setBasket({})
-            unawaited(deleteBasketAll)
-        }
         //нет организации
-        else if(!newOrganization)
+        if(!newOrganization)
             newOrganization = {_id: profile.organization}
         //получаем список товаров
         if(newOrganization)
@@ -158,14 +142,6 @@ const Catalog = React.memo((props) => {
                 getSpecialPriceCategories({category: client.category, organization: organization._id}),
                 getDiscountClient({client: client._id, organization: organization._id})
             ]);
-            //очистка корзины если есть новые данные
-            if(
-                canClearBasket.current&&(limitItemClients&&limitItemClients.length||stocks&&stocks.length||specialPricesData&&specialPricesData.length||
-                specialPriceCategoriesData&&specialPriceCategoriesData.length||discountClient&&discountClient.discount)
-            ) {
-                setBasket({})
-                unawaited(deleteBasketAll)
-            }
             //план клиента
             planClient = planClientData
             //перебор лимитов
@@ -204,7 +180,18 @@ const Catalog = React.memo((props) => {
                         brand.maxCount = stockClient[brand._id]
                     else if(isNotEmpty(limitItemClient[brand._id]))
                         brand.maxCount = limitItemClient[brand._id]
+                    //если есть в корзине
+                    if(basket[brand._id]) {
+                        if(!brand.maxCount)
+                            delete basket[brand._id];
+                        else {
+                            if (basket[brand._id].count > brand.maxCount)
+                                basket[brand._id].count = brand.maxCount
+                            basket[brand._id].allPrice = checkFloat(basket[brand._id].count * brand.price)
+                        }
+                    }
                 }
+                setBasket({...basket})
                 return [...brands]
             });
         }
