@@ -290,7 +290,8 @@ const Catalog = React.memo((props) => {
     }, [pagination, list])
     //поиск
     useEffect(() => {
-        setList([...brands.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))])
+        if(brands)
+            setList([...brands.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))])
     }, [search, brands])
     //изображения фхо
     const [fhoClient, setFhoClient] = useState(null);
