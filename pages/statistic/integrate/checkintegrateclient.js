@@ -36,7 +36,7 @@ const CheckIntegrateClient = React.memo((props) => {
     const initialRender = useRef(true);
     let [organizations, setOrganizations] = useState(data.organizations);
     let handleChangeDocument1 = ((event) => {
-        if(event.target.files[0].size/1024/1024<maxFileSize)
+        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxFileSize)
             setDocument1(event.target.files[0])
         else showSnackBar('Файл слишком большой')
     })

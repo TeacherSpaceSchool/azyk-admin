@@ -44,7 +44,7 @@ const UploadItems = React.memo((props) => {
         })()
     }, [city])
     let handleChangeDocument = ((event) => {
-        if(event.target.files[0].size/1024/1024<maxFileSize)
+        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxFileSize)
             setDocument(event.target.files[0])
         else showSnackBar('Файл слишком большой')
     })

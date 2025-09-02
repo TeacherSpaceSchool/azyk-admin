@@ -81,7 +81,7 @@ const Contact = React.memo((props) => {
     let [preview, setPreview] = useState(data.contact.image===''?'/static/add.png':data.contact.image);
     let [image, setImage] = useState(null);
     let handleChangeImage = ((event) => {
-        if(event.target.files[0].size/1024/1024<maxImageSize) {
+        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
             setImage(event.target.files[0])
             setPreview(URL.createObjectURL(event.target.files[0]))
         } else showSnackBar('Файл слишком большой')

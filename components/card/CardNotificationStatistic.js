@@ -22,7 +22,7 @@ const NotificationStatistic = React.memo((props) => {
     let [preview, setPreview] = useState(element?element.icon:'/static/add.png');
     let [icon, setIcon] = useState(null);
     let handleChangeIcon = ((event) => {
-        if(event.target.files[0].size/1024/1024<maxImageSize) {
+        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
             setIcon(event.target.files[0])
             setPreview(URL.createObjectURL(event.target.files[0]))
         } else showSnackBar('Файл слишком большой')

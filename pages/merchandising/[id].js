@@ -92,7 +92,7 @@ const Merchandising = React.memo((props) => {
     let [typeImage, setTypeImage] = useState('product');
     let [indexImage, setIndexImage] = useState(0);
     let handleChangeImage = (async (event) => {
-        if(event.target.files[0].size/1024/1024<maxImageSize) {
+        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
             let image = await resizeImg(event.target.files[0])
             if(typeImage==='products') {
                 setImages([image, ...images])
@@ -210,7 +210,7 @@ const Merchandising = React.memo((props) => {
                             {router.query.id==='new'&&['суперагент', 'admin'].includes(profile.role)?
                                 <Autocomplete
                                     className={classes.input}
-                                    options={[{name: 'AZYK.STORE', _id: 'super'}, ...data.organizations]}
+                                    options={data.organizations}
                                     getOptionLabel={option => option.name}
                                     value={organization}
                                     onChange={(event, newValue) => {
@@ -743,7 +743,7 @@ Merchandising.getInitialProps = async function(ctx) {
     return {
         data: {
             merchandising,
-            ...organizations?{organizations: [{name: 'AZYK.STORE', _id: 'super'}, ...organizations]}:{}
+            organizations
         }
     };
 };

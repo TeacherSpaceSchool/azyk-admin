@@ -46,7 +46,7 @@ const FhoClient = React.memo((props) => {
     let [lightboxImages, setLightboxImages] = useState([]);
     let [lightboxIndex, setLightboxIndex] = useState(0);
     let handleChangeImage = (async (event) => {
-        if(event.target.files[0].size/1024/1024<maxImageSize) {
+        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
             let image = await resizeImg(event.target.files[0])
             setUploads([image, ...uploads])
             setPreviews([image, ...previews])

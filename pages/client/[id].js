@@ -96,7 +96,7 @@ const Client = React.memo((props) => {
     let [preview, setPreview] = useState(data.client?data.client.image:'/static/add.png');
     let [image, setImage] = useState(null);
     let handleChangeImage = ((event) => {
-        if(event.target.files[0].size/1024/1024<maxImageSize) {
+        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
             setImage(event.target.files[0])
             setPreview(URL.createObjectURL(event.target.files[0]))
         } else showSnackBar('Файл слишком большой')

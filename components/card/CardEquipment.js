@@ -44,7 +44,7 @@ const CardEquipment = React.memo((props) => {
     const refImageInput = useRef()
     const clickImageInput = () => refImageInput.current.click()
     const handleChangeImage = async (event) => {
-        if(event.target.files[0].size/1024/1024<maxImageSize) {
+        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
             const image = event.target.files[0]
             const preview = URL.createObjectURL(event.target.files[0])
             showLoad(true)
