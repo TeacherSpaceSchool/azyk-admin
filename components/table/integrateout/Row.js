@@ -1,31 +1,26 @@
 import React from 'react';
-import {pdDDMMYYHHMM} from '../../../src/lib';
-import TextViewer from '../../dialog/TextViewer';
-import * as mini_dialogActions from '../../../redux/actions/mini_dialog';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
+import {pdDDMMHHMM} from '../../../src/lib';
 
-const Tables =  React.memo(({element, columns, mini_dialogActions}) =>{
-    const {showFullDialog, setFullDialog} = mini_dialogActions;
-    return <div onClick={async () => {
-        setFullDialog(element.title, <TextViewer text={element.xml}/>)
-        showFullDialog(true)
-    }} className='tableRow tablePointer'>
+const Tables =  React.memo(({element, columns}) =>{
+    const statusColor = {
+        'create': 'orange',
+        'del': 'blue',
+        'update': 'blue',
+        'check': 'green',
+        'error': 'red'
+    }
+    return <div className='tableRow'>
         <div className='tableCell' style={columns[0].style}>
-            {pdDDMMYYHHMM(element.createdAt)}<br/>
+            {pdDDMMHHMM(element.createdAt)}<br/>
+            <span style={{color: statusColor[element.status]}}>{element.status}</span>
         </div>
         <div className='tableBorder'/>
         <div className='tableCell' style={columns[1].style}>
-            {element.path}
+            {element.guid}<br/>
+            {element.number}
         </div>
     </div>
 })
 
-function mapDispatchToProps(dispatch) {
-    return {
-        mini_dialogActions: bindActionCreators(mini_dialogActions, dispatch),
-    }
-}
-
-export default connect(null, mapDispatchToProps)(Tables)
+export default Tables
 

@@ -92,7 +92,7 @@ Districts.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            districts: await getDistricts({organization: ctx.query.id, search: '', sort: '-createdAt', filter: ''}, getClientGqlSsr(ctx.req))
+            districts: await getDistricts({organization: ctx.query.id, search: ctx.store.getState().app.search, sort: ctx.store.getState().app.sort}, getClientGqlSsr(ctx.req))
         }
     };
 };

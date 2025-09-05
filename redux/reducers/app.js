@@ -16,6 +16,7 @@ import {
 import {viewModes} from '../../src/enum';
 
 const initialState = {
+    lastPath: '',
     showAppBar: true,
     drawer: false,
     search: '',

@@ -39,7 +39,7 @@ const CardOrganization = React.memo((props) => {
                         }
                         {viewMode===viewModes.card?<Link href='/client/[id]' as={`/client/${element._id}`}>
                             <a>
-                                <img
+                                <img style={{cursor: 'pointer'}}
                                     className={classes.media}
                                     src={element.image?element.image:'/static/add.png'}
                                     alt={element.name}
@@ -48,7 +48,7 @@ const CardOrganization = React.memo((props) => {
                             </a>
                         </Link>:null}
                         <Link href='/client/[id]' as={`/client/${element._id}`}>
-                            <div style={{width: viewMode===viewModes.card?'calc(100% - 70px)':'100%'}}>
+                            <div style={{cursor: 'pointer', width: viewMode===viewModes.card?'calc(100% - 70px)':'100%'}}>
                                 {element.name!==element.address[0][2]?<div className={classes.row}>
                                     <div className={classes.nameField} style={
                                         !(profile.role==='admin'&&viewMode===viewModes.card)?{marginBottom: 5}:{}

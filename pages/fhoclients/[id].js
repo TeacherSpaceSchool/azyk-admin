@@ -98,8 +98,11 @@ FhoClients.getInitialProps = async function(ctx) {
     return {
         data: {
             fhoClients: await getFhoClients({
-                ...ctx.query.client?{client: ctx.query.client}:{}, organization: ctx.query.id, sort: ctx.store.getState().app.sort,
-                filter: ctx.store.getState().app.filter, skip: 0, search: ''
+                ...ctx.query.client?{client: ctx.query.client}:{},
+                organization: ctx.query.id, sort: ctx.store.getState().app.sort,
+                filter: ctx.store.getState().app.filter, skip: 0,
+                date: ctx.store.getState().app.date,
+                search: ctx.store.getState().app.search
             }, getClientGqlSsr(ctx.req))
         }
     };

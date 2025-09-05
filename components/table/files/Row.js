@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Tables =  React.memo(({element, columns}) =>{
-    return <div className='tableRow tablePointer'>
+    return <div className='tableRow'>
         <div className='tableCell' style={columns[0].style}>
             {element.createdAt}
         </div>

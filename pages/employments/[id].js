@@ -102,7 +102,8 @@ Employment.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            employments: await getEmployments({organization: ctx.query.id, search: '', filter: '', skip: 0}, getClientGqlSsr(ctx.req))
+            employments: await getEmployments({organization: ctx.query.id,
+                search: ctx.store.getState().app.search, filter: ctx.store.getState().app.filter, skip: 0}, getClientGqlSsr(ctx.req))
         }
     };
 };

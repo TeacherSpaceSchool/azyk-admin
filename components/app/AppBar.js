@@ -45,7 +45,6 @@ import {isNotTestUser, setCityCookie, setViewModeCookie} from '../../src/lib'
 import {pdDDMMYY} from '../../src/lib'
 import {getDistricts} from '../../src/gql/district';
 import SetDistrict from '../dialog/SetDistrict';
-import {setViewMode} from '../../redux/actions/app';
 import {viewModes} from '../../src/enum';
 
 const MyAppBar = React.memo((props) => {
@@ -135,7 +134,7 @@ const MyAppBar = React.memo((props) => {
     let handleCloseCities = () => {
         setAnchorElCities(null);
     }
-    const [openSearch, setOpenSearch] = useState(defaultOpenSearch);
+    const [openSearch, setOpenSearch] = useState(searchShow&&search.length||defaultOpenSearch);
     let handleSearch = (event) => {
         setSearch(event.target.value)
     };

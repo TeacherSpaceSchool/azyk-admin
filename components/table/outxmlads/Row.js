@@ -2,7 +2,7 @@ import React from 'react';
 import {pdDDMMYY} from '../../../src/lib';
 
 const Tables =  React.memo(({element, columns}) =>{
-    return <div className='tableRow tablePointer'>
+    return <div className='tableRow'>
         <div className='tableCell' style={columns[0].style}>
             {pdDDMMYY(element.createdAt)}<br/>
         </div>

@@ -1,10 +1,18 @@
 import { getProfile } from '../redux/actions/user'
 import { setClient } from './gql/client'
-import {getJWT, checkMobile, getCityCookie, unawaited, getViewModeCookie} from './lib'
+import {getJWT, checkMobile, getCityCookie, unawaited, getViewModeCookie, isSameUrl} from './lib'
 import uaParserJs from 'ua-parser-js';
 import { getClientGqlSsr } from './getClientGQL'
 
 export default async (ctx) => {
+    //текущая ссылка
+    let url;
+    if (ctx.req) {
+        url = ctx.req.url; // например "/products/123?sort=asc"
+    } else {
+        url = ctx.asPath;
+    }
+    //на сервере
     if(ctx.req) {
         //опредление устройства
         let ua = uaParserJs(ctx.req.headers['user-agent'])
@@ -48,21 +56,29 @@ export default async (ctx) => {
             ctx.store.getState().user.profile = {}
         }
     }
-    //поиск
-    ctx.store.getState().app.search = ''
-    //сортровка
-    ctx.store.getState().app.sort = '-createdAt'
-    //фильтр
-    ctx.store.getState().app.filter = ''
+    //только есл ине тот же маршрут
+    if(!isSameUrl(ctx.store.getState().app.lastPath, url)) {
+        //поиск
+        ctx.store.getState().app.search = ''
+        //сортровка
+        ctx.store.getState().app.sort = '-createdAt'
+        //фильтр
+        ctx.store.getState().app.filter = ''
+        //дата
+        ctx.store.getState().app.date = ''
+        //организация
+        ctx.store.getState().app.organization = null
+    }
     //не админ установить город
     if(ctx.store.getState().user.profile.role&&ctx.store.getState().user.profile.role!=='admin')
         ctx.store.getState().app.city = ctx.store.getState().user.profile.city
-    //организация
-    ctx.store.getState().app.organization = null
-    ctx.store.getState().app.date = ''
+    //загрузка
     ctx.store.getState().app.load = false
+    //шторка
     ctx.store.getState().app.drawer = false
+    //диалог
     ctx.store.getState().mini_dialog.show = false
     ctx.store.getState().mini_dialog.showFull = false
-
+    //сохраняем как предыдущую ссылку
+    ctx.store.getState().app.lastPath = url
 }

@@ -261,3 +261,29 @@ export const handleDateRange = ({type, value, setDateRange,  maxMonthPeriod = 12
 
 
 };
+
+// Функция для извлечения базового пути без id
+function getBasePath(path) {
+    const slashCount = (path.match(/\//g) || []).length;
+    let basePath = path;
+
+    // Если слешей больше одного, убираем последний сегмент (id)
+    if (slashCount > 1) {
+        const lastSlashIndex = path.lastIndexOf('/');
+        basePath = path.slice(0, lastSlashIndex);
+    }
+
+    // Убираем конечную 's' у последнего сегмента
+    const segments = basePath.split('/');
+    const lastSegmentIndex = segments.length - 1;
+    segments[lastSegmentIndex] = segments[lastSegmentIndex].endsWith('s')
+        ? segments[lastSegmentIndex].slice(0, -1)
+        : segments[lastSegmentIndex];
+
+    return segments.join('/');
+}
+
+// Функция сравнения объектов
+export const isSameUrl = (obj1, obj2) => {
+    return getBasePath(obj1) === getBasePath(obj2);
+}

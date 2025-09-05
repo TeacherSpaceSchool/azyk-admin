@@ -89,7 +89,11 @@ Items.getInitialProps = async function(ctx) {
             Router.push('/contact')
     ctx.store.getState().app.sort = '-priotiry'
     return {
-        data: {items: await getItems({search: ''}, getClientGqlSsr(ctx.req))}
+        data: {items: await getItems({
+                organization: ctx.store.getState().app.organization,
+                search: ctx.store.getState().app.search,
+                sort: ctx.store.getState().app.sort,
+            }, getClientGqlSsr(ctx.req))}
     };
 };
 

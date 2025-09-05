@@ -99,7 +99,16 @@ Merchandisings.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            merchandisings: await getMerchandisings({...ctx.query.client?{client: ctx.query.client}:{}, organization: ctx.query.id, sort: ctx.store.getState().app.sort, agent: ctx.store.getState().app.agent, filter: ctx.store.getState().app.filter, skip: 0, search: ''}, getClientGqlSsr(ctx.req))
+            merchandisings: await getMerchandisings({
+                ...ctx.query.client?{client: ctx.query.client}:{},
+                organization: ctx.query.id,
+                sort: ctx.store.getState().app.sort,
+                agent: ctx.store.getState().app.agent,
+                filter: ctx.store.getState().app.filter,
+                date: ctx.store.getState().app.date,
+                skip: 0,
+                search: ctx.store.getState().app.search
+            }, getClientGqlSsr(ctx.req))
         }
     };
 };

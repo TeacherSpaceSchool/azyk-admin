@@ -95,7 +95,10 @@ RepairEquipments.getInitialProps = async function(ctx) {
             Router.push('/contact')
     return {
         data: {
-            repairEquipments: await getRepairEquipments({organization: ctx.query.id, search: '', filter: ''}, getClientGqlSsr(ctx.req))
+            repairEquipments: await getRepairEquipments({organization: ctx.query.id,
+                search: ctx.store.getState().app.search,
+                filter: ctx.store.getState().app.filter
+            }, getClientGqlSsr(ctx.req))
         }
     };
 };

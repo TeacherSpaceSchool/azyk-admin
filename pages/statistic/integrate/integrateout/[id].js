@@ -18,7 +18,7 @@ import { bindActionCreators } from 'redux'
 import { useRouter } from 'next/router'
 import {formatAmount, unawaited} from '../../../../src/lib';
 import {viewModes} from '../../../../src/enum';
-import Table from '../../../../components/table/integrate';
+import Table from '../../../../components/table/integrateout';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Создан', value: 'create'}, {name: 'Обновлен', value: 'update'}, {name: 'На удаление', value: 'del'}, {name: 'Выполнен', value: 'check'}, {name: 'Ошибка', value: 'error'}]
 

@@ -90,7 +90,11 @@ SubBrands.getInitialProps = async function(ctx) {
         else {
             Router.push(['суперагент','агент'].includes(role)?'/catalog':!authenticated?'/contact':'/items/all')
         }
-    return {data: {subBrands: await getSubBrands({search: ''}, getClientGqlSsr(ctx.req))}};
+    return {data: {subBrands: await getSubBrands({
+                search: ctx.store.getState().app.search,
+                organization: ctx.store.getState().app.organization,
+                city: ctx.store.getState().app.city
+            }, getClientGqlSsr(ctx.req))}};
 };
 
 function mapStateToProps (state) {

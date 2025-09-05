@@ -10,7 +10,7 @@ const historyTypes = {
 
 const Tables =  React.memo(({element, columns}) =>{
     const router = useRouter();
-    return <div className='tableRow tablePointer'>
+    return <div className='tableRow'>
         <div className='tableCell' style={columns[0].style}>
             {pdDDMMYYHHMM(element.createdAt)}<br/>
             {historyTypes[element.type]}

@@ -4,8 +4,8 @@ import Row from './Row';
 
 const Tables =  React.memo(({list}) =>{
     const columns = [
-        {title: 'Создан\nСтатус', style: {width: 80}},
-        {title: 'Номер\nGUID', style: {width: 300}},
+        {title: 'Создан\nТип', style: {width: 60}},
+        {title: 'GUID\nИмя', style: {width: 300}},
     ]
     return <Table
         columns = {columns}

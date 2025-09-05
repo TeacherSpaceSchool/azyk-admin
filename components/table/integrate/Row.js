@@ -1,23 +1,18 @@
 import React from 'react';
-import {pdDDMMHHMM} from '../../../src/lib';
+import {pdDDMMYY} from '../../../src/lib';
 
 const Tables =  React.memo(({element, columns}) =>{
-    const statusColor = {
-        'create': 'orange',
-        'del': 'blue',
-        'update': 'blue',
-        'check': 'green',
-        'error': 'red'
-    }
-    return <div className='tableRow tablePointer'>
+    const type = element.agent? 'агент' : element.item? 'товар' : element.client? 'клиент' : 'экспедитор'
+    return <div className='tableRow'>
         <div className='tableCell' style={columns[0].style}>
-            {pdDDMMHHMM(element.createdAt)}<br/>
-            <span style={{color: statusColor[element.status]}}>{element.status}</span>
+            {pdDDMMYY(element.createdAt)}<br/>
+            {type}
         </div>
         <div className='tableBorder'/>
         <div className='tableCell' style={columns[1].style}>
             {element.guid}<br/>
-            {element.number}
+            {element.item&&element.item.name||element.agent&&element.agent.name||element.client&&element.client.name||
+                element.ecspeditor&&element.ecspeditor.name}
         </div>
     </div>
 })
