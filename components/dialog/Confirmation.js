@@ -16,7 +16,7 @@ const Confirmation =  React.memo(
         const {showLoad} = props.appActions;
         const {classes, action} = props;
         return (
-            <div className={classes.line}>
+            <center className={classes.line}>
                 <IconButton onClick={async () => {
                     showMiniDialog(false)
                     showLoad(true)
@@ -30,7 +30,7 @@ const Confirmation =  React.memo(
                 }}>
                     <Clear className={classes.button}/>
                 </IconButton>
-            </div>
+            </center>
         );
     }
 )

@@ -27,6 +27,7 @@ import GroupIcon from '@material-ui/icons/Group';
 import LocationCityIcon from '@material-ui/icons/LocationCity';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ReorderIcon from '@material-ui/icons/Reorder';
+import RemoveIcon from '@material-ui/icons/Delete';
 import FilterList from '@material-ui/icons/FilterListRounded';
 import DateRange from '@material-ui/icons/DateRange';
 import PermIdentity from '@material-ui/icons/PermIdentity';
@@ -51,7 +52,7 @@ const MyAppBar = React.memo((props) => {
     //props
     const initialRender = useRef(true);
     const classes = appbarStyle();
-    const {filters, sorts, pageName, dates, searchShow, unread, defaultOpenSearch, organizations, cityShow, agents, showDistrict, cities} = props
+    const {filters, sorts, pageName, dates, searchShow, unread, defaultOpenSearch, organizations, cityShow, agents, showDistrict, cities, clearBasket} = props
     const {drawer, search, filter, sort, isMobileApp, date, organization, agent, district, city, viewMode} = props.app;
     const {showDrawer, setSearch, setFilter, setSort, setDate, setOrganization, setAgent, setDistrict, setCity, setViewMode} = props.appActions;
     const {authenticated, profile} = props.user;
@@ -192,6 +193,15 @@ const MyAppBar = React.memo((props) => {
                                         {viewMode===viewModes.card?<DashboardIcon/>:<ReorderIcon/>}
                                     </IconButton>
                                 </Tooltip>
+                                {clearBasket?<Tooltip title='Очистка корзины'>
+                                    <IconButton
+                                        aria-haspopup='true'
+                                        onClick={clearBasket}
+                                        color='inherit'
+                                    >
+                                        <RemoveIcon/>
+                                    </IconButton>
+                                </Tooltip>:null}
                                 {
                                     cityShow||dates||searchShow||filters||sorts?
                                         <IconButton
@@ -557,6 +567,15 @@ const MyAppBar = React.memo((props) => {
                                         {viewMode===viewModes.card?<DashboardIcon/>:<ReorderIcon/>}
                                     </IconButton>
                                 </Tooltip>
+                                {clearBasket?<Tooltip title='Очистка корзины'>
+                                    <IconButton
+                                        aria-haspopup='true'
+                                        onClick={clearBasket}
+                                        color='inherit'
+                                    >
+                                        <RemoveIcon/>
+                                    </IconButton>
+                                </Tooltip>:null}
                                 {cityShow&&['admin'].includes(profile.role)?
                                     <>
                                         <Tooltip title='Город'>

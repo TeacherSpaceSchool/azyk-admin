@@ -31,6 +31,7 @@ import {getDiscountClient} from '../src/gql/discountClient';
 import Info from '@material-ui/icons/Info';
 import IconButton from '@material-ui/core/IconButton';
 import {getFhoClient} from '../src/gql/fhoClient';
+import Confirmation from '../components/dialog/Confirmation';
 
 const Catalog = React.memo((props) => {
     const {search, isMobileApp} = props.app;
@@ -301,9 +302,14 @@ const Catalog = React.memo((props) => {
             fhoClient = await getFhoClient({_id: client._id})
         setFhoClient(fhoClient)
     })()}, [client])
+    //clearBasket
+    const clearBasket = () => {
+        setMiniDialog('Очистить корзину?', <Confirmation action={() => setBasket({})}/>)
+        showMiniDialog(true)
+    }
     //рендер
     return (
-        <App checkPagination={checkPagination} searchShow pageName='Каталог'>
+        <App checkPagination={checkPagination} clearBasket={clearBasket} searchShow pageName='Каталог'>
             <Head>
                 <title>Каталог</title>
                 <meta name='robots' content='noindex, nofollow'/>
