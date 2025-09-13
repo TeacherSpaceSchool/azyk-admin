@@ -11,6 +11,10 @@ import Router from 'next/router'
 import {formatAmount, isNotTestUser, isPWA, unawaited} from '../src/lib';
 import {viewModes} from '../src/enum';
 import Table from '../components/table/organizations';
+import ClientIndex from '../components/clientIndex';
+import {getBanners} from '../src/gql/banners';
+import {getAgentRoute} from '../src/gql/agentRoute';
+import {getOrganizations} from '../src/gql/organization';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Активные', value: 'active'}, {name: 'Неактивные', value: 'deactive'}]
 
@@ -74,9 +78,24 @@ const Organization = React.memo((props) => {
                 <title>Бренды</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className='count'>
-                Всего: {formatAmount(list.length)}
-            </div>
+            {
+                isMobileApp&&profile.role==='client'?<ClientIndex banners={data.banners} list={list} pagination={pagination}/>:
+                    <>
+                        <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
+                            {list?viewMode===viewModes.card?
+                                    list.map((element, idx) => {
+                                        if(idx<pagination)
+                                            return <CardBrand key={element._id} element={element} idx={idx} list={list} setList={setList}/>
+                                    })
+                                    :
+                                    <Table pagination={pagination} path='brand' list={list}/>
+                                :null}
+                        </div>
+                        <div className='count'>
+                            Всего: {formatAmount(list.length)}
+                        </div>
+                    </>
+            }
             {
                 isNotTestUser(profile)&&isMobileApp&&deferredPrompt&&!isPWA()?
                     <div className={classes.scrollDown} onClick={prompt}>
@@ -88,16 +107,6 @@ const Organization = React.memo((props) => {
                     :
                     null
             }
-            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
-                {list?profile.role==='client'||viewMode===viewModes.card?
-                        list.map((element, idx) => {
-                            if(idx<pagination)
-                                return <CardBrand key={element._id} element={element} idx={idx} list={list} setList={setList}/>
-                        })
-                        :
-                        <Table pagination={pagination} path='brand' list={list}/>
-                    :null}
-            </div>
         </App>
     )
 })
@@ -117,10 +126,14 @@ Organization.getInitialProps = async function(ctx) {
         else {
             Router.push(['суперагент','агент'].includes(role)?'/catalog':!authenticated?'/contact':'/items/all')
         }
+
+    // eslint-disable-next-line no-undef
+    const [brandOrganizations, banners] = await Promise.all([
+        getBrandOrganizations({search: '', sort: ctx.store.getState().app.sort, filter: '', city: ctx.store.getState().app.city}, getClientGqlSsr(ctx.req)),
+        ctx.store.getState().app.isMobileApp&&role==='client'?getBanners(getClientGqlSsr(ctx.req)):[]
+    ])
     return {
-        data: {
-            brandOrganizations: await getBrandOrganizations({search: '', sort: ctx.store.getState().app.sort, filter: '', city: ctx.store.getState().app.city}, getClientGqlSsr(ctx.req))
-        }
+        data: {brandOrganizations, banners}
     };
 };
 

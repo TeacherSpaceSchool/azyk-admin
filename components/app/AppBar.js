@@ -271,7 +271,7 @@ const MyAppBar = React.memo((props) => {
                                     }
                                     {sorts&&sorts.length?
                                         [
-                                            <MenuItem key='sortMenu' onClick={handleMenuSort} style={{background: sort?'rgba(255, 179, 0, 0.15)': '#fff'}}>
+                                            <MenuItem key='sortMenu' onClick={handleMenuSort} style={{background: '#fff'}}>
                                                 <div style={{display: 'flex', color: '#606060'}}>
                                                     {
                                                         sort?

@@ -135,6 +135,11 @@ const list = {
     ],
     administration: [
         {
+            name: 'Баннера',
+            link: '/statistic/administration/banners',
+            role: ['admin']
+        },
+        {
             name: 'История',
             link: '/statistic/administration/histories',
             role: ['admin']

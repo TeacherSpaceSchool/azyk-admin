@@ -168,7 +168,8 @@ const SubBrand = React.memo((props) => {
                                     onChange={handleName}
                                 />
                                 <TextField
-                                    label='Описание'
+                                    multiline
+                                    label='Мини описание'
                                     value={miniInfo}
                                     className={classes.input}
                                     onChange={handleMiniInfo}

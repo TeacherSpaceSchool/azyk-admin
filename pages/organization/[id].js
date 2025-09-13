@@ -367,7 +367,8 @@ const Organization = React.memo((props) => {
                                         </Select>
                                     </FormControl>
                                     <TextField
-                                        label='Профиль'
+                                        multiline
+                                        label='Мини описание'
                                         error={!miniInfo}
                                         value={miniInfo}
                                         className={isMobileApp?classes.inputM:classes.inputD}

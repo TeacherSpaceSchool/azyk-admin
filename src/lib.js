@@ -232,29 +232,25 @@ export const handleDateRange = ({type, value, setDateRange,  maxMonthPeriod = 12
     setDateRange(dateRange => {
         let start = dateRange.start;
         let end = dateRange.end;
-
         if(type === 'start') {
             start = value || pdDatePicker(new Date());
+            end = null
         } else {
             end = value;
-        }
-
-        if(end) {
-            let startDate = new Date(start);
-            let endDate = new Date(end);
-
-            /*if(endDate < startDate) {
-                endDate = new Date(startDate)
-                endDate.setDate(endDate.getDate() + 1);
-                end = pdDatePicker(endDate);
-            } else {*/
-                const maxEnd = new Date(startDate);
-                maxEnd.setMonth(maxEnd.getMonth() + maxMonthPeriod);
-                if(endDate > maxEnd) {
-                    end = pdDatePicker(maxEnd);
+            if(end) {
+                let startDate = new Date(start);
+                let endDate = new Date(end);
+                if(endDate < startDate)
+                    end = null;
+                else {
+                    const maxEnd = new Date(startDate);
+                    maxEnd.setMonth(maxEnd.getMonth() + maxMonthPeriod);
+                    if(endDate > maxEnd)
+                        end = pdDatePicker(maxEnd);
                 }
-            /*}*/
+            }
         }
+
 
         return { start, end };
     });

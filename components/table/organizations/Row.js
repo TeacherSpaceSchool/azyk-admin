@@ -12,7 +12,7 @@ const Tables =  React.memo(({element, path, columns}) =>{
                 </span>:null}
             </div>
             <div className='tableBorder'/>
-            <div className='tableCell' style={columns[1].style}>
+            <div className='tableCell' style={{whiteSpace: 'normal', ...columns[1].style}}>
                 {element.name}<br/>
                 {element.miniInfo}
             </div>
