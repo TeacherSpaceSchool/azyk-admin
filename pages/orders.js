@@ -29,11 +29,11 @@ const Orders = React.memo((props) => {
     const {data} = props;
     const initialRender = useRef(true);
     let [simpleStatistic, setSimpleStatistic] = useState(['0']);
-    const getSimpleStatistic = async () => setSimpleStatistic(await getInvoicesSimpleStatistic({search, filter, date, organization, city}))
+    const getSimpleStatistic = async () => setSimpleStatistic(await getInvoicesSimpleStatistic({search, filter, date, organization, city, agent, district}))
     let [list, setList] = useState(data.orders);
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {showLoad} = props.appActions;
-    const {search, filter, sort, date, organization, city, viewMode} = props.app;
+    const {search, filter, sort, date, organization, city, viewMode, agent, district} = props.app;
     const {profile} = props.user;
     const paginationWork = useRef(true);
     const checkPagination = useCallback(async () => {
@@ -48,7 +48,7 @@ const Orders = React.memo((props) => {
     }, [search, sort, filter, date, organization, city, list])
     const getList = async () => {
         unawaited(getSimpleStatistic)
-        const orders = await getOrders({search, sort, filter, date, skip: 0, organization, city})
+        const orders = await getOrders({search, sort, filter, date, skip: 0, organization, city, agent, district})
         setList(orders);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
         paginationWork.current = true
@@ -61,7 +61,7 @@ const Orders = React.memo((props) => {
                 showLoad(false)
             })
         }
-    }, [filter, sort, date, organization, city])
+    }, [filter, sort, date, organization, city, agent, district])
     const [searchTimeOut, setSearchTimeOut] = useState(null);
     useEffect(() => {
         (async () => {
@@ -85,7 +85,7 @@ const Orders = React.memo((props) => {
     };
     let close = () => setAnchorEl(null);
     return (
-        <App organizations filters={!profile.client&&filters} cityShow checkPagination={checkPagination} list={list} setList={setList} searchShow dates pageName='Заказы'>
+        <App organizations filters={!profile.client&&filters} cityShow showDistrict agents checkPagination={checkPagination} list={list} setList={setList} searchShow dates pageName='Заказы'>
             <Head>
                 <title>Заказы</title>
                 <meta name='robots' content='noindex, nofollow'/>

@@ -34,11 +34,18 @@ const FhoClient = React.memo((props) => {
     const router = useRouter();
     const classes = organizationStyle();
     const {data} = props;
-    const {isMobileApp} = props.app;
+    const {isMobileApp, district} = props.app;
     const {showAppBar} = props.appActions;
+    const appActions = props.appActions;
     const {showSnackBar} = props.snackbarActions;
     let [client, setClient] = useState(data.fhoClient?data.fhoClient.client:null);
-    let [organization, setOrganization] = useState(data.fhoClient?data.fhoClient.organization:null);
+    let [organization, setOrganization] = useState(data.fhoClient?data.fhoClient.organization:profile.organization?{_id: profile.organization}:null);
+    const handleOrganization = (organization) => {
+        setOrganization(organization)
+        appActions.setOrganization(organization?organization._id:null)
+        setClient(null)
+
+    }
     let [previews, setPreviews] = useState(data.fhoClient?data.fhoClient.images:[]);
     let [uploads, setUploads] = useState([]);
     let [deletedImages, setDeletedImages] = useState([]);
@@ -52,10 +59,6 @@ const FhoClient = React.memo((props) => {
             setPreviews([image, ...previews])
         } else showSnackBar('Файл слишком большой')
     })
-    useEffect(() => {
-        if(profile.organization)
-            setOrganization({_id: profile.organization})
-    }, [])
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const [clients, setClients] = useState([]);
     const [inputValue, setInputValue] = React.useState('');
@@ -77,7 +80,7 @@ const FhoClient = React.memo((props) => {
                     clearTimeout(searchTimeOut.current)
                 searchTimeOut.current = setTimeout(async () => {
                     setClients(await getClientsFhoClients({
-                        organization: organization._id, search: inputValue
+                        organization: organization._id, search: inputValue, district
                     }))
                     if(!open)
                         setOpen(true)
@@ -94,7 +97,7 @@ const FhoClient = React.memo((props) => {
     };
     let imageRef = useRef(null);
     return (
-        <App pageName='ФХО клиента'>
+        <App pageName='ФХО клиента' showDistrict>
             <Head>
                 <title>ФХО клиента</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -111,8 +114,7 @@ const FhoClient = React.memo((props) => {
                                     getOptionLabel={option => option.name}
                                     value={organization}
                                     onChange={(event, newValue) => {
-                                        setOrganization(newValue)
-                                        setClient(null)
+                                        handleOrganization(newValue)
                                     }}
                                     noOptionsText='Ничего не найдено'
                                     renderInput={params => (

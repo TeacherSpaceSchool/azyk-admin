@@ -24,6 +24,7 @@ import Search from '@material-ui/icons/SearchRounded';
 import Sort from '@material-ui/icons/SortRounded';
 import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
 import GroupIcon from '@material-ui/icons/Group';
+import PersonIcon from '@material-ui/icons/Person';
 import LocationCityIcon from '@material-ui/icons/LocationCity';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ReorderIcon from '@material-ui/icons/Reorder';
@@ -384,7 +385,7 @@ const MyAppBar = React.memo((props) => {
                                         [
                                             <MenuItem key='agentssMenu' onClick={handleMenuAgents} style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}}>
                                                 <div style={{display: 'flex', color: '#606060'}}>
-                                                    <GroupIcon/>&nbsp;Агенты
+                                                    <PersonIcon/>&nbsp;Агенты
                                                 </div>
                                             </MenuItem>,
                                             <Menu
@@ -416,7 +417,7 @@ const MyAppBar = React.memo((props) => {
                                         [
                                             <MenuItem key='districtMenu' onClick={handleMenuDistricts} style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}}>
                                                 <div style={{display: 'flex', color: '#606060'}}>
-                                                    <GroupIcon/>&nbsp;Агенты
+                                                    <GroupIcon/>&nbsp;Районы
                                                 </div>
                                             </MenuItem>,
                                             <Menu
@@ -434,7 +435,7 @@ const MyAppBar = React.memo((props) => {
                                                 open={openDistricts}
                                                 onClose={handleCloseDistricts}
                                             >
-                                                <MenuItem key='onDistrict' style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let districts = await getDistricts({_id: organization, search: '', sort: '-createdAt'});setMiniDialog('Район', <SetDistrict setDistrict={setDistrict} districts={districts}/>);showMiniDialog(true);handleCloseDistricts();handleCloseMobileMenu();}}>
+                                                <MenuItem key='onDistrict' style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let districts = await getDistricts({organization, search: '', sort: '-createdAt'});setMiniDialog('Район', <SetDistrict setDistrict={setDistrict} districts={districts}/>);showMiniDialog(true);handleCloseDistricts();handleCloseMobileMenu();}}>
                                                     По району
                                                 </MenuItem>
                                                 <MenuItem key='allDistricts' style={{background: !district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setDistrict(null);handleCloseDistricts();handleCloseMobileMenu();}}>
@@ -664,7 +665,7 @@ const MyAppBar = React.memo((props) => {
                                                 onClick={handleMenuAgents}
                                                 color='inherit'
                                             >
-                                                <GroupIcon/>
+                                                <PersonIcon/>
                                             </IconButton>
                                         </Tooltip>
                                         <Menu
@@ -721,7 +722,7 @@ const MyAppBar = React.memo((props) => {
                                             open={openDistricts}
                                             onClose={handleCloseDistricts}
                                         >
-                                            <MenuItem style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let districts = await getDistricts({_id: organization, search: '', sort: '-createdAt'});setMiniDialog('Район', <SetDistrict setDistrict={setDistrict} districts={districts}/>);showMiniDialog(true);handleCloseDistricts();}}>
+                                            <MenuItem style={{background: district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let districts = await getDistricts({organization, search: '', sort: '-createdAt'});setMiniDialog('Район', <SetDistrict setDistrict={setDistrict} districts={districts}/>);showMiniDialog(true);handleCloseDistricts();}}>
                                                 По району
                                             </MenuItem>
                                             <MenuItem style={{background: !district?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setDistrict(null);handleCloseDistricts();}}>

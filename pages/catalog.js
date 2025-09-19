@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import pageListStyle from '../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat, isNotEmpty, unawaited, formatAmount} from '../src/lib';
+import {checkInt, checkFloat, isNotEmpty, unawaited, formatAmount, getClientTitle} from '../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import * as snackbarActions from '../redux/actions/snackbar'
@@ -56,7 +56,7 @@ const Catalog = React.memo((props) => {
         //задаем клиента
         setClient(client)
         //полностью прописываем ввод
-        handleInputValue(client?client.name:'', false)
+        handleInputValue(client?getClientTitle(client):'', false)
         //сохраняем или удаляем клиента
         if(client)
             sessionStorage.client = JSON.stringify(client)
@@ -183,13 +183,13 @@ const Catalog = React.memo((props) => {
                         brand.maxCount = limitItemClient[brand._id]
                     //если есть в корзине
                     if(basket[brand._id]) {
-                        if(!brand.maxCount)
+                        /*if(!brand.maxCount)
                             delete basket[brand._id];
-                        else {
-                            if (basket[brand._id].count > brand.maxCount)
+                        else {*/
+                            if (isNotEmpty(brand.maxCount) && basket[brand._id].count > brand.maxCount)
                                 basket[brand._id].count = brand.maxCount
                             basket[brand._id].allPrice = checkFloat(basket[brand._id].count * brand.price)
-                        }
+                        /*}*/
                     }
                 }
                 setBasket({...basket})
@@ -271,7 +271,7 @@ const Catalog = React.memo((props) => {
             if(!data.client&&sessionStorage.client&&sessionStorage.client!=='null') {
                 client = JSON.parse(sessionStorage.client)
                 setClient(client)
-                handleInputValue(client.name, false)
+                handleInputValue(getClientTitle(client), false)
             }
             //первозапуск окончен
             initialRender.current = false;
@@ -335,7 +335,7 @@ const Catalog = React.memo((props) => {
                                     inputValue={inputValue}
                                     className={classes.input}
                                     options={clients}
-                                    getOptionLabel={option => `${option.address&&option.address[0]?`${option.address[0][2]?`${option.address[0][2]}, `:''}${option.address[0][0]}`:''}`}
+                                    getOptionLabel={option => getClientTitle(option)}
                                     onChange={(event, newValue) => handleClient(newValue)}
                                     noOptionsText='Ничего не найдено'
                                     renderInput={params => (
@@ -379,9 +379,8 @@ const Catalog = React.memo((props) => {
                                         </div>
                                     </div></>:null}
                                 {isMobileApp&&fhoClient&&planClient&&planClient.current&&planClient.month?<Divider style={{marginTop: 10, marginBottom: 10}}/>:null}
-                                {isMobileApp&&fhoClient?<center style={{ fontWeight: 'bold', width: '100%', cursor: 'pointer', color: fhoClient.images.length?'#ffb300':'red'}}
-                                onClick={() => router.push(`/fhoclient/${fhoClient._id}`)}>
-                                    📷&nbsp;{fhoClient.images.length?'Изменить':'Добавить'} фото полки или фхо
+                                {isMobileApp&&fhoClient?<center style={{ fontWeight: 'bold', width: '100%', cursor: 'pointer', color: fhoClient.required?'red':'#ffb300'}} onClick={() => router.push(`/fhoclient/${fhoClient._id}`)}>
+                                    📷&nbsp;Загрузить фото полки или фхо
                                 </center>:null}
                                 <Divider style={{marginTop: 10, marginBottom: 10}}/>
                             </>
@@ -489,7 +488,8 @@ const Catalog = React.memo((props) => {
                     </div>
                 </div>
                 <div className={isMobileApp?classes.buyM:classes.buyD} onClick={() => {
-                    if(!fhoClient||fhoClient.images.length) {
+                    if(fhoClient&&fhoClient.required) showSnackBar('Сначала загрузите фото ФХО')
+                    else {
                         if (allPrice) {
                             if (client) {
                                 setMiniDialog('Купить', <BuyBasket
@@ -504,8 +504,7 @@ const Catalog = React.memo((props) => {
                                 showSnackBar('Пожалуйста выберите клиента')
                         } else
                             showSnackBar('Добавьте товар в корзину')
-                    } else
-                        showSnackBar('Сначала загрузите фото ФХО')
+                    }
                 }}>
                     КУПИТЬ
                 </div>

@@ -67,7 +67,10 @@ export default async (ctx) => {
         //дата
         ctx.store.getState().app.date = ''
         //организация
-        ctx.store.getState().app.organization = null
+        if(!ctx.store.getState().user.profile.organization)
+            ctx.store.getState().app.organization = null
+        else
+            ctx.store.getState().app.organization = ctx.store.getState().user.profile.organization
     }
     //не админ установить город
     if(ctx.store.getState().user.profile.role&&ctx.store.getState().user.profile.role!=='admin')

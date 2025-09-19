@@ -6,7 +6,7 @@ import Row from './Row';
 const Tables =  React.memo(({list, app}) =>{
     const {isMobileApp} = app;
     const columns = [
-        {title: 'Регистрация\nСтатус', style: {width: 90}},
+        {title: 'Регистрация\nСтатус', style: {width: 95}},
         {title: 'Роль', style: {width: 125}},
         {title: 'Имя', style: {width: isMobileApp?200:300}},
     ]

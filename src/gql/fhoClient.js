@@ -8,6 +8,7 @@ const FhoClient = `
     client {_id name address}
     images
     history {date editor}
+    required
 `
 
 export const getFhoClients = async (variables, client) => {
@@ -51,8 +52,8 @@ export const getClientsFhoClients = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($search: String!, $organization: ID!) {
-                        clientsForFhoClient(search: $search, organization: $organization) {
+                    query ($search: String!, $organization: ID!, $district: ID) {
+                        clientsForFhoClient(search: $search, organization: $organization, district: $district) {
                             _id
                             createdAt
                             name

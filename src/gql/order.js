@@ -52,8 +52,8 @@ export const getOrders = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($search: String!, $sort: String!, $filter: String!, $date: String!, $skip: Int, $organization: ID, $city: String) {
-                        invoices(search: $search, sort: $sort, filter: $filter, date: $date, skip: $skip, organization: $organization, city: $city) {${Invoice}}
+                    query ($search: String!, $sort: String!, $filter: String!, $date: String!, $skip: Int, $organization: ID, $city: String, $agent: ID, $district: ID) {
+                        invoices(search: $search, sort: $sort, filter: $filter, date: $date, skip: $skip, organization: $organization, city: $city, agent: $agent, district: $district) {${Invoice}}
                     }`,
             })
         return res.data.invoices
@@ -86,8 +86,8 @@ export const getInvoicesSimpleStatistic = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($search: String!, $filter: String!, $date: String!, $organization: ID, $city: String) {
-                        invoicesSimpleStatistic(search: $search, filter: $filter, date: $date, organization: $organization, city: $city) 
+                    query ($search: String!, $filter: String!, $date: String!, $organization: ID, $city: String, $agent: ID, $district: ID) {
+                        invoicesSimpleStatistic(search: $search, filter: $filter, date: $date, organization: $organization, city: $city, agent: $agent, district: $district) 
                     }`,
             })
         return res.data.invoicesSimpleStatistic
