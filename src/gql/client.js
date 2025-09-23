@@ -61,8 +61,8 @@ export const getClients = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($search: String!, $sort: String!, $filter: String!, $date: String, $skip: Int, $city: String, $catalog: Boolean) {
-                        clients(search: $search, sort: $sort, filter: $filter, date: $date, skip: $skip, city: $city, catalog: $catalog) {${Client}}
+                    query ($search: String!, $sort: String!, $filter: String!, $date: String, $skip: Int, $city: String, $catalog: Boolean, $district: ID) {
+                        clients(search: $search, sort: $sort, filter: $filter, date: $date, skip: $skip, city: $city, catalog: $catalog, district: $district) {${Client}}
                     }`,
             })
         if(new SingletonStore().getStore()&&new SingletonStore().getStore().getState().user.profile.role&&new SingletonStore().getStore().getState().user.profile.role.includes('агент'))

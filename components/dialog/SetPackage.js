@@ -20,6 +20,7 @@ const SetPackage =  React.memo(
         return (
             <div className={classes.main}>
                 <TextField
+                    autoFocus
                     value={count}
                     className={classes.input}
                     onChange={handleCount}

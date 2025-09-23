@@ -109,7 +109,7 @@ export default makeStyles({
         width: 'calc(100vw - 300px)',
         background: '#fff',
         borderTop: '1px #aeaeae solid',
-        height: 70,
+        height: 44,
         position: 'fixed',
         bottom: 0,
         right: 0,
@@ -122,7 +122,7 @@ export default makeStyles({
     },
     allPriceD:{
         marginLeft: 20,
-        width: 'calc(100vw - 500px)',
+        width: '100%',
     },
     buyD:{
         width: 140,
@@ -134,7 +134,6 @@ export default makeStyles({
         fontSize: '1rem',
         fontFamily: 'Roboto',
         background: '#ffb300',
-        marginRight: 15
 
     },
     priceAll:{
@@ -145,8 +144,8 @@ export default makeStyles({
     },
     priceAllText:{
         fontSize: '1rem',
-        fontFamily: 'Roboto'
-
+        fontFamily: 'Roboto',
+        width: 'fit-content'
     },
     line: {
         display: 'flex',

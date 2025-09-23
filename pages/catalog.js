@@ -32,15 +32,18 @@ import Info from '@material-ui/icons/Info';
 import IconButton from '@material-ui/core/IconButton';
 import {getFhoClient} from '../src/gql/fhoClient';
 import Confirmation from '../components/dialog/Confirmation';
+import {viewModes} from '../src/enum';
+import Table from '../components/table/catalog';
 
 const Catalog = React.memo((props) => {
-    const {search, isMobileApp} = props.app;
+    const {search, isMobileApp, district, viewMode} = props.app;
     const classes = pageListStyle();
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
     const {profile} = props.user;
     const {data} = props;
     const router = useRouter();
+    const contentRef = useRef();
     //первый рендер
     const initialRender = useRef(true);
     //лимиты клиента
@@ -90,7 +93,7 @@ const Catalog = React.memo((props) => {
                         search: inputValue,
                         sort: '-name',
                         filter: 'Включенные',
-                        catalog: true
+                        catalog: true, district
                     }))
                     if (!open)
                         setOpen(true)
@@ -186,9 +189,9 @@ const Catalog = React.memo((props) => {
                         /*if(!brand.maxCount)
                             delete basket[brand._id];
                         else {*/
-                            if (isNotEmpty(brand.maxCount) && basket[brand._id].count > brand.maxCount)
-                                basket[brand._id].count = brand.maxCount
-                            basket[brand._id].allPrice = checkFloat(basket[brand._id].count * brand.price)
+                        if (isNotEmpty(brand.maxCount) && basket[brand._id].count > brand.maxCount)
+                            basket[brand._id].count = brand.maxCount
+                        basket[brand._id].allPrice = checkFloat(basket[brand._id].count * brand.price)
                         /*}*/
                     }
                 }
@@ -296,7 +299,7 @@ const Catalog = React.memo((props) => {
     }, [search, brands])
     //изображения фхо
     const [fhoClient, setFhoClient] = useState(null);
-    useEffect(() => {(async () => {
+    useEffect(() => {if(isMobileApp) (async () => {
         let fhoClient = null
         if(client)
             fhoClient = await getFhoClient({_id: client._id})
@@ -307,108 +310,116 @@ const Catalog = React.memo((props) => {
         setMiniDialog('Очистить корзину?', <Confirmation action={() => setBasket({})}/>)
         showMiniDialog(true)
     }
+    //double
+    const double = contentRef.current&&contentRef.current.offsetWidth>=1100
+    //middleList
+    const middleList = list?Math.ceil(list.length/2):0
     //рендер
     return (
-        <App checkPagination={checkPagination} clearBasket={clearBasket} searchShow pageName='Каталог'>
+        <App showDistrict checkPagination={checkPagination} clearBasket={clearBasket} searchShow pageName='Каталог'>
             <Head>
                 <title>Каталог</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
-                <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
-                    <div className={classes.row} style={{width: '100%'}}>
-                        {
-                            data.client?
-                                <TextField
-                                    label='Клиент'
-                                    variant='outlined'
-                                    value={data.client.name}
-                                    className={classes.input}
-                                    inputProps={{readOnly: true}}
-                                />
-                                :
-                                <Autocomplete
-                                    onClose={() =>setOpen(false)}
-                                    open={open}
-                                    disableOpenOnFocus
-                                    value={client}
-                                    inputValue={inputValue}
-                                    className={classes.input}
-                                    options={clients}
-                                    getOptionLabel={option => getClientTitle(option)}
-                                    onChange={(event, newValue) => handleClient(newValue)}
-                                    noOptionsText='Ничего не найдено'
-                                    renderInput={params => (
-                                        <TextField {...params} label='Выберите клиента' fullWidth variant='outlined'
-                                                   onChange={event => handleInputValue(event.target.value)}
-                                                   InputProps={{
-                                                       ...params.InputProps,
-                                                       endAdornment: (
-                                                           <React.Fragment>
-                                                               {loading ? <CircularProgress color='inherit' size={20} /> : null}
-                                                               {params.InputProps.endAdornment}
-                                                           </React.Fragment>
-                                                       ),
-                                                   }}
+                <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}} ref={contentRef}>
+                    <div style={!isMobileApp?{width: '100%', display: 'flex', flexDirection: 'row'}:{}}>
+                        <div style={{width: '100%'}}>
+                            <div className={classes.row} style={{width: '100%'}}>
+                                {
+                                    data.client?
+                                        <TextField
+                                            label='Клиент'
+                                            variant='outlined'
+                                            value={data.client.name}
+                                            className={classes.input}
+                                            inputProps={{readOnly: true}}
                                         />
-                                    )}
-                                />
-                        }
+                                        :
+                                        <Autocomplete
+                                            onClose={() =>setOpen(false)}
+                                            open={open}
+                                            disableOpenOnFocus
+                                            value={client}
+                                            inputValue={inputValue}
+                                            className={classes.input}
+                                            options={clients}
+                                            getOptionLabel={option => getClientTitle(option)}
+                                            onChange={(event, newValue) => handleClient(newValue)}
+                                            noOptionsText='Ничего не найдено'
+                                            renderInput={params => (
+                                                <TextField {...params} label='Выберите клиента' fullWidth variant={isMobileApp?'outlined':'standard'}
+                                                           onChange={event => handleInputValue(event.target.value)}
+                                                           InputProps={{
+                                                               ...params.InputProps,
+                                                               endAdornment: (
+                                                                   <React.Fragment>
+                                                                       {loading ? <CircularProgress color='inherit' size={20} /> : null}
+                                                                       {params.InputProps.endAdornment}
+                                                                   </React.Fragment>
+                                                               ),
+                                                           }}
+                                                />
+                                            )}
+                                        />
+                                }
+                                {
+                                    client?
+                                        <IconButton onClick={() => window.open(`/client/${client._id}`, '_blank')}>
+                                            <Info/>
+                                        </IconButton>
+                                        :
+                                        !isMobileApp?<div style={{width: 10}}/>:null
+                                }
+                            </div>
+                            {
+                                isMobileApp&&fhoClient||planClient&&planClient.current&&planClient.month?
+                                    <>
+                                        {isMobileApp?<Divider style={{marginTop: 10, marginBottom: 10}}/>:null}
+                                        {planClient&&planClient.current&&planClient.month?<>
+                                            <div className={classes.row} style={{justifyContent: 'center'}}>
+                                                <div className={classes.nameField} style={{marginBottom: 0}}>
+                                                    План на месяц:&nbsp;
+                                                </div>
+                                                <div className={classes.valueField} style={{marginBottom: 0}}>
+                                                    <div className={classes.row}>
+                                                        {formatAmount(planClient.current)} сом / <div style={{color: planClient.current<planClient.month?'orange':'green'}}>{formatAmount(planClient.month)} сом</div>
+                                                    </div>
+                                                </div>
+                                            </div></>:null}
+                                        {isMobileApp&&fhoClient&&planClient&&planClient.current&&planClient.month?<Divider style={{marginTop: 10, marginBottom: 10}}/>:null}
+                                        {isMobileApp&&fhoClient?<center style={{ fontWeight: 'bold', width: '100%', cursor: 'pointer', color: fhoClient.required?'red':'#ffb300'}} onClick={() => router.push(`/fhoclient/${fhoClient._id}`)}>
+                                            📷&nbsp;Загрузить фото полки или фхо
+                                        </center>:null}
+                                        {isMobileApp?<Divider style={{marginTop: 10, marginBottom: 10}}/>:<div style={{height: 10}}/>}
+                                    </>
+                                    :
+                                    <div style={{height: 10}}/>
+                            }
+                        </div>
                         {
-                            client?
-                                <IconButton onClick={() => window.open(`/client/${client._id}`, '_blank')}>
-                                    <Info/>
-                                </IconButton>
-                                :
-                                null
+                            data.brandOrganizations.length>1&&profile.agentSubBrand?
+                                <>
+                                    <Autocomplete
+                                        style={{marginBottom: 10}}
+                                        className={classes.input}
+                                        options={data.brandOrganizations}
+                                        getOptionLabel={option => option.name}
+                                        onChange={(event, newValue) => {
+                                            handleOrganization(newValue)
+                                        }}
+                                        noOptionsText='Ничего не найдено'
+                                        renderInput={params => (
+                                            <TextField {...params} label='Выберите организацию' fullWidth variant={isMobileApp?'outlined':'standard'}/>
+                                        )}
+                                    />
+                                </>
+                                :null
+
                         }
                     </div>
                     {
-                        isMobileApp&&fhoClient||planClient&&planClient.current&&planClient.month?
-                            <>
-                                <Divider style={{marginTop: 10, marginBottom: 10}}/>
-                                {planClient&&planClient.current&&planClient.month?<>
-                                    <div className={classes.row} style={{justifyContent: 'center'}}>
-                                        <div className={classes.nameField} style={{marginBottom: 0}}>
-                                            План на месяц:&nbsp;
-                                        </div>
-                                        <div className={classes.valueField} style={{marginBottom: 0}}>
-                                            <div className={classes.row}>
-                                                {formatAmount(planClient.current)} сом / <div style={{color: planClient.current<planClient.month?'orange':'green'}}>{formatAmount(planClient.month)} сом</div>
-                                            </div>
-                                        </div>
-                                    </div></>:null}
-                                {isMobileApp&&fhoClient&&planClient&&planClient.current&&planClient.month?<Divider style={{marginTop: 10, marginBottom: 10}}/>:null}
-                                {isMobileApp&&fhoClient?<center style={{ fontWeight: 'bold', width: '100%', cursor: 'pointer', color: fhoClient.required?'red':'#ffb300'}} onClick={() => router.push(`/fhoclient/${fhoClient._id}`)}>
-                                    📷&nbsp;Загрузить фото полки или фхо
-                                </center>:null}
-                                <Divider style={{marginTop: 10, marginBottom: 10}}/>
-                            </>
-                            :
-                            <div style={{height: 10}}/>
-                    }
-                    {
-                        data.brandOrganizations.length>1&&profile.agentSubBrand?
-                            <>
-                                <Autocomplete
-                                    style={{marginBottom: 10}}
-                                    className={classes.input}
-                                    options={data.brandOrganizations}
-                                    getOptionLabel={option => option.name}
-                                    onChange={(event, newValue) => {
-                                        handleOrganization(newValue)
-                                    }}
-                                    noOptionsText='Ничего не найдено'
-                                    renderInput={params => (
-                                        <TextField {...params} label='Выберите организацию' fullWidth variant='outlined'/>
-                                    )}
-                                />
-                            </>
-                            :null
-
-                    }
-                    {
-                        organization&&organization.catalog?
+                        isMobileApp&&organization&&organization.catalog?
                             <Button className={classes.input} onClick={() => window.open(organization.catalog, '_blank')} size='small' color='primary'>
                                 Открыть каталог
                             </Button>
@@ -416,6 +427,7 @@ const Catalog = React.memo((props) => {
                             null
                     }
                     {
+                        isMobileApp?
                         list.map((row, idx) => {
                                 let price
                                 if(basket[row._id]&&basket[row._id].allPrice)
@@ -466,25 +478,25 @@ const Catalog = React.memo((props) => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <br/>
-                                            <Divider/>
-                                            <br/>
+                                            <Divider style={{marginTop: 10, marginBottom: 10}}/>
                                         </div>
                                     )
-                            }
-                        )
+                            })
+                            :
+                            <div style={{display: 'flex', flexDirection: 'row'}}>
+                                <Table double={double} contentRef={contentRef} list={double?list.slice(0, middleList):list} stockClient={stockClient} basket={basket} setBasketChange={setBasketChange} setPackage={setPackage}/>
+                                {double?<Table  middleList={middleList} double={double} contentRef={contentRef} list={list.slice(middleList)} stockClient={stockClient} basket={basket} setBasketChange={setBasketChange} setPackage={setPackage}/>:null}
+                            </div>
                     }
                 </CardContent>
             </Card>
             <div style={{height: 70}}/>
             <div className={isMobileApp?classes.bottomBasketM:classes.bottomBasketD}>
-                <div className={isMobileApp?classes.allPriceM:classes.allPriceD}>
-                    <div className={isMobileApp?classes.value:classes.priceAllText}>Общая стоимость</div>
+                <div className={isMobileApp?classes.allPriceM:classes.allPriceD} style={!isMobileApp?{display: 'flex'}:{}}>
+                    <div className={isMobileApp?classes.value:classes.priceAllText}>Итого{!isMobileApp?<>:&nbsp;</>:null}</div>
                     <div className={classes.row} style={{alignItems: 'baseline'}}>
                         <div className={isMobileApp?classes.nameM:classes.priceAll}>{formatAmount(allPrice)} сом</div>
-                        {
-                            planClient?<>&nbsp;/&nbsp;<div style={{color: allPrice<planClient.visit?'orange':'green'}}>{formatAmount(planClient.visit)} сом</div></>:null
-                        }
+                        {planClient?<>&nbsp;/&nbsp;<div style={{color: allPrice<planClient.visit?'orange':'green'}}>{formatAmount(planClient.visit)} сом</div></>:null}
                     </div>
                 </div>
                 <div className={isMobileApp?classes.buyM:classes.buyD} onClick={() => {

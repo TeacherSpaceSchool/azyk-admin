@@ -254,8 +254,7 @@ const Catalog = React.memo((props) => {
                                         :
                                         null
                                 }
-                                <Divider/>
-                                <br/>
+                                <Divider style={{marginBottom: 10}}/>
                             </>
                             :
                             null
@@ -302,9 +301,7 @@ const Catalog = React.memo((props) => {
                                                     }
                                                 </div>
                                             </div>
-                                            <br/>
-                                            <Divider/>
-                                            <br/>
+                                            <Divider style={{marginTop: 10, marginBottom: 10}}/>
                                         </div>
                                     )
                             })

@@ -27,7 +27,7 @@ import GridListTileBar from '@material-ui/core/GridListTileBar';
 import RemoveIcon from '@material-ui/icons/Delete';
 import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
-import {dayStartDefault, getClientTitle, maxImageSize, pdDDMMHHMM} from '../../src/lib';
+import {dayStartDefault, getClientTitle, maxImageSize, pdDDMMHHMM, pdDDMMYYHHMM} from '../../src/lib';
 
 const FhoClient = React.memo((props) => {
     const {profile} = props.user;
@@ -44,11 +44,10 @@ const FhoClient = React.memo((props) => {
         setOrganization(organization)
         appActions.setOrganization(organization?organization._id:null)
         setClient(null)
-
     }
-    let [previews, setPreviews] = useState(data.fhoClient?data.fhoClient.images:[]);
+    let [previews, setPreviews] = useState(data.fhoClient&&(!data.fhoClient.required||!['client', 'агент'].includes(profile.role))?data.fhoClient.images:[]);
     let [uploads, setUploads] = useState([]);
-    let [deletedImages, setDeletedImages] = useState([]);
+    let [deletedImages, setDeletedImages] = useState(data.fhoClient&&data.fhoClient.required&&['client', 'агент'].includes(profile.role)?data.fhoClient.images:[]);
     let [showLightbox, setShowLightbox] = useState(false);
     let [lightboxImages, setLightboxImages] = useState([]);
     let [lightboxIndex, setLightboxIndex] = useState(0);
@@ -157,12 +156,9 @@ const FhoClient = React.memo((props) => {
                                 </a>
                             }
                             {router.query.id!=='new'?<div className={classes.box}>
-                                <Typography component='legend'>Фотографии</Typography>
+                                <Typography component='legend' style={!uploads.length&&!previews.length?{color:'red'}:{}}>Фотографии</Typography>
                                 <GridList className={classes.gridList} cols={isMobileApp?2.5:6.5} style={{display: 'flex'}} wrap={'wrap'}>
-                                    <GridListTile
-                                        onClick={() => {
-                                            imageRef.current.click()
-                                        }}>
+                                    <GridListTile onClick={() => imageRef.current.click()}>
                                         <img style={{cursor: 'pointer'}} src={'/static/add.png'}/>
                                         <GridListTileBar
                                             title={'Добавить'}
@@ -203,7 +199,7 @@ const FhoClient = React.memo((props) => {
                                 <Typography component='legend'>История</Typography>
                                 <div className={classes.line}>{data.fhoClient.history.reverse().map((history, idx) =>
                                     <div key={`history${idx}`}>
-                                        {pdDDMMHHMM(history.date)} {history.editor};&nbsp;
+                                        {pdDDMMYYHHMM(history.date)} {history.editor};&nbsp;
                                     </div>
                                 )}</div>
                             </>:null}
@@ -221,23 +217,23 @@ const FhoClient = React.memo((props) => {
                                                 }
                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                 showMiniDialog(true)
-                                            } else {
-                                                showSnackBar('Заполните все поля')
-                                            }
+                                            } else showSnackBar('Заполните все поля')
                                         }} size='small' color='primary'>
                                             Добавить
                                         </Button>
                                         :
                                         <Button onClick={() => {
-                                            const action = async () => {
-                                                await setFhoClient({_id: router.query.id, deletedImages, uploads})
-                                                if(['агент', 'client'].includes(profile.role))
-                                                    router.back()
-                                                else
-                                                    router.reload()
-                                            }
-                                            setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                                            showMiniDialog(true)
+                                            if(uploads.length) {
+                                                const action = async () => {
+                                                    await setFhoClient({_id: router.query.id, deletedImages, uploads})
+                                                    if (['агент', 'client'].includes(profile.role))
+                                                        router.back()
+                                                    else
+                                                        router.reload()
+                                                }
+                                                setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                                                showMiniDialog(true)
+                                            } else showSnackBar('Заполните все поля')
                                         }} size='small' color='primary'>
                                             Сохранить
                                         </Button>

@@ -184,6 +184,15 @@ const MyAppBar = React.memo((props) => {
                             </Paper>
                             :
                             <>
+                                {clearBasket?<Tooltip title='Очистка корзины'>
+                                    <IconButton
+                                        aria-haspopup='true'
+                                        onClick={clearBasket}
+                                        color='inherit'
+                                    >
+                                        <RemoveIcon/>
+                                    </IconButton>
+                                </Tooltip>:null}
                                 <Tooltip title={viewMode===viewModes.card?'Карточки':'Таблица'}>
                                     <IconButton
                                         aria-owns={openCities ? 'menu-appbar' : null}
@@ -194,15 +203,6 @@ const MyAppBar = React.memo((props) => {
                                         {viewMode===viewModes.card?<DashboardIcon/>:<ReorderIcon/>}
                                     </IconButton>
                                 </Tooltip>
-                                {clearBasket?<Tooltip title='Очистка корзины'>
-                                    <IconButton
-                                        aria-haspopup='true'
-                                        onClick={clearBasket}
-                                        color='inherit'
-                                    >
-                                        <RemoveIcon/>
-                                    </IconButton>
-                                </Tooltip>:null}
                                 {
                                     cityShow||dates||searchShow||filters||sorts?
                                         <IconButton
@@ -558,6 +558,15 @@ const MyAppBar = React.memo((props) => {
                             </Paper>
                             :
                             <>
+                                {clearBasket?<Tooltip title='Очистка корзины'>
+                                    <IconButton
+                                        aria-haspopup='true'
+                                        onClick={clearBasket}
+                                        color='inherit'
+                                    >
+                                        <RemoveIcon/>
+                                    </IconButton>
+                                </Tooltip>:null}
                                 <Tooltip title={viewMode===viewModes.card?'Карточки':'Таблица'}>
                                     <IconButton
                                         aria-owns={openCities ? 'menu-appbar' : null}
@@ -568,15 +577,6 @@ const MyAppBar = React.memo((props) => {
                                         {viewMode===viewModes.card?<DashboardIcon/>:<ReorderIcon/>}
                                     </IconButton>
                                 </Tooltip>
-                                {clearBasket?<Tooltip title='Очистка корзины'>
-                                    <IconButton
-                                        aria-haspopup='true'
-                                        onClick={clearBasket}
-                                        color='inherit'
-                                    >
-                                        <RemoveIcon/>
-                                    </IconButton>
-                                </Tooltip>:null}
                                 {cityShow&&['admin'].includes(profile.role)?
                                     <>
                                         <Tooltip title='Город'>
