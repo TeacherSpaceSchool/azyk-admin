@@ -14,7 +14,16 @@ import {formatAmount, unawaited} from '../../../src/lib';
 import {viewModes} from '../../../src/enum';
 import Table from '../../../components/table/histories';
 
-const filters = [{name: 'Все', value: ''}, {name: 'SubBrandAzyk', value: 'SubBrandAzyk'}, {name: 'ClientAzyk', value: 'ClientAzyk'}, {name: 'DistrictAzyk', value: 'DistrictAzyk'}, {name: 'EmploymentAzyk', value: 'EmploymentAzyk'}, {name: 'ItemAzyk', value: 'ItemAzyk'}, {name: 'OrganizationAzyk', value: 'OrganizationAzyk'},]
+const filters = [
+    {name: 'Все', value: ''},
+    {name: 'ClientAzyk', value: 'ClientAzyk'},
+    {name: 'ClientNetworkAzyk', value: 'ClientNetworkAzyk'},
+    {name: 'DistrictAzyk', value: 'DistrictAzyk'},
+    {name: 'EmploymentAzyk', value: 'EmploymentAzyk'},
+    {name: 'ItemAzyk', value: 'ItemAzyk'},
+    {name: 'OrganizationAzyk', value: 'OrganizationAzyk'},
+    {name: 'SubBrandAzyk', value: 'SubBrandAzyk'},
+]
 
 const History = React.memo((props) => {
     const classes = pageListStyle();

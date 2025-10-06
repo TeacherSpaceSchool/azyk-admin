@@ -17,21 +17,26 @@ import Table from '../components/table/subbrands';
 
 const SubBrands = React.memo((props) => {
     const classes = pageListStyle();
+    //props
     const {data} = props;
-    let [list, setList] = useState(data.subBrands);
     const {search, organization, city, viewMode} = props.app;
+    //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
+    //list
+    let [list, setList] = useState(data.subBrands);
     const getList = async () => {
         setList(await getSubBrands({search, organization, city}));
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         setPagination(100);
     }
+    //filter
     useEffect(() => {
             if(!initialRender.current) {
                 unawaited(getList)
             }
     }, [city, organization])
+    //search
     useEffect(() => {
         if(initialRender.current)
             initialRender.current = false;
@@ -43,11 +48,13 @@ const SubBrands = React.memo((props) => {
             }, 500)
         }
     }, [search])
+    //pagination
     const [pagination, setPagination] = useState(100);
     const checkPagination = useCallback(() => {
         if(pagination<list.length)
             setPagination(pagination => pagination+100)
     }, [pagination, list])
+    //render
     return (
         <App checkPagination={checkPagination} searchShow  pageName='Подбренды' organizations cityShow>
             <Head>

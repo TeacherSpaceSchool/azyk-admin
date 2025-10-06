@@ -17,35 +17,44 @@ const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value
 
 const Reviews = React.memo((props) => {
     const classes = pageListStyle();
+    //ref
     const initialRender = useRef(true);
+    const paginationWork = useRef(true);
+    //props
     const {profile} = props.user;
     const {data} = props;
-    let [list, setList] = useState(data.reviews);
     const {filter, organization, viewMode} = props.app;
-    const paginationWork = useRef(true);
+    //deps
+    const deps = [organization, filter]
+    //list
+    let [list, setList] = useState(data.reviews);
+    const getList = async (skip) => {
+        const reviews = await getReviews({organization, filter, skip: skip||0})
+        if(!skip) {
+            setList(reviews)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(list.length) {
+            setList(list => [...list, ...reviews])
+            paginationWork.current = true
+        }
+    }
+    //pagination
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
             paginationWork.current = false
-            let addedList = await getReviews({organization, filter, skip: list.length})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
+            await getList(list.length)
         }
-    }, [organization, filter, list])
-    const getList = async () => {
-        setList(await getReviews({organization, filter, skip: 0}))
-        paginationWork.current = true;
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-    }
+    }, [list, ...deps])
+    //filter
     useEffect(() => {
-        if(initialRender.current) {
+        if(initialRender.current)
             initialRender.current = false;
-        }
-        else {
+        else
             unawaited(getList)
-        }
-    }, [filter, organization])
+    }, deps)
+    //render
     return (
         <App organizations checkPagination={checkPagination} list={list} setList={setList} filters={filters} pageName='Отзывы'>
             <Head>

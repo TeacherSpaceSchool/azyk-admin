@@ -15,6 +15,10 @@ const Tables =  React.memo(({middleList, double, app, mini_dialogActions, list, 
     if(widthNbmr>60) {
         widthNbmr = 60
         titleWidth = (contentRef.current.offsetWidth-32-((widthNbmr+10)*(hasStock?10:8)))/2
+        if(titleWidth>350) {
+            titleWidth = 350
+            widthNbmr = 80
+        }
     }
     const columns = [
         {title: 'Название', style: {width: titleWidth}},
@@ -49,10 +53,10 @@ const Tables =  React.memo(({middleList, double, app, mini_dialogActions, list, 
                     </div>
                     <div className='tableBorder'/>
                 </>:null}
-                <div className='tableCell' style={columns[2].style}>
+                <div className='tableCell' style={columns[2].style} onClick={() => document.getElementById(`catalogCount${idx}`).focus()}>
                     <input style={{width: widthNbmr, outline: 'none', border: 'none', fontWeight: 500, fontFamily: 'Roboto, serif', fontSize}}
                            readOnly={/*!row.apiece*/false} type={isMobileApp?'number':'text'} value={basket[row._id]&&basket[row._id].count?basket[row._id].count:''}
-                           onChange={(event) => setBasketChange(idx, event.target.value)}/>
+                           onChange={(event) => setBasketChange(idx, event.target.value)} id={`catalogCount${idx}`}/>
                 </div>
                 <div className='tableBorder'/>
                 <div className='tableCell' style={{...columns[3].style, cursor: 'pointer'}} onClick={() => {

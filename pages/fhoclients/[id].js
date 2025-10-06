@@ -21,32 +21,43 @@ const filters = [{name: 'Все', value: ''},{name: 'Пустой', value: 'пу
 const FhoClients = React.memo((props) => {
     const router = useRouter()
     const classes = pageListStyle();
+    //ref
+    const initialRender = useRef(true);
+    const paginationWork = useRef(true);
+    const searchTimeOut = useRef(null);
+    //props
     const {profile} = props.user;
     const {data} = props;
+    const {search, filter, sort, date, viewMode, district} = props.app;
+    //deps
+    const deps = [date, sort, filter, district]
+    //list
     let [list, setList] = useState(data.fhoClients);
-    const {search, filter, sort, date, viewMode} = props.app;
-    const initialRender = useRef(true);
-    const searchTimeOut = useRef(null);
-    const paginationWork = useRef(true);
+    const getList = async (skip) => {
+        const clients = await getFhoClients({...router.query.client?{client: router.query.client}:{}, district, date, organization: router.query.id, sort, filter, search, skip: skip||0})
+        if(!skip) {
+            setList(clients)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(list.length) {
+            setList(list => [...list, ...clients])
+            paginationWork.current = true
+        }
+    }
+    //pagination
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
             paginationWork.current = false
-            let addedList = await getFhoClients({...router.query.client?{client: router.query.client}:{}, date, organization: router.query.id, sort, filter, search, skip: list.length})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
+            await getList(list.length)
         }
-    }, [date, sort, filter, search, list])
-    const getList = async () => {
-        setList(await getFhoClients({...router.query.client?{client: router.query.client}:{}, date, organization: router.query.id, sort, filter, search, skip: 0}))
-        paginationWork.current = true;
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-    }
+    }, [list, search, ...deps])
+    //filter
     useEffect(() => {
         if(!initialRender.current)
             unawaited(getList)
-    }, [filter, sort, date])
+    }, deps)
+    //search
     useEffect(() => {
         if(initialRender.current)
             initialRender.current = false;
@@ -58,8 +69,9 @@ const FhoClients = React.memo((props) => {
             }, 500)
         }
     }, [search])
+    //render
     return (
-        <App filters={filters} checkPagination={checkPagination} list={list} setList={setList} searchShow pageName='ФХО клиентов'>
+        <App filters={filters} showDistrict checkPagination={checkPagination} list={list} setList={setList} searchShow pageName='ФХО клиентов'>
             <Head>
                 <title>ФХО клиентов</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -102,6 +114,7 @@ FhoClients.getInitialProps = async function(ctx) {
                 organization: ctx.query.id, sort: ctx.store.getState().app.sort,
                 filter: ctx.store.getState().app.filter, skip: 0,
                 date: ctx.store.getState().app.date,
+                district: ctx.store.getState().app.district,
                 search: ctx.store.getState().app.search
             }, getClientGqlSsr(ctx.req))
         }

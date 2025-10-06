@@ -118,6 +118,11 @@ const list = {
             role: ['суперорганизация', 'admin']
         },
         {
+            name: 'Сети клиентов',
+            link: '/statistic/tools/clientnetworks',
+            role: ['admin', 'суперорганизация', 'организация']
+        },
+        {
             name: 'Скидки клиентов',
             link: '/statistic/tools/discountclient',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент']

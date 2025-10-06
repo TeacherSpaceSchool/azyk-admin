@@ -45,7 +45,7 @@ const Orders = React.memo((props) => {
                 paginationWork.current = true
             }
         }
-    }, [search, sort, filter, date, organization, city, list])
+    }, [search, sort, filter, date, organization, city, list, district])
     const getList = async () => {
         unawaited(getSimpleStatistic)
         const orders = await getOrders({search, sort, filter, date, skip: 0, organization, city, agent, district})

@@ -18,8 +18,8 @@ export const getFhoClients = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($organization: ID!, $client: ID, $search: String!, $filter: String!, $skip: Int) {
-                        fhoClients(organization: $organization, client: $client, search: $search, filter: $filter, skip: $skip) {${FhoClient}}
+                    query ($organization: ID!, $client: ID, $district: ID, $search: String!, $filter: String!, $skip: Int) {
+                        fhoClients(organization: $organization, client: $client, district: $district, search: $search, filter: $filter, skip: $skip) {${FhoClient}}
                     }`,
             })
         return res.data.fhoClients
