@@ -27,17 +27,19 @@ import GridListTileBar from '@material-ui/core/GridListTileBar';
 import RemoveIcon from '@material-ui/icons/Delete';
 import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
-import {dayStartDefault, getClientTitle, maxImageSize, pdDDMMHHMM, pdDDMMYYHHMM} from '../../src/lib';
+import {dayStartDefault, getClientTitle, maxImageSize, pdDDMMYYHHMM} from '../../src/lib';
 
 const FhoClient = React.memo((props) => {
-    const {profile} = props.user;
-    const router = useRouter();
     const classes = organizationStyle();
+    const router = useRouter();
+    //props
+    const {profile} = props.user;
     const {data} = props;
     const {isMobileApp, district} = props.app;
     const {showAppBar} = props.appActions;
     const appActions = props.appActions;
     const {showSnackBar} = props.snackbarActions;
+    //state
     let [client, setClient] = useState(data.fhoClient?data.fhoClient.client:null);
     let [organization, setOrganization] = useState(data.fhoClient?data.fhoClient.organization:profile.organization?{_id: profile.organization}:null);
     const handleOrganization = (organization) => {
@@ -95,6 +97,7 @@ const FhoClient = React.memo((props) => {
         setOpen(false)
     };
     let imageRef = useRef(null);
+    //render
     return (
         <App pageName='ФХО клиента' showDistrict>
             <Head>

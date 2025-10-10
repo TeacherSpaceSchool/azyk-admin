@@ -31,12 +31,14 @@ import {getFhoClient} from '../../src/gql/fhoClient';
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
+    const router = useRouter()
+    //props
     const {setMiniDialog, showMiniDialog, setFullDialog, showFullDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
     const {profile} = props.user;
     const {data} = props;
-    const router = useRouter()
     const {isMobileApp, search} = props.app;
+    //ref
     const initialRender = useRef(true);
     //limitItemClient
     const [limitItemClient, setLimitItemClient] = useState({});
@@ -137,7 +139,7 @@ const Catalog = React.memo((props) => {
             // eslint-disable-next-line no-undef
             let [limitItemClients, stocks, specialPricesData, specialPriceCategoriesData, discountClient] = await Promise.all([
                 getLimitItemClients({client: profile._id, organization: router.query.id}),
-                getStocks({client: profile._id, search: '', organization: router.query.id}),
+                getStocks({unlimited: false, client: profile._id, search: '', organization: router.query.id}),
                 getSpecialPriceClients({client: profile._id, organization: router.query.id}),
                 getSpecialPriceCategories({client: profile._id, organization: router.query.id}),
                 getDiscountClient({client: profile._id, organization: router.query.id})

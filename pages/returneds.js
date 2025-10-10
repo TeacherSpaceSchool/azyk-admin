@@ -20,35 +20,48 @@ import Table from '../components/table/returneds';
 
 const Returneds = React.memo((props) => {
     const classes = pageListStyle();
+    //ref
+    const paginationWork = useRef(true);
+    const searchTimeOut = useRef(null);
+    const initialRender = useRef(true);
+    //props
     const {data} = props;
-    let [simpleStatistic, setSimpleStatistic] = useState(['0']);
-    const getSimpleStatistic = async () => setSimpleStatistic(await getReturnedsSimpleStatistic({search, date, city}))
-    let [list, setList] = useState(data.returneds);
     const {search, sort, date, city, viewMode} = props.app;
     const {profile} = props.user;
-    const paginationWork = useRef(true);
+    //deps
+    const deps = [sort, date, city]
+    //listArgs
+    const listArgs = {search, date, city}
+    //simpleStatistic
+    let [simpleStatistic, setSimpleStatistic] = useState(['0']);
+    const getSimpleStatistic = async () => setSimpleStatistic(await getReturnedsSimpleStatistic(listArgs))
+    //list
+    let [list, setList] = useState(data.returneds);
+    const getList = async (skip) => {
+        const returneds = await getReturneds({...listArgs, sort, skip: skip||0})
+        if(!skip) {
+            unawaited(getSimpleStatistic)
+            setList(returneds)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(list.length) {
+            setList(list => [...list, ...returneds])
+            paginationWork.current = true
+        }
+    }
+    //pagination
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
             paginationWork.current = false
-            let addedList = await getReturneds({search, sort, date, skip: list.length, city})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
+            await getList(list.length)
         }
-    }, [search, sort, date, list, city])
-    const getList = async () => {
-        unawaited(getSimpleStatistic)
-        setList(await getReturneds({search, sort, date, skip: 0, city}));
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
-        paginationWork.current = true;
-    }
-    const searchTimeOut = useRef(null);
-    const initialRender = useRef(true);
+    }, [list, search, ...deps])
+    //filter
     useEffect(() => {
         if(!initialRender.current)
             unawaited(getList)
-    }, [sort, date, city])
+    }, deps)
     useEffect(() => {
         (async () => {
             if(initialRender.current) {
@@ -57,13 +70,11 @@ const Returneds = React.memo((props) => {
             } else {
                 if(searchTimeOut.current)
                     clearTimeout(searchTimeOut.current)
-                searchTimeOut.current = setTimeout(() => {
-                    unawaited(getList)
-                }, 500)
+                searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }})()
     }, [search])
     let [showStat, setShowStat] = useState(false);
-
+    //render
     return (
         <App cityShow checkPagination={checkPagination} list={list} setList={setList} searchShow dates pageName='Возвраты'>
             <Head>

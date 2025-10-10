@@ -13,8 +13,8 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import {checkFloat, inputFloat} from '../../src/lib'
 import {addStock, deleteStock, getItemsForStocks, setStock} from '../../src/gql/stock';
 import {useRouter} from 'next/router';
-
-const defaultWarehouse = {name: 'Основной'}
+import Switch from '@material-ui/core/Switch';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 const CardStock = React.memo((props) => {
     const classes = cardStyle();
@@ -36,6 +36,7 @@ const CardStock = React.memo((props) => {
     })()}, [warehouse])
     let handleItem =  (item) => setItem(item)
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    let [unlimited, setUnlimited] = useState(element?element.unlimited:false);
     return (
         <div>
             <Card className={isMobileApp?classes.cardM:classes.cardD}>
@@ -80,20 +81,41 @@ const CardStock = React.memo((props) => {
                                 />
 
                         }
-                        <TextField
-                            label='Количество'
-                            value={count}
-                            className={classes.input}
-                            onChange={ event => setCount(inputFloat(event.target.value)) }
-                            inputProps={{readOnly: !['admin', 'суперорганизация', 'организация'].includes(profile.role)}}
-                        />
+                        <div className={classes.row}>
+                            {
+                                !unlimited?<TextField
+                                    label='Количество'
+                                    value={count}
+                                    className={classes.input}
+                                    onChange={ event => setCount(inputFloat(event.target.value)) }
+                                    inputProps={{readOnly: !['admin', 'суперорганизация', 'организация'].includes(profile.role)}}
+                                />:null
+                            }
+                            <FormControlLabel
+                                style={{zoom: unlimited?1:0.75}}
+                                labelPlacement={unlimited?'left':'bottom'}
+                                control={
+                                    <Switch
+                                        checked={unlimited}
+                                        onChange={async () => {
+                                            setUnlimited(!unlimited)
+                                        }}
+                                        color='primary'
+                                        inputProps={{ 'aria-label': 'primary checkbox' }}
+                                    />
+                                }
+                                label='Бесконечно'
+                            />
+                        </div>
                     </CardContent>
                 {['admin', 'суперорганизация', 'организация'].includes(profile.role)?<CardActions>
                     {
                         element?
                             <>
                                 <Button onClick={async () => {
-                                    const action = async () => await setStock({_id: element._id, count: checkFloat(count)})
+                                    const action = async () => {
+                                        await setStock({_id: element._id, count: checkFloat(count), ...unlimited!==element.unlimited?{unlimited}:{}})
+                                    }
                                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                     showMiniDialog(true)
                                 }} size='small' color='primary'>
@@ -120,6 +142,7 @@ const CardStock = React.memo((props) => {
                                         let element = {
                                             count: checkFloat(count),
                                             organization,
+                                            unlimited,
                                             item: item._id,
                                             warehouse: warehouse?warehouse._id:warehouse
                                         }

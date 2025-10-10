@@ -32,12 +32,14 @@ const withoutSubBrand = {name: 'Без подбренда', _id: null}
 
 const Item = React.memo((props) => {
     const classes = itemStyle();
-    const {data} = props;
     const router = useRouter()
+    //props
+    const {data} = props;
     const {isMobileApp} = props.app;
     const {profile} = props.user;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
+    //state
     let [unit, setUnit] = useState(data.item?data.item.unit:'шт');
     let [name, setName] = useState(data.item?data.item.name:'');
     let [price, setPrice] = useState(data.item?data.item.price:'');
@@ -90,6 +92,7 @@ const Item = React.memo((props) => {
             setPreview(URL.createObjectURL(event.target.files[0]))
         } else showSnackBar('Файл слишком большой')
     })
+    //render
     return (
         <App pageName={router.query.id==='new'?'Добавить':data.item?data.item.name:'Ничего не найдено'}>
             <Head>

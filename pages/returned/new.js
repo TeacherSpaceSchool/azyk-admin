@@ -23,13 +23,14 @@ import ReturnedConfirmed from '../../components/dialog/ReturnedConfirmed'
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
+    //props
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
     const {profile} = props.user;
     const {data} = props;
-    const [clients, setClients] = useState([]);
     const {search, filter, isMobileApp} = props.app;
-    /*autocomlete*/
+    //client
+    const [clients, setClients] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const searchTimeOut = useRef(null);
     const [open, setOpen] = useState(false);
@@ -60,7 +61,6 @@ const Catalog = React.memo((props) => {
         setClient(client)
         setOpen(false)
     };
-    /*autocomlete*/
     //товары
     const [list, setList] = useState([]);
     const getList = async () => {

@@ -22,32 +22,45 @@ const filters = [{name: 'Все', value: ''},{name: 'Обработка', value:
 const Merchandisings = React.memo((props) => {
     const router = useRouter()
     const classes = pageListStyle();
+    //props
     const {profile} = props.user;
     const {data} = props;
-    let [list, setList] = useState(data.merchandisings);
     const {search, filter, sort, date, agent, viewMode} = props.app;
+    //ref
     const initialRender = useRef(true);
     const searchTimeOut = useRef(null);
     const paginationWork = useRef(true);
+    //deps
+    const deps = [agent, date, sort, filter]
+    //listArgs
+    const listArgs = {...router.query.client?{client: router.query.client}:{}, agent, date, organization: router.query.id, sort, filter, search}
+    //list
+    let [list, setList] = useState(data.merchandisings);
+    const getList = async (skip) => {
+        const orders = await getMerchandisings({...listArgs, skip: skip||0})
+        if(!skip) {
+            setList(orders)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(list.length) {
+            setList(list => [...list, ...orders])
+            paginationWork.current = true
+        }
+    }
+    //pagination
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
             paginationWork.current = false
-            let addedList = await getMerchandisings({...router.query.client?{client: router.query.client}:{}, agent, date, organization: router.query.id, sort, filter, search, skip: list.length})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
+            await getList(list.length)
         }
-    }, [agent, date, sort, filter, search, list])
-    const getList = async () => {
-        setList(await getMerchandisings({...router.query.client?{client: router.query.client}:{}, agent, date, organization: router.query.id, sort, filter, search, skip: 0}))
-        paginationWork.current = true;
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-    }
+    }, [list, search, ...deps])
+    //filter
     useEffect(() => {
         if(!initialRender.current)
             unawaited(getList)
-    }, [filter, sort, date, agent])
+    }, deps)
+    //search
     useEffect(() => {
         if(initialRender.current)
             initialRender.current = false;
@@ -59,6 +72,7 @@ const Merchandisings = React.memo((props) => {
             }, 500)
         }
     }, [search])
+    //render
     return (
         <App dates filters={filters} agents sorts={sorts} checkPagination={checkPagination} list={list} setList={setList} searchShow pageName='Мерчендайзинг'>
             <Head>

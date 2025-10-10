@@ -27,10 +27,15 @@ import {maxImageSize} from '../src/lib';
 
 const Contact = React.memo((props) => {
     const classes = contactStyle();
+    //props
     const {data} = props;
     const {isMobileApp} = props.app;
     const {showSnackBar} = props.snackbarActions;
+    const {profile} = props.user;
+    const {setMiniDialog, showMiniDialog, setFullDialog, showFullDialog} = props.mini_dialogActions;
+    //name
     let [name, setName] = useState(data.contact.name);
+    //address
     let [address, setAddress] = useState(data.contact.address);
     let [newAddress, setNewAddress] = useState('');
     let addAddress = () => {
@@ -46,7 +51,9 @@ const Contact = React.memo((props) => {
         address.splice(idx, 1);
         setAddress([...address])
     };
+    //warehouse
     let [warehouse, setWarehouse] = useState(data.contact.warehouse);
+    //email
     let [email, setEmail] = useState(data.contact.email);
     let [newEmail, setNewEmail] = useState('');
     let addEmail = () => {
@@ -62,6 +69,7 @@ const Contact = React.memo((props) => {
         email.splice(idx, 1);
         setEmail([...email])
     };
+    //phone
     let [phone, setPhone] = useState(data.contact.phone);
     let [newPhone, setNewPhone] = useState('');
     let addPhone = () => {
@@ -77,7 +85,9 @@ const Contact = React.memo((props) => {
         phone.splice(idx, 1);
         setPhone([...phone])
     };
+    //info
     let [info, setInfo] = useState(data.contact.info);
+    //image
     let [preview, setPreview] = useState(data.contact.image===''?'/static/add.png':data.contact.image);
     let [image, setImage] = useState(null);
     let handleChangeImage = ((event) => {
@@ -86,8 +96,7 @@ const Contact = React.memo((props) => {
             setPreview(URL.createObjectURL(event.target.files[0]))
         } else showSnackBar('Файл слишком большой')
     })
-    const {profile} = props.user;
-    const {setMiniDialog, showMiniDialog, setFullDialog, showFullDialog} = props.mini_dialogActions;
+    //render
     return (
         <App pageName='Контакты'>
             <Head>

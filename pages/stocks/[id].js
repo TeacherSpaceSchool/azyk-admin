@@ -17,22 +17,25 @@ import Table from '../../components/table/stocks';
 const defaultWarehouse = {name: 'Основной'}
 
 const Stock = React.memo((props) => {
-    const {profile} = props.user;
     const classes = pageListStyle();
-    const {data} = props;
-    let [list, setList] = useState(data.stocks);
-    const {search, viewMode} = props.app;
     const router = useRouter()
+    //props
+    const {profile} = props.user;
+    const {data} = props;
+    const {search, viewMode} = props.app;
+    //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
+    //listArgs
+    const listArgs = {organization: router.query.id, search}
+    //list
+    let [list, setList] = useState(data.stocks);
     const getList = async () => {
-        setList(await getStocks({organization: router.query.id, search}))
+        setList(await getStocks(listArgs))
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
-    useEffect(() => {
-        if(!initialRender.current) unawaited(getList)
-    }, [])
+    //search
     useEffect(() => {
             if(initialRender.current)
                 initialRender.current = false;
@@ -42,11 +45,13 @@ const Stock = React.memo((props) => {
                 searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
             }
     }, [search])
+    //pagination
     const [pagination, setPagination] = useState(100);
     const checkPagination = useCallback(() => {
         if(pagination<list.length)
             setPagination(pagination => pagination+100)
     }, [pagination, list])
+    //render
     return (
         <App checkPagination={checkPagination} searchShow pageName='Остатки'>
             <Head>

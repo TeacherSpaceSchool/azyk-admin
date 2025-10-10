@@ -31,10 +31,12 @@ const FhoClients = React.memo((props) => {
     const {search, filter, sort, date, viewMode, district} = props.app;
     //deps
     const deps = [date, sort, filter, district]
+    //listArgs
+    const listArgs = {...router.query.client?{client: router.query.client}:{}, district, date, organization: router.query.id, sort, filter, search}
     //list
     let [list, setList] = useState(data.fhoClients);
     const getList = async (skip) => {
-        const clients = await getFhoClients({...router.query.client?{client: router.query.client}:{}, district, date, organization: router.query.id, sort, filter, search, skip: skip||0})
+        const clients = await getFhoClients({...listArgs, skip: skip||0})
         if(!skip) {
             setList(clients)
             paginationWork.current = true;
@@ -64,9 +66,7 @@ const FhoClients = React.memo((props) => {
         else {
             if(searchTimeOut.current)
                 clearTimeout(searchTimeOut.current)
-            searchTimeOut.current = setTimeout(() => {
-                unawaited(getList)
-            }, 500)
+            searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
     }, [search])
     //render

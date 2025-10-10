@@ -26,10 +26,12 @@ const Reviews = React.memo((props) => {
     const {filter, organization, viewMode} = props.app;
     //deps
     const deps = [organization, filter]
+    //listArgs
+    const listArgs = {organization, filter}
     //list
     let [list, setList] = useState(data.reviews);
     const getList = async (skip) => {
-        const reviews = await getReviews({organization, filter, skip: skip||0})
+        const reviews = await getReviews({...listArgs, skip: skip||0})
         if(!skip) {
             setList(reviews)
             paginationWork.current = true;

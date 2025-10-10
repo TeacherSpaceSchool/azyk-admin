@@ -19,22 +19,31 @@ import Table from '../../components/table/items';
 
 const Brand = React.memo((props) => {
     const classes = pageListStyle();
-    const {data} = props;
     const router = useRouter()
+    //props
+    const {data} = props;
     let [list, setList] = useState(data.brands);
     const {search, filter, city, viewMode} = props.app;
     const {profile} = props.user;
+    //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
+    //deps
+    const deps = [filter, city]
+    //listArgs
+    const listArgs = {city, organization: router.query.id, search}
+    //list
     const getList = async () => {
-        setList(await getBrands({city, organization: router.query.id, search}))
+        setList(await getBrands(listArgs))
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
+    //filter
     useEffect(() => {
         if(!initialRender.current)
             unawaited(getList)
-    }, [filter, city])
+    }, deps)
+    //search
     useEffect(() => {
         if(initialRender.current)
             initialRender.current = false;
@@ -44,11 +53,13 @@ const Brand = React.memo((props) => {
             searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
     }, [search])
+    //pagination
     const [pagination, setPagination] = useState(100);
     const checkPagination = useCallback(() => {
         if(pagination<list.length)
             setPagination(pagination => pagination+100)
     }, [pagination, list])
+    //render
     return (
         <App cityShow checkPagination={checkPagination} searchShow pageName={data.organization?data.organization.name:'Ничего не найдено'}>
             <Head>

@@ -10,8 +10,8 @@ import {
     SHOW_LOAD,
     SET_COUNT_BASKET,
     SET_DATE,
-    SET_ORGANIZATION,
-    SET_DISTRICT, SET_VIEW_MODE
+    SET_ORGANIZATION, SET_FORWARDER,
+    SET_DISTRICT, SET_VIEW_MODE, SET_CLIENT_NETWORK
 } from '../constants/app'
 import {viewModes} from '../../src/enum';
 
@@ -39,6 +39,10 @@ export default function mini_dialog(state = initialState, action) {
             return {...state, sort: action.payload}
         case SET_DISTRICT:
             return {...state, district: action.payload}
+        case SET_FORWARDER:
+            return {...state, forwarder: action.payload}
+        case SET_CLIENT_NETWORK:
+            return {...state, clientNetwork: action.payload}
         case SET_FILTER:
             return {...state, filter: action.payload}
         case SET_SEARCH:

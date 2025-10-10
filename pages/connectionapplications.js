@@ -19,30 +19,44 @@ const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value
 
 const ConnectionApplications = React.memo((props) => {
     const classes = pageListStyle();
+    //ref
+    const initialRender = useRef(true);
+    const paginationWork = useRef(true);
+    //props
     const {profile} = props.user;
     const {data} = props;
-    const initialRender = useRef(true);
-    let [list, setList] = useState(data.connectionApplications);
-    let [simpleStatistic, setSimpleStatistic] = useState('');
-    const getSimpleStatistic = async () => setSimpleStatistic(await getConnectionApplicationsSimpleStatistic({filter}))
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {filter, isMobileApp, viewMode} = props.app;
-    const paginationWork = useRef(true);
+    //deps
+    const deps = [filter]
+    //listArgs
+    const listArgs = {filter}
+    //simpleStatistic
+    let [simpleStatistic, setSimpleStatistic] = useState('');
+    const getSimpleStatistic = async () => setSimpleStatistic(await getConnectionApplicationsSimpleStatistic(listArgs))
+    //list
+    let [list, setList] = useState(data.connectionApplications);
+    const getList = async (skip) => {
+        const connectionApplications = await getConnectionApplications({...listArgs, skip: skip||0})
+        if(!skip) {
+            unawaited(getSimpleStatistic)
+            setList(connectionApplications)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(list.length) {
+            setList(list => [...list, ...connectionApplications])
+            paginationWork.current = true
+        }
+    }
+    //pagination
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
             paginationWork.current = false
-            let addedList = await getConnectionApplications({filter, skip: list.length})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
+            await getList(list.length)
         }
-    }, [filter, list])
-    const getList = async () => {
-        unawaited(getSimpleStatistic)
-        setList(await getConnectionApplications({filter, skip: 0}))
-        paginationWork.current = true;
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-    }
+    }, [list, ...deps])
+    //filter
     useEffect(() => {
         if(initialRender.current) {
             initialRender.current = false;
@@ -50,8 +64,8 @@ const ConnectionApplications = React.memo((props) => {
         }
         else
             unawaited(getList)
-    }, [filter])
-    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    }, deps)
+    //render
     return (
         <App checkPagination={checkPagination} list={list} setList={setList} filters={'admin'===profile.role?filters:null} pageName='Заявка на подключение'>
             <Head>

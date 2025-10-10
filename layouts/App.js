@@ -33,7 +33,7 @@ const App = React.memo(props => {
     const {setIsMobileApp} = props.appActions;
     const {profile, authenticated} = props.user;
     const {load, search, showAppBar, city, filter} = props.app;
-    let {checkPagination, sorts, clearBasket, filters, pageName, dates, searchShow, setList, list, defaultOpenSearch, organizations, cityShow, showDistrict, agents, cities} = props;
+    let {clientNetworkShow, checkPagination, sorts, clearBasket, filters, pageName, dates, searchShow, setList, list, defaultOpenSearch, organizations, cityShow, showDistrict, showForwarder, agents, cities} = props;
     const {showFull, show} = props.mini_dialog;
     const router = useRouter();
     const [unread, setUnread] = useState({});
@@ -218,7 +218,7 @@ const App = React.memo(props => {
                 showAppBar?
                     <>
                     <Drawer unread={unread} setUnread={setUnread}/>
-                    <AppBar clearBasket={clearBasket} cities={cities} cityShow={cityShow} showDistrict={showDistrict} agents={agents} organizations={organizations} unread={unread} defaultOpenSearch={defaultOpenSearch} searchShow={searchShow} dates={dates} pageName={pageName} sorts={sorts} filters={filters}/>
+                    <AppBar clearBasket={clearBasket} cities={cities} clientNetworkShow={clientNetworkShow} cityShow={cityShow} showForwarder={showForwarder} showDistrict={showDistrict} agents={agents} organizations={organizations} unread={unread} defaultOpenSearch={defaultOpenSearch} searchShow={searchShow} dates={dates} pageName={pageName} sorts={sorts} filters={filters}/>
                     </>
                     :
                     null

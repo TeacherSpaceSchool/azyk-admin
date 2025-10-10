@@ -303,13 +303,14 @@ const list = {
 
 const Statistic = React.memo((props) => {
     const classes = pageListStyle();
+    //props
     const {isMobileApp, search} = props.app;
     const {profile} = props.user;
-    let [showList, setShowList] = useState({});
+    //expanded
     const [expanded, setExpanded] = React.useState(false);
-    const handleChange = (panel) => (event, isExpanded) => {
-        setExpanded(isExpanded ? panel : false);
-    };
+    const handleChange = (panel) => (event, isExpanded) => setExpanded(isExpanded ? panel : false);;
+    //list
+    let [showList, setShowList] = useState({});
     useEffect(() => {
         showList = {
             statistic: [],
@@ -340,7 +341,7 @@ const Statistic = React.memo((props) => {
         }
         setShowList({...showList})
     }, [search])
-
+    //render
     return (
         <App searchShow pageName='Инструменты'>
             <Head>

@@ -9,9 +9,7 @@ import Router from 'next/router'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Fab from '@material-ui/core/Fab';
-import SettingsIcon from '@material-ui/icons/Settings';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
+import DoneAllIcon from '@material-ui/icons/DoneAll';
 import Confirmation from '../components/dialog/Confirmation'
 import { getInvoicesSimpleStatistic, acceptOrders } from '../src/gql/order'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
@@ -26,33 +24,46 @@ const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value
 
 const Orders = React.memo((props) => {
     const classes = pageListStyle();
-    const {data} = props;
+    //ref
     const initialRender = useRef(true);
-    let [simpleStatistic, setSimpleStatistic] = useState(['0']);
-    const getSimpleStatistic = async () => setSimpleStatistic(await getInvoicesSimpleStatistic({search, filter, date, organization, city, agent, district}))
-    let [list, setList] = useState(data.orders);
+    const paginationWork = useRef(true);
+    //props
+    const {data} = props;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {showLoad} = props.appActions;
-    const {search, filter, sort, date, organization, city, viewMode, agent, district} = props.app;
+    const {search, filter, sort, date, organization, city, viewMode, agent, district, forwarder} = props.app;
     const {profile} = props.user;
-    const paginationWork = useRef(true);
+    //deps
+    const deps = [filter, sort, date, organization, city, agent, district, forwarder]
+    //listArgs
+    const listArgs = {search, filter, date, organization, city, agent, district, forwarder}
+    //simpleStatistic
+    let [showStat, setShowStat] = useState(false);
+    let [simpleStatistic, setSimpleStatistic] = useState(['0']);
+    const getSimpleStatistic = async () => setSimpleStatistic(await getInvoicesSimpleStatistic(listArgs))
+    //list
+    let [list, setList] = useState(data.orders);
+    const getList = async (skip) => {
+        const orders = await getOrders({...listArgs, sort, skip: skip||0})
+        if(!skip) {
+            unawaited(getSimpleStatistic)
+            setList(orders)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(list.length) {
+            setList(list => [...list, ...orders])
+            paginationWork.current = true
+        }
+    }
+    //pagination
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
             paginationWork.current = false
-            let addedList = await getOrders({search, sort, filter, date, skip: list.length, organization, city})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
+            await getList(list.length)
         }
-    }, [search, sort, filter, date, organization, city, list, district])
-    const getList = async () => {
-        unawaited(getSimpleStatistic)
-        const orders = await getOrders({search, sort, filter, date, skip: 0, organization, city, agent, district})
-        setList(orders);
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
-        paginationWork.current = true
-     }
+    }, [list, search, ...deps])
+    //filter
     useEffect(() => {
         if(!initialRender.current) {
             unawaited(async () => {
@@ -61,7 +72,8 @@ const Orders = React.memo((props) => {
                 showLoad(false)
             })
         }
-    }, [filter, sort, date, organization, city, agent, district])
+    }, deps)
+    //search
     const [searchTimeOut, setSearchTimeOut] = useState(null);
     useEffect(() => {
         (async () => {
@@ -78,14 +90,9 @@ const Orders = React.memo((props) => {
             }
         })()
     }, [search])
-    let [showStat, setShowStat] = useState(false);
-    let [anchorEl, setAnchorEl] = useState(null);
-    let open = event => {
-        setAnchorEl(event.currentTarget);
-    };
-    let close = () => setAnchorEl(null);
+    //render
     return (
-        <App organizations filters={!profile.client&&filters} cityShow showDistrict agents checkPagination={checkPagination} list={list} setList={setList} searchShow dates pageName='Заказы'>
+        <App organizations filters={!profile.client&&filters} cityShow showForwarder showDistrict agents checkPagination={checkPagination} list={list} setList={setList} searchShow dates pageName='Заказы'>
             <Head>
                 <title>Заказы</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -117,33 +124,16 @@ const Orders = React.memo((props) => {
                 }
             </div>
             {profile.role==='admin'&&filter==='обработка'?
-                <Fab onClick={open} color='primary' className={classes.fab}>
-                    <SettingsIcon />
+                <Fab onClick={() => {
+                    const action = async () => await acceptOrders()
+                    setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                    showMiniDialog(true);
+                }} color='primary' className={classes.fab}>
+                    <DoneAllIcon/>
                 </Fab>
                 :
                 null
             }
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={close}
-                className={classes.menu}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                }}
-                transformOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                }}
-            >
-                <MenuItem onClick={() => {
-                    const action = async () => await acceptOrders()
-                    setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                    showMiniDialog(true);
-                    close()
-                }}>Принять</MenuItem>
-            </Menu>
         </App>
     )
 })

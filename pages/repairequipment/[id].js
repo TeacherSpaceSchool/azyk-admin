@@ -35,12 +35,17 @@ import {getOrganizations} from '../../src/gql/organization';
 import {getClientTitle} from '../../src/lib';
 
 const RepairEquipment = React.memo((props) => {
-    const {profile} = props.user;
     const classes = organizationStyle();
+    const router = useRouter()
+    //props
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    const {profile} = props.user;
     const {data} = props;
     const {isMobileApp, city} = props.app;
     const {showSnackBar} = props.snackbarActions;
+    //ref
     const initialRender = useRef(true);
+    //clients
     const [clients, setClients] = useState([]);
     const [inputValue, setInputValue] = React.useState('');
     const searchTimeOut = useRef(null);
@@ -74,6 +79,7 @@ const RepairEquipment = React.memo((props) => {
         setClient(client)
         setOpen(false)
     };
+    //state
     let [accept, setAccept] = useState(data.repairEquipment?data.repairEquipment.accept:false);
     let [done, setDone] = useState(data.repairEquipment?data.repairEquipment.done:false);
     let [cancel, setCancel] = useState(data.repairEquipment?data.repairEquipment.cancel:false);
@@ -86,8 +92,6 @@ const RepairEquipment = React.memo((props) => {
     let handleOrganization = async (organization) => {
         setOrganization(organization)
     };
-    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
-    const router = useRouter()
     useEffect(() => {
         (async () => {
             if(initialRender.current) {
@@ -99,6 +103,7 @@ const RepairEquipment = React.memo((props) => {
             }
         })()
     }, [city])
+    //render
     return (
         <App cityShow={router.query.id==='new'} pageName={router.query.id==='new'?'Добавить':data.repairEquipment?data.repairEquipment.number:'Ничего не найдено'}>
             <Head>

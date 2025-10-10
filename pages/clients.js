@@ -20,25 +20,48 @@ const filters = [{name: 'Все', value: ''}, {name: 'Без геолокаци�
 
 const Client = React.memo((props) => {
     const classes = pageListStyle();
-    const {data} = props;
-    let [list, setList] = useState(data.clients);
-    let [simpleStatistic, setSimpleStatistic] = useState('');
-    const getSimpleStatistic = async () => setSimpleStatistic(await getClientsSimpleStatistic({search, filter, date, city}))
+    //ref
     const paginationWork = useRef(true);
-    const getList = async () => {
-        unawaited(getSimpleStatistic)
-        const clients = await getClients({search, sort, filter, date, skip: 0, city})
-        setList(clients);
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
-        paginationWork.current = true;
-    }
-    const {search, filter, sort, date, city, viewMode} = props.app;
-    const {profile} = props.user;
     const initialRender = useRef(true);
     const searchTimeOut = useRef(null);
+    //props
+    const {data} = props;
+    const {search, filter, sort, date, city, viewMode, clientNetwork} = props.app;
+    const {profile} = props.user;
+    //deps
+    const deps = [filter, sort, date, city, clientNetwork]
+    //listArgs
+    const listArgs = {search, filter, date, city, network: clientNetwork}
+    //simpleStatistic
+    let [simpleStatistic, setSimpleStatistic] = useState('');
+    const getSimpleStatistic = async () => setSimpleStatistic(await getClientsSimpleStatistic(listArgs))
+    //list
+    let [list, setList] = useState(data.clients);
+    const getList = async (skip) => {
+        const clients = await getClients({...listArgs, sort, skip: skip||0})
+        if(!skip) {
+            unawaited(getSimpleStatistic)
+            setList(clients)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(list.length) {
+            setList(list => [...list, ...clients])
+            paginationWork.current = true
+        }
+    }
+    //pagination
+    const checkPagination = useCallback(async () => {
+        if(paginationWork.current) {
+            paginationWork.current = false
+            await getList(list.length)
+        }
+    }, [list, search, ...deps])
+    //filter
     useEffect(() => {
         if(!initialRender.current) unawaited(getList)
-    }, [filter, sort, date, city])
+    }, deps)
+    //search
     useEffect(() => {
             if(initialRender.current) {
                 initialRender.current = false;
@@ -50,18 +73,9 @@ const Client = React.memo((props) => {
                 searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
             }
     }, [search])
-    const checkPagination = useCallback(async () => {
-        if(paginationWork.current) {
-            paginationWork.current = false
-            let addedList = await getClients({search, sort, filter, date, skip: list.length, city})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
-        }
-    }, [search, sort, filter, date, list, city])
+    //render
     return (
-        <App cityShow checkPagination={checkPagination} searchShow dates filters={filters} sorts={sorts} pageName='Клиенты'>
+        <App cityShow checkPagination={checkPagination} searchShow clientNetworkShow dates filters={filters} sorts={sorts} pageName='Клиенты'>
             <Head>
                 <title>Клиенты</title>
                 <meta name='robots' content='noindex, nofollow'/>

@@ -18,20 +18,29 @@ const sorts = [{name: 'Тоннаж', field: 'tonnage'}]
 
 const Autos = React.memo((props) => {
     const classes = pageListStyle();
-    const {data} = props;
-    let [list, setList] = useState(data.autos);
-    const {search, sort, viewMode} = props.app;
     const router = useRouter()
+    //props
+    const {data} = props;
+    const {search, sort, viewMode} = props.app;
+    //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
+    //deps
+    const deps = [sort]
+    //listArgs
+    const listArgs = {search, sort, organization: router.query.id}
+    //list
+    let [list, setList] = useState(data.autos);
     const getList = async () => {
-        setList(await getAutos({search, sort, organization: router.query.id}))
+        setList(await getAutos(listArgs))
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
+    //filter
     useEffect(() => {
         if(!initialRender.current) unawaited(getList)
-    }, [sort])
+    }, deps)
+    //search
     useEffect(() => {
             if(initialRender.current) 
                 initialRender.current = false;
@@ -41,11 +50,13 @@ const Autos = React.memo((props) => {
                 searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
             }
     }, [search])
+    //pagination
     const [pagination, setPagination] = useState(100);
     const checkPagination = useCallback(() => {
         if(pagination<list.length)
             setPagination(pagination => pagination+100)
     }, [pagination, list])
+    //render
     return (
         <App checkPagination={checkPagination} searchShow sorts={sorts} pageName={'Транспорт'}>
             <Head>

@@ -23,19 +23,22 @@ const SubBrands = React.memo((props) => {
     //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
+    //deps
+    const deps = [city, organization]
+    //listArgs
+    const listArgs = {search, organization, city}
     //list
     let [list, setList] = useState(data.subBrands);
     const getList = async () => {
-        setList(await getSubBrands({search, organization, city}));
+        setList(await getSubBrands(listArgs));
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         setPagination(100);
     }
     //filter
     useEffect(() => {
-            if(!initialRender.current) {
-                unawaited(getList)
-            }
-    }, [city, organization])
+        if(!initialRender.current)
+            unawaited(getList)
+    }, deps)
     //search
     useEffect(() => {
         if(initialRender.current)
@@ -43,9 +46,7 @@ const SubBrands = React.memo((props) => {
         else {
             if(searchTimeOut.current)
                 clearTimeout(searchTimeOut.current)
-            searchTimeOut.current = setTimeout(() => {
-                unawaited(getList)
-            }, 500)
+            searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
     }, [search])
     //pagination

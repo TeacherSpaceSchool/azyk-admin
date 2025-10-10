@@ -14,12 +14,17 @@ import Table from '../components/table/faqs';
 
 const Faqs = React.memo((props) => {
     const classes = pageListStyle();
-    const {data} = props;
-    let [list, setList] = useState(data.faqs);
-    const {search, viewMode} = props.app;
-    const {profile} = props.user;
+    //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
+    //props
+    const {data} = props;
+    const {search, viewMode} = props.app;
+    const {profile} = props.user;
+    //listArgs
+    const listArgs = {search}
+    //list
+    let [list, setList] = useState(data.faqs);
     useEffect(() => {
             if(initialRender.current) 
                 initialRender.current = false;
@@ -27,17 +32,19 @@ const Faqs = React.memo((props) => {
                 if(searchTimeOut.current)
                     clearTimeout(searchTimeOut.current)
                 searchTimeOut.current = setTimeout(async () => {
-                    setList(await getFaqs({search}))
+                    setList(await getFaqs(listArgs))
                     setPagination(100);
                     (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
                 }, 500)
             }
     }, [search])
+    //pagination
     const [pagination, setPagination] = useState(100);
     const checkPagination = useCallback(() => {
         if(pagination<list.length)
             setPagination(pagination => pagination+100)
     }, [pagination, list])
+    //render
     return (
         <App checkPagination={checkPagination} searchShow pageName='Инструкции'>
             <Head>

@@ -37,20 +37,16 @@ import {viewModes} from '../../src/enum';
 const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
 
 const SubBrand = React.memo((props) => {
+    const classes = subBrandStyle();
+    const router = useRouter()
+    //ref
+    const initialRender = useRef(true);
+    //props
+    const {data} = props;
     const {profile} = props.user;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
-    const classes = subBrandStyle();
-    const {data} = props;
-    const router = useRouter()
     const {search, isMobileApp, city, viewMode} = props.app;
-    const initialRender = useRef(true);
-    useEffect(() => {(async () => {
-        if(initialRender.current)
-            initialRender.current = false;
-        else if(router.query.id==='new')
-            setOrganizations(await getOrganizations({search: '', filter: '', city}))
-    })()}, [city])
     //selectType
     let [selectType, setSelectType] = useState('Выбранные');
     //name
@@ -88,6 +84,12 @@ const SubBrand = React.memo((props) => {
     const selectedCount = items.filter(item => (item.subBrand&&item.subBrand._id===router.query.id)&&(!search||(item.name.toLowerCase()).includes(search.toLowerCase()))).length
     //organization
     let [organizations, setOrganizations] = useState(data.organizations);
+    useEffect(() => {(async () => {
+        if(initialRender.current)
+            initialRender.current = false;
+        else if(router.query.id==='new')
+            setOrganizations(await getOrganizations({search: '', filter: '', city}))
+    })()}, [city])
     let [organization, setOrganization] = useState(router.query.id==='new'||!data.subBrand?null:data.subBrand.organization||{name: 'AZYK.STORE', _id: 'super'});
     let handleOrganization =  (event) => setOrganization({_id: event.target.value});
     useEffect(() => {

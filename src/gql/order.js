@@ -52,28 +52,11 @@ export const getOrders = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($search: String!, $sort: String!, $filter: String!, $date: String!, $skip: Int, $organization: ID, $city: String, $agent: ID, $district: ID) {
-                        invoices(search: $search, sort: $sort, filter: $filter, date: $date, skip: $skip, organization: $organization, city: $city, agent: $agent, district: $district) {${Invoice}}
+                    query ($forwarder: ID, $dateDelivery: Date, $search: String!, $sort: String!, $filter: String!, $date: String!, $skip: Int, $organization: ID, $city: String, $agent: ID, $district: ID) {
+                        invoices(forwarder: $forwarder, dateDelivery: $dateDelivery, search: $search, sort: $sort, filter: $filter, date: $date, skip: $skip, organization: $organization, city: $city, agent: $agent, district: $district) {${Invoice}}
                     }`,
             })
         return res.data.invoices
-    } catch(err) {
-        console.error(err)
-    }
-}
-
-export const getOrdersFromDistrict = async (variables, client) => {
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        const res = await client
-            .query({
-                variables,
-                query: gql`
-                    query ($organization: ID!, $district: ID!, $date: String!) {
-                        invoicesFromDistrict(organization: $organization, district: $district, date: $date) {${Invoice}}
-                    }`,
-            })
-        return res.data.invoicesFromDistrict
     } catch(err) {
         console.error(err)
     }
@@ -86,8 +69,8 @@ export const getInvoicesSimpleStatistic = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($search: String!, $filter: String!, $date: String!, $organization: ID, $city: String, $agent: ID, $district: ID) {
-                        invoicesSimpleStatistic(search: $search, filter: $filter, date: $date, organization: $organization, city: $city, agent: $agent, district: $district) 
+                    query ($forwarder: ID, $dateDelivery: Date, $search: String!, $filter: String!, $date: String!, $organization: ID, $city: String, $agent: ID, $district: ID) {
+                        invoicesSimpleStatistic(forwarder: $forwarder, dateDelivery: $dateDelivery, search: $search, filter: $filter, date: $date, organization: $organization, city: $city, agent: $agent, district: $district) 
                     }`,
             })
         return res.data.invoicesSimpleStatistic

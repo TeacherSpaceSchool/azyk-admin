@@ -31,13 +31,15 @@ const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'
 const GeoRouteAgent = dynamic(() => import('../../components/dialog/GeoRouteAgent'))
 
 const District = React.memo((props) => {
+    const classes = districtStyle();
+    const router = useRouter()
+    //props
+    const {data} = props;
     const {profile} = props.user;
     const {setMiniDialog, showMiniDialog, setFullDialog, showFullDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
-    const classes = districtStyle();
-    const {data} = props;
-    const router = useRouter()
     const {search, isMobileApp, city} = props.app;
+    //ref
     const initialRender = useRef(true);
     useEffect(() => {(async () => {
         if(initialRender.current)

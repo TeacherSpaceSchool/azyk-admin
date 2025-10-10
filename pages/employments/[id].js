@@ -19,26 +19,51 @@ import Table from '../../components/table/employments';
 const filters = [{name: 'Все', value: ''}, {name: 'Агент', value: 'агент'}, {name: 'Супервайзер', value: 'менеджер'}, {name: 'Экспедитор', value: 'экспедитор'}, {name: 'Организация', value: 'организация'}]
 
 const Employment = React.memo((props) => {
-    const {profile} = props.user;
     const classes = pageListStyle();
-    const {data} = props;
-    let [list, setList] = useState(data.employments);
-    let [count, setCount] = useState('');
-    const getCount = async () => setCount(await getEmploymentsCount({organization: router.query.id, search, filter}))
-    const {search, filter, sort, viewMode} = props.app;
     const router = useRouter()
+    //props
+    const {profile} = props.user;
+    const {data} = props;
+    const {search, filter, viewMode} = props.app;
+    //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
-    const getList = async () => {
-        unawaited(getCount)
-        setList(await getEmployments({organization: router.query.id, search, filter, skip: 0}));
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-        paginationWork.current = true;
+    const paginationWork = useRef(true);
+    //deps
+    const deps = [filter]
+    //listArgs
+    const listArgs = {organization: router.query.id, search, filter}
+    //count
+    let [count, setCount] = useState('');
+    const getCount = async () => setCount(await getEmploymentsCount(listArgs))
+    //list
+    let [list, setList] = useState(data.employments);
+    const getList = async (skip) => {
+        const employments = await getEmployments({...listArgs, skip: 0});
+        if(!skip) {
+            unawaited(getCount)
+            setList(employments)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(list.length) {
+            setList(list => [...list, ...employments])
+            paginationWork.current = true
+        }
     }
+    //pagination
+    const checkPagination = useCallback(async () => {
+        if(paginationWork.current) {
+            paginationWork.current = false
+            await getList(list.length)
+        }
+    }, [search, list, ...deps])
+    //filter
     useEffect(() => {
         if(!initialRender.current)
             unawaited(getList)
-    }, [filter, sort])
+    }, deps)
+    //search
     useEffect(() => {
         if(initialRender.current) {
             initialRender.current = false;
@@ -50,17 +75,7 @@ const Employment = React.memo((props) => {
             searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
     }, [search])
-    const paginationWork = useRef(true);
-    const checkPagination = useCallback(async () => {
-        if(paginationWork.current) {
-            paginationWork.current = false
-            const addedList = await getEmployments({organization: router.query.id, search, filter, skip: list.length})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
-        }
-    }, [search, filter, list])
+    //render
     return (
         <App checkPagination={checkPagination} searchShow filters={['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?filters:null} pageName='Сотрудники'>
             <Head>

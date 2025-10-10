@@ -32,20 +32,21 @@ import Info from '@material-ui/icons/Info';
 import IconButton from '@material-ui/core/IconButton';
 import {getFhoClient} from '../src/gql/fhoClient';
 import Confirmation from '../components/dialog/Confirmation';
-import {viewModes} from '../src/enum';
 import Table from '../components/table/catalog';
 
 const Catalog = React.memo((props) => {
-    const {search, isMobileApp, district, viewMode} = props.app;
     const classes = pageListStyle();
+    const router = useRouter();
+    //props
+    const {search, isMobileApp, district} = props.app;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
     const {profile} = props.user;
     const {data} = props;
-    const router = useRouter();
+    //ref
     const contentRef = useRef();
-    //первый рендер
     const initialRender = useRef(true);
+    const searchTimeOutClient = useRef(null);
     //лимиты клиента
     let [limitItemClient, setLimitItemClient] = useState({});
     //остаток клиента
@@ -72,7 +73,6 @@ const Catalog = React.memo((props) => {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [inputValue, setInputValue] = useState('');
-    const searchTimeOutClient = useRef(null);
     const handleInputValue = (inputValue, search = true) => {
         setInputValue(inputValue);
         if(search) {
@@ -140,7 +140,7 @@ const Catalog = React.memo((props) => {
             // eslint-disable-next-line no-undef
             let [limitItemClients, stocks, planClientData, specialPricesData, specialPriceCategoriesData, discountClient] = await Promise.all([
                 getLimitItemClients({client: client._id, organization: organization._id}),
-                getStocks({client: client._id, search: '', organization: organization._id}),
+                getStocks({unlimited: false, client: client._id, search: '', organization: organization._id}),
                 getPlanClient({client: client._id, organization: organization._id}),
                 getSpecialPriceClients({client: client._id, organization: organization._id}),
                 getSpecialPriceCategories({category: client.category, organization: organization._id}),

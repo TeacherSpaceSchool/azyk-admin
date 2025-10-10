@@ -22,19 +22,24 @@ const filters = [{name: 'Все', value: ''}, {name: 'Активные', value: 
 
 const Organization = React.memo((props) => {
     const classes = pageListStyle();
+    //ref
+    const prevPath = useRef(null);
+    const searchTimeOut = useRef(null);
+    const initialRender = useRef(true);
+    //props
     const {data} = props;
     const {profile} = props.user;
+    const {search, filter, city, viewMode} = props.app;
+    //data
     const router = useRouter();
     const defaultPath = 'organization'
     const path = router.query.path||defaultPath
     const defaultTitle = 'Организации'
     const title = router.query.title||defaultTitle
+    //state
     const showSuperOrganization = profile.role==='admin'&&path!==defaultPath&&router.query.super
+    //list
     let [list, setList] = useState(data.organizations);
-    const {search, filter, city, viewMode} = props.app;
-    const prevPath = useRef(null);
-    const searchTimeOut = useRef(null);
-    const initialRender = useRef(true);
     const getList = async (varPath) => {
         setList(profile.role!=='admin'&&(varPath||path)===adsPath?
             await getAdsOrganizations()
@@ -44,6 +49,7 @@ const Organization = React.memo((props) => {
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         setPagination(100);
     }
+    //обновить данные
     useEffect(() => {
         const routeChangeComplete = (url) => {
             if(
@@ -62,25 +68,27 @@ const Organization = React.memo((props) => {
             Router.events.off('routeChangeComplete', routeChangeComplete)
         }
     }, [])
+    //filter
     useEffect(() => {
         if (!initialRender.current) unawaited(getList)
     }, [filter, city])
+    //search
     useEffect(() => {
-        if(initialRender.current) {
+        if(initialRender.current)
             initialRender.current = false;
-        } else {
+        else {
             if(searchTimeOut.current)
                 clearTimeout(searchTimeOut.current)
-            searchTimeOut.current = setTimeout(() => {
-                unawaited(getList)
-            }, 500)
+            searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
     }, [search])
+    //pagination
     const [pagination, setPagination] = useState(100);
     const checkPagination = useCallback(() => {
         if(pagination<list.length)
             setPagination(pagination => pagination+100)
     }, [pagination, list])
+    //render
     return (
         <App cityShow checkPagination={checkPagination} searchShow filters={profile.role==='admin'&&filters} pageName={title}>
             <Head>

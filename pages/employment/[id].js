@@ -31,12 +31,17 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import {validPhone} from '../../src/lib';
 
 const Client = React.memo((props) => {
-    const {profile} = props.user;
     const classes = organizationStyle();
+    //props
+    const {profile} = props.user;
     const {data} = props;
     const {isMobileApp, city} = props.app;
     const {showSnackBar} = props.snackbarActions;
+    const {logout} = props.userActions;
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    //ref
     const initialRender = useRef(true);
+    //state
     let [organizations, setOrganizations] = useState(data.organizations);
     useEffect(() => {(async () => {
             if(initialRender.current)
@@ -85,9 +90,7 @@ const Client = React.memo((props) => {
     };
     let [hide, setHide] = useState(true);
     let handleHide =  () => setHide(hide => !hide);
-    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const router = useRouter()
-    const {logout} = props.userActions;
     let roles = ['организация', 'менеджер', 'экспедитор', 'агент', 'ремонтник', 'мерчендайзер']
     if(profile.role==='admin')
         roles.push('суперорганизация')
@@ -96,6 +99,7 @@ const Client = React.memo((props) => {
         if(router.query.id!=='new'&&organization&&!organization.name)
             setOrganization({name: 'AZYK.STORE', _id: 'super'})
     }, [])
+    //render
     return (
         <App cityShow={router.query.id==='new'} pageName={router.query.id==='new'?'Добавить':data.employment!==null?data.employment.name:'Ничего не найдено'}>
             <Head>

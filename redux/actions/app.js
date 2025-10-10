@@ -11,7 +11,7 @@ import {
     SET_COUNT_BASKET,
     SET_DATE,
     SET_ORGANIZATION,
-    SET_DISTRICT, SET_VIEW_MODE
+    SET_DISTRICT, SET_VIEW_MODE, SET_CLIENT_NETWORK, SET_FORWARDER
 } from '../constants/app'
 
 export function setViewMode(data) {
@@ -45,6 +45,20 @@ export function showDrawer(data) {
 export function setAgent(data) {
     return {
         type: SET_AGENT,
+        payload: data
+    }
+}
+
+export function setForwarder(data) {
+    return {
+        type: SET_FORWARDER,
+        payload: data
+    }
+}
+
+export function setClientNetwork(data) {
+    return {
+        type: SET_CLIENT_NETWORK,
         payload: data
     }
 }

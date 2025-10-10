@@ -70,12 +70,15 @@ const marks = [
 const types = ['холодные полки', 'теплые полки'];
 
 const Merchandising = React.memo((props) => {
-    const {profile} = props.user;
     const classes = organizationStyle();
+    //props
+    const {profile} = props.user;
     const {data} = props;
     const {isMobileApp} = props.app;
     const {showAppBar} = props.appActions;
     const {showSnackBar} = props.snackbarActions;
+    const {setMiniDialog, showMiniDialog, setFullDialog, showFullDialog} = props.mini_dialogActions;
+    //state
     let [client, setClient] = useState(data.merchandising?data.merchandising.client:null);
     let [organization, setOrganization] = useState(data.merchandising?data.merchandising.organization:null);
     let [productAvailability, setProductAvailability] = useState(data.merchandising?data.merchandising.productAvailability:[]);
@@ -145,7 +148,6 @@ const Merchandising = React.memo((props) => {
     let [stateProduct, setStateProduct] = useState(data.merchandising?data.merchandising.stateProduct:0);
     let [reviewerComment, setReviewerComment] = useState(data.merchandising?data.merchandising.reviewerComment:'');
     let [reviewerScore, setReviewerScore] = useState(data.merchandising?data.merchandising.reviewerScore:0);
-    const {setMiniDialog, showMiniDialog, setFullDialog, showFullDialog} = props.mini_dialogActions;
     const router = useRouter()
     const [clients, setClients] = useState([]);
     const [inputValue, setInputValue] = React.useState('');
@@ -181,6 +183,7 @@ const Merchandising = React.memo((props) => {
         setOpen(false)
     };
     let imageRef = useRef(null);
+    //render
     return (
         <App pageName='Мерчендайзинг'>
             <Head>

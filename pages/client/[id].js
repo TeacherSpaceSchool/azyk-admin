@@ -29,18 +29,28 @@ import Router from 'next/router'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import { validPhone } from '../../src/lib'
 import initialApp from '../../src/initialApp'
+import {getClientNetworks} from '../../src/gql/clientNetwork';
+
+const withoutNetwork = {name: 'Без сети', _id: null}
 
 const Client = React.memo((props) => {
-    const {profile} = props.user;
     const classes = clientStyle();
-    const {data} = props;
     const router = useRouter()
+    //props
+    const {profile} = props.user;
+    const {data} = props;
     const {isMobileApp} = props.app;
     const {showSnackBar} = props.snackbarActions;
+    const {setMiniDialog, showMiniDialog, showFullDialog, setFullDialog} = props.mini_dialogActions;
+    //status
     let [status, setStatus] = useState(data.client?data.client.user.status:'');
+    //name
     let [name, setName] = useState(data.client?data.client.name:'');
+    //inn
     let [inn, setInn] = useState(data.client?data.client.inn:'');
+    //email
     let [email, setEmail] = useState(data.client?data.client.email:'');
+    //phone
     let [phone, setPhone] = useState(data.client?data.client.phone:[]);
     let addPhone = () => {
         phone = [...phone, '+996']
@@ -64,21 +74,23 @@ const Client = React.memo((props) => {
         phone.splice(idx, 1);
         setPhone([...phone])
     };
+    //login
     let [login, setLogin] = useState(data.client?data.client.user.login:'');
+    //category
     let categorys = ['A','B','C','D','Horeca']
     let [category, setCategory] = useState(data.client?data.client.category:'B');
     let handleCategory =  (event) => {
         setCategory(event.target.value)
     };
-
     //привести к геолокации
     if(data.client&&data.client.address.length&&!Array.isArray(data.client.address[0])) data.client.address.map((addres) =>[addres])
-
-    let [address, setAddress] = useState(data.client?data.client.address:[['']]);
+    //city
     let [city, setCity] = useState(data.client?data.client.city:profile.city?profile.city:'Бишкек');
     let handleCity =  (event) => {
         setCity(event.target.value)
     };
+    //address
+    let [address, setAddress] = useState(data.client?data.client.address:[['']]);
     let editAddress = (event, idx) => {
         address[idx][0] = event.target.value
         setAddress([...address])
@@ -91,8 +103,9 @@ const Client = React.memo((props) => {
         address[idx][1] = geo
         setAddress([...address])
     };
-
+    //info
     let [info, setInfo] = useState(data.client?data.client.info:'');
+    //image
     let [preview, setPreview] = useState(data.client?data.client.image:'/static/add.png');
     let [image, setImage] = useState(null);
     let handleChangeImage = ((event) => {
@@ -101,18 +114,29 @@ const Client = React.memo((props) => {
             setPreview(URL.createObjectURL(event.target.files[0]))
         } else showSnackBar('Файл слишком большой')
     })
-    const {setMiniDialog, showMiniDialog, showFullDialog, setFullDialog} = props.mini_dialogActions;
+    //newPass
     let [newPass, setNewPass] = useState('');
     let handleNewPass =  (event) => {
         setNewPass(event.target.value)
     };
+    //hide
     let [hide, setHide] = useState(true);
     let handleHide =  () => setHide(hide => !hide);
+    //networks
+    let [networks, setNetworks] = useState([withoutNetwork]);
+    useEffect(() => {(async () => {
+        networks = [withoutNetwork, ...await getClientNetworks({search: ''})]
+        setNetworks(networks)
+    })()}, [])
+    let [network, setNetwork] = useState(data.client&&data.client.network?data.client.network:withoutNetwork);
+    let handleNetwork =  (event) => setNetwork({_id: event.target.value});
+    //проверка заполненности полей
     useEffect(() => {
         if(!name||!city||!phone.length||!address.length||!address[0]||!address[0][0]||!address[0][1]) {
             showSnackBar(`Обязательно заполните: ${!address[0][1]?'геолокацию; ':''}${!name?'имя; ':''}${!city?'город; ':''}${!phone.length?'номер телефона; ':''}${!address.length||!address[0]||!address[0][0]?'адрес;':''}`)
         }
     }, [])
+    //render
     return (
         <App pageName={router.query.id==='new'?'Добавить':data.client?data.client.name:'Ничего не найдено'}>
             <Head>
@@ -305,6 +329,12 @@ const Client = React.memo((props) => {
                                         className={classes.input}
                                         onChange={(event) => {setInfo(event.target.value)}}
                                     />
+                                    <FormControl className={classes.input}>
+                                        <InputLabel>Сеть</InputLabel>
+                                        <Select value={network&&network._id} onChange={handleNetwork}>
+                                            {networks.map((element) => <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>)}
+                                        </Select>
+                                    </FormControl>
                                     <div className={classes.row}>
                                         {
                                             (router.query.id!=='new'&&['суперорганизация', 'организация', 'агент', 'экспедитор', 'admin', 'суперагент'].includes(profile.role))/*||(data.client.user&&profile._id===data.client.user._id)*/?
@@ -326,6 +356,7 @@ const Client = React.memo((props) => {
                                                         editElement.phone = phone
                                                         if(info && info.length && info !== data.client.info) editElement.info = info
                                                         if(city && city.length && city !== data.client.city) editElement.city = city
+                                                        if((network?network._id:null) !== (data.client.network?data.client.network._id:null)) editElement.network = network._id
                                                         if(newPass && newPass.length) editElement.newPass = newPass
                                                        const action = async () => await setClient(editElement)
                                                         setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
@@ -375,7 +406,8 @@ const Client = React.memo((props) => {
                                                             checkPhone = validPhone(phone[i])
                                                         }
                                                         if(name&&login&&newPass&&address&&address[0]&&address[0][0]&&address[0][2]&&city&&checkPhone) {
-                                                            let editElement = {login: login, password: newPass, category}
+                                                            let editElement = {login: login, password: newPass, category, }
+                                                            if(network)editElement.network = network._id
                                                             if(image)editElement.image = image
                                                             if(name.length)editElement.name = name
                                                             editElement.address = address

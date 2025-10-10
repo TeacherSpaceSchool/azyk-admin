@@ -22,35 +22,49 @@ import Table from '../../components/table/planClients';
 
 const Plan = React.memo((props) => {
     const classes = pageListStyle();
+    const router = useRouter()
+    //props
     const {profile} = props.user;
     const {data} = props;
-    const router = useRouter()
-    const initialRender = useRef(true);
-    let [list, setList] = useState(data.planClients);
-    let [count, setCount] = useState('');
-    const getCount = async () => setCount(await getPlanClientsCount({search, skip: 0, city, organization: router.query.id, ...district?{district}:{}}))
     const {search, city, district, viewMode} = props.app;
+    //ref
+    const initialRender = useRef(true);
     const searchTimeOut = useRef(null);
     const paginationWork = useRef(true);
+    //deps
+    const deps = [city, district]
+    //listArgs
+    const listArgs = {search, city, organization: router.query.id, ...district?{district}:{}}
+    //count
+    let [count, setCount] = useState('');
+    const getCount = async () => setCount(await getPlanClientsCount(listArgs))
+    //list
+    let [list, setList] = useState(data.planClients);
+    const getList = async (skip) => {
+        const orders = await getPlanClients({...listArgs, skip: skip||0})
+        if(!skip) {
+            unawaited(getCount)
+            setList(orders)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(list.length) {
+            setList(list => [...list, ...orders])
+            paginationWork.current = true
+        }
+    }
+    //pagination
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
             paginationWork.current = false
-            let addedList = await getPlanClients({search, skip: list.length, city, organization: router.query.id, ...district?{district}:{}})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
+            await getList(list.length)
         }
-    }, [search, list, city, district])
-    const getList = async () => {
-        unawaited(getCount)
-        setList(await getPlanClients({search, skip: 0, city, organization: router.query.id, ...district?{district}:{}}))
-        paginationWork.current = true;
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-    }
+    }, [search, list, ...deps])
+    //filter
     useEffect(() => {
         if(!initialRender.current) unawaited(getList)
-    }, [city, district])
+    }, deps)
+    //search
     useEffect(() => {
         if(initialRender.current) {
             initialRender.current = false;
@@ -62,9 +76,11 @@ const Plan = React.memo((props) => {
             searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
     }, [search])
+    //fab
     let [anchorEl, setAnchorEl] = useState(null);
     let open = event => setAnchorEl(event.currentTarget);
     let close = () => setAnchorEl(null);
+    //render
     return (
         <App checkPagination={checkPagination} showDistrict searchShow pageName={data.organization.name}>
             <Head>

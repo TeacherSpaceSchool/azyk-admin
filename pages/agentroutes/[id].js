@@ -12,37 +12,46 @@ import Router from 'next/router'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import { useRouter } from 'next/router'
 import initialApp from '../../src/initialApp'
-import {formatAmount} from '../../src/lib';
+import {formatAmount, unawaited} from '../../src/lib';
 import {viewModes} from '../../src/enum';
 import Table from '../../components/table/agentroutes';
 
 const AgentRoutes = React.memo((props) => {
-    const {profile} = props.user;
     const classes = pageListStyle();
     const router = useRouter()
+    //props
+    const {profile} = props.user;
     const {data} = props;
-    let [list, setList] = useState(data.agentRoutes);
     const {search, viewMode} = props.app;
+    //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
+    //listArgs
+    const listArgs = {organization: router.query.id, search}
+    //list
+    let [list, setList] = useState(data.agentRoutes);
+    const getList = async () => {
+        setList(await getAgentRoutes(listArgs))
+        setPagination(100);
+        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+    }
+    //search
     useEffect(() => {
         if(initialRender.current)
             initialRender.current = false;
         else {
             if(searchTimeOut.current)
                 clearTimeout(searchTimeOut.current)
-            searchTimeOut.current = setTimeout(async () => {
-                setList(await getAgentRoutes({organization: router.query.id, search}))
-                setPagination(100);
-                (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-            }, 500)
+            searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
     }, [search])
+    //pagination
     const [pagination, setPagination] = useState(100);
     const checkPagination = useCallback(() => {
         if(pagination<list.length)
             setPagination(pagination => pagination+100)
     }, [pagination, list])
+    //render
     return (
         <App checkPagination={checkPagination} searchShow pageName='Маршруты агентов'>
             <Head>

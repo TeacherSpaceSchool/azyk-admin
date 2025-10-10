@@ -13,65 +13,64 @@ import {viewModes} from '../src/enum';
 import Table from '../components/table/organizations';
 import ClientIndex from '../components/clientIndex';
 import {getBanners} from '../src/gql/banners';
-import {getAgentRoute} from '../src/gql/agentRoute';
-import {getOrganizations} from '../src/gql/organization';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Активные', value: 'active'}, {name: 'Неактивные', value: 'deactive'}]
 
 const Organization = React.memo((props) => {
     const classes = pageListStyle();
-    const {data} = props;
-     const {search, filter, sort, isMobileApp, city, device, viewMode} = props.app;
-    const {profile} = props.user;
-    let [list, setList] = useState(data.brandOrganizations);
+    //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
+    //props
+    const {data} = props;
+    const {search, filter, sort, isMobileApp, city, device, viewMode} = props.app;
+    const {profile} = props.user;
+    //deps
+    const deps = [filter, sort, city]
+    //list
+    let [list, setList] = useState(data.brandOrganizations);
     const getList = async () => {
         setList(await getBrandOrganizations({search, sort, filter, city}));
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         setPagination(100);
     }
+    //filter
     useEffect(() => {
         if(!initialRender.current) 
             unawaited(getList)
-    }, [filter, sort, city])
+    }, deps)
+    //search
     useEffect(() => {
             if(initialRender.current) 
                 initialRender.current = false;
             else {
                 if(searchTimeOut.current)
                     clearTimeout(searchTimeOut.current)
-                searchTimeOut.current = setTimeout(() =>unawaited(getList), 500)
+                searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
             }
     }, [search])
-    //установка pwa
-    let [deferredPrompt, setDeferredPrompt] = useState(device.vendor==='Apple');
-    useEffect(() => {
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Сохраняем событие для последующего использования
-            setDeferredPrompt(e);
-        });
-    }, [])
-    const prompt = () => {
-        if(device.vendor==='Apple') {
-            Router.push('/howtoinstall/ios')
-
-        }
-        else {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if(choiceResult.outcome === 'accepted') {
-                    setDeferredPrompt(null)
-                }
-            });
-        }
-    }
     //pagination
     const [pagination, setPagination] = useState(100);
     const checkPagination = useCallback(() => {
         if(pagination<list.length)
             setPagination(pagination => pagination+100)
     }, [pagination, list])
+    //установка pwa
+    let [deferredPrompt, setDeferredPrompt] = useState(device.vendor==='Apple');
+    useEffect(() => {
+        window.addEventListener('beforeinstallprompt', (e) => setDeferredPrompt(e));
+    }, [])
+    const prompt = () => {
+        if(device.vendor==='Apple')
+            Router.push('/howtoinstall/ios')
+        else {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if(choiceResult.outcome === 'accepted') setDeferredPrompt(null)
+            });
+        }
+    }
+    //render
     return (
         <App cityShow checkPagination={checkPagination} searchShow filters={profile.role==='admin'&&filters} pageName='Бренды'>
             <Head>

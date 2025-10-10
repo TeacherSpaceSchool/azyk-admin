@@ -46,14 +46,17 @@ import RemoveIcon from '@material-ui/icons/Remove';
 
 const Route = React.memo((props) => {
     const classes = routeStyle();
-    const {data} = props;
     const router = useRouter()
+    //props
+    const {data} = props;
     const {isMobileApp} = props.app;
     const {profile} = props.user;
     const {setMiniDialog, showMiniDialog, showFullDialog, setFullDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
     const {showLoad} = props.appActions;
+    //screen
     let [screen, setScreen] = useState('setting');
+    //provider
     let [provider, setProvider] = useState(data.route?data.route.provider?data.route.provider:{name: 'AZYK.STORE', _id: 'super'}:null);
     let handleProvider = (async (provider) => {
         setSelectDistricts([])
@@ -118,12 +121,12 @@ const Route = React.memo((props) => {
         setAnchorEl(null);
     };
     useEffect(() => {
-            if(router.query.id==='new'&&profile.organization) {
-                for(let i=0;i<data.organizations.length;i++) {
-                    if(data.organizations[i]._id===profile.organization)
-                        handleProvider(data.organizations[i])
-                }
+        if(router.query.id==='new'&&profile.organization) {
+            for(let i=0;i<data.organizations.length;i++) {
+                if(data.organizations[i]._id===profile.organization)
+                    handleProvider(data.organizations[i])
             }
+        }
     }, [])
     useEffect(() => {
         (async () => {
@@ -139,20 +142,20 @@ const Route = React.memo((props) => {
         })()
     }, [selectProdusers, provider, selectDistricts, dateDelivery])
     useEffect(() => {
-            let tonnage = 0;
-            let price = 0;
-            let returnedPrice = 0;
-            for(let i=0; i<selectedOrders.length; i++) {
-                if(selectedOrders[i].allPrice)
-                    price += selectedOrders[i].allPrice
-                if(selectedOrders[i].returnedPrice)
-                    returnedPrice += selectedOrders[i].returnedPrice
-                if(selectedOrders[i].allTonnage)
-                    tonnage += selectedOrders[i].allTonnage
-            }
-            setAllPrice(checkFloat(price))
-            setAllTonnage(checkFloat(tonnage))
-            setAllReturnedPrice(checkFloat(returnedPrice))
+        let tonnage = 0;
+        let price = 0;
+        let returnedPrice = 0;
+        for(let i=0; i<selectedOrders.length; i++) {
+            if(selectedOrders[i].allPrice)
+                price += selectedOrders[i].allPrice
+            if(selectedOrders[i].returnedPrice)
+                returnedPrice += selectedOrders[i].returnedPrice
+            if(selectedOrders[i].allTonnage)
+                tonnage += selectedOrders[i].allTonnage
+        }
+        setAllPrice(checkFloat(price))
+        setAllTonnage(checkFloat(tonnage))
+        setAllReturnedPrice(checkFloat(returnedPrice))
     }, [selectedOrders])
     return (
         <App checkPagination={checkPagination} pageName={router.query.id==='new'?'Добавить':data.route?data.route.number:'Ничего не найдено'}>
@@ -166,426 +169,426 @@ const Route = React.memo((props) => {
             {
                 router.query.id==='new'||data.route?
                     <>
-                    <Card className={isMobileApp?classes.pageM:classes.pageD}>
-                        <CardContent className={classes.column}>
-                            <div style={{ justifyContent: 'center' }} className={classes.row}>
-                                <div style={{background: screen==='setting'?'#ffb300':'#ffffff'}} onClick={() => {setPagination(100);setScreen('setting')}} className={classes.selectType}>
-                                    Настройки
+                        <Card className={isMobileApp?classes.pageM:classes.pageD}>
+                            <CardContent className={classes.column}>
+                                <div style={{ justifyContent: 'center' }} className={classes.row}>
+                                    <div style={{background: screen==='setting'?'#ffb300':'#ffffff'}} onClick={() => {setPagination(100);setScreen('setting')}} className={classes.selectType}>
+                                        Настройки
+                                    </div>
+                                    <div style={{background: screen==='invoices'?'#ffb300':'#ffffff'}} onClick={() => {setPagination(100);setScreen('invoices')}} className={classes.selectType}>
+                                        Заказы {selectedOrders.length}/{orders.length}
+                                    </div>
                                 </div>
-                                <div style={{background: screen==='invoices'?'#ffb300':'#ffffff'}} onClick={() => {setPagination(100);setScreen('invoices')}} className={classes.selectType}>
-                                    Заказы {selectedOrders.length}/{orders.length}
-                                </div>
-                            </div>
-                            {
-                                screen==='setting'?
-                                    <>
-                                    <div className={classes.row}>
-                                        <Autocomplete
-                                            className={classes.inputHalf}
-                                            options={data.organizations}
-                                            getOptionLabel={option => option.name}
-                                            value={provider}
-                                            onChange={(event, newValue) => {
-                                                handleProvider(newValue)
-                                            }}
-                                            disabled={router.query.id!=='new'}
-                                            noOptionsText='Ничего не найдено'
-                                            renderInput={params => (
-                                                <TextField {...params} label='Поставщик' fullWidth />
-                                            )}
-                                        />
-                                        <FormControl className={classes.inputHalf}>
-                                            <InputLabel>Производители</InputLabel>
-                                            <Select
-                                                disabled={router.query.id!=='new'}
-                                                multiple
-                                                value={selectProdusers}
-                                                onChange={handleSelectProdusers}
-                                                input={<Input />}
-                                                MenuProps={{
-                                                    PaperProps: {
-                                                        style: {
-                                                            maxHeight: 226,
-                                                            width: 250,
-                                                        },
-                                                    }
-                                                }}
-                                            >
-                                                {produsers.map((organization) => (
-                                                    <MenuItem key={organization.name} value={organization}>
-                                                        {organization.name}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-                                    </div>
-                                    <div className={classes.row}>
-                                        <Autocomplete
-                                            className={classes.inputHalf}
-                                            disabled={router.query.id!=='new'}
-                                            options={ecspeditors}
-                                            value={selectEcspeditor}
-                                            getOptionLabel={option => option.name}
-                                            onChange={(event, newValue) => {
-                                                setSelectEcspeditor(newValue)
-                                            }}
-                                            noOptionsText='Ничего не найдено'
-                                            renderInput={params => (
-                                                <TextField {...params} label='Экспедитор' fullWidth />
-                                            )}
-                                        />
-                                        <Autocomplete
-                                            className={classes.inputHalf}
-                                            disabled={router.query.id!=='new'}
-                                            options={autos}
-                                            value={selectAuto}
-                                            getOptionLabel={option => option.number}
-                                            onChange={(event, newValue) => {
-                                                setSelectAuto(newValue)
-                                            }}
-                                            noOptionsText='Ничего не найдено'
-                                            renderInput={params => (
-                                                <TextField {...params} label='Транспорт' fullWidth />
-                                            )}
-                                        />
-                                    </div>
-                                    <div className={classes.row}>
-                                        <FormControl
-                                            className={classes.inputThird}
-                                           >
-                                            <InputLabel>Районы</InputLabel>
-                                            <Select
-                                                multiple
-                                                disabled={router.query.id!=='new'}
-                                                value={selectDistricts}
-                                                onChange={handleSelectDistricts}
-                                                input={<Input />}
-                                                MenuProps={{
-                                                    PaperProps: {
-                                                        style: {
-                                                            maxHeight: 226,
-                                                            width: 250,
-                                                        },
-                                                    }
-                                                }}
-                                            >
-                                                {districts.map((district) => (
-                                                    <MenuItem key={district.name} value={district}>
-                                                        {district.name}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-                                        <TextField
-                                            className={classes.inputThird}
-                                            label='Развозка'
-                                            disabled={router.query.id!=='new'}
-                                            type='date'
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                            value={dateDelivery}
-                                            format='MM/dd/yy'
-                                            onChange={ event => setDateDelivery(event.target.value) }
-                                        />
-                                        <TextField
-                                            disabled={router.query.id!=='new'}
-                                            type={ isMobileApp?'number':'text'}
-                                            label='Максимально заказов'
-                                            value={length}
-                                            className={classes.inputThird}
-                                            onChange={(event) => {setLength(inputInt(event.target.value))}}
-                                         />
-                                    </div>
-                                    <br/>
-                                    {
-                                        deliverys?deliverys.map((element, idx) =>
-                                            <ExpansionPanel key={`рейс${idx}`}>
-                                                <ExpansionPanelSummary
-                                                    expandIcon={<ExpandMoreIcon />}
+                                {
+                                    screen==='setting'?
+                                        <>
+                                            <div className={classes.row}>
+                                                <Autocomplete
+                                                    className={classes.inputHalf}
+                                                    options={data.organizations}
+                                                    getOptionLabel={option => option.name}
+                                                    value={provider}
+                                                    onChange={(event, newValue) => {
+                                                        handleProvider(newValue)
+                                                    }}
+                                                    disabled={router.query.id!=='new'}
+                                                    noOptionsText='Ничего не найдено'
+                                                    renderInput={params => (
+                                                        <TextField {...params} label='Поставщик' fullWidth />
+                                                    )}
+                                                />
+                                                <FormControl className={classes.inputHalf}>
+                                                    <InputLabel>Производители</InputLabel>
+                                                    <Select
+                                                        disabled={router.query.id!=='new'}
+                                                        multiple
+                                                        value={selectProdusers}
+                                                        onChange={handleSelectProdusers}
+                                                        input={<Input />}
+                                                        MenuProps={{
+                                                            PaperProps: {
+                                                                style: {
+                                                                    maxHeight: 226,
+                                                                    width: 250,
+                                                                },
+                                                            }
+                                                        }}
+                                                    >
+                                                        {produsers.map((organization) => (
+                                                            <MenuItem key={organization.name} value={organization}>
+                                                                {organization.name}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                </FormControl>
+                                            </div>
+                                            <div className={classes.row}>
+                                                <Autocomplete
+                                                    className={classes.inputHalf}
+                                                    disabled={router.query.id!=='new'}
+                                                    options={ecspeditors}
+                                                    value={selectEcspeditor}
+                                                    getOptionLabel={option => option.name}
+                                                    onChange={(event, newValue) => {
+                                                        setSelectEcspeditor(newValue)
+                                                    }}
+                                                    noOptionsText='Ничего не найдено'
+                                                    renderInput={params => (
+                                                        <TextField {...params} label='Экспедитор' fullWidth />
+                                                    )}
+                                                />
+                                                <Autocomplete
+                                                    className={classes.inputHalf}
+                                                    disabled={router.query.id!=='new'}
+                                                    options={autos}
+                                                    value={selectAuto}
+                                                    getOptionLabel={option => option.number}
+                                                    onChange={(event, newValue) => {
+                                                        setSelectAuto(newValue)
+                                                    }}
+                                                    noOptionsText='Ничего не найдено'
+                                                    renderInput={params => (
+                                                        <TextField {...params} label='Транспорт' fullWidth />
+                                                    )}
+                                                />
+                                            </div>
+                                            <div className={classes.row}>
+                                                <FormControl
+                                                    className={classes.inputThird}
                                                 >
-                                                    <div className={classes.value}>
-                                                        Рейс {idx+1}
-                                                    </div>
-                                                </ExpansionPanelSummary>
-                                                <ExpansionPanelDetails>
-                                                    <div className={classes.column}>
-                                                        <div className={classes.row}>
-                                                            <div className={classes.nameField}>
-                                                                Заказов:&nbsp;
-                                                            </div>
+                                                    <InputLabel>Районы</InputLabel>
+                                                    <Select
+                                                        multiple
+                                                        disabled={router.query.id!=='new'}
+                                                        value={selectDistricts}
+                                                        onChange={handleSelectDistricts}
+                                                        input={<Input />}
+                                                        MenuProps={{
+                                                            PaperProps: {
+                                                                style: {
+                                                                    maxHeight: 226,
+                                                                    width: 250,
+                                                                },
+                                                            }
+                                                        }}
+                                                    >
+                                                        {districts.map((district) => (
+                                                            <MenuItem key={district.name} value={district}>
+                                                                {district.name}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                </FormControl>
+                                                <TextField
+                                                    className={classes.inputThird}
+                                                    label='Развозка'
+                                                    disabled={router.query.id!=='new'}
+                                                    type='date'
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                                    value={dateDelivery}
+                                                    format='MM/dd/yy'
+                                                    onChange={ event => setDateDelivery(event.target.value) }
+                                                />
+                                                <TextField
+                                                    disabled={router.query.id!=='new'}
+                                                    type={ isMobileApp?'number':'text'}
+                                                    label='Максимально заказов'
+                                                    value={length}
+                                                    className={classes.inputThird}
+                                                    onChange={(event) => {setLength(inputInt(event.target.value))}}
+                                                />
+                                            </div>
+                                            <br/>
+                                            {
+                                                deliverys?deliverys.map((element, idx) =>
+                                                    <ExpansionPanel key={`рейс${idx}`}>
+                                                        <ExpansionPanelSummary
+                                                            expandIcon={<ExpandMoreIcon />}
+                                                        >
                                                             <div className={classes.value}>
-                                                                {element.orders.length}
+                                                                Рейс {idx+1}
                                                             </div>
-                                                        </div>
-                                                        <div className={classes.row}>
-                                                            <div className={classes.nameField}>
-                                                                Сумма{element.orders.reduce((accumulator, element) => accumulator + element.returnedPrice, 0)?' (факт/итого)':''}:&nbsp;
-                                                            </div>
-                                                            <div className={classes.value}>
-                                                                {element.orders.reduce((accumulator, element) => accumulator + element.returnedPrice, 0)?`${checkFloat(element.orders.reduce((accumulator, element) => accumulator + element.allPrice-element.returnedPrice, 0)-element.orders.reduce((accumulator, element) => accumulator + element.returnedPrice, 0))} сом/`:''}{checkFloat(element.orders.reduce((accumulator, element) => accumulator + element.allPrice-element.returnedPrice, 0))} сом
-                                                            </div>
-                                                        </div>
-                                                        <div className={classes.row}>
-                                                            <div className={classes.nameField}>
-                                                                Тоннаж:&nbsp;
-                                                            </div>
-                                                            <div className={classes.value}>
-                                                                {element.tonnage} кг
-                                                            </div>
-                                                        </div>
-                                                        <div className={classes.row}>
-                                                            <div className={classes.nameField}>
-                                                                Протяженость:&nbsp;
-                                                            </div>
-                                                            <div className={classes.value}>
-                                                                {element.lengthInMeters/1000} км
-                                                            </div>
-                                                        </div>
-                                                        <Button onClick={async () => {
-                                                            showLoad(true)
-                                                            window.open(await downloadInvoicesFromRouting({
-                                                                organization: provider._id,
-                                                                orders: element.orders.map(order=>order._id)
-                                                            }), '_blank');
-                                                            showLoad(false)
-                                                        }} size='small' color='primary'>
-                                                            Скачать накладные
-                                                        </Button>
-                                                        <Button onClick={async () => {
-                                                            let items = await listDownload(element.orders.map(order=>order._id))
-                                                            setMiniDialog('Лист загрузки', <ItemList items={items}/>)
-                                                            showMiniDialog(true)
-                                                        }} size='small' color='primary'>
-                                                            Лист загрузки
-                                                        </Button>
-                                                        {/*<Button onClick={async () => {
+                                                        </ExpansionPanelSummary>
+                                                        <ExpansionPanelDetails>
+                                                            <div className={classes.column}>
+                                                                <div className={classes.row}>
+                                                                    <div className={classes.nameField}>
+                                                                        Заказов:&nbsp;
+                                                                    </div>
+                                                                    <div className={classes.value}>
+                                                                        {element.orders.length}
+                                                                    </div>
+                                                                </div>
+                                                                <div className={classes.row}>
+                                                                    <div className={classes.nameField}>
+                                                                        Сумма{element.orders.reduce((accumulator, element) => accumulator + element.returnedPrice, 0)?' (факт/итого)':''}:&nbsp;
+                                                                    </div>
+                                                                    <div className={classes.value}>
+                                                                        {element.orders.reduce((accumulator, element) => accumulator + element.returnedPrice, 0)?`${checkFloat(element.orders.reduce((accumulator, element) => accumulator + element.allPrice-element.returnedPrice, 0)-element.orders.reduce((accumulator, element) => accumulator + element.returnedPrice, 0))} сом/`:''}{checkFloat(element.orders.reduce((accumulator, element) => accumulator + element.allPrice-element.returnedPrice, 0))} сом
+                                                                    </div>
+                                                                </div>
+                                                                <div className={classes.row}>
+                                                                    <div className={classes.nameField}>
+                                                                        Тоннаж:&nbsp;
+                                                                    </div>
+                                                                    <div className={classes.value}>
+                                                                        {element.tonnage} кг
+                                                                    </div>
+                                                                </div>
+                                                                <div className={classes.row}>
+                                                                    <div className={classes.nameField}>
+                                                                        Протяженость:&nbsp;
+                                                                    </div>
+                                                                    <div className={classes.value}>
+                                                                        {element.lengthInMeters/1000} км
+                                                                    </div>
+                                                                </div>
+                                                                <Button onClick={async () => {
+                                                                    showLoad(true)
+                                                                    window.open(await downloadInvoicesFromRouting({
+                                                                        organization: provider._id,
+                                                                        orders: element.orders.map(order=>order._id)
+                                                                    }), '_blank');
+                                                                    showLoad(false)
+                                                                }} size='small' color='primary'>
+                                                                    Скачать накладные
+                                                                </Button>
+                                                                <Button onClick={async () => {
+                                                                    let items = await listDownload(element.orders.map(order=>order._id))
+                                                                    setMiniDialog('Лист загрузки', <ItemList items={items}/>)
+                                                                    showMiniDialog(true)
+                                                                }} size='small' color='primary'>
+                                                                    Лист загрузки
+                                                                </Button>
+                                                                {/*<Button onClick={async () => {
                                                             let items = await listUnload(element.orders.map(order=>order._id))
                                                             setMiniDialog('Лист выгрузки', <ItemList items={items}/>)
                                                             showMiniDialog(true)
                                                         }} size='small' color='primary'>
                                                             Лист выгрузки
                                                         </Button>*/}
-                                                        <Button onClick={() => {
-                                                            setFullDialog('Список магазинов', <ListOrder
-                                                                setList={(list) => {deliverys[idx].orders = list; setDeliverys([...deliverys])}}
-                                                                invoices={element.orders}
-                                                            />)
-                                                            showFullDialog(true)
-                                                        }} size='small' color='primary'>
-                                                            Список магазинов
-                                                        </Button>
-                                                        <Button onClick={() => {
-                                                            setFullDialog('Маршрут', <GeoRoute legs={element.legs} setList={(list) => {deliverys[idx].orders = list; setDeliverys([...deliverys])}} invoices={element.orders}/>)
-                                                            showFullDialog(true)
-                                                        }} size='small' color='primary'>
-                                                            Карта
-                                                        </Button>
-                                                    </div>
-                                                </ExpansionPanelDetails>
-                                            </ExpansionPanel>
-                                        ):null
-                                    }
-                                    <br/>
+                                                                <Button onClick={() => {
+                                                                    setFullDialog('Список магазинов', <ListOrder
+                                                                        setList={(list) => {deliverys[idx].orders = list; setDeliverys([...deliverys])}}
+                                                                        invoices={element.orders}
+                                                                    />)
+                                                                    showFullDialog(true)
+                                                                }} size='small' color='primary'>
+                                                                    Список магазинов
+                                                                </Button>
+                                                                <Button onClick={() => {
+                                                                    setFullDialog('Маршрут', <GeoRoute legs={element.legs} setList={(list) => {deliverys[idx].orders = list; setDeliverys([...deliverys])}} invoices={element.orders}/>)
+                                                                    showFullDialog(true)
+                                                                }} size='small' color='primary'>
+                                                                    Карта
+                                                                </Button>
+                                                            </div>
+                                                        </ExpansionPanelDetails>
+                                                    </ExpansionPanel>
+                                                ):null
+                                            }
+                                            <br/>
+                                        </>
+                                        :
+                                        <div className={classes.listInvoices}>
+                                            {orders?orders.map((element, idx) => {
+                                                if(idx<pagination)
+                                                    return(
+                                                        <div key={element._id} style={isMobileApp ? {alignItems: 'baseline'} : {}}
+                                                             className={isMobileApp ? classes.column1 : classes.row1}>
+                                                            {
+                                                                router.query.id==='new'?
+                                                                    <Checkbox checked={selectedOrders.findIndex(element1=>element1._id===element._id)!==-1}
+                                                                              onChange={() => {
+                                                                                  if(selectedOrders.findIndex(element1=>element1._id===element._id)===-1) {
+                                                                                      selectedOrders.push(element)
+                                                                                  } else {
+                                                                                      selectedOrders.splice(selectedOrders.findIndex(element1=>element1._id===element._id), 1)
+                                                                                  }
+                                                                                  setSelectedOrders([...selectedOrders])
+                                                                                  setDeliverys([])
+                                                                              }}
+                                                                    />
+                                                                    :
+                                                                    <IconButton
+                                                                        onClick={() => {
+                                                                            deletedOrders.push(orders[idx])
+                                                                            setDeletedOrders([...deletedOrders])
+                                                                            orders.splice(idx, 1);
+                                                                            setOrders([...orders])
+                                                                        }}
+                                                                    >
+                                                                        <RemoveIcon/>
+                                                                    </IconButton>
+                                                            }
+                                                            <CardOrder setList={setOrders} list={orders} idx={idx} element={element}/>
+                                                        </div>
+                                                    )}
+                                            ):null}
+                                        </div>
+                                }
+                            </CardContent>
+                            {
+                                router.query.id==='new'||deletedOrders.length?
+                                    <>
+                                        <Fab onClick={open} color='primary' className={classes.fab}>
+                                            <SettingsIcon />
+                                        </Fab>
+                                        <Menu
+                                            anchorEl={anchorEl}
+                                            open={Boolean(anchorEl)}
+                                            onClose={close}
+                                            className={classes.menu}
+                                            anchorOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'left',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'bottom',
+                                                horizontal: 'left',
+                                            }}
+                                        >
+                                            {
+                                                router.query.id==='new'?
+                                                    screen==='setting'?
+                                                        <>
+                                                            {
+                                                                selectedOrders.length&&selectAuto?
+                                                                    <MenuItem onClick={async () => {
+                                                                        close()
+                                                                        showLoad(true)
+                                                                        let tonnageError = selectedOrders.find(element=>element.allTonnage>selectAuto.tonnage)
+                                                                        if(!tonnageError) {
+                                                                            let geoError = selectedOrders.find(element=>!element.address[1])
+                                                                            if(!geoError) {
+                                                                                let deliverys = await buildRoute({
+                                                                                    provider: provider._id,
+                                                                                    autoTonnage: selectAuto.tonnage,
+                                                                                    length: checkInt(length),
+                                                                                    orders: selectedOrders.map(element => element._id)
+                                                                                })
+                                                                                let resultSelectedOrders = []
+                                                                                for(let i=0; i<deliverys.length; i++) {
+                                                                                    for(let i1=0; i1<deliverys[i].orders.length; i1++) {
+                                                                                        resultSelectedOrders.push(deliverys[i].orders[i1]._id)
+                                                                                    }
+                                                                                }
+                                                                                selectedOrders = selectedOrders.filter(element => resultSelectedOrders.includes(element._id))
+                                                                                setSelectedOrders([...selectedOrders])
+                                                                                setDeliverys(deliverys)
+                                                                            }
+                                                                            else
+                                                                                showSnackBar(`Заказ №${geoError.number} отсуствует геолокация`)
+                                                                        }
+                                                                        else
+                                                                            showSnackBar(`Заказ №${tonnageError.number} слишком большой`)
+                                                                        showLoad(false)
+                                                                    }}>Построить маршрут</MenuItem>
+                                                                    :
+                                                                    null
+                                                            }
+                                                            {
+                                                                deliverys.length&&selectEcspeditor&&selectEcspeditor._id?
+                                                                    <MenuItem onClick={async () => {
+                                                                        close()
+                                                                        showLoad(true)
+                                                                        for(let i=0; i<deliverys.length; i++) {
+                                                                            deliverys[i].orders = deliverys[i].orders.map(element=>element._id)
+                                                                            deliverys[i] = {
+                                                                                legs: deliverys[i].legs,
+                                                                                orders: deliverys[i].orders,
+                                                                                tonnage: deliverys[i].tonnage,
+                                                                                lengthInMeters: deliverys[i].lengthInMeters
+                                                                            }
+                                                                        }
+                                                                        await addRoute({provider: provider._id, deliverys: deliverys, selectedOrders: selectedOrders.map(element=>element._id), selectDistricts: selectDistricts.map(element=>element._id), selectEcspeditor: selectEcspeditor._id, selectAuto: selectAuto._id, dateDelivery: dateDelivery, allTonnage: parseInt(allTonnage), selectProdusers: selectProdusers.map(element=>element._id)})
+                                                                        Router.push(`/routes/${provider._id}`)
+                                                                        showLoad(false)
+                                                                    }}>Сохранить маршрут</MenuItem>
+                                                                    :
+                                                                    null
+                                                            }
+                                                        </>
+                                                        :
+                                                        <>
+                                                            {
+                                                                orders.length?
+                                                                    <>
+                                                                        <MenuItem onClick={() => {
+                                                                            setSelectedOrders([...orders])
+                                                                            setDeliverys([])
+                                                                            close()
+                                                                        }}>Выбрать все</MenuItem>
+                                                                        <MenuItem onClick={() => {
+                                                                            setSelectedOrders([])
+                                                                            setDeliverys([])
+                                                                            close()
+                                                                        }}>Отменить выбор</MenuItem>
+                                                                    </>
+                                                                    :
+                                                                    null
+                                                            }
+                                                            <MenuItem onClick={() => {
+                                                                setDeliverys([])
+                                                                setFullDialog('Добавить заказ', <AddOrder districts={districts} produsers={produsers} dateDelivery={dateDelivery} mainSelectedOrders={selectedOrders} setMainSelectedOrders={setSelectedOrders} mainOrders={orders} setMainOrders={setOrders}/>)
+                                                                showFullDialog(true)
+                                                                close()
+                                                            }}>Добавить заказ</MenuItem>
+                                                        </>
+                                                    :
+                                                    <MenuItem onClick={async () => {
+                                                        showLoad(true)
+                                                        await setRoute({route: router.query.id, deletedOrders: deletedOrders.map(element=>element._id)})
+                                                        showLoad(false)
+                                                        close()
+                                                    }}>
+                                                        Сохранить
+                                                    </MenuItem>
+
+                                            }
+                                        </Menu>
                                     </>
                                     :
-                                    <div className={classes.listInvoices}>
-                                        {orders?orders.map((element, idx) => {
-                                            if(idx<pagination)
-                                                return(
-                                                    <div key={element._id} style={isMobileApp ? {alignItems: 'baseline'} : {}}
-                                                         className={isMobileApp ? classes.column1 : classes.row1}>
-                                                        {
-                                                            router.query.id==='new'?
-                                                                <Checkbox checked={selectedOrders.findIndex(element1=>element1._id===element._id)!==-1}
-                                                                          onChange={() => {
-                                                                              if(selectedOrders.findIndex(element1=>element1._id===element._id)===-1) {
-                                                                                  selectedOrders.push(element)
-                                                                              } else {
-                                                                                  selectedOrders.splice(selectedOrders.findIndex(element1=>element1._id===element._id), 1)
-                                                                              }
-                                                                              setSelectedOrders([...selectedOrders])
-                                                                              setDeliverys([])
-                                                                          }}
-                                                                />
-                                                                :
-                                                                <IconButton
-                                                                    onClick={() => {
-                                                                        deletedOrders.push(orders[idx])
-                                                                        setDeletedOrders([...deletedOrders])
-                                                                        orders.splice(idx, 1);
-                                                                        setOrders([...orders])
-                                                                    }}
-                                                                >
-                                                                    <RemoveIcon/>
-                                                                </IconButton>
-                                                        }
-                                                        <CardOrder setList={setOrders} list={orders} idx={idx} element={element}/>
-                                                    </div>
-                                                )}
-                                        ):null}
-                                    </div>
+                                    null
                             }
-                        </CardContent>
+                        </Card>
                         {
-                            router.query.id==='new'||deletedOrders.length?
-                                <>
-                                <Fab onClick={open} color='primary' className={classes.fab}>
-                                    <SettingsIcon />
-                                </Fab>
-                                <Menu
-                                    anchorEl={anchorEl}
-                                    open={Boolean(anchorEl)}
-                                    onClose={close}
-                                    className={classes.menu}
-                                    anchorOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'left',
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'bottom',
-                                        horizontal: 'left',
-                                    }}
-                                >
+                            selectedOrders&&selectedOrders.length?
+                                <div className='count' onClick={() =>setShowStat(!showStat)}>
+                                    Заказов: {formatAmount(selectedOrders.length)}
                                     {
-                                        router.query.id==='new'?
-                                            screen==='setting'?
-                                                <>
+                                        showStat?
+                                            <>
                                                 {
-                                                    selectedOrders.length&&selectAuto?
-                                                        <MenuItem onClick={async () => {
-                                                            close()
-                                                            showLoad(true)
-                                                            let tonnageError = selectedOrders.find(element=>element.allTonnage>selectAuto.tonnage)
-                                                            if(!tonnageError) {
-                                                                let geoError = selectedOrders.find(element=>!element.address[1])
-                                                                if(!geoError) {
-                                                                    let deliverys = await buildRoute({
-                                                                        provider: provider._id,
-                                                                        autoTonnage: selectAuto.tonnage,
-                                                                        length: checkInt(length),
-                                                                        orders: selectedOrders.map(element => element._id)
-                                                                    })
-                                                                    let resultSelectedOrders = []
-                                                                    for(let i=0; i<deliverys.length; i++) {
-                                                                        for(let i1=0; i1<deliverys[i].orders.length; i1++) {
-                                                                            resultSelectedOrders.push(deliverys[i].orders[i1]._id)
-                                                                        }
-                                                                    }
-                                                                    selectedOrders = selectedOrders.filter(element => resultSelectedOrders.includes(element._id))
-                                                                    setSelectedOrders([...selectedOrders])
-                                                                    setDeliverys(deliverys)
-                                                                }
-                                                                else
-                                                                    showSnackBar(`Заказ №${geoError.number} отсуствует геолокация`)
-                                                            }
-                                                            else
-                                                                showSnackBar(`Заказ №${tonnageError.number} слишком большой`)
-                                                            showLoad(false)
-                                                        }}>Построить маршрут</MenuItem>
+                                                    allPrice?
+                                                        <>
+                                                            <br/>
+                                                            <br/>
+                                                            {`Сумма${allReturnedPrice?' (факт./итого)':''}: ${allReturnedPrice?`${formatAmount(allPrice-allReturnedPrice)}/${formatAmount(allPrice)}`:formatAmount(allPrice)} сом`}
+                                                        </>
                                                         :
                                                         null
                                                 }
                                                 {
-                                                    deliverys.length&&selectEcspeditor&&selectEcspeditor._id?
-                                                        <MenuItem onClick={async () => {
-                                                            close()
-                                                            showLoad(true)
-                                                            for(let i=0; i<deliverys.length; i++) {
-                                                                deliverys[i].orders = deliverys[i].orders.map(element=>element._id)
-                                                                deliverys[i] = {
-                                                                    legs: deliverys[i].legs,
-                                                                    orders: deliverys[i].orders,
-                                                                    tonnage: deliverys[i].tonnage,
-                                                                    lengthInMeters: deliverys[i].lengthInMeters
-                                                                }
-                                                            }
-                                                            await addRoute({provider: provider._id, deliverys: deliverys, selectedOrders: selectedOrders.map(element=>element._id), selectDistricts: selectDistricts.map(element=>element._id), selectEcspeditor: selectEcspeditor._id, selectAuto: selectAuto._id, dateDelivery: dateDelivery, allTonnage: parseInt(allTonnage), selectProdusers: selectProdusers.map(element=>element._id)})
-                                                            Router.push(`/routes/${provider._id}`)
-                                                            showLoad(false)
-                                                        }}>Сохранить маршрут</MenuItem>
+                                                    allTonnage?
+                                                        <>
+                                                            <br/>
+                                                            <br/>
+                                                            {`Тоннаж: ${allTonnage} кг`}
+                                                        </>
                                                         :
                                                         null
                                                 }
-                                                </>
-                                                :
-                                                <>
-                                                {
-                                                    orders.length?
-                                                    <>
-                                                    <MenuItem onClick={() => {
-                                                        setSelectedOrders([...orders])
-                                                        setDeliverys([])
-                                                        close()
-                                                    }}>Выбрать все</MenuItem>
-                                                    <MenuItem onClick={() => {
-                                                        setSelectedOrders([])
-                                                        setDeliverys([])
-                                                        close()
-                                                    }}>Отменить выбор</MenuItem>
-                                                    </>
-                                                    :
-                                                    null
-                                                }
-                                                <MenuItem onClick={() => {
-                                                    setDeliverys([])
-                                                    setFullDialog('Добавить заказ', <AddOrder districts={districts} produsers={produsers} dateDelivery={dateDelivery} mainSelectedOrders={selectedOrders} setMainSelectedOrders={setSelectedOrders} mainOrders={orders} setMainOrders={setOrders}/>)
-                                                    showFullDialog(true)
-                                                    close()
-                                                }}>Добавить заказ</MenuItem>
-                                                </>
+                                            </>
                                             :
-                                            <MenuItem onClick={async () => {
-                                                showLoad(true)
-                                                await setRoute({route: router.query.id, deletedOrders: deletedOrders.map(element=>element._id)})
-                                                showLoad(false)
-                                                close()
-                                            }}>
-                                                Сохранить
-                                            </MenuItem>
-
+                                            null
                                     }
-                                </Menu>
-                                </>
+                                </div>
                                 :
                                 null
                         }
-                    </Card>
-                    {
-                        selectedOrders&&selectedOrders.length?
-                            <div className='count' onClick={() =>setShowStat(!showStat)}>
-                                Заказов: {formatAmount(selectedOrders.length)}
-                                {
-                                    showStat?
-                                        <>
-                                        {
-                                            allPrice?
-                                                <>
-                                                <br/>
-                                                <br/>
-                                                {`Сумма${allReturnedPrice?' (факт./итого)':''}: ${allReturnedPrice?`${formatAmount(allPrice-allReturnedPrice)}/${formatAmount(allPrice)}`:formatAmount(allPrice)} сом`}
-                                                </>
-                                                :
-                                                null
-                                        }
-                                        {
-                                            allTonnage?
-                                                <>
-                                                <br/>
-                                                <br/>
-                                                {`Тоннаж: ${allTonnage} кг`}
-                                                </>
-                                                :
-                                                null
-                                        }
-                                        </>
-                                        :
-                                        null
-                                }
-                            </div>
-                            :
-                            null
-                    }
                     </>
                     :
                     null
@@ -603,7 +606,7 @@ Route.getInitialProps = async function(ctx) {
             })
             ctx.res.end()
         } else
-                Router.push('/contact')
+            Router.push('/contact')
     return {
         data: {
             route: await getRoute(ctx.query.id, getClientGqlSsr(ctx.req)),

@@ -20,21 +20,30 @@ const filters = [{name: 'Все', value: ''}, {name: 'Обработка', value
 
 const RepairEquipments = React.memo((props) => {
     const classes = pageListStyle();
+    const router = useRouter()
+    //props
     const {data} = props;
-    let [list, setList] = useState(data.repairEquipments);
     const {search, filter, viewMode} = props.app;
     const {profile} = props.user;
-    const router = useRouter()
+    //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
+    //listArgs
+    const listArgs = {organization: router.query.id, search, filter}
+    //deps
+    const deps = [filter]
+    //list
+    let [list, setList] = useState(data.repairEquipments);
     const getList = async () => {
-        setList(await getRepairEquipments({organization: router.query.id, search, filter}))
+        setList(await getRepairEquipments(listArgs))
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
+    //filter
     useEffect(() => {
         if(!initialRender.current) unawaited(getList)
-    }, [filter])
+    }, deps)
+    //search
     useEffect(() => {
             if(initialRender.current) 
                 initialRender.current = false;
@@ -44,6 +53,7 @@ const RepairEquipments = React.memo((props) => {
                 searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
             }
     }, [search])
+    //pagination
     const [pagination, setPagination] = useState(100);
     const checkPagination = useCallback(() => {
         if(pagination<list.length)

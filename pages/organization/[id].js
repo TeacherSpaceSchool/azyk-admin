@@ -33,10 +33,14 @@ import * as lib from '../../src/lib'
 
 const Organization = React.memo((props) => {
     const classes = organizationStyle();
+    const router = useRouter()
+    //props
     const {data} = props;
     const {isMobileApp} = props.app;
-    const router = useRouter()
     const {showSnackBar} = props.snackbarActions;
+    const {profile} = props.user;
+    const {setMiniDialog, showMiniDialog, setFullDialog, showFullDialog} = props.mini_dialogActions;
+    //state
     let [statusO, setStatusO] = useState(data.organization?data.organization.status:'');
     let [name, setName] = useState(data.organization?data.organization.name:'');
     let [onlyDistrict, setOnlyDistrict] = useState(data.organization&&data.organization.onlyDistrict!==null?data.organization.onlyDistrict:false);
@@ -124,8 +128,7 @@ const Organization = React.memo((props) => {
             setPreview(URL.createObjectURL(event.target.files[0]))
         } else showSnackBar('Файл слишком большой')
     })
-    const {profile} = props.user;
-    const {setMiniDialog, showMiniDialog, setFullDialog, showFullDialog} = props.mini_dialogActions;
+    //render
     return (
         <App pageName={router.query.id==='new'?'Добавить':data.organization!==null?data.organization.name:'Ничего не найдено'}>
             <Head>

@@ -13,38 +13,52 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
 import {formatAmount, unawaited} from '../../src/lib';
+import {getOrders} from '../../src/gql/order';
 
 const filters = [{name: 'Все', value: ''}, {name: 'Cоздан', value: 'создан'}, {name: 'Выполняется', value: 'выполняется'}, {name: 'Выполнен', value: 'выполнен'}]
 
 const Routes = React.memo((props) => {
-    const {profile} = props.user;
     const classes = pageListStyle();
-    const initialRender = useRef(true);
     const router = useRouter()
+    //props
+    const {profile} = props.user;
     const {data} = props;
-    let [list, setList] = useState(data.routes);
-    const paginationWork = useRef(true);
     const {search, filter, sort, date} = props.app;
+    //ref
+    const initialRender = useRef(true);
+    //deps
+    const deps = [sort, filter, date]
+    //listArgs
+    const listArgs = {organization: router.query.id, search, sort, filter, date}
+    //list
+    let [list, setList] = useState(data.routes);
+    const getList = async (skip) => {
+        const orders = await getRoutes({...listArgs, skip: skip||0})
+        if(!skip) {
+            setList(orders)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(list.length) {
+            setList(list => [...list, ...orders])
+            paginationWork.current = true
+        }
+    }
+    //pagination
+    const paginationWork = useRef(true);
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
             paginationWork.current = false
-            let addedList = await getRoutes({organization: router.query.id, search, sort, filter, date, skip: list.length})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
+            await getList(list.length)
         }
-    }, [search, sort, filter, date, list])
-    const getList = async () => {
-        setList(await getRoutes({organization: router.query.id, search, sort, filter, date, skip: 0}))
-        paginationWork.current = true;
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-    }
-    const searchTimeOut = useRef(null);
+    }, [search, list, ...deps])
+    //filter
     useEffect(() => {
-            if(!initialRender.current)
-                unawaited(getList)
-    }, [filter, sort, date])
+        if(!initialRender.current)
+            unawaited(getList)
+    }, deps)
+    //search
+    const searchTimeOut = useRef(null);
     useEffect(() => {
         if(initialRender.current)
             initialRender.current = false;
@@ -54,6 +68,7 @@ const Routes = React.memo((props) => {
             searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
     }, [search])
+    //render
     return (
         <App checkPagination={checkPagination} getList={getList} searchShow dates filters={filters} pageName='Маршруты экспедитора'>
             <Head>

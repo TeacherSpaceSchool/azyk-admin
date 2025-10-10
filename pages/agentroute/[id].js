@@ -33,11 +33,13 @@ import {getDistrict} from '../../src/gql/district';
 const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
 
 const AgentRoute = React.memo((props) => {
-    const {profile} = props.user;
     const classes = agentRouteStyle();
-    const {data} = props;
     const router = useRouter()
+    //props
+    const {profile} = props.user;
+    const {data} = props;
     const {search, isMobileApp, city} = props.app;
+    //pagination
     const [pagination, setPagination] = useState(100);
     const initialRender = useRef(true);
     let [organizations, setOrganizations] = useState(data.organizations);

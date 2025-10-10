@@ -17,20 +17,29 @@ import Table from '../../components/table/items';
 
 const Items = React.memo((props) => {
     const classes = pageListStyle();
+    //props
     const {data} = props;
-    let [list, setList] = useState(data.items);
     const {search, sort, organization, viewMode} = props.app;
     const {profile} = props.user;
+    //ref
     const searchTimeOut= useRef(null);
     const initialRender = useRef(true);
+    //listArgs
+    const listArgs = {organization, search, sort}
+    //deps
+    const deps = [sort, organization]
+    //list
+    let [list, setList] = useState(data.items);
     const getList = async () => {
-        setList(await getItems({organization, search, sort}))
+        setList(await getItems(listArgs))
         setPagination(100);
         (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
+    //filter
     useEffect(() => {
         if(!initialRender.current) unawaited(getList)
-    }, [sort, organization])
+    }, deps)
+    //search
     useEffect(() => {
         if(initialRender.current)
             initialRender.current = false;
@@ -40,11 +49,13 @@ const Items = React.memo((props) => {
             searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
     }, [search])
+    //pagination
     const [pagination, setPagination] = useState(100);
     const checkPagination = useCallback(() => {
         if(pagination<list.length)
             setPagination(pagination => pagination+100)
     }, [pagination, list])
+    //render
     return (
         <App organizations checkPagination={checkPagination} searchShow pageName={'Товары'}>
             <Head>

@@ -21,24 +21,41 @@ import Table from '../../components/table/equipments';
 
 const Equipments = React.memo((props) => {
     const classes = pageListStyle();
-    const {data} = props;
-    let [list, setList] = useState(data.equipments);
-    let [count, setCount] = useState('');
-    const getCount = async () => setCount(await getEquipmentsCount({organization: router.query.id, search, ...agent?{agent}:{}}))
-    const {search, agent, viewMode} = props.app;
     const router = useRouter()
+    //props
+    const {data} = props;
+    const {search, agent, viewMode} = props.app;
+    //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
-    const getList = async () => {
-        unawaited(getCount)
-        setList(await getEquipments({organization: router.query.id, search, skip: 0, ...agent?{agent}:{}}));
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-        paginationWork.current = true;
+    const paginationWork = useRef(true);
+    //deps
+    const deps = [agent]
+    //listArgs
+    const listArgs = {organization: router.query.id, search, ...agent?{agent}:{}}
+    //count
+    let [count, setCount] = useState('');
+    const getCount = async () => setCount(await getEquipmentsCount(listArgs))
+    //list
+    let [list, setList] = useState(data.equipments);
+    const getList = async (skip) => {
+        const equipments = await getEquipments({...listArgs, skip: 0});
+        if(!skip) {
+            unawaited(getCount)
+            setList(equipments)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(list.length) {
+            setList(list => [...list, ...equipments])
+            paginationWork.current = true
+        }
     }
+    //filter
     useEffect(() => {
         if(!initialRender.current)
             unawaited(getList)
-    }, [agent])
+    }, deps)
     useEffect(() => {
             if(initialRender.current) {
                 initialRender.current = false;
@@ -50,20 +67,18 @@ const Equipments = React.memo((props) => {
                 searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
             }
     }, [search])
-    const paginationWork = useRef(true);
+    //pagination
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
             paginationWork.current = false
-            let addedList = await getEquipments({organization: router.query.id, search, skip: list.length, ...agent?{agent}:{}})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
+            await getList(list.length)
         }
-    }, [search, list])
+    }, [search, list, ...deps])
+    //fab
     let [anchorEl, setAnchorEl] = useState(null);
     let open = event => setAnchorEl(event.currentTarget);
     let close = () => setAnchorEl(null);
+    //render
     return (
         <App checkPagination={checkPagination} searchShow pageName='Оборудование' agents>
             <Head>

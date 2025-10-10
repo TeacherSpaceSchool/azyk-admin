@@ -15,7 +15,7 @@ import { getOrganizations } from '../../../src/gql/organization'
 import {checkInt, formatAmount, isNotEmpty} from '../../../src/lib'
 import { getEcspeditors } from '../../../src/gql/employment'
 import { getDistricts } from '../../../src/gql/district'
-import { getOrdersFromDistrict, setInvoicesLogic } from '../../../src/gql/order'
+import { setInvoicesLogic } from '../../../src/gql/order'
 import { getReturnedsFromDistrict, setReturnedLogic } from '../../../src/gql/returned'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';

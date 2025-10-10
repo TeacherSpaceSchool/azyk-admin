@@ -18,10 +18,12 @@ import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
 import Paper from '@material-ui/core/Paper';
 import Cancel from '@material-ui/icons/Cancel';
+import ClientNetworksIcon from '@material-ui/icons/DeviceHub';
 import Input from '@material-ui/core/Input';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Search from '@material-ui/icons/SearchRounded';
 import Sort from '@material-ui/icons/SortRounded';
+import ForwarderIcon from '@material-ui/icons/LocalShipping';
 import BusinessCenterIcon from '@material-ui/icons/BusinessCenter';
 import GroupIcon from '@material-ui/icons/Group';
 import PersonIcon from '@material-ui/icons/Person';
@@ -42,20 +44,23 @@ import SetOrganizations from '../dialog/SetOrganizations'
 import SetAgent from '../dialog/SetAgent'
 import SetCities from '../dialog/SetCities'
 import { getOrganizations } from '../../src/gql/organization'
-import { getAgents } from '../../src/gql/employment'
+import {getAgents, getEmployments} from '../../src/gql/employment'
 import {isNotTestUser, setCityCookie, setViewModeCookie} from '../../src/lib'
 import {pdDDMMYY} from '../../src/lib'
 import {getDistricts} from '../../src/gql/district';
 import SetDistrict from '../dialog/SetDistrict';
 import {viewModes} from '../../src/enum';
+import SetClientNetwork from '../dialog/SetClientNetwork';
+import {getClientNetworks} from '../../src/gql/clientNetwork';
+import SetForwarder from '../dialog/SetForwarder';
 
 const MyAppBar = React.memo((props) => {
     //props
     const initialRender = useRef(true);
     const classes = appbarStyle();
-    const {filters, sorts, pageName, dates, searchShow, unread, defaultOpenSearch, organizations, cityShow, agents, showDistrict, cities, clearBasket} = props
-    const {drawer, search, filter, sort, isMobileApp, date, organization, agent, district, city, viewMode} = props.app;
-    const {showDrawer, setSearch, setFilter, setSort, setDate, setOrganization, setAgent, setDistrict, setCity, setViewMode} = props.appActions;
+    const {filters, sorts, pageName, dates, searchShow, unread, defaultOpenSearch, organizations, clientNetworkShow, cityShow, agents, showForwarder, showDistrict, cities, clearBasket} = props
+    const {drawer, search, filter, sort, isMobileApp, date, organization, agent, district, forwarder, city, clientNetwork, viewMode} = props.app;
+    const {showDrawer, setSearch, setFilter, setSort, setDate, setOrganization, setAgent, setDistrict, setForwarder, setCity, setClientNetwork, setViewMode} = props.appActions;
     const {authenticated, profile} = props.user;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {logout} = props.userActions;
@@ -120,6 +125,14 @@ const MyAppBar = React.memo((props) => {
     let handleCloseAgents = () => {
         setAnchorElAgents(null);
     }
+    const [anchorElForwarders, setAnchorElForwarders] = useState(null);
+    const openForwarders = Boolean(anchorElForwarders);
+    let handleMenuForwarders = (event) => {
+        setAnchorElForwarders(event.currentTarget);
+    }
+    let handleCloseForwarders = () => {
+        setAnchorElForwarders(null);
+    }
     const [anchorElDistricts, setAnchorElDistricts] = useState(null);
     const openDistricts = Boolean(anchorElDistricts);
     let handleMenuDistricts = (event) => {
@@ -135,6 +148,15 @@ const MyAppBar = React.memo((props) => {
     }
     let handleCloseCities = () => {
         setAnchorElCities(null);
+    }
+    //ClientNetwork
+    const [anchorElClientNetworks, setAnchorElClientNetworks] = useState(null);
+    const openClientNetworks = Boolean(anchorElClientNetworks);
+    let handleMenuClientNetworks = (event) => {
+        setAnchorElClientNetworks(event.currentTarget);
+    }
+    let handleCloseClientNetworks = () => {
+        setAnchorElClientNetworks(null);
     }
     const [openSearch, setOpenSearch] = useState(searchShow&&search.length||defaultOpenSearch);
     let handleSearch = (event) => {
@@ -204,9 +226,9 @@ const MyAppBar = React.memo((props) => {
                                     </IconButton>
                                 </Tooltip>
                                 {
-                                    cityShow||dates||searchShow||filters||sorts?
+                                    cityShow||clientNetworkShow||dates||searchShow||filters||sorts?
                                         <IconButton
-                                            style={{background: date||organization||agent||showDistrict||city||filter?'rgba(51, 143, 255, 0.29)': 'transparent'}}
+                                            style={{background: date||organization||agent||showForwarder||showDistrict||city||filter?'rgba(51, 143, 255, 0.29)': 'transparent'}}
                                             aria-owns={openMobileMenu ? 'menu-appbar' : null}
                                             aria-haspopup='true'
                                             onClick={handleMobileMenu}
@@ -445,6 +467,38 @@ const MyAppBar = React.memo((props) => {
                                         ]
                                         :null
                                     }
+                                    {organization&&showForwarder&&['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
+                                        [
+                                            <MenuItem key='forwarderMenu' onClick={handleMenuForwarders} style={{background: forwarder?'rgba(255, 179, 0, 0.15)': '#fff'}}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    <ForwarderIcon/>&nbsp;Экспедиторы
+                                                </div>
+                                            </MenuItem>,
+                                            <Menu
+                                                key='forwarders'
+                                                id='menu-appbar'
+                                                anchorEl={anchorElForwarders}
+                                                anchorOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                transformOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                open={openForwarders}
+                                                onClose={handleCloseForwarders}
+                                            >
+                                                <MenuItem key='onForwarder' style={{background: forwarder?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let forwarders = await getEmployments({organization, search: '', filter: 'экспедитор'});setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);showMiniDialog(true);handleCloseForwarders();handleCloseMobileMenu();}}>
+                                                    По экспедитору
+                                                </MenuItem>
+                                                <MenuItem key='allForwarders' style={{background: !forwarder?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setForwarder(null);handleCloseForwarders();handleCloseMobileMenu();}}>
+                                                    Все
+                                                </MenuItem>
+                                            </Menu>
+                                        ]
+                                        :null
+                                    }
                                     {cityShow&&['admin'].includes(profile.role)?
                                         [
                                             <MenuItem key='cityMenu' onClick={handleMenuCities} style={{background: city?'rgba(255, 179, 0, 0.15)': '#fff'}}>
@@ -471,6 +525,38 @@ const MyAppBar = React.memo((props) => {
                                                     По городу
                                                 </MenuItem>
                                                 <MenuItem key='allCity' style={{background: !city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setCity(null);setCityCookie('');handleCloseCities();handleCloseMobileMenu();}}>
+                                                    Все
+                                                </MenuItem>
+                                            </Menu>
+                                        ]
+                                        :null
+                                    }
+                                    {clientNetworkShow&&profile.role?
+                                        [
+                                            <MenuItem key='networkMenu' onClick={handleMenuClientNetworks} style={{background: clientNetwork?'rgba(255, 179, 0, 0.15)': '#fff'}}>
+                                                <div style={{display: 'flex', color: '#606060'}}>
+                                                    <ClientNetworksIcon/>&nbsp;Сети клиентов
+                                                </div>
+                                            </MenuItem>,
+                                            <Menu
+                                                key='clientNetwork'
+                                                id='menu-appbar'
+                                                anchorEl={anchorElClientNetworks}
+                                                anchorOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                transformOrigin={{
+                                                    vertical: 'top',
+                                                    horizontal: 'right',
+                                                }}
+                                                open={openClientNetworks}
+                                                onClose={handleCloseClientNetworks}
+                                            >
+                                                <MenuItem key='onClientNetwork' style={{background: clientNetwork?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let clientNetworks = await getClientNetworks({search: ''});setMiniDialog('Сети клиентов', <SetClientNetwork clientNetworks={clientNetworks}/>);showMiniDialog(true);handleCloseClientNetworks();handleCloseMobileMenu();}}>
+                                                    По сети клиентов
+                                                </MenuItem>
+                                                <MenuItem key='allClientNetworks' style={{background: !clientNetwork?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setClientNetwork(null);handleCloseClientNetworks();handleCloseMobileMenu();}}>
                                                     Все
                                                 </MenuItem>
                                             </Menu>
@@ -569,7 +655,6 @@ const MyAppBar = React.memo((props) => {
                                 </Tooltip>:null}
                                 <Tooltip title={viewMode===viewModes.card?'Карточки':'Таблица'}>
                                     <IconButton
-                                        aria-owns={openCities ? 'menu-appbar' : null}
                                         aria-haspopup='true'
                                         onClick={() => handleViewMode(viewMode===viewModes.card?viewModes.table:viewModes.card)}
                                         color='inherit'
@@ -609,6 +694,45 @@ const MyAppBar = React.memo((props) => {
                                                 По городу
                                             </MenuItem>
                                             <MenuItem style={{background: !city?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setCity(null);setCityCookie('');handleCloseCities();}}>
+                                                Все
+                                            </MenuItem>
+                                        </Menu>
+                                        &nbsp;
+                                    </>
+                                    :null
+                                }
+                                {clientNetworkShow&&profile.role?
+                                    <>
+                                        <Tooltip title='Сети клиентов'>
+                                            <IconButton
+                                                style={{background: clientNetwork?'rgba(51, 143, 255, 0.29)': 'transparent'}}
+                                                aria-owns={openClientNetworks ? 'menu-appbar' : null}
+                                                aria-haspopup='true'
+                                                onClick={handleMenuClientNetworks}
+                                                color='inherit'
+                                            >
+                                                <ClientNetworksIcon/>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Menu
+                                            key='clientNetworkShow'
+                                            id='menu-appbar'
+                                            anchorEl={anchorElClientNetworks}
+                                            anchorOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            open={openClientNetworks}
+                                            onClose={handleCloseClientNetworks}
+                                        >
+                                            <MenuItem style={{background: clientNetwork?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let clientNetworks = await getClientNetworks({search: ''});setMiniDialog('Сети клиентов', <SetClientNetwork clientNetworks={clientNetworks}/>);showMiniDialog(true);handleCloseClientNetworks();}}>
+                                                По сети клиентов
+                                            </MenuItem>
+                                            <MenuItem style={{background: !clientNetwork?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setClientNetwork(null);handleCloseClientNetworks();}}>
                                                 Все
                                             </MenuItem>
                                         </Menu>
@@ -687,6 +811,45 @@ const MyAppBar = React.memo((props) => {
                                                 По агенту
                                             </MenuItem>
                                             <MenuItem style={{background: !agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setAgent(null);handleCloseAgents();}}>
+                                                Все
+                                            </MenuItem>
+                                        </Menu>
+                                        &nbsp;
+                                    </>
+                                    :null
+                                }
+                                {organization&&showForwarder&&['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
+                                    <>
+                                        <Tooltip title='Экспедиторы'>
+                                            <IconButton
+                                                style={{background: forwarder?'rgba(51, 143, 255, 0.29)': 'transparent'}}
+                                                aria-owns={openForwarders ? 'menu-appbar' : null}
+                                                aria-haspopup='true'
+                                                onClick={handleMenuForwarders}
+                                                color='inherit'
+                                            >
+                                                <ForwarderIcon/>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Menu
+                                            key='Forwarders'
+                                            id='menu-appbar'
+                                            anchorEl={anchorElForwarders}
+                                            anchorOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            open={openForwarders}
+                                            onClose={handleCloseForwarders}
+                                        >
+                                            <MenuItem style={{background: forwarder?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let forwarders = await getEmployments({organization, search: '', filter: 'экспедитор'});setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);showMiniDialog(true);handleCloseForwarders();}}>
+                                                По экспедитору
+                                            </MenuItem>
+                                            <MenuItem style={{background: !forwarder?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setForwarder(null);handleCloseForwarders();}}>
                                                 Все
                                             </MenuItem>
                                         </Menu>

@@ -7,6 +7,7 @@ const Stock = `
     item {_id name}
     warehouse {_id name}
     count
+    unlimited
 `
 
 export const getItemsForStocks = async (variables, client) => {
@@ -37,8 +38,8 @@ export const getStocks = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($search: String!, $client: ID, $organization: ID!) {
-                        stocks(search: $search, client: $client, organization: $organization) {${Stock}}
+                    query ($search: String!, $client: ID, $organization: ID!, $unlimited: Boolean) {
+                        stocks(search: $search, client: $client, organization: $organization, unlimited: $unlimited) {${Stock}}
                     }`,
             })
         return res.data.stocks
@@ -68,8 +69,8 @@ export const addStock = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($item: ID!, $count: Float!, $organization: ID!, $warehouse: ID) {
-                        addStock(item: $item, count: $count, organization: $organization, warehouse: $warehouse) {${Stock}}
+                    mutation ($unlimited: Boolean, $item: ID!, $count: Float!, $organization: ID!, $warehouse: ID) {
+                        addStock(unlimited: $unlimited, item: $item, count: $count, organization: $organization, warehouse: $warehouse) {${Stock}}
                     }`})
         return res.data.addStock
     } catch(err) {
@@ -83,8 +84,8 @@ export const setStock = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($_id: ID!, $count: Float!) {
-                        setStock(_id: $_id, count: $count)
+                    mutation ($_id: ID!, $count: Float, $unlimited: Boolean) {
+                        setStock(_id: $_id, count: $count, unlimited: $unlimited)
                     }`})
         return res.data.setStock
     } catch(err) {

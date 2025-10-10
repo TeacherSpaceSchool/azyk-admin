@@ -11,37 +11,46 @@ import { getOrganization } from '../../src/gql/organization'
 import { useRouter } from 'next/router'
 import Router from 'next/router'
 import {getBrands} from '../../src/gql/items';
-import {formatAmount} from '../../src/lib';
+import {formatAmount, unawaited} from '../../src/lib';
 import {viewModes} from '../../src/enum';
 import Table from '../../components/table/ads';
 
 const Ads = React.memo((props) => {
-    const initialRender = useRef(true);
     const classes = pageListStyle();
+    const router = useRouter()
+    //props
     const {data} = props;
-    let [list, setList] = useState(data.adss);
     const {search, viewMode} = props.app;
     const {profile} = props.user;
+    //ref
+    const initialRender = useRef(true);
     const searchTimeOut = useRef(null);
+    //listArgs
+    const listArgs = {organization: router.query.id, search}
+    //list
+    let [list, setList] = useState(data.adss);
+    const getList = async () => {
+        setList(await getAdss(listArgs))
+        setPagination(100);
+        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+    }
+    //search
     useEffect(() => {
             if(initialRender.current) 
                 initialRender.current = false;
             else {
                 if(searchTimeOut.current)
                     clearTimeout(searchTimeOut.current)
-                searchTimeOut.current = setTimeout(async () => {
-                    setList(await getAdss({search, organization: router.query.id}))
-                    setPagination(100);
-                    (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-                }, 500)
+                searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
             }
     }, [search])
+    //pagination
     const [pagination, setPagination] = useState(100);
     const checkPagination = useCallback(() => {
         if(pagination<list.length)
             setPagination(pagination => pagination+100)
     }, [list, pagination])
-    const router = useRouter()
+    //render
     return (
         <App checkPagination={checkPagination} searchShow pageName={`Акции${data.organization?` ${data.organization.name}`:''}`}>
             <Head>
