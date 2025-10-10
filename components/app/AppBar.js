@@ -44,7 +44,7 @@ import SetOrganizations from '../dialog/SetOrganizations'
 import SetAgent from '../dialog/SetAgent'
 import SetCities from '../dialog/SetCities'
 import { getOrganizations } from '../../src/gql/organization'
-import {getAgents, getEmployments} from '../../src/gql/employment'
+import {getEmployments} from '../../src/gql/employment'
 import {isNotTestUser, setCityCookie, setViewModeCookie} from '../../src/lib'
 import {pdDDMMYY} from '../../src/lib'
 import {getDistricts} from '../../src/gql/district';
@@ -425,7 +425,7 @@ const MyAppBar = React.memo((props) => {
                                                 open={openAgents}
                                                 onClose={handleCloseAgents}
                                             >
-                                                <MenuItem key='onAgents' style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let agents = await getAgents(organization);let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();handleCloseMobileMenu();}}>
+                                                <MenuItem key='onAgents' style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let agents = await getEmployments({organization, search: '', filter: 'агент'});let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();handleCloseMobileMenu();}}>
                                                     По агенту
                                                 </MenuItem>
                                                 <MenuItem key='allAgents' style={{background: !agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setAgent(null);handleCloseAgents();handleCloseMobileMenu();}}>
@@ -807,7 +807,7 @@ const MyAppBar = React.memo((props) => {
                                             open={openAgents}
                                             onClose={handleCloseAgents}
                                         >
-                                            <MenuItem style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let agents = await getAgents(organization);let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();}}>
+                                            <MenuItem style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let agents = await getEmployments({organization, search: '', filter: 'агент'});let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();}}>
                                                 По агенту
                                             </MenuItem>
                                             <MenuItem style={{background: !agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setAgent(null);handleCloseAgents();}}>

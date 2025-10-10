@@ -4,7 +4,6 @@ import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import { getOrganizations } from '../../src/gql/organization'
 import { getDistrict, setDistrict, deleteDistrict, addDistrict } from '../../src/gql/district'
-import { getAgents, getEcspeditors, getManagers } from '../../src/gql/employment'
 import { getClientsWithoutDistrict } from '../../src/gql/client'
 import districtStyle from '../../src/styleMUI/district/district'
 import { useRouter } from 'next/router'
@@ -26,6 +25,7 @@ import dynamic from 'next/dynamic'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import {getWarehouses} from '../../src/gql/warehouse';
+import {getEmployments} from '../../src/gql/employment';
 
 const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
 const GeoRouteAgent = dynamic(() => import('../../components/dialog/GeoRouteAgent'))
@@ -64,10 +64,10 @@ const District = React.memo((props) => {
     let [warehouses, setWarehouses] = useState([]);
     let [warehouse, setWarehouse] = useState(data.district?data.district.warehouse:null);
     let handleWarehouse = (event) => setWarehouse({_id: event.target.value});
-    //ecspeditor
-    let [ecspeditors, setEcspeditors] = useState([]);
-    let [ecspeditor, setEcspeditor] = useState(data.district?data.district.ecspeditor:null);
-    let handleEcspeditor =  (event) => setEcspeditor({_id: event.target.value});
+    //forwarder
+    let [forwarders, setForwarders] = useState([]);
+    let [forwarder, setForwarder] = useState(data.district?data.district.forwarder:null);
+    let handleForwarder =  (event) => setForwarder({_id: event.target.value});
     //organization
     let [organizations, setOrganizations] = useState(data.organizations);
     let [organization, setOrganization] = useState(router.query.id==='new'||!data.district?null:data.district.organization||{name: 'AZYK.STORE', _id: 'super'});
@@ -82,27 +82,27 @@ const District = React.memo((props) => {
                 setAgent(null)
                 setWarehouse(null)
                 setManager(null)
-                setEcspeditor(null)
+                setForwarder(null)
             }
-            let agents = [], managers = [], ecspeditors = [], clientsWithoutDistrict = [], warehouses = []
+            let agents = [], managers = [], forwarders = [], clientsWithoutDistrict = [], warehouses = []
             if(organization) {
                 // eslint-disable-next-line no-undef
-                const [agentsData, managersData, ecspeditorsData, clientsWithoutDistrictData, warehousesData] = await Promise.all([
-                    getAgents(organization._id),
-                    getManagers(organization._id),
-                    getEcspeditors(organization._id),
+                const [agentsData, managersData, forwardersData, clientsWithoutDistrictData, warehousesData] = await Promise.all([
+                    getEmployments({organization: organization._id, search: '', filter: 'агент'}),
+                    getEmployments({organization: organization._id, search: '', filter: 'менеджер'}),
+                    getEmployments({organization: organization._id, search: '', filter: 'экспедитор'}),
                     getClientsWithoutDistrict({
                         ...data.district?{district: data.district._id}:{}, organization: organization._id,
                         city: organization&&organization.cities&&organization.cities[0]?organization.cities[0]:city
                     }),
                     getWarehouses({search: '', organization: organization._id})
                 ])
-                agents = agentsData; managers = managersData; ecspeditors = ecspeditorsData; clientsWithoutDistrict = clientsWithoutDistrictData;
+                agents = agentsData; managers = managersData; forwarders = forwardersData; clientsWithoutDistrict = clientsWithoutDistrictData;
                 warehouses = warehousesData
             }
             setAgents(agents)
             setManagers(managers)
-            setEcspeditors(ecspeditors)
+            setForwarders(forwarders)
             setUnselectedClient(clientsWithoutDistrict)
             setWarehouses(warehouses)
     })()}, [organization])
@@ -225,8 +225,8 @@ const District = React.memo((props) => {
                         {['admin', 'суперорганизация', 'организация'].includes(profile.role)?
                             <FormControl className={isMobileApp?classes.inputM:classes.inputDF}>
                                 <InputLabel>Экспедитор</InputLabel>
-                                <Select value={ecspeditor&&ecspeditor._id} onChange={handleEcspeditor}>
-                                    {ecspeditors.map((element) =>
+                                <Select value={forwarder&&forwarder._id} onChange={handleForwarder}>
+                                    {forwarders.map((element) =>
                                         <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
                                     )}
                                 </Select>
@@ -234,7 +234,7 @@ const District = React.memo((props) => {
                             :
                             <TextField
                                 label='Экспедитор'
-                                value={ecspeditor&&ecspeditor.name}
+                                value={forwarder&&forwarder.name}
                                 className={isMobileApp?classes.inputM:classes.inputDF}
                                 inputProps={{readOnly: true}}
                             />
@@ -322,7 +322,7 @@ const District = React.memo((props) => {
                                                         agent: agent&&agent._id,
                                                         warehouse: warehouse&&warehouse._id,
                                                         manager: manager&&manager._id,
-                                                        ecspeditor: ecspeditor&&ecspeditor._id,
+                                                        forwarder: forwarder&&forwarder._id,
                                                     })
                                                     if(res)
                                                         Router.push(`/district/${res}`)
@@ -346,8 +346,8 @@ const District = React.memo((props) => {
                                                     if(!data.district.warehouse||warehouse!==data.district.warehouse._id)editElement.warehouse = warehouse;
                                                     if(manager) manager = manager._id
                                                     if(!data.district.manager||manager!==data.district.manager._id)editElement.manager = manager;
-                                                    if(ecspeditor) ecspeditor = ecspeditor._id
-                                                    if(!data.district.ecspeditor||ecspeditor!==data.district.ecspeditor._id)editElement.ecspeditor = ecspeditor;
+                                                    if(forwarder) forwarder = forwarder._id
+                                                    if(!data.district.forwarder||forwarder!==data.district.forwarder._id)editElement.forwarder = forwarder;
                                                     if(name!==data.district.name)editElement.name = name;
                                                     await setDistrict(editElement)
                                                 }

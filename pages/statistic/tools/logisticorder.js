@@ -13,7 +13,6 @@ import CardReturned from '../../../components/card/CardReturned'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import { getOrganizations } from '../../../src/gql/organization'
 import {checkInt, formatAmount, isNotEmpty} from '../../../src/lib'
-import { getEcspeditors } from '../../../src/gql/employment'
 import { getDistricts } from '../../../src/gql/district'
 import { setInvoicesLogic } from '../../../src/gql/order'
 import { getReturnedsFromDistrict, setReturnedLogic } from '../../../src/gql/returned'
@@ -28,6 +27,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import * as snackbarActions from '../../../redux/actions/snackbar'
 import dynamic from 'next/dynamic'
+import {getEmployments} from '../../../src/gql/employment';
 
 const Confirmation = dynamic(() => import('../../../components/dialog/Confirmation'))
 
@@ -37,9 +37,9 @@ const LogistiOorder = React.memo((props) => {
     let {isMobileApp, date, filter, city} = props.app;
     const {profile} = props.user;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
-    let [ecspeditors, setEcspeditors] = useState([]);
+    let [forwarders, setForwarders] = useState([]);
     let [type, setType] = useState('Заказы');
-    let [ecspeditor, setEcspeditor] = useState(null);
+    let [forwarder, setForwarder] = useState(null);
     let [districts, setDistricts] = useState([]);
     let [price, setPrice] = useState(0);
     let [track, setTrack] = useState(0);
@@ -75,18 +75,18 @@ const LogistiOorder = React.memo((props) => {
     useEffect(() => {
         (async () => {
             setSelectedOrders([])
-            setEcspeditor(null)
+            setForwarder(null)
             setOrders([])
             setDistrict(null)
             if(organization) {
                 showLoad(true)
                 setDistricts(await getDistricts({search: '', sort: '-name', organization: organization._id}))
-                setEcspeditors(await getEcspeditors(organization._id))
+                setForwarders(await getEmployments({organization: organization._id, search: '', filter: 'экспедитор'}))
                 showLoad(false)
             }
             else {
                 setDistricts([])
-                setEcspeditors([])
+                setForwarders([])
             }
         })()
     }, [organization])
@@ -189,11 +189,11 @@ const LogistiOorder = React.memo((props) => {
                     <div className={classes.row}>
                         <Autocomplete
                             className={classes.inputHalf}
-                            options={ecspeditors}
+                            options={forwarders}
                             getOptionLabel={option => option.name}
-                            value={ecspeditor}
+                            value={forwarder}
                             onChange={(event, newValue) => {
-                                setEcspeditor(newValue)
+                                setForwarder(newValue)
                             }}
                             noOptionsText='Ничего не найдено'
                             renderInput={params => (
@@ -261,16 +261,16 @@ const LogistiOorder = React.memo((props) => {
                 }}
             >
                 <MenuItem onClick={async () => {
-                    if(selectedOrders.length&&(ecspeditor||isNotEmpty(track))) {
+                    if(selectedOrders.length&&(forwarder||isNotEmpty(track))) {
                         const action = async () => {
                             if(selectedOrders.length) {
                                 let element = {invoices: selectedOrders, returneds: selectedOrders}
-                                if(ecspeditor) element.forwarder = ecspeditor._id
+                                if(forwarder) element.forwarder = forwarder._id
                                 if(track) element.track = track
                                 orders = orders.map(order=>{
                                     if(selectedOrders.includes(order._id)) {
                                         order.track = track;
-                                        if(ecspeditor)order.forwarder = ecspeditor
+                                        if(forwarder)order.forwarder = forwarder
                                     }
                                     return(order)
                                 })

@@ -8,7 +8,6 @@ import { getAgentMapGeos } from '../../../src/gql/statistic'
 import Fab from '@material-ui/core/Fab';
 import ListIcon from '@material-ui/icons/FormatListNumbered';
 import ClearIcon from '@material-ui/icons/Clear';
-import { getAgents } from '../../../src/gql/employment'
 import { Map, YMaps, Placemark } from 'react-yandex-maps';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -20,6 +19,7 @@ import AgentMapGeoOrders from '../../../components/dialog/AgentMapGeoOrders'
 import {dayStartDefault, formatAmount, isNotEmpty, pdDatePicker} from '../../../src/lib'
 import pageListStyle from '../../../src/styleMUI/file/fileList'
 import { getGeoDistance } from '../../../src/lib'
+import {getEmployments} from '../../../src/gql/employment';
 
 const AgentMapGeoStatistic = React.memo((props) => {
     const classes = pageListStyle();
@@ -38,7 +38,7 @@ const AgentMapGeoStatistic = React.memo((props) => {
     let [index, setIndex] = useState(null);
     useEffect(() => {
         (async () => {
-            setAgents(organization?await getAgents(organization):[])
+            setAgents(organization?await getEmployments({organization, search: '', filter: 'агент'}):[])
             setAgent(null)
         })()
     }, [organization])

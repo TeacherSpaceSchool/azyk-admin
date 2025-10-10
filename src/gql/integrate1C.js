@@ -5,7 +5,7 @@ const Integrate = `
     _id
     createdAt
     guid
-    ecspeditor {_id name}
+    forwarder {_id name}
     organization {_id name}
     client {_id name city}
     agent {_id name}
@@ -46,7 +46,7 @@ export const getIntegrate1CsSimpleStatistic = async (variables, client) => {
     }
 }
 
-export const getEcspeditorsIntegrate1C = async (variables, client) => {
+export const getForwardersIntegrate1C = async (variables, client) => {
     try{
         client = client? client : new SingletonApolloClient().getClient()
         const res = await client
@@ -54,13 +54,13 @@ export const getEcspeditorsIntegrate1C = async (variables, client) => {
                 variables,
                 query: gql`
                     query ($search: String!, $organization: ID!) {
-                        ecspeditorsIntegrate1C(search: $search, organization: $organization) {
+                        forwardersIntegrate1C(search: $search, organization: $organization) {
                             _id 
                             name
                         }
                     }`,
             })
-        return res.data.ecspeditorsIntegrate1C
+        return res.data.forwardersIntegrate1C
     } catch(err) {
         console.error(err)
     }
@@ -166,8 +166,8 @@ export const addIntegrate1C = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($organization: ID!, $item: ID, $client: ID, $guid: String, $agent: ID, $ecspeditor: ID) {
-                        addIntegrate1C(organization: $organization, item: $item, client: $client, guid: $guid, agent: $agent, ecspeditor: $ecspeditor) {${Integrate}}
+                    mutation ($organization: ID!, $item: ID, $client: ID, $guid: String, $agent: ID, $forwarder: ID) {
+                        addIntegrate1C(organization: $organization, item: $item, client: $client, guid: $guid, agent: $agent, forwarder: $forwarder) {${Integrate}}
                     }`})
         return res.data.addIntegrate1C
     } catch(err) {

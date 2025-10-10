@@ -49,10 +49,10 @@ const CardDistrict = React.memo((props) => {
                                 null
                         }
                         {
-                            element.ecspeditor?
+                            element.forwarder?
                                 <div className={classes.row}>
                                     <div className={classes.nameField}>Экспедитор:&nbsp;</div>
-                                    <div className={classes.value}>{element.ecspeditor.name}</div>
+                                    <div className={classes.value}>{element.forwarder.name}</div>
                                 </div>
                                 :
                                 null

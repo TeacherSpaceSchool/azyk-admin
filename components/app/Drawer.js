@@ -246,20 +246,6 @@ const MyDrawer = React.memo((props) => {
                         :null
                 }
                 {
-                    ['admin', 'организация', 'суперорганизация', 'суперэкспедитор', 'экспедитор', 'агент'].includes(profile.role)?
-                        <>
-                            <Link href={profile.role==='admin'?'/organizations?path=routes&title=Маршруты экспедитора':'/routes/[id]'}
-                                  as={profile.role==='admin'?'/organizations?path=routes&title=Маршруты экспедитора':`/routes/${profile.organization}`}>
-                            <ListItem style={{background: router.asPath.includes('route')&&!router.asPath.includes('agentroute')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {setUncover(false);showDrawer(false)}}>
-                                <ListItemIcon><FormatListNumberedIcon color='inherit'/></ListItemIcon>
-                                <ListItemText primary='Маршруты экспедитора' />
-                            </ListItem>
-                        </Link>
-                        <Divider/>
-                        </>
-                        :null
-                }
-                {
                     ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент', 'ремонтник'].includes(profile.role)?
                         <>
                             <Link href={profile.role==='admin'?'/organizations?path=equipments&title=Оборудование':'/equipments/[id]'}
@@ -281,20 +267,6 @@ const MyDrawer = React.memo((props) => {
                                 <ListItem style={{background: router.asPath.includes('repairequipment')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false)}}>
                                     <ListItemIcon><AllInboxIcon color='inherit'/></ListItemIcon>
                                     <ListItemText primary='Ремонт оборудования' />
-                                </ListItem>
-                            </Link>
-                            <Divider/>
-                        </>
-                        :null
-                }
-                {
-                    ['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role)?
-                        <>
-                            <Link href={profile.role==='admin'?'/organizations?path=autos&title=Транспорт&super=1':'/autos/[id]'}
-                                  as={profile.role==='admin'?'/organizations?path=autos&title=Транспорт&super=1':`/autos/${profile.organization}`}>
-                                <ListItem style={{background: router.asPath.includes('autos')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {setUncover(false);showDrawer(false)}}>
-                                    <ListItemIcon><CommuteIcon color='inherit'/></ListItemIcon>
-                                    <ListItemText primary='Транспорт' />
                                 </ListItem>
                             </Link>
                             <Divider/>

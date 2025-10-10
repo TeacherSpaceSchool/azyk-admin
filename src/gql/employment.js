@@ -62,57 +62,6 @@ export const getEmployment = async (_id, client) => {
     }
 }
 
-export const getManagers = async (organization, client) => {
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        const res = await client
-            .query({
-                variables: {organization},
-                query: gql`
-                    query ($organization: ID) {
-                        managers(organization: $organization) {${Employment}}
-                    }`,
-            })
-        return res.data.managers
-    } catch(err) {
-        console.error(err)
-    }
-}
-
-export const getEcspeditors = async (organization, client) => {
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        const res = await client
-            .query({
-                variables: {organization},
-                query: gql`
-                    query ($organization: ID) {
-                        ecspeditors(organization: $organization) {${Employment}}
-                    }`,
-            })
-        return res.data.ecspeditors
-    } catch(err) {
-        console.error(err)
-    }
-}
-
-export const getAgents = async (organization, client) => {
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        const res = await client
-            .query({
-                variables: {organization},
-                query: gql`
-                    query ($organization: ID) {
-                        agents(organization: $organization) {${Employment}}
-                    }`,
-            })
-        return res.data.agents
-    } catch(err) {
-        console.error(err)
-    }
-}
-
 export const onoffEmployment = async (_id) => {
     try{
         const client = new SingletonApolloClient().getClient()

@@ -12,7 +12,7 @@ const Tables =  React.memo(({element, columns}) =>{
         <div className='tableCell' style={columns[1].style}>
             {element.guid}<br/>
             {element.item&&element.item.name||element.agent&&element.agent.name||element.client&&element.client.name||
-                element.ecspeditor&&element.ecspeditor.name}
+                element.forwarder&&element.forwarder.name}
         </div>
     </div>
 })

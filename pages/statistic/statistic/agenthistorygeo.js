@@ -9,7 +9,7 @@ import Router from 'next/router'
 import initialApp from '../../../src/initialApp'
 import StatisticTable from '../../../components/app/StatisticTable'
 import { getAgentHistoryGeos } from '../../../src/gql/agentHistoryGeo'
-import { getAgents } from '../../../src/gql/employment'
+import { getEmployments } from '../../../src/gql/employment'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
@@ -47,7 +47,7 @@ const AgentHistoryGeo = React.memo((props) => {
         setAgent(null)
         if(organization)
             (async () => {
-                setAgents(await getAgents(organization._id))
+                setAgents(await getEmployments({organization: organization._id, search: '', filter: 'агент'}))
             })()
         else
             setAgents()

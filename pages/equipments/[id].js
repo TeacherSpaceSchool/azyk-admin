@@ -9,7 +9,6 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import Router from 'next/router'
 import initialApp from '../../src/initialApp'
 import { useRouter } from 'next/router'
-import {getAgents} from '../../src/gql/employment';
 import Fab from '@material-ui/core/Fab';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Menu from '@material-ui/core/Menu';
@@ -143,7 +142,7 @@ Equipments.getInitialProps = async function(ctx) {
     const [organization, equipments, agents] = await Promise.all([
         getOrganization(ctx.query.id, getClientGqlSsr(ctx.req)),
         getEquipments({organization: ctx.query.id, search: '', skip: 0}, getClientGqlSsr(ctx.req)),
-        getAgents(ctx.query.id, getClientGqlSsr(ctx.req))
+        getEquipments({organization: ctx.query.id, search: '', filter: 'агент'}, getClientGqlSsr(ctx.req))
     ])
     return {
         data: {

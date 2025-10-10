@@ -16,11 +16,11 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../../redux/actions/app'
-import { getAgents } from '../../../src/gql/employment'
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import {getEmployments} from '../../../src/gql/employment';
 
 const types = [{name:'Все', value: null}, {name:'Холодные полки', value: 'холодные полки'}, {name:'Теплые полки', value: 'теплые полки'}]
 
@@ -64,7 +64,7 @@ const MerchandisingStatistic = React.memo((props) => {
     }, [process.browser])
     useEffect(() => {
         (async () => {
-            setAgents(organization?await getAgents(organization._id?organization._id:'super'):[])
+            setAgents(organization?await getEmployments({organization: organization._id?organization._id:'super', search: '', filter: 'агент'}):[])
             setAgent(null)
         })()
     }, [organization])

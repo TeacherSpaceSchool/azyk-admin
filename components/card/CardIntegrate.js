@@ -10,7 +10,7 @@ import {
     setIntegrate1C,
     deleteIntegrate1C,
     getClientsIntegrate1C,
-    getEcspeditorsIntegrate1C, getItemsIntegrate1C, getAgentsIntegrate1C
+    getForwardersIntegrate1C, getItemsIntegrate1C, getAgentsIntegrate1C
 } from '../../src/gql/integrate1C'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
@@ -36,9 +36,9 @@ const CardIntegrate = React.memo((props) => {
     let handleGuid =  (event) => {
         setGuid(event.target.value)
     };
-    //type
+    //typeF
     const types = ['агент', 'товар', 'клиент', 'экспедитор'];
-    let [type, setType] = useState(element? element.agent? 'агент' : element.item? 'товар' : element.client? 'клиент' : element.ecspeditor? 'экспедитор' : '' : '');
+    let [type, setType] = useState(element? element.agent? 'агент' : element.item? 'товар' : element.client? 'клиент' : element.forwarder? 'экспедитор' : '' : '');
     let handleType =  (event) => {
         setType(event.target.value)
         setOption(null)
@@ -86,7 +86,7 @@ const CardIntegrate = React.memo((props) => {
                     }) : (type === 'клиент' ? async () => await getClientsIntegrate1C({
                         search: inputValue,
                         organization: router.query.id
-                    }) : async () => await getEcspeditorsIntegrate1C({
+                    }) : async () => await getForwardersIntegrate1C({
                         search: inputValue,
                         organization: router.query.id
                     })))
@@ -146,7 +146,7 @@ const CardIntegrate = React.memo((props) => {
                                 label={type}
                                 value={
                                     element.item&&element.item.name||element.agent&&element.agent.name||element.client&&element.client.name||
-                                    element.ecspeditor&&element.ecspeditor.name
+                                    element.forwarder&&element.forwarder.name
                                 }
                                 className={classes.input}
                                 inputProps={{readOnly: true}}
@@ -241,7 +241,7 @@ const CardIntegrate = React.memo((props) => {
                             option&&guid?<Button onClick={async () => {
                                 const action = async () => {
                                     let element = {
-                                        guid, organization, [type==='агент'?'agent':type==='товар'?'item':type==='клиент'?'client':'ecspeditor']: option._id
+                                        guid, organization, [type==='агент'?'agent':type==='товар'?'item':type==='клиент'?'client':'forwarder']: option._id
                                     }
                                     let res = await addIntegrate1C(element)
                                     if(res) {

@@ -244,13 +244,13 @@ const Catalog = React.memo((props) => {
                                         null
                                 }
                                 {
-                                    data.district.ecspeditor&&data.district.ecspeditor.name&&data.district.ecspeditor.phone&&data.district.ecspeditor.phone[0]?
+                                    data.district.forwarder&&data.district.forwarder.name&&data.district.forwarder.phone&&data.district.forwarder.phone[0]?
                                         <div className={classes.row}>
                                             <div className={classes.nameField}>
                                                 Экспедитор:&nbsp;
                                             </div>
-                                            <a href={`tel:${data.district.ecspeditor.phone[0]}`} className={classes.valueField}>
-                                                {data.district.ecspeditor.name}
+                                            <a href={`tel:${data.district.forwarder.phone[0]}`} className={classes.valueField}>
+                                                {data.district.forwarder.name}
                                             </a>
                                         </div>
                                         :

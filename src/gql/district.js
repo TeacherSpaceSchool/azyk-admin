@@ -7,7 +7,7 @@ const District = `
     name
     organization {_id name cities}
     client {_id image createdAt lastActive name email address city category phone user {_id role status login}}
-    ecspeditor {_id name phone}
+    forwarder {_id name phone}
     agent {_id name phone}
     manager {_id name phone}
     warehouse {_id name}
@@ -85,8 +85,8 @@ export const addDistrict = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($organization: ID, $client: [ID]!, $name: String!, $agent: ID, $ecspeditor: ID, $manager: ID, $warehouse: ID) {
-                        addDistrict(organization: $organization, client: $client, name: $name, agent: $agent, ecspeditor: $ecspeditor, manager: $manager, warehouse: $warehouse)
+                    mutation ($organization: ID, $client: [ID]!, $name: String!, $agent: ID, $forwarder: ID, $manager: ID, $warehouse: ID) {
+                        addDistrict(organization: $organization, client: $client, name: $name, agent: $agent, forwarder: $forwarder, manager: $manager, warehouse: $warehouse)
                     }`})
         return res.data.addDistrict
     } catch(err) {
@@ -100,8 +100,8 @@ export const setDistrict = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($_id: ID!, $client: [ID], $name: String, $agent: ID, $ecspeditor: ID, $manager: ID, $warehouse: ID) {
-                        setDistrict(_id: $_id, client: $client, name: $name, agent: $agent, ecspeditor: $ecspeditor, manager: $manager, warehouse: $warehouse) 
+                    mutation ($_id: ID!, $client: [ID], $name: String, $agent: ID, $forwarder: ID, $manager: ID, $warehouse: ID) {
+                        setDistrict(_id: $_id, client: $client, name: $name, agent: $agent, forwarder: $forwarder, manager: $manager, warehouse: $warehouse) 
                     }`})
         return res.data.setDistrict
     } catch(err) {
