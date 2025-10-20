@@ -1,5 +1,5 @@
 import React from 'react';
-import {checkFloat} from '../../../src/lib';
+import {checkFloat, formatAmount} from '../../../src/lib';
 import {connect} from 'react-redux';
 import SetPackage from '../../dialog/SetPackage';
 import {bindActionCreators} from 'redux';
@@ -9,17 +9,9 @@ const Tables =  React.memo(({middleList, double, app, mini_dialogActions, list, 
     const {isMobileApp} = app;
     const {setMiniDialog, showMiniDialog} = mini_dialogActions;
     const hasStock = Object.values(stockClient).length
-    let titleWidth = hasStock?310:330
-    const fontSize = double?13:14
-    let widthNbmr = double&&contentRef.current?(contentRef.current.offsetWidth-titleWidth*2-32-(10*(hasStock?12:10)))/(hasStock?10:8):60
-    if(widthNbmr>60) {
-        widthNbmr = 60
-        titleWidth = (contentRef.current.offsetWidth-32-((widthNbmr+10)*(hasStock?10:8)))/2
-        if(titleWidth>350) {
-            titleWidth = 350
-            widthNbmr = 80
-        }
-    }
+    const fontSize = 13
+    let titleWidth = 300
+    let widthNbmr = 55
     const columns = [
         {title: 'Название', style: {width: titleWidth}},
         hasStock?{title: 'Остаток', style: {width: widthNbmr}}:null,

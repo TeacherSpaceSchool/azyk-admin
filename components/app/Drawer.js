@@ -260,20 +260,6 @@ const MyDrawer = React.memo((props) => {
                         :null
                 }
                 {
-                    ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент', 'ремонтник'].includes(profile.role)?
-                        <>
-                            <Link href={profile.role==='admin'?'/organizations?path=repairequipments&title=Ремонт оборудования':'/repairequipments/[id]'}
-                                  as={profile.role==='admin'?'/organizations?path=repairequipments&title=Ремонт оборудования':`/repairequipments/${profile.organization}`}>
-                                <ListItem style={{background: router.asPath.includes('repairequipment')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false)}}>
-                                    <ListItemIcon><AllInboxIcon color='inherit'/></ListItemIcon>
-                                    <ListItemText primary='Ремонт оборудования' />
-                                </ListItem>
-                            </Link>
-                            <Divider/>
-                        </>
-                        :null
-                }
-                {
                     isNotTestUser(profile)&&['admin', 'client', 'суперорганизация', 'организация'].includes(profile.role)?
                         <>
                         <Link href='/reviews'>

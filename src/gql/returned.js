@@ -31,43 +31,11 @@ export const getReturneds = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($search: String!, $sort: String!, $date: String!, $skip: Int, $city: String) {
-                        returneds(search: $search, sort: $sort, date: $date, skip: $skip, city: $city) {${Returned}}
+                    query ($search: String!, $sort: String!, $date: String!, $skip: Int, $organization: ID, $city: String, $track: Int, $forwarder: ID, $dateDelivery: Date, $agent: ID, $district: ID) {
+                        returneds(search: $search, sort: $sort, date: $date, skip: $skip, organization: $organization, city: $city, track: $track, forwarder: $forwarder, dateDelivery: $dateDelivery, agent: $agent, district: $district) {${Returned}}
                     }`,
             })
         return res.data.returneds
-    } catch(err) {
-        console.error(err)
-    }
-}
-
-export const getReturnedsFromDistrict = async (variables, client) => {
-    try{
-        client = client? client : new SingletonApolloClient().getClient()
-        const res = await client
-            .query({
-                variables,
-                query: gql`
-                    query ($organization: ID!, $district: ID!, $date: String!) {
-                        returnedsFromDistrict(organization: $organization, date: $date, district: $district) {${Returned}}
-                    }`,
-            })
-        return res.data.returnedsFromDistrict
-    } catch(err) {
-        console.error(err)
-    }
-}
-
-export const setReturnedLogic = async (variables) => {
-    try{
-        const client = new SingletonApolloClient().getClient()
-        const res = await client.mutate({
-            variables,
-            mutation : gql`
-                    mutation ($track: Int, $forwarder: ID, $returneds: [ID]!) {
-                        setReturnedLogic(track: $track, forwarder: $forwarder, returneds: $returneds)
-                    }`})
-        return res.data.setReturnedLogic
     } catch(err) {
         console.error(err)
     }
@@ -80,8 +48,8 @@ export const getReturnedsSimpleStatistic = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($search: String!, $date: String!, $city: String) {
-                        returnedsSimpleStatistic(search: $search, date: $date, city: $city) 
+                    query ($search: String!, $date: String!, $organization: ID, $city: String, $forwarder: ID, $track: Int, $dateDelivery: Date, $agent: ID, $district: ID) {
+                        returnedsSimpleStatistic(search: $search, date: $date, organization: $organization, city: $city, forwarder: $forwarder, track: $track, dateDelivery: $dateDelivery, agent: $agent, district: $district) 
                     }`,
             })
         return res.data.returnedsSimpleStatistic

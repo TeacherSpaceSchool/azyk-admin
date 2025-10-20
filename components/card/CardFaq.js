@@ -115,9 +115,7 @@ const CardFaq = React.memo((props) => {
                                           setVideo('')
                                           setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                           showMiniDialog(true)
-                                      } else {
-                                          showSnackBar('Заполните все поля')
-                                      }
+                                      } else showSnackBar('Заполните все поля')
                                   }} size='small' color='primary'>
                                       Добавить
                                   </Button>

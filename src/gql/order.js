@@ -13,7 +13,7 @@ const Order = `
     status
 `
 
-const Invoice = `
+export const Invoice = `
     _id
     createdAt
     updatedAt
@@ -52,8 +52,8 @@ export const getOrders = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($forwarder: ID, $dateDelivery: Date, $search: String!, $sort: String!, $filter: String!, $date: String!, $skip: Int, $organization: ID, $city: String, $agent: ID, $district: ID) {
-                        invoices(forwarder: $forwarder, dateDelivery: $dateDelivery, search: $search, sort: $sort, filter: $filter, date: $date, skip: $skip, organization: $organization, city: $city, agent: $agent, district: $district) {${Invoice}}
+                    query ($search: String!, $sort: String!, $filter: String!, $date: String!, $skip: Int, $organization: ID, $city: String, $track: Int, $forwarder: ID, $dateDelivery: Date, $agent: ID, $district: ID) {
+                        invoices(search: $search, sort: $sort, filter: $filter, date: $date, skip: $skip, organization: $organization, city: $city, track: $track, forwarder: $forwarder, dateDelivery: $dateDelivery, agent: $agent, district: $district) {${Invoice}}
                     }`,
             })
         return res.data.invoices
@@ -69,8 +69,8 @@ export const getInvoicesSimpleStatistic = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($forwarder: ID, $dateDelivery: Date, $search: String!, $filter: String!, $date: String!, $organization: ID, $city: String, $agent: ID, $district: ID) {
-                        invoicesSimpleStatistic(forwarder: $forwarder, dateDelivery: $dateDelivery, search: $search, filter: $filter, date: $date, organization: $organization, city: $city, agent: $agent, district: $district) 
+                    query ($search: String!, $filter: String!, $date: String, $organization: ID, $city: String, $forwarder: ID, $track: Int, $dateDelivery: Date, $agent: ID, $district: ID) {
+                        invoicesSimpleStatistic(search: $search, filter: $filter, date: $date, organization: $organization, city: $city, forwarder: $forwarder, track: $track, dateDelivery: $dateDelivery, agent: $agent, district: $district) 
                     }`,
             })
         return res.data.invoicesSimpleStatistic
@@ -96,23 +96,6 @@ export const getOrderHistorys = async (invoice, client) => {
                     }`,
             })
         return res.data.orderHistorys
-    } catch(err) {
-        console.error(err)
-    }
-}
-
-export const getOrdersForRouting = async (variables) => {
-    try{
-        const client = new SingletonApolloClient().getClient();
-        const res = await client
-            .query({
-                variables,
-                query: gql`
-                    query($produsers: [ID]!, $clients: [ID]!, $dateDelivery: Date, $dateStart: Date, $dateEnd: Date) {
-                        invoicesForRouting(produsers: $produsers, clients: $clients, dateDelivery: $dateDelivery, dateStart: $dateStart, dateEnd: $dateEnd) {${Invoice}}
-                    }`,
-            })
-        return res.data.invoicesForRouting
     } catch(err) {
         console.error(err)
     }
@@ -185,8 +168,8 @@ export const setInvoicesLogic = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($track: Int, $forwarder: ID, $invoices: [ID]!) {
-                        setInvoicesLogic(track: $track, forwarder: $forwarder, invoices: $invoices)
+                    mutation ($dateDelivery: Date, $track: Int, $forwarder: ID, $invoices: [ID]!) {
+                        setInvoicesLogic(dateDelivery: $dateDelivery, track: $track, forwarder: $forwarder, invoices: $invoices)
                     }`})
         return res.data.setInvoicesLogic
     } catch(err) {

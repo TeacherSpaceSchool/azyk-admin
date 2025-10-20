@@ -311,7 +311,7 @@ const Catalog = React.memo((props) => {
         showMiniDialog(true)
     }
     //double
-    const double = contentRef.current&&contentRef.current.offsetWidth>=1100
+    const double = contentRef.current&&contentRef.current.offsetWidth>=1150
     //middleList
     const middleList = list?Math.ceil(list.length/2):0
     //рендер

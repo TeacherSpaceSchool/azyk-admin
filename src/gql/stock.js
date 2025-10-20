@@ -8,6 +8,7 @@ const Stock = `
     warehouse {_id name}
     count
     unlimited
+    logisticName
 `
 
 export const getItemsForStocks = async (variables, client) => {
@@ -69,8 +70,8 @@ export const addStock = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($unlimited: Boolean, $item: ID!, $count: Float!, $organization: ID!, $warehouse: ID) {
-                        addStock(unlimited: $unlimited, item: $item, count: $count, organization: $organization, warehouse: $warehouse) {${Stock}}
+                    mutation ($logisticName: String, $unlimited: Boolean, $item: ID!, $count: Float!, $organization: ID!, $warehouse: ID) {
+                        addStock(logisticName: $logisticName, unlimited: $unlimited, item: $item, count: $count, organization: $organization, warehouse: $warehouse) {${Stock}}
                     }`})
         return res.data.addStock
     } catch(err) {
@@ -84,8 +85,8 @@ export const setStock = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($_id: ID!, $count: Float, $unlimited: Boolean) {
-                        setStock(_id: $_id, count: $count, unlimited: $unlimited)
+                    mutation ($_id: ID!, $logisticName: String, $count: Float, $unlimited: Boolean) {
+                        setStock(_id: $_id, logisticName: $logisticName, count: $count, unlimited: $unlimited)
                     }`})
         return res.data.setStock
     } catch(err) {

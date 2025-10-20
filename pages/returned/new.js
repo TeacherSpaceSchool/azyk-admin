@@ -20,9 +20,12 @@ import initialApp from '../../src/initialApp'
 import { getBrandOrganizations } from '../../src/gql/items'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ReturnedConfirmed from '../../components/dialog/ReturnedConfirmed'
+import Table from '../../components/table/catalogReturned';
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
+    //ref
+    const contentRef = useRef();
     //props
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
@@ -152,6 +155,10 @@ const Catalog = React.memo((props) => {
         if(pagination<list.length)
             setPagination(pagination => pagination+100)
     }, [pagination, list])
+    //double
+    const double = contentRef.current&&contentRef.current.offsetWidth>=1020
+    //middleList
+    const middleList = list?Math.ceil(list.length/2):0
    //рендер
     return (
         <App checkPagination={checkPagination} searchShow pageName='Каталог возврата'>
@@ -160,7 +167,7 @@ const Catalog = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
-                <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
+                <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}} ref={contentRef}>
                     <Autocomplete
                         onClose={() =>setOpen(false)}
                         open={open}
@@ -208,7 +215,8 @@ const Catalog = React.memo((props) => {
 
                     }
                     {
-                        list.map((row, idx) => {
+                        isMobileApp?
+                            list.map((row, idx) => {
                                 let price
                                 if(items[row._id]&&items[row._id].allPrice)
                                     price = items[row._id].allPrice
@@ -249,8 +257,12 @@ const Catalog = React.memo((props) => {
                                             <br/>
                                         </div>
                                     )
-                            }
-                        )
+                            })
+                            :
+                            <div style={{display: 'flex', flexDirection: 'row'}}>
+                                <Table contentRef={contentRef} list={double?list.slice(0, middleList):list} items={items} setBasketChange={setBasketChange}/>
+                                {double?<Table  middleList={middleList} contentRef={contentRef} list={list.slice(middleList)} items={items} setBasketChange={setBasketChange}/>:null}
+                            </div>
                     }
                 </CardContent>
             </Card>

@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import cardAutoStyle from '../../src/styleMUI/auto/cardAuto'
+import cardAutoStyle from '../../src/styleMUI/subbrand/cardSubbrand'
 import { connect } from 'react-redux'
 import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
@@ -13,7 +13,6 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import * as snackbarActions from '../../redux/actions/snackbar'
 import * as appActions from '../../redux/actions/app'
-import {useRouter} from 'next/router';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {getClients} from '../../src/gql/client';
 import FormControl from '@material-ui/core/FormControl';

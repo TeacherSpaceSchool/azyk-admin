@@ -26,9 +26,11 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import {getWarehouses} from '../../src/gql/warehouse';
 import {getEmployments} from '../../src/gql/employment';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
 const GeoRouteAgent = dynamic(() => import('../../components/dialog/GeoRouteAgent'))
+const defaultWarehouse = {name: 'Основной'}
 
 const District = React.memo((props) => {
     const classes = districtStyle();
@@ -62,8 +64,11 @@ const District = React.memo((props) => {
     let handleAgent = (event) => setAgent({_id: event.target.value});
     //warehouse
     let [warehouses, setWarehouses] = useState([]);
-    let [warehouse, setWarehouse] = useState(data.district?data.district.warehouse:null);
-    let handleWarehouse = (event) => setWarehouse({_id: event.target.value});
+    let [warehouse, setWarehouse] = useState(data.district&&data.district.warehouse?data.district.warehouse:defaultWarehouse);
+    let handleWarehouse =  (warehouse) => {
+        if(!warehouse) warehouse = defaultWarehouse
+        setWarehouse(warehouse)
+    }
     //forwarder
     let [forwarders, setForwarders] = useState([]);
     let [forwarder, setForwarder] = useState(data.district?data.district.forwarder:null);
@@ -104,7 +109,8 @@ const District = React.memo((props) => {
             setManagers(managers)
             setForwarders(forwarders)
             setUnselectedClient(clientsWithoutDistrict)
-            setWarehouses(warehouses)
+        if(warehouses)
+            setWarehouses([defaultWarehouse, ...warehouses])
     })()}, [organization])
     //клиенты района
     let [client, setClient] = useState(data.district?data.district.client:[]);
@@ -240,18 +246,19 @@ const District = React.memo((props) => {
                             />
                         }
                         {['admin', 'суперорганизация', 'организация'].includes(profile.role)?
-                            <FormControl className={isMobileApp?classes.inputM:classes.inputDF}>
-                                <InputLabel>Склад</InputLabel>
-                                <Select value={warehouse&&warehouse._id} onChange={handleWarehouse}>
-                                    {warehouses.map((element) =>
-                                        <MenuItem key={element._id} value={element._id}>{element.name}</MenuItem>
-                                    )}
-                                </Select>
-                            </FormControl>
+                            <Autocomplete
+                                className={classes.input}
+                                options={warehouses}
+                                getOptionLabel={option => option.name}
+                                value={warehouse}
+                                onChange={(event, newValue) => handleWarehouse(newValue)}
+                                noOptionsText='Ничего не найдено'
+                                renderInput={params => <TextField {...params} label='Выберите склад' fullWidth />}
+                            />
                             :
                             <TextField
                                 label='Склад'
-                                value={warehouse?warehouse.name:'Основной'}
+                                value={warehouse?warehouse.name:defaultWarehouse.name}
                                 className={isMobileApp?classes.inputM:classes.inputDF}
                                 inputProps={{readOnly: true}}
                             />
@@ -320,7 +327,7 @@ const District = React.memo((props) => {
                                                         client,
                                                         name,
                                                         agent: agent&&agent._id,
-                                                        warehouse: warehouse&&warehouse._id,
+                                                        warehouse: warehouse._id,
                                                         manager: manager&&manager._id,
                                                         forwarder: forwarder&&forwarder._id,
                                                     })
@@ -342,8 +349,9 @@ const District = React.memo((props) => {
                                                     let editElement = {_id: data.district._id, client: client.map(element=>element._id)}
                                                     if(agent) agent = agent._id
                                                     if(!data.district.agent||agent!==data.district.agent._id)editElement.agent = agent;
-                                                    if(warehouse) warehouse = warehouse._id
-                                                    if(!data.district.warehouse||warehouse!==data.district.warehouse._id)editElement.warehouse = warehouse;
+                                                    if((warehouse&&warehouse._id)!==(data.district.warehouse&&data.district.warehouse._id)){
+                                                        editElement.warehouse = (warehouse&&warehouse._id)||null;
+                                                    }
                                                     if(manager) manager = manager._id
                                                     if(!data.district.manager||manager!==data.district.manager._id)editElement.manager = manager;
                                                     if(forwarder) forwarder = forwarder._id

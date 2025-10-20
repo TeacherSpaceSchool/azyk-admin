@@ -20,7 +20,7 @@ const Tables =  React.memo(({element, columns}) =>{
             <div className='tableBorder'/>
             <div className='tableCell' style={columns[3].style}>
                 {element.manager&&element.manager.name}<br/>
-                {element.ecspeditor&&element.ecspeditor.name}
+                {element.forwarder&&element.forwarder.name}
             </div>
         </div>
     </Link>

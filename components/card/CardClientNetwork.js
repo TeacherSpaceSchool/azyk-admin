@@ -2,7 +2,7 @@ import React, {useState}  from 'react';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import cardClientNetworkStyle from '../../src/styleMUI/auto/cardAuto'
+import cardClientNetworkStyle from '../../src/styleMUI/subbrand/cardSubbrand'
 import { connect } from 'react-redux'
 import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'

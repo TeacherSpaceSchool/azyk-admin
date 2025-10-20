@@ -35,6 +35,10 @@ const CardStock = React.memo((props) => {
         setItems(await getItemsForStocks({organization: router.query.id, warehouse: warehouse && warehouse._id}))
     })()}, [warehouse])
     let handleItem =  (item) => setItem(item)
+    let [logisticName, setLogisticName] = useState(element?element.logisticName:'');
+    let handleLogisticName =  (event) => {
+        setLogisticName(event.target.value)
+    };
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     let [unlimited, setUnlimited] = useState(element?element.unlimited:false);
     return (
@@ -81,6 +85,12 @@ const CardStock = React.memo((props) => {
                                 />
 
                         }
+                        <TextField
+                            label='Склад логистики'
+                            value={logisticName}
+                            className={classes.input}
+                            onChange={handleLogisticName}
+                        />
                         <div className={classes.row}>
                             {
                                 !unlimited?<TextField
@@ -114,7 +124,7 @@ const CardStock = React.memo((props) => {
                             <>
                                 <Button onClick={async () => {
                                     const action = async () => {
-                                        await setStock({_id: element._id, count: checkFloat(count), ...unlimited!==element.unlimited?{unlimited}:{}})
+                                        await setStock({_id: element._id, logisticName, count: checkFloat(count), ...unlimited!==element.unlimited?{unlimited}:{}})
                                     }
                                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                     showMiniDialog(true)
@@ -143,6 +153,7 @@ const CardStock = React.memo((props) => {
                                             count: checkFloat(count),
                                             organization,
                                             unlimited,
+                                            logisticName,
                                             item: item._id,
                                             warehouse: warehouse?warehouse._id:warehouse
                                         }
