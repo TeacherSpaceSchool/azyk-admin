@@ -93,9 +93,9 @@ const District = React.memo((props) => {
             if(organization) {
                 // eslint-disable-next-line no-undef
                 const [agentsData, managersData, forwardersData, clientsWithoutDistrictData, warehousesData] = await Promise.all([
-                    getEmployments({organization: organization._id, search: '', filter: 'агент'}),
-                    getEmployments({organization: organization._id, search: '', filter: 'менеджер'}),
-                    getEmployments({organization: organization._id, search: '', filter: 'экспедитор'}),
+                    getEmployments({organization: organization._id, search: '', filter: 'агент', sort: 'name'}),
+                    getEmployments({organization: organization._id, search: '', filter: 'менеджер', sort: 'name'}),
+                    getEmployments({organization: organization._id, search: '', filter: 'экспедитор', sort: 'name'}),
                     getClientsWithoutDistrict({
                         ...data.district?{district: data.district._id}:{}, organization: organization._id,
                         city: organization&&organization.cities&&organization.cities[0]?organization.cities[0]:city

@@ -14,7 +14,7 @@ export default async (ctx) => {
     }
     //на сервере
     if(ctx.req) {
-        //опредление устройства
+        //определение устройства
         let ua = uaParserJs(ctx.req.headers['user-agent'])
         ctx.store.getState().app.isMobileApp = ['mobile', 'tablet'].includes(ua.device.type)||checkMobile(ua.ua)||ctx.req.headers['sec-ch-ua-mobile']==='?1'
         ctx.store.getState().app.device = ua.device

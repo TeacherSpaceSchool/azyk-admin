@@ -5,11 +5,10 @@ import SetPackage from '../../dialog/SetPackage';
 import {bindActionCreators} from 'redux';
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog';
 
-const Tables =  React.memo(({middleList, double, app, mini_dialogActions, list, stockClient, basket, setBasketChange, setPackage, contentRef}) =>{
+const Tables =  React.memo(({middleList, app, mini_dialogActions, list, stockClient, basket, setBasketChange, setPackage}) =>{
     const {isMobileApp} = app;
     const {setMiniDialog, showMiniDialog} = mini_dialogActions;
     const hasStock = Object.values(stockClient).length
-    const fontSize = 13
     let titleWidth = 300
     let widthNbmr = 55
     const columns = [
@@ -46,7 +45,7 @@ const Tables =  React.memo(({middleList, double, app, mini_dialogActions, list, 
                     <div className='tableBorder'/>
                 </>:null}
                 <div className='tableCell' style={columns[2].style} onClick={() => document.getElementById(`catalogCount${idx}`).focus()}>
-                    <input style={{width: widthNbmr, outline: 'none', border: 'none', fontWeight: 500, fontFamily: 'Roboto, serif', fontSize}}
+                    <input style={{width: widthNbmr, outline: 'none', border: 'none', fontWeight: 500, fontFamily: 'Roboto, serif'}}
                            readOnly={/*!row.apiece*/false} type={isMobileApp?'number':'text'} value={basket[row._id]&&basket[row._id].count?basket[row._id].count:''}
                            onChange={(event) => setBasketChange(idx, event.target.value)} id={`catalogCount${idx}`}/>
                 </div>

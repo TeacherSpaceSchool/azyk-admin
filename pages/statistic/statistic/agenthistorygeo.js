@@ -47,7 +47,7 @@ const AgentHistoryGeo = React.memo((props) => {
         setAgent(null)
         if(organization)
             (async () => {
-                setAgents(await getEmployments({organization: organization._id, search: '', filter: 'агент'}))
+                setAgents(await getEmployments({organization: organization._id, search: '', filter: 'агент', sort: 'name'}))
             })()
         else
             setAgents()

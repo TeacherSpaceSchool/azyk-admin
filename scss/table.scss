@@ -1,7 +1,6 @@
 @import 'lib';
 .table {
   width: fit-content;
-  font-size: 13px;
 }
 .tableHead {
   align-items: stretch;
@@ -41,6 +40,10 @@
   font-weight: 500;
   font-family: Roboto, serif;
   width: 100%;
+  font-size: 13px;
+  @media screen and (max-width: $break-small) {
+    font-size: 14px;
+  }
 };
 .tableAppBody {
   @media screen and (max-width: $break-small) {

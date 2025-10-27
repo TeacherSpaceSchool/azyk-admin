@@ -174,6 +174,12 @@ export const pdDDMMHHMM = (date) =>
     date = `${date.getDate()<10?'0':''}${date.getDate()}.${date.getMonth()<9?'0':''}${date.getMonth()+1} ${date.getHours()<10?'0':''}${date.getHours()}:${date.getMinutes()<10?'0':''}${date.getMinutes()}`
     return date
 }
+export const pdHHMM = (date) =>
+{
+    date = new Date(date)
+    date = `${date.getHours()<10?'0':''}${date.getHours()}:${date.getMinutes()<10?'0':''}${date.getMinutes()}`
+    return date
+}
 export const pdDDMM = (date) =>
 {
     date = new Date(date)
@@ -281,5 +287,7 @@ function getBasePath(path) {
 
 // Функция сравнения объектов
 export const isSameUrl = (obj1, obj2) => {
-    return getBasePath(obj1) === getBasePath(obj2);
+    return getBasePath(obj1) === getBasePath(obj2)||obj1.includes('/logistic/')&&obj2.includes('/logistic/');
 }
+
+export const isObject = v => v !== null && typeof v === 'object' && !Array.isArray(v);

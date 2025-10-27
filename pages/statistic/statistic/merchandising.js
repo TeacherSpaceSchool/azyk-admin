@@ -64,7 +64,7 @@ const MerchandisingStatistic = React.memo((props) => {
     }, [process.browser])
     useEffect(() => {
         (async () => {
-            setAgents(organization?await getEmployments({organization: organization._id?organization._id:'super', search: '', filter: 'агент'}):[])
+            setAgents(organization?await getEmployments({organization: organization._id?organization._id:'super', search: '', filter: 'агент', sort: 'name'}):[])
             setAgent(null)
         })()
     }, [organization])

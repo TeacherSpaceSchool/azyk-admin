@@ -4,7 +4,7 @@ import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../../layouts/App';
 import { connect } from 'react-redux'
 import pageListStyle from '../../../src/styleMUI/statistic/statistic'
-import Router from 'next/router'
+import Router, {useRouter} from 'next/router'
 import initialApp from '../../../src/initialApp'
 import {checkFloat, dayStartDefault, formatAmount, pdDatePicker, unawaited} from '../../../src/lib'
 import {getOrders} from '../../../src/gql/order'
@@ -18,8 +18,10 @@ import * as snackbarActions from '../../../redux/actions/snackbar'
 import Table from '../../../components/table/changelogistic';
 import {getEmployment} from '../../../src/gql/employment';
 import ChangeLogistic from '../../../components/dialog/ChangeLogistic';
+import {getClientGqlSsr} from '../../../src/getClientGQL';
+import QuickTransition from '../QuickTransition';
 
-const sort = '-createdAt'
+const sort = 'createdAt'
 const filters = [
     {name: 'Все', value: null},
     {name: 'Рейс 1', value: 1},
@@ -29,22 +31,18 @@ const filters = [
     {name: 'Рейс 5', value: 5},
 ]
 
-const Changelogistic = React.memo((props) => {
+const Id = React.memo((props) => {
     const classes = pageListStyle();
+    const router = useRouter()
     //ref
     const initialRender = useRef(true);
     const searchTimeOut = useRef(null);
     const contentRef = useRef();
     //props
-    const {search, filter, date, organization, city, agent, district, forwarder} = props.app;
-    const {setOrganization} = props.appActions;
+    const {search, filter, date, agent, district, forwarder} = props.app;
+    const {showLoad} = props.appActions;
     const {showMiniDialog, setMiniDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
-    //organization
-    useEffect(() => {
-        if(!initialRender.current)
-            setOrganization(null)
-    }, [city])
     //forwarderData
     let [forwarderData, setForwarderData] = useState(null);
     useEffect(() => {(async () => {
@@ -52,30 +50,25 @@ const Changelogistic = React.memo((props) => {
         else setForwarderData(null)
     })()}, [forwarder])
     //deps
-    const deps = [filter, date, organization, city, agent, district, forwarder]
+    const deps = [filter, date, agent, district, forwarder]
     //listArgs
-    const listArgs = {search, track: filter, filter: '', dateDelivery: date, date: '', organization, city, agent, district, forwarder}
+    const listArgs = {search, track: filter, filter: '', dateDelivery: date, date: '', organization: router.query.id, agent, district, forwarder}
     //selectedOrders
     let [selectedOrders, setSelectedOrders] = useState([]);
     //list
     let [list, setList] = useState([]);
     const getList = async () => {
-        if(date&&organization&&forwarder) {
+        if(date) {
+            showLoad(true)
             const orders = await getOrders({...listArgs, sort})
-            const sortedOrders = {}
-            for(const order of orders) {
-                if(order.taken) {
-                    if (!sortedOrders[order.client._id]) sortedOrders[order.client._id] = []
-                    sortedOrders[order.client._id].push(order)
-                }
-            }
-            setList(Object.values(sortedOrders).flat());
+            showLoad(false)
+            setList(orders);
             setPagination(100);
             (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         }
         else {
             setList([])
-            showSnackBar(`Укажите:${!date?' дату доставки;':''}${!organization?' организацию;':''}${!forwarder?' экспедитора;':''}`)
+            showSnackBar(`Укажите:${!date?' дату доставки;':''}`)
         }
     }
     //filter
@@ -122,7 +115,7 @@ const Changelogistic = React.memo((props) => {
     let open = event => setAnchorEl(event.currentTarget);
     let close = () => setAnchorEl(null);
     //double
-    const double = contentRef.current&&contentRef.current.offsetWidth>=1100
+    const double = contentRef.current&&contentRef.current.offsetWidth>=1180
     //middleList
     const middleList = list?Math.ceil(list.length/2):0
     //changeLogistic
@@ -132,48 +125,53 @@ const Changelogistic = React.memo((props) => {
         showMiniDialog(true)
     }
     //render
-    return <App showDistrict agents cityShow organizations showForwarder pageName='Редактирование логистики' dates checkPagination={checkPagination} filters={filters}>
+    return <App searchShow showDistrict agents showForwarder pageName='Редактирование логистики' dates checkPagination={checkPagination} filters={filters}>
         <Head>
             <title>Редактирование логистики</title>
             <meta name='robots' content='noindex, nofollow'/>
         </Head>
-        {list.length?<div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 30}}>
-            <Table pagination={pagination} forwarderData={forwarderData} list={double?list.slice(0, middleList):list} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>
-            {double?<Table pagination={pagination} middleList={middleList} forwarderData={forwarderData} list={list.slice(middleList)} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>:null}
-        </div>:null}
-        <Fab onClick={open} color='primary' className={classes.fab}>
-            <SettingsIcon />
-        </Fab>
-        <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={close}
-            className={classes.menu}
-            anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-            }}
-            transformOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-            }}
-        >
-            {selectedOrders.length?<MenuItem onClick={() => changeLogistic('track')}>Изменить рейс</MenuItem>:null}
-            {selectedOrders.length?<MenuItem onClick={() => changeLogistic('forwarder')}>Изменить экспедитора</MenuItem>:null}
-            <MenuItem onClick={() => {setSelectedOrders([...list]);close()}}>Выбрать все</MenuItem>
-            {selectedOrders.length?<MenuItem onClick={() => {setSelectedOrders([]);close()}}>Отменить выбор</MenuItem>:null}
-        </Menu>
-        <div className='count'>
-            Всего: {formatAmount(selectedOrders.length||list.length)}
-            <br/>
-            Сумма: {formatAmount(ordersData.priceSelected||ordersData.priceAll)} сом
-            <br/>
-            Тоннаж: {formatAmount(ordersData.weightSelected||ordersData.weightAll)} кг
-        </div>
+        {list.length?<>
+            <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 30}}>
+                <Table pagination={pagination} forwarderData={forwarderData} list={double?list.slice(0, middleList):list} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>
+                {double?<Table pagination={pagination} middleList={middleList} forwarderData={forwarderData} list={list.slice(middleList)} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>:null}
+            </div>
+            {selectedOrders.length||forwarder?<><Fab onClick={open} color='primary' className={classes.fab}>
+                <SettingsIcon />
+            </Fab>
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={close}
+                className={classes.menu}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                }}
+                transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                {selectedOrders.length?<MenuItem onClick={() => changeLogistic('track')}>Изменить рейс</MenuItem>:null}
+                {forwarder?<>
+                    {selectedOrders.length?<MenuItem onClick={() => changeLogistic('forwarder')}>Изменить экспедитора</MenuItem>:null}
+                    <MenuItem onClick={() => {setSelectedOrders([...list]);close()}}>Выбрать все</MenuItem>
+                </>:null}
+                {selectedOrders.length?<MenuItem onClick={() => {setSelectedOrders([]);close()}}>Отменить выбор</MenuItem>:null}
+            </Menu></>:null}
+            <QuickTransition/>
+            <div className='count'>
+                Всего: {formatAmount(selectedOrders.length||list.length)}
+                <br/>
+                Сумма: {formatAmount(ordersData.priceSelected||ordersData.priceAll)} сом
+                <br/>
+                Тоннаж: {formatAmount(ordersData.weightSelected||ordersData.weightAll)} кг
+            </div>
+        </>:!date?`Укажите:${!date?' дату доставки;':''}`:null}
     </App>
 })
 
-Changelogistic.getInitialProps = async function(ctx) {
+Id.getInitialProps = async function(ctx) {
     await initialApp(ctx)
     if(!['суперорганизация', 'организация', 'admin', 'менеджер', 'агент'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
@@ -183,11 +181,14 @@ Changelogistic.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
-    let date = new Date()
-    if(date.getHours()<dayStartDefault)
-        date.setDate(date.getDate() - 1)
-    ctx.store.getState().app.date = pdDatePicker(date)
-    ctx.store.getState().app.filter = null
+    if(!ctx.store.getState().app.date) {
+        let date = new Date()
+        if (date.getHours() < dayStartDefault)
+            date.setDate(date.getDate() - 1)
+        ctx.store.getState().app.date = pdDatePicker(date)
+    }
+    if(!ctx.store.getState().app.filter)
+        ctx.store.getState().app.filter = null
     return {};
 };
 
@@ -207,4 +208,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Changelogistic);
+export default connect(mapStateToProps, mapDispatchToProps)(Id);

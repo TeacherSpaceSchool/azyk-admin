@@ -425,7 +425,7 @@ const MyAppBar = React.memo((props) => {
                                                 open={openAgents}
                                                 onClose={handleCloseAgents}
                                             >
-                                                <MenuItem key='onAgents' style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let agents = await getEmployments({organization, search: '', filter: 'агент'});let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();handleCloseMobileMenu();}}>
+                                                <MenuItem key='onAgents' style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let agents = await getEmployments({organization, search: '', filter: 'агент', sort: 'name'});let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();handleCloseMobileMenu();}}>
                                                     По агенту
                                                 </MenuItem>
                                                 <MenuItem key='allAgents' style={{background: !agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setAgent(null);handleCloseAgents();handleCloseMobileMenu();}}>
@@ -489,7 +489,7 @@ const MyAppBar = React.memo((props) => {
                                                 open={openForwarders}
                                                 onClose={handleCloseForwarders}
                                             >
-                                                <MenuItem key='onForwarder' style={{background: forwarder?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let forwarders = await getEmployments({organization, search: '', filter: 'экспедитор'});setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);showMiniDialog(true);handleCloseForwarders();handleCloseMobileMenu();}}>
+                                                <MenuItem key='onForwarder' style={{background: forwarder?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let forwarders = await getEmployments({organization, search: '', filter: 'экспедитор', sort: 'name'});setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);showMiniDialog(true);handleCloseForwarders();handleCloseMobileMenu();}}>
                                                     По экспедитору
                                                 </MenuItem>
                                                 <MenuItem key='allForwarders' style={{background: !forwarder?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setForwarder(null);handleCloseForwarders();handleCloseMobileMenu();}}>
@@ -807,7 +807,7 @@ const MyAppBar = React.memo((props) => {
                                             open={openAgents}
                                             onClose={handleCloseAgents}
                                         >
-                                            <MenuItem style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let agents = await getEmployments({organization, search: '', filter: 'агент'});let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();}}>
+                                            <MenuItem style={{background: agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let agents = await getEmployments({organization, search: '', filter: 'агент', sort: 'name'});let agentF; if(agent) agentF = agents.find((element) => element._id===agent);setMiniDialog('Агент', <SetAgent agent={agentF} agents={agents}/>);showMiniDialog(true);handleCloseAgents();}}>
                                                 По агенту
                                             </MenuItem>
                                             <MenuItem style={{background: !agent?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setAgent(null);handleCloseAgents();}}>
@@ -846,7 +846,7 @@ const MyAppBar = React.memo((props) => {
                                             open={openForwarders}
                                             onClose={handleCloseForwarders}
                                         >
-                                            <MenuItem style={{background: forwarder?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let forwarders = await getEmployments({organization, search: '', filter: 'экспедитор'});setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);showMiniDialog(true);handleCloseForwarders();}}>
+                                            <MenuItem style={{background: forwarder?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={async () => {let forwarders = await getEmployments({organization, search: '', filter: 'экспедитор', sort: 'name'});setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);showMiniDialog(true);handleCloseForwarders();}}>
                                                 По экспедитору
                                             </MenuItem>
                                             <MenuItem style={{background: !forwarder?'rgba(255, 179, 0, 0.15)': '#fff'}} onClick={() => {setForwarder(null);handleCloseForwarders();}}>

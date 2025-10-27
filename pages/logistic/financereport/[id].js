@@ -3,9 +3,9 @@ import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../../layouts/App';
 import { connect } from 'react-redux'
 import pageListStyle from '../../../src/styleMUI/statistic/statistic'
-import Router from 'next/router'
+import Router, {useRouter} from 'next/router'
 import initialApp from '../../../src/initialApp'
-import {checkFloat, dayStartDefault, formatAmount, pdDatePicker, unawaited} from '../../../src/lib'
+import {checkFloat, dayStartDefault, formatAmount, pdDatePicker, pdDDMMYYYY, unawaited} from '../../../src/lib'
 import { bindActionCreators } from 'redux'
 import Fab from '@material-ui/core/Fab';
 import PrintIcon from '@material-ui/icons/Print';
@@ -14,6 +14,9 @@ import {getEmployment} from '../../../src/gql/employment';
 import {getFinanceReport} from '../../../src/gql/logistic';
 import * as appActions from '../../../redux/actions/app'
 import * as snackbarActions from '../../../redux/actions/snackbar'
+import {printHTML} from '../../../components/print';
+import templateFinanceReport from '../../../components/print/template/financeReport';
+import QuickTransition from '../QuickTransition';
 
 const filters = [
     {name: 'Все', value: null},
@@ -24,20 +27,15 @@ const filters = [
     {name: 'Рейс 5', value: 5},
 ]
 
-const FinanceReport = React.memo((props) => {
+const Id = React.memo((props) => {
     const classes = pageListStyle();
+    const router = useRouter()
     //ref
-    const initialRender = useRef(true);
     const contentRef = useRef();
     //props
-    const {filter, date, organization, city, forwarder} = props.app;
-    const {setOrganization} = props.appActions;
+    const {filter, date, forwarder} = props.app;
+    const {showLoad} = props.appActions;
     const {showSnackBar} = props.snackbarActions;
-    //organization
-    useEffect(() => {
-        if(!initialRender.current)
-            setOrganization(null)
-    }, [city])
     //forwarderData
     let [forwarderData, setForwarderData] = useState(null);
     useEffect(() => {(async () => {
@@ -45,14 +43,16 @@ const FinanceReport = React.memo((props) => {
         else setForwarderData(null)
     })()}, [forwarder])
     //deps
-    const deps = [filter, date, organization, city, forwarder]
+    const deps = [filter, date, forwarder]
     //listArgs
-    const listArgs = {track: filter, dateDelivery: date, organization, forwarder}
+    const listArgs = {track: filter, dateDelivery: date, organization: router.query.id, forwarder}
     //list
     let [list, setList] = useState([]);
     const getList = async (excel) => {
-        if(date&&organization&&forwarder) {
+        if(date&&forwarder) {
+            showLoad(true)
             const list = await getFinanceReport({...listArgs, excel})
+            showLoad(false)
             if (!excel) {
                 setList(list);
                 setPagination(100);
@@ -61,20 +61,27 @@ const FinanceReport = React.memo((props) => {
         }
         else {
             setList([])
-            showSnackBar(`Укажите:${!date?' дату доставки;':''}${!organization?' организацию;':''}${!forwarder?' экспедитора;':''}`)
+            showSnackBar(`Укажите:${!date?' дату доставки;':''}${!forwarder?' экспедитора;':''}`)
         }
     }
     //filter
     useEffect(() => {
         unawaited(getList)
     }, deps)
-    //priceAll
-    let [priceAll, setPriceAll] = useState(0);
+    //ordersData
+    let [ordersData, setOrdersData] = useState({});
     useEffect(() => {
-        priceAll = 0
-        for (let i = 0; i < list.length; i++)
-            priceAll = checkFloat(priceAll + checkFloat(list[i][3]))
-        setPriceAll(priceAll)
+        ordersData = {
+            allPrice: 0,
+            paymentPrice: 0,
+            returnedPrice: 0,
+        }
+        for (let i = 0; i < list.length; i++) {
+            ordersData.allPrice = checkFloat(ordersData.allPrice + checkFloat(list[i][1]))
+            ordersData.paymentPrice = checkFloat(ordersData.paymentPrice + checkFloat(list[i][2]))
+            ordersData.returnedPrice = checkFloat(ordersData.returnedPrice + checkFloat(list[i][4]))
+        }
+        setOrdersData({...ordersData})
     }, [list])
     //pagination
     const [pagination, setPagination] = useState(100);
@@ -83,28 +90,36 @@ const FinanceReport = React.memo((props) => {
             setPagination(pagination => pagination+100)
     }, [pagination, list])
     //render
-    return <App cityShow organizations showForwarder pageName='Отчет по деньгам' dates checkPagination={checkPagination} filters={filters}>
+    return <App showForwarder pageName='Отчет по деньгам' dates checkPagination={checkPagination} filters={filters}>
         <Head>
             <title>Отчет по деньгам</title>
             <meta name='robots' content='noindex, nofollow'/>
         </Head>
         {list.length?<>
-            <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 10}}>
+            <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 30}}>
                 <Table pagination={pagination} forwarderData={forwarderData} list={list}/>
             </div>
-            <Fab onClick={() => getList(true)} color='primary' className={classes.fab}>
+            <Fab
+                color='primary' className={classes.fab}
+                onClick={() => printHTML({ data: {list, forwarderData, date, filter, ordersData}, template: templateFinanceReport, title: `Отчет по деньгам ${pdDDMMYYYY(date)}`})}
+            >
                 <PrintIcon />
             </Fab>
-        </>:null}
+        </>:!date||!forwarder?`Укажите:${!date?' дату доставки;':''}${!forwarder?' экспедитора;':''}`:null}
+        <QuickTransition/>
         <div className='count'>
             Всего: {formatAmount(list.length)}
             <br/>
-            К оплате: {formatAmount(priceAll)} сом
+            Отгружено: {formatAmount(ordersData.allPrice)} сом
+            <br/>
+            К оплате: {formatAmount(ordersData.paymentPrice)} сом
+            <br/>
+            Возврат: {formatAmount(ordersData.returnedPrice)} сом
         </div>
     </App>
 })
 
-FinanceReport.getInitialProps = async function(ctx) {
+Id.getInitialProps = async function(ctx) {
     await initialApp(ctx)
     if(!['admin', 'суперорганизация', 'организация', 'агент', 'менеджер'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
@@ -114,11 +129,14 @@ FinanceReport.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
-    let date = new Date()
-    if(date.getHours()<dayStartDefault)
-        date.setDate(date.getDate() - 1)
-    ctx.store.getState().app.date = pdDatePicker(date)
-    ctx.store.getState().app.filter = null
+    if(!ctx.store.getState().app.date) {
+        let date = new Date()
+        if (date.getHours() < dayStartDefault)
+            date.setDate(date.getDate() - 1)
+        ctx.store.getState().app.date = pdDatePicker(date)
+    }
+    if(!ctx.store.getState().app.filter)
+        ctx.store.getState().app.filter = null
     return {};
 };
 
@@ -135,4 +153,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(FinanceReport);
+export default connect(mapStateToProps, mapDispatchToProps)(Id);

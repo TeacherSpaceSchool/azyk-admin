@@ -3,9 +3,9 @@ import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../../layouts/App';
 import { connect } from 'react-redux'
 import pageListStyle from '../../../src/styleMUI/statistic/statistic'
-import Router from 'next/router'
+import Router, {useRouter} from 'next/router'
 import initialApp from '../../../src/initialApp'
-import {checkFloat, dayStartDefault, formatAmount, pdDatePicker, unawaited} from '../../../src/lib'
+import {checkFloat, dayStartDefault, formatAmount, pdDatePicker, pdDDMMYYYY, unawaited} from '../../../src/lib'
 import { bindActionCreators } from 'redux'
 import * as appActions from '../../../redux/actions/app'
 import Fab from '@material-ui/core/Fab';
@@ -14,6 +14,9 @@ import {getEmployment} from '../../../src/gql/employment';
 import {getSummaryInvoice} from '../../../src/gql/logistic';
 import PrintIcon from '@material-ui/icons/Print';
 import * as snackbarActions from '../../../redux/actions/snackbar';
+import {printHTML} from '../../../components/print';
+import templateSummaryInvoice from '../../../components/print/template/summaryInvoice';
+import QuickTransition from '../QuickTransition';
 
 const filters = [
     {name: 'Все', value: null},
@@ -26,18 +29,13 @@ const filters = [
 
 const FinanceReport = React.memo((props) => {
     const classes = pageListStyle();
+    const router = useRouter()
     //ref
-    const initialRender = useRef(true);
     const contentRef = useRef();
     //props
-    const {filter, date, organization, city, forwarder} = props.app;
-    const {setOrganization} = props.appActions;
+    const {filter, date, forwarder} = props.app;
+    const {showLoad} = props.appActions;
     const {showSnackBar} = props.snackbarActions;
-    //organization
-    useEffect(() => {
-        if(!initialRender.current)
-            setOrganization(null)
-    }, [city])
     //forwarderData
     let [forwarderData, setForwarderData] = useState(null);
     useEffect(() => {(async () => {
@@ -45,14 +43,16 @@ const FinanceReport = React.memo((props) => {
         else setForwarderData(null)
     })()}, [forwarder])
     //deps
-    const deps = [filter, date, organization, city, forwarder]
+    const deps = [filter, date, forwarder]
     //listArgs
-    const listArgs = {track: filter, dateDelivery: date, organization, forwarder}
+    const listArgs = {track: filter, dateDelivery: date, organization: router.query.id, forwarder}
     //list
     let [list, setList] = useState([]);
     const getList = async (excel) => {
-        if(filter&&date&&organization&&forwarder) {
+        if(filter&&date&&forwarder) {
+            showLoad(true)
             const list = await getSummaryInvoice({...listArgs, excel})
+            showLoad(false)
             if (!excel) {
                 setList(list);
                 setPagination(100);
@@ -60,7 +60,7 @@ const FinanceReport = React.memo((props) => {
             } else window.open(list[0][0], '_blank');
         } else {
             setList([])
-            showSnackBar(`Укажите:${!filter?' рейс;':''}${!date?' дату доставки;':''}${!organization?' организацию;':''}${!forwarder?' экспедитора;':''}`)
+            showSnackBar(`Укажите:${!filter?' рейс;':''}${!date?' дату доставки;':''}${!forwarder?' экспедитора;':''}`)
         }
     }
     //filter
@@ -79,30 +79,42 @@ const FinanceReport = React.memo((props) => {
         ordersData = {
             priceAll: 0,
             weightAll: 0,
+            countAll: 0,
+            packageAll: 0,
         }
         const iterableList = list
         for (let i = 0; i < iterableList.length; i++) {
+            ordersData.countAll = checkFloat(ordersData.countAll + checkFloat(iterableList[i][2]))
+            ordersData.packageAll = checkFloat(ordersData.packageAll + checkFloat(iterableList[i][3]))
             ordersData.priceAll = checkFloat(ordersData.priceAll + checkFloat(iterableList[i][4]))
             ordersData.weightAll = checkFloat(ordersData.weightAll + checkFloat(iterableList[i][5]))
         }
         setOrdersData({...ordersData})
     }, [list])
     //render
-    return <App cityShow organizations showForwarder pageName='Сводная накладная' dates checkPagination={checkPagination} filters={filters}>
+    return <App showForwarder pageName='Сводная накладная' dates checkPagination={checkPagination} filters={filters}>
         <Head>
             <title>Сводная накладная</title>
             <meta name='robots' content='noindex, nofollow'/>
         </Head>
         {list.length?<>
-            <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 30}}>
+            <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 50}}>
                 <Table pagination={pagination} forwarderData={forwarderData} list={list}/>
             </div>
-            <Fab onClick={() => getList(true)} color='primary' className={classes.fab}>
+            <Fab
+                color='primary' className={classes.fab}
+                onClick={() => printHTML({ data: {list, forwarderData, date, filter, ordersData}, template: templateSummaryInvoice, title: `Сводная накладная ${pdDDMMYYYY(date)}`})}
+            >
                 <PrintIcon />
             </Fab>
-        </>:null}
+        </>:!filter||!date||!forwarder?`Укажите:${!filter?' рейс;':''}${!date?' дату доставки;':''}${!forwarder?' экспедитора;':''}`:null}
+        <QuickTransition/>
         <div className='count'>
             Всего: {formatAmount(list.length)}
+            <br/>
+            Кол-во: {formatAmount(ordersData.countAll)}
+            <br/>
+            Уп-ок: {formatAmount(ordersData.packageAll)}
             <br/>
             Сумма: {formatAmount(ordersData.priceAll)} сом
             <br/>
@@ -121,11 +133,15 @@ FinanceReport.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
-    let date = new Date()
-    if(date.getHours()<dayStartDefault)
-        date.setDate(date.getDate() - 1)
-    ctx.store.getState().app.date = pdDatePicker(date)
-    ctx.store.getState().app.filter = null
+    if(!ctx.store.getState().app.date) {
+        let date = new Date()
+        if (date.getHours() < dayStartDefault)
+            date.setDate(date.getDate() - 1)
+        ctx.store.getState().app.date = pdDatePicker(date)
+    }
+    if(!ctx.store.getState().app.filter) {
+        ctx.store.getState().app.filter = null
+    }
     return {};
 };
 

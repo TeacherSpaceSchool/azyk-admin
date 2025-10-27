@@ -2,7 +2,6 @@ import React from 'react';
 import {formatAmount} from '../../../src/lib';
 
 const Tables =  React.memo(({list, forwarderData, pagination}) =>{
-    const fontSize = 13
     const columns = [
         {title: 'Склад', style: {width: 200}},
         {title: 'Товар', style: {width: 300}},
@@ -11,7 +10,7 @@ const Tables =  React.memo(({list, forwarderData, pagination}) =>{
         {title: 'Сумма', style: {width: 60}},
         {title: 'Тоннаж', style: {width: 60}},
     ]
-    return <div style={{width: 'fit-content', background: 'white', fontSize}}>
+    return <div style={{width: 'fit-content', background: 'white'}}>
             {forwarderData?<div style={{zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}><span style={{color: '#707070'}}>Экспедитор:</span> {forwarderData.name}</div>:null}
             <div className='tableHead' style={{top: 31}}>
                 {columns.map((column, idx) => {

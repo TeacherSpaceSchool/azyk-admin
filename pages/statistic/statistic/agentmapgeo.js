@@ -38,7 +38,7 @@ const AgentMapGeoStatistic = React.memo((props) => {
     let [index, setIndex] = useState(null);
     useEffect(() => {
         (async () => {
-            setAgents(organization?await getEmployments({organization, search: '', filter: 'агент'}):[])
+            setAgents(organization?await getEmployments({organization, search: '', filter: 'агент', sort: 'name'}):[])
             setAgent(null)
         })()
     }, [organization])

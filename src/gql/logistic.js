@@ -8,8 +8,8 @@ export const getFinanceReport = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($organization: ID!, $track: Int, $forwarder: ID!, $dateDelivery: Date!, $excel: Boolean) {
-                        financeReport(organization: $organization, track: $track, forwarder: $forwarder, dateDelivery: $dateDelivery, excel: $excel)
+                    query ($organization: ID!, $track: Int, $forwarder: ID!, $dateDelivery: Date!) {
+                        financeReport(organization: $organization, track: $track, forwarder: $forwarder, dateDelivery: $dateDelivery)
                     }`,
             })
         return res.data.financeReport
@@ -25,8 +25,8 @@ export const getSummaryInvoice = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($organization: ID!, $track: Int!, $forwarder: ID!, $dateDelivery: Date!, $excel: Boolean) {
-                        summaryInvoice(organization: $organization, track: $track, forwarder: $forwarder, dateDelivery: $dateDelivery, excel: $excel)
+                    query ($organization: ID!, $track: Int!, $forwarder: ID!, $dateDelivery: Date!) {
+                        summaryInvoice(organization: $organization, track: $track, forwarder: $forwarder, dateDelivery: $dateDelivery)
                     }`,
             })
         return res.data.summaryInvoice

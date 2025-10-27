@@ -180,23 +180,6 @@ const list = {
             role: ['admin']
         },
     ],
-    logistic: [
-        {
-            name: 'Отчет по деньгам',
-            link: '/statistic/logistic/financereport',
-            role: ['admin', 'суперорганизация', 'организация', 'менеджер']
-        },
-        {
-            name: 'Редактирование логистики',
-            link: '/statistic/logistic/changelogistic',
-            role: ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент']
-        },
-        {
-            name: 'Сводная накладная',
-            link: '/statistic/logistic/summaryinvoice',
-            role: ['admin', 'суперорганизация', 'организация', 'менеджер']
-        },
-    ],
     integrate: [
         {
             name: 'Акционная интеграции 1С',

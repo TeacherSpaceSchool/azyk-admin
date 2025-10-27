@@ -73,5 +73,10 @@ export default makeStyles({
         bottom: '20px',
         right: '20px'
     },
+    fab2: {
+        position: 'fixed!important',
+        right: '86px',
+        bottom: '28px'
+    },
 
 })

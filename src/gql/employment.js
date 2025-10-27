@@ -18,8 +18,8 @@ export const getEmployments = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($organization: ID, $search: String!, $filter: String!, $skip: Int) {
-                        employments(organization: $organization, search: $search, filter: $filter, skip: $skip) {${Employment}}
+                    query ($organization: ID, $sort: String, $search: String!, $filter: String!, $skip: Int) {
+                        employments(organization: $organization, sort: $sort, search: $search, filter: $filter, skip: $skip) {${Employment}}
                     }`,
             })
         return res.data.employments
