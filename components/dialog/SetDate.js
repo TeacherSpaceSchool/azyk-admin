@@ -13,14 +13,18 @@ import {dayStartDefault, pdDatePicker} from '../../src/lib'
 const SetDate =  React.memo(
     (props) =>{
         const {classes} = props;
+        const {isMobileApp, date} = props.app;
         let [dateChange, setDateChange] = useState(null);
         useEffect(() => {
-            let dateStart = new Date()
-            if(dateStart.getHours()<dayStartDefault)
-                dateStart.setDate(dateStart.getDate() - 1)
-            setDateChange(pdDatePicker(dateStart))
+            if(date) {
+                setDateChange(pdDatePicker(date))
+            } else {
+                let dateStart = new Date()
+                if (dateStart.getHours() < dayStartDefault)
+                    dateStart.setDate(dateStart.getDate() - 1)
+                setDateChange(pdDatePicker(dateStart))
+            }
         }, []);
-        const {isMobileApp} = props.app;
         const {showMiniDialog} = props.mini_dialogActions;
         const {setDate} = props.appActions;
         const width = isMobileApp? (window.innerWidth-112) : 500

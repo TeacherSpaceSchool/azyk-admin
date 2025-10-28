@@ -70,7 +70,7 @@ const ChangeLogistic =  React.memo(
                     <Button variant='contained' color='primary' onClick={async () => {
                        if(forwarder||track) {
                            await setInvoicesLogic({track, ...forwarder?{forwarder: forwarder._id}:{}, invoices, dateDelivery})
-                           setSelectedOrders([])
+                           ///setSelectedOrders([])
                            showMiniDialog(false);
                            await getList()
                        } else showSnackBar('Заполните все поля')

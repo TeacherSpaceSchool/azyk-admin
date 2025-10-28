@@ -124,7 +124,7 @@ export function logout(reload) {
         localStorage.removeItem('extendedJWT')
         if(reload) {
             await unregister()
-            Router.push('/contact')
+            await Router.push('/contact')
             window.location.reload()
         }
         else

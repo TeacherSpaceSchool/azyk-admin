@@ -106,7 +106,7 @@ const Id = React.memo((props) => {
                 <PrintIcon />
             </Fab>
         </>:!date||!forwarder?`Укажите:${!date?' дату доставки;':''}${!forwarder?' экспедитора;':''}`:null}
-        <QuickTransition/>
+        <QuickTransition fab2={list.length}/>
         <div className='count'>
             Всего: {formatAmount(list.length)}
             <br/>
@@ -129,8 +129,10 @@ Id.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
+    ctx.store.getState().app.organization = ctx.query.id
     if(!ctx.store.getState().app.date) {
         let date = new Date()
+        date.setDate(date.getDate() + 1)
         if (date.getHours() < dayStartDefault)
             date.setDate(date.getDate() - 1)
         ctx.store.getState().app.date = pdDatePicker(date)

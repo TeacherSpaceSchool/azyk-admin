@@ -18,8 +18,9 @@ import * as snackbarActions from '../../../redux/actions/snackbar'
 import Table from '../../../components/table/changelogistic';
 import {getEmployment} from '../../../src/gql/employment';
 import ChangeLogistic from '../../../components/dialog/ChangeLogistic';
-import {getClientGqlSsr} from '../../../src/getClientGQL';
 import QuickTransition from '../QuickTransition';
+import {getDistricts} from '../../../src/gql/district';
+import {getClientGqlSsr} from '../../../src/getClientGQL';
 
 const sort = 'createdAt'
 const filters = [
@@ -34,6 +35,7 @@ const filters = [
 const Id = React.memo((props) => {
     const classes = pageListStyle();
     const router = useRouter()
+    const forwarderByClient = props.data.forwarderByClient
     //ref
     const initialRender = useRef(true);
     const searchTimeOut = useRef(null);
@@ -115,7 +117,7 @@ const Id = React.memo((props) => {
     let open = event => setAnchorEl(event.currentTarget);
     let close = () => setAnchorEl(null);
     //double
-    const double = contentRef.current&&contentRef.current.offsetWidth>=1180
+    const double = contentRef.current&&contentRef.current.offsetWidth>=(forwarderData?1180:1700)
     //middleList
     const middleList = list?Math.ceil(list.length/2):0
     //changeLogistic
@@ -124,6 +126,9 @@ const Id = React.memo((props) => {
         setMiniDialog('Логистика', <ChangeLogistic dateDelivery={date} setSelectedOrders={setSelectedOrders} type={type} invoices={selectedOrders.map(selectedOrder => selectedOrder._id)} getList={getList}/>)
         showMiniDialog(true)
     }
+    //showSetting
+    const [showSetting, setShowSetting] = useState(false)
+    useEffect(() => {setShowSetting(list.length&&(selectedOrders.length||forwarder))}, [list, selectedOrders, forwarder])
     //render
     return <App searchShow showDistrict agents showForwarder pageName='Редактирование логистики' dates checkPagination={checkPagination} filters={filters}>
         <Head>
@@ -132,10 +137,10 @@ const Id = React.memo((props) => {
         </Head>
         {list.length?<>
             <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 30}}>
-                <Table pagination={pagination} forwarderData={forwarderData} list={double?list.slice(0, middleList):list} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>
-                {double?<Table pagination={pagination} middleList={middleList} forwarderData={forwarderData} list={list.slice(middleList)} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>:null}
+                <Table forwarderByClient={forwarderByClient} pagination={pagination} forwarderData={forwarderData} list={double?list.slice(0, middleList):list} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>
+                {double?<Table forwarderByClient={forwarderByClient} pagination={pagination} middleList={middleList} forwarderData={forwarderData} list={list.slice(middleList)} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>:null}
             </div>
-            {selectedOrders.length||forwarder?<><Fab onClick={open} color='primary' className={classes.fab}>
+            {showSetting?<><Fab onClick={open} color='primary' className={classes.fab}>
                 <SettingsIcon />
             </Fab>
             <Menu
@@ -152,14 +157,14 @@ const Id = React.memo((props) => {
                     horizontal: 'left',
                 }}
             >
-                {selectedOrders.length?<MenuItem onClick={() => changeLogistic('track')}>Изменить рейс</MenuItem>:null}
-                {forwarder?<>
-                    {selectedOrders.length?<MenuItem onClick={() => changeLogistic('forwarder')}>Изменить экспедитора</MenuItem>:null}
-                    <MenuItem onClick={() => {setSelectedOrders([...list]);close()}}>Выбрать все</MenuItem>
+                {selectedOrders.length?<>
+                    <MenuItem onClick={() => changeLogistic('track')}>Изменить рейс</MenuItem>
+                    <MenuItem onClick={() => changeLogistic('forwarder')}>Изменить экспедитора</MenuItem>
                 </>:null}
+                {forwarder?<MenuItem onClick={() => {setSelectedOrders([...list]);close()}}>Выбрать все</MenuItem>:null}
                 {selectedOrders.length?<MenuItem onClick={() => {setSelectedOrders([]);close()}}>Отменить выбор</MenuItem>:null}
             </Menu></>:null}
-            <QuickTransition/>
+            <QuickTransition fab2={showSetting}/>
             <div className='count'>
                 Всего: {formatAmount(selectedOrders.length||list.length)}
                 <br/>
@@ -181,15 +186,23 @@ Id.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
+    ctx.store.getState().app.organization = ctx.query.id
     if(!ctx.store.getState().app.date) {
         let date = new Date()
+        date.setDate(date.getDate() + 1)
         if (date.getHours() < dayStartDefault)
             date.setDate(date.getDate() - 1)
         ctx.store.getState().app.date = pdDatePicker(date)
     }
     if(!ctx.store.getState().app.filter)
         ctx.store.getState().app.filter = null
-    return {};
+    const districts = await getDistricts({search: '', sort: '-name', organization: ctx.query.id}, getClientGqlSsr(ctx.req));
+    const forwarderByClient = {}
+    for(const district of districts)
+        for(const client of district.client) {
+            forwarderByClient[client._id] = district.forwarder?district.forwarder.name:'Не указан'
+        }
+    return {data: {forwarderByClient}};
 };
 
 function mapStateToProps (state) {

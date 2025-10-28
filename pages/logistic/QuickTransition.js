@@ -10,8 +10,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Link from 'next/link';
 import Button from '@material-ui/core/Button';
 
-const QuickTransition = React.memo(() => {
-    const classes = pageListStyle();
+const QuickTransition = React.memo(({fab2}) => {
     const router = useRouter()
     //speedDial
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -24,7 +23,7 @@ const QuickTransition = React.memo(() => {
     //render
     return (
         <>
-            <Button className={classes.fab2} variant='contained' color='primary' onClick={handleClick} onMouseEnter={handleClick}>
+            <Button style={{position: 'fixed', right: fab2?86:20, bottom: 28}} variant='contained' color='primary' onClick={handleClick} onMouseEnter={handleClick}>
                 Переход
             </Button>
             <Menu

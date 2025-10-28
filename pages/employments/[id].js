@@ -39,7 +39,7 @@ const Employment = React.memo((props) => {
     //list
     let [list, setList] = useState(data.employments);
     const getList = async (skip) => {
-        const employments = await getEmployments({...listArgs, skip: 0});
+        const employments = await getEmployments({...listArgs, skip: skip||0});
         if(!skip) {
             unawaited(getCount)
             setList(employments)

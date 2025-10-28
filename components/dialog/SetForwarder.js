@@ -12,9 +12,9 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const SetForwarder =  React.memo(
     (props) =>{
-        const {classes, forwarders, forwarder} = props;
-        let [forwarderChange, setForwarderChange] = useState(forwarder);
-        const {isMobileApp} = props.app;
+        const {classes, forwarders} = props;
+        const {isMobileApp, forwarder} = props.app;
+        let [forwarderChange, setForwarderChange] = useState(forwarder?forwarders.find(f => f._id === forwarder):null);
         const {showMiniDialog} = props.mini_dialogActions;
         const {setForwarder} = props.appActions;
         const width = isMobileApp? (window.innerWidth-112) : 500

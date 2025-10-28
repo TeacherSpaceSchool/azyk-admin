@@ -38,7 +38,7 @@ const Equipments = React.memo((props) => {
     //list
     let [list, setList] = useState(data.equipments);
     const getList = async (skip) => {
-        const equipments = await getEquipments({...listArgs, skip: 0});
+        const equipments = await getEquipments({...listArgs, skip: skip||0});
         if(!skip) {
             unawaited(getCount)
             setList(equipments)

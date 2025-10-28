@@ -31,7 +31,7 @@ const Tables =  React.memo(({middleList, app, list, items, setBasketChange}) =>{
                 </div>
                 <div className='tableBorder'/>
                 <div className='tableCell' style={columns[1].style} onClick={() => document.getElementById(`catalogCount${idx}`).focus()}>
-                    <input style={{width: widthNbmr, outline: 'none', border: 'none', fontWeight: 500, fontFamily: 'Roboto, serif', fontSize}}
+                    <input style={{width: widthNbmr, outline: 'none', border: 'none', fontWeight: 500, fontFamily: 'Roboto, serif'}}
                            type={isMobileApp?'number':'text'} value={items[row._id]&&items[row._id].count?items[row._id].count:''}
                            onChange={(event) => setBasketChange(idx, event.target.value)} id={`catalogCount${idx}`}/>
                 </div>

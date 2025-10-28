@@ -13,8 +13,8 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 const SetOrganizations =  React.memo(
     (props) =>{
         const {classes, organizations} = props;
-        let [organizationChange, setOrganizationChange] = useState(null);
-        const {isMobileApp} = props.app;
+        const {isMobileApp, organization} = props.app;
+        let [organizationChange, setOrganizationChange] = useState(organization?organizations.find(f => f._id === organization):null);
         const {showMiniDialog} = props.mini_dialogActions;
         const {setOrganization} = props.appActions;
         const width = isMobileApp? (window.innerWidth-112) : 500

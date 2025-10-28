@@ -12,8 +12,8 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 const SetDistrict =  React.memo(
     (props) =>{
         const {classes, districts, setDistrict} = props;
-        let [districtChange, setDistrictChange] = useState(null);
-        const {isMobileApp} = props.app;
+        const {isMobileApp, district} = props.app;
+        let [districtChange, setDistrictChange] = useState(district?districts.find(f => f._id === district):null);
         const {showMiniDialog} = props.mini_dialogActions;
         const width = isMobileApp? (window.innerWidth-112) : 500
         return (

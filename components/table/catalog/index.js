@@ -19,7 +19,7 @@ const Tables =  React.memo(({middleList, app, mini_dialogActions, list, stockCli
         {title: 'Цена', style: {width: widthNbmr}},
         {title: 'Итого', style: {width: widthNbmr}},
     ]
-    return <div style={{width: 'fit-content', borderTop: '1px solid #00000040', borderLeft: '1px solid #00000040', fontSize}}>
+    return <div style={{width: 'fit-content', borderTop: '1px solid #00000040', borderLeft: '1px solid #00000040'}}>
         <div className='tableHead'>
             {columns.map((column, idx) => {
                 return column?<React.Fragment key={`column${idx}`}>

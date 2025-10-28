@@ -12,9 +12,9 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const SetAgent =  React.memo(
     (props) =>{
-        const {classes, agents, agent} = props;
-        let [agentChange, setAgentChange] = useState(agent);
-        const {isMobileApp} = props.app;
+        const {classes, agents} = props;
+        const {isMobileApp, agent} = props.app;
+        let [agentChange, setAgentChange] = useState(agent?agents.find(f => f._id === agent):null);
         const {showMiniDialog} = props.mini_dialogActions;
         const {setAgent} = props.appActions;
         const width = isMobileApp? (window.innerWidth-112) : 500
