@@ -253,7 +253,7 @@ const MyDrawer = React.memo((props) => {
                         <ListItemText primary='Редактирование логистики'/>
                     </ListItem>
                 </Link>:<>
-                    <ListItem style={{background: router.asPath.includes('logistic') ? 'rgba(255, 179, 0, 0.15)' : '#ffffff'}} button onClick={() => {showDrawer(false);setUncover(uncover => uncover !== 'logistic' ? 'logistic' : '')}}>
+                    <ListItem style={{background: router.asPath.includes('logistic') ? 'rgba(255, 179, 0, 0.15)' : '#ffffff'}} button onClick={() => setUncover(uncover => uncover !== 'logistic' ? 'logistic' : '')}>
                         <ListItemIcon><LocalShipping color="inherit"/></ListItemIcon>
                         <ListItemText primary="Логистика"/>
                         {uncover.includes('logistic') ? <UnfoldLess/> : <UnfoldMore/>}
