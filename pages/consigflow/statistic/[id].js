@@ -1,35 +1,35 @@
 import Head from 'next/head';
 import React, {useState, useEffect, useRef, useCallback} from 'react';
-import App from '../../layouts/App';
-import pageListStyle from '../../src/styleMUI/statistic/statisticsList'
-import {getConsigFlows} from '../../src/gql/consigFlow'
-import CardConsigFlows from '../../components/card/CardConsigFlow'
+import App from '../../../layouts/App';
 import { connect } from 'react-redux'
-import Router from 'next/router'
-import { getClientGqlSsr } from '../../src/getClientGQL'
-import initialApp from '../../src/initialApp'
+import { getConsigFlows } from '../../../src/gql/consigFlow'
+import pageListStyle from '../../../src/styleMUI/organization/orgaizationsList'
+import CardConsigFlow from '../../../components/card/CardConsigFlow'
 import { useRouter } from 'next/router'
-import {getWarehouses} from '../../src/gql/warehouse';
-import {formatAmount, unawaited} from '../../src/lib';
-import {viewModes} from '../../src/enum';
-import Table from '../../components/table/stocks';
+import { getClientGqlSsr } from '../../../src/getClientGQL'
+import initialApp from '../../../src/initialApp'
+import Router from 'next/router'
+import * as appActions from '../../../redux/actions/app'
+import {bindActionCreators} from 'redux';
+import {unawaited} from '../../../src/lib';
+import {viewModes} from '../../../src/enum';
+import Table from '../../../components/table/consigflow/history';
 
-const ConsigFlows = React.memo((props) => {
+const ConsigFlow = React.memo((props) => {
     const classes = pageListStyle();
     const router = useRouter()
     //props
-    const {profile} = props.user;
     const {data} = props;
-    const {viewMode, client, district} = props.app;
+    const {district, viewMode} = props.app;
     //ref
     const initialRender = useRef(true);
     const paginationWork = useRef(true);
     //deps
-    const deps = [client, district]
+    const deps = [district]
     //listArgs
-    const listArgs = {...router.query.invoice?{invoice: router.query.invoice}:{}, client, district, organization: router.query._id}
+    const listArgs = {district, organization: router.query.id, ...router.query.invoice?{invoice: router.query.invoice}:{}, ...router.query.client?{client: router.query.client}:{}}
     //list
-    let [list, setList] = useState(data.stocks);
+    let [list, setList] = useState(data.list);
     const getList = async (skip) => {
         const gettedData = await getConsigFlows({...listArgs, skip: skip||0})
         if(!skip) {
@@ -42,6 +42,11 @@ const ConsigFlows = React.memo((props) => {
             paginationWork.current = true
         }
     }
+    //filter
+    useEffect(() => {
+        if(initialRender.current) initialRender.current = false
+        else unawaited(getList)
+    }, deps)
     //pagination
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
@@ -49,46 +54,31 @@ const ConsigFlows = React.memo((props) => {
             await getList(list.length)
         }
     }, [list, ...deps])
-    //filter
-    useEffect(() => {
-        if(!initialRender.current)
-            unawaited(getList)
-    }, deps)
     //render
     return (
-        <App checkPagination={checkPagination} searchShow pageName='Остатки'>
+        <App checkPagination={checkPagination} searchShow pageName={data.organization?data.organization.name:'AZYK.STORE'}>
             <Head>
-                <title>Остатки</title>
+                <title>{data.organization?data.organization.name:'AZYK.STORE'}</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className='count'>
-                Всего: {formatAmount(list.length)}
-            </div>
             <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
                 {list?viewMode===viewModes.card?
                         <>
-                            {
-                                ['admin', 'суперорганизация', 'организация'].includes(profile.role)?
-                                    <CardConsigFlows list={list} setList={setList} warehouses={data.warehouses} organization={router.query.id}/>
-                                    :
-                                    null
-                            }
-                            {list?list.map((element, idx) => {
-                                if(idx<pagination)
-                                    return <CardConsigFlows idx={idx} key={element._id} warehouses={data.warehouses} organization={router.query.id} list={list} setList={setList} element={element}/>
-                            }):null}
+                            {list.map((element, idx) => {
+                                return <CardConsigFlow key={element._id} idx={idx} element={element} organization={router.query.id} list={list} setList={setList}/>
+                            })}
                         </>
                         :
-                        <Table list={list} pagination={pagination}/>
+                        <Table list={list}/>
                     :null}
             </div>
         </App>
     )
 })
 
-ConsigFlows.getInitialProps = async function(ctx) {
+ConsigFlow.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin', 'суперорганизация', 'организация', 'менеджер', 'агент'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin', 'суперорганизация', 'организация', 'менеджер'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -96,15 +86,14 @@ ConsigFlows.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
-    // eslint-disable-next-line no-undef
-    const [warehouses, stocks] = await Promise.all([
-        getWarehouses({organization: ctx.query.id, search: ''}, getClientGqlSsr(ctx.req)),
-        getConsigFlows({organization: ctx.query.id, search: ''}, getClientGqlSsr(ctx.req))
-    ])
     return {
         data: {
-            ...warehouses?{warehouses: [defaultWarehouse, ...warehouses]}:{},
-            stocks
+            list: await getConsigFlows({
+                district: ctx.store.getState().app.district,
+                skip: 0, organization: ctx.query.id,
+                ...ctx.query.invoice?{invoice: ctx.query.invoice}:{},
+                ...ctx.query.client?{client: ctx.query.client}:{}
+            }, getClientGqlSsr(ctx.req))
         }
     };
 };
@@ -116,4 +105,10 @@ function mapStateToProps (state) {
     }
 }
 
-export default connect(mapStateToProps)(ConsigFlows);
+function mapDispatchToProps(dispatch) {
+    return {
+        appActions: bindActionCreators(appActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ConsigFlow);
