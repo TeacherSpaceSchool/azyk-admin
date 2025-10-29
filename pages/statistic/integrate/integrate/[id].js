@@ -20,49 +20,63 @@ const filters = [{name: 'Все', value: ''}, {name: 'Агент', value: 'аг�
 
 const Integrate = React.memo((props) => {
     const classes = pageListStyle();
-    const {data} = props;
     const router = useRouter()
-    const initialRender = useRef(true);
+    //props
+    const {data} = props;
     const {showLoad} = props.appActions;
-    let [list, setList] = useState(data.integrate1Cs);
-    let [simpleStatistic, setSimpleStatistic] = useState(null);
-    const getSimpleStatistic = async () => setSimpleStatistic(await getIntegrate1CsSimpleStatistic({search, filter, organization: router.query.id}))
     const {search, filter, viewMode} = props.app;
-    let [showStat, setShowStat] = useState(false);
+    //ref
+    const initialRender = useRef(true);
     const searchTimeOut = useRef(null);
     const paginationWork = useRef(true);
-    const checkPagination = useCallback(async () => {
-        if(paginationWork.current) {
-            paginationWork.current = false
-            let addedList = await getIntegrate1Cs({search, filter, skip: list.length, organization: router.query.id})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
-        }
-    }, [search, filter, list])
-    const getList = async () => {
+    //deps
+    const deps = [filter]
+    //listArgs
+    const listArgs = {filter, organization: router.query.id}
+    //simpleStatistic
+    let [showStat, setShowStat] = useState(false);
+    let [simpleStatistic, setSimpleStatistic] = useState(null);
+    const getSimpleStatistic = async () => setSimpleStatistic(await getIntegrate1CsSimpleStatistic({search, ...listArgs}))
+    //list
+    let [list, setList] = useState(data.integrate1Cs);
+    const getList = async (skip) => {
         showLoad(true)
-        setList(await getIntegrate1Cs({search, filter, skip: 0, organization: router.query.id}))
+        const gettedData = await getIntegrate1Cs({...listArgs, search, skip: 0})
         showLoad(false)
-
-        paginationWork.current = true;
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        if(!skip) {
+            unawaited(getSimpleStatistic)
+            setList(gettedData)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(gettedData.length) {
+            setList(list => [...list, ...gettedData])
+            paginationWork.current = true
+        }
     }
+    //filter
     useEffect(() => {
-        if(!initialRender.current) {
+        if(!initialRender.current)
+            unawaited(getList)
+    }, deps)
+    //search
+    useEffect(() => {
+        if(initialRender.current)
+            initialRender.current = false;
+        else {
             if(searchTimeOut.current)
                 clearTimeout(searchTimeOut.current)
             searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
     }, [search])
-    useEffect(() => {
-        if(initialRender.current)
-            initialRender.current = false;
-        else
-            unawaited(getList)
-        unawaited(getSimpleStatistic)
-    }, [filter])
+    //pagination
+    const checkPagination = useCallback(async () => {
+        if(paginationWork.current) {
+            paginationWork.current = false
+            await getList(list.length)
+        }
+    }, [search, list, ...deps])
+    //render
     return (
         <App checkPagination={checkPagination} searchShow filters={filters} pageName={data.organization?data.organization.name:'AZYK.STORE'}>
             <Head>

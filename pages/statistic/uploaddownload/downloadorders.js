@@ -24,7 +24,7 @@ const DownloadOrders = React.memo((props) => {
     const initialRender = useRef(true);
     let [organizations, setOrganizations] = useState(data.organizations);
     let [date, setDate] = useState(null);
-    let [organization, setOrganization] = useState(profile.organization?{_id: profile.organization}:{_id: 'all'});
+    let [organization, setOrganization] = useState(profile.organization?{_id: profile.organization}:null);
     const {isMobileApp, filter, city} = props.app;
     useEffect(() => {
         if(process.browser) {
@@ -47,6 +47,7 @@ const DownloadOrders = React.memo((props) => {
     }, [city])
     const {showLoad} = props.appActions;
     const filters = [{name: 'Дата доставки', value: 'Дата доставки'}, {name: 'Дата заказа', value: 'Дата заказа'}]
+    console.lo
     return (
         <App cityShow pageName='Выгрузка заказов' filters={filters}>
             <Head>
@@ -117,8 +118,13 @@ DownloadOrders.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     return {
-        data:
-            await getOrganizations({city: ctx.store.getState().app.city, search: '', filter: ''}, getClientGqlSsr(ctx.req)),
+        data: {
+            organizations: await getOrganizations({
+                city: ctx.store.getState().app.city,
+                search: '',
+                filter: ''
+            }, getClientGqlSsr(ctx.req))
+        }
     }
 };
 

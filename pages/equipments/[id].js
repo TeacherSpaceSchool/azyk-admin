@@ -17,6 +17,7 @@ import {formatAmount, unawaited} from '../../src/lib';
 import {getOrganization} from '../../src/gql/organization';
 import {viewModes} from '../../src/enum';
 import Table from '../../components/table/equipments';
+import {getEmployments} from '../../src/gql/employment';
 
 const Equipments = React.memo((props) => {
     const classes = pageListStyle();
@@ -38,15 +39,15 @@ const Equipments = React.memo((props) => {
     //list
     let [list, setList] = useState(data.equipments);
     const getList = async (skip) => {
-        const equipments = await getEquipments({...listArgs, skip: skip||0});
+        const gettedData = await getEquipments({...listArgs, skip: skip||0});
         if(!skip) {
             unawaited(getCount)
-            setList(equipments)
+            setList(gettedData)
             paginationWork.current = true;
             (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         }
-        else if(list.length) {
-            setList(list => [...list, ...equipments])
+        else if(gettedData.length) {
+            setList(list => [...list, ...gettedData])
             paginationWork.current = true
         }
     }
@@ -55,6 +56,7 @@ const Equipments = React.memo((props) => {
         if(!initialRender.current)
             unawaited(getList)
     }, deps)
+    //search
     useEffect(() => {
             if(initialRender.current) {
                 initialRender.current = false;
@@ -142,7 +144,7 @@ Equipments.getInitialProps = async function(ctx) {
     const [organization, equipments, agents] = await Promise.all([
         getOrganization(ctx.query.id, getClientGqlSsr(ctx.req)),
         getEquipments({organization: ctx.query.id, search: '', skip: 0}, getClientGqlSsr(ctx.req)),
-        getEquipments({organization: ctx.query.id, search: '', filter: 'агент'}, getClientGqlSsr(ctx.req))
+        getEmployments({organization: ctx.query.id, search: '', filter: 'агент'}, getClientGqlSsr(ctx.req))
     ])
     return {
         data: {

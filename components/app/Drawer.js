@@ -341,51 +341,33 @@ const MyDrawer = React.memo((props) => {
                         </>
                         :null
                 }
-                {/*
-                    ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)?
+                {
+                    ['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role)?
                         <>
-                            <ListItem style={{background: router.asPath.includes('logistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false); setUncover(uncover => uncover!=='logistic'?'logistic':'')}}>
+                            <ListItem style={{background: router.asPath.includes('consigflow')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false); setUncover(uncover => uncover!=='consigflow'?'consigflow':'')}}>
                                 <ListItemIcon><LocalShipping color='inherit'/></ListItemIcon>
                                 <ListItemText primary='Консигнации' />
-                                {uncover.includes('logistic') ? <UnfoldLess/> : <UnfoldMore/>}
+                                {uncover.includes('consigflow') ? <UnfoldLess/> : <UnfoldMore/>}
                             </ListItem>
                             <Divider/>
-                            {uncover.includes('logistic')?<>
-                                {['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role)?<>
-                                    <Link href={profile.role==='admin'?'/organizations?path=logistic/financereport&title=Отчет по деньгам':'/logistic/financereport/[id]'}
-                                          as={profile.role==='admin'?'/organizations?path=logistic/financereport&title=Отчет по деньгам':`/logistic/financereport/${profile.organization}`}>
-                                        <ListItem style={{background: router.asPath.includes('logistic/financereport')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>
+                            {uncover.includes('consigflow')?<>
+                                    <Link href={profile.role==='admin'?'/organizations?path=consigflow/history&title=История(конс)':'/consigflow/history/[id]'}
+                                          as={profile.role==='admin'?'/organizations?path=consigflow/history&title=История(конс)':`/consigflow/history/${profile.organization}`}>
+                                        <ListItem style={{background: router.asPath.includes('consigflow/history')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>
                                             <ListItemIcon/>
-                                            <ListItemText primary='Отчет по деньгам'/>
+                                            <ListItemText primary='История(конс)'/>
                                         </ListItem>
                                     </Link>
                                     <Divider/>
-                                </>:null}
-                                {['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role)?<>
-                                    <Link href={profile.role==='admin'?'/organizations?path=logistic/changelogistic&title=Редактирование логистики':'/logistic/changelogistic/[id]'}
-                                          as={profile.role==='admin'?'/organizations?path=logistic/changelogistic&title=Редактирование логистики':`/logistic/changelogistic/${profile.organization}`}>
-                                        <ListItem style={{background: router.asPath.includes('logistic/changelogistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>
+                                    <Link href={profile.role==='admin'?'/organizations?path=consigflow/statistic&title=Статистика(конс)':'/consigflow/statistic/[id]'}
+                                          as={profile.role==='admin'?'/organizations?path=consigflow/statistic&title=Статистика(конс)':`/consigflow/statistic/${profile.organization}`}>
+                                        <ListItem style={{background: router.asPath.includes('consigflow/statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>
                                             <ListItemIcon/>
-                                            <ListItemText primary='Статистик'/>
+                                            <ListItemText primary='Статистика(конс)'/>
                                         </ListItem>
                                     </Link>
                                     <Divider/>
-                                </>:null}
                             </>:null}
-                        </>
-                        :null
-                */}
-                {
-                    ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)?
-                        <>
-                            <Link href={profile.role==='admin'?'/organizations?path=consigflows&title=Задолженность':'/consigflows/[id]'}
-                                  as={profile.role==='admin'?'/organizations?path=consigflows&title=Задолженность':`/consigflows/${profile.organization}`}>
-                                <ListItem style={{background: router.asPath.includes('planClients')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => showDrawer(false)}>
-                                    <ListItemIcon><TargetIcon color='inherit'/></ListItemIcon>
-                                    <ListItemText primary='Задолженность' />
-                                </ListItem>
-                            </Link>
-                            <Divider/>
                         </>
                         :null
                 }

@@ -250,7 +250,7 @@ const list = {
         },
         {
             name: 'Выгрузка планов клиентов',
-            link: '/statistic/uploaddownload/unloadplanclients',
+            link: '/statistic/uploaddownload/downloadplanclients',
             role: ['admin', 'суперорганизация', 'организация', 'менеджер']
         },
         {
@@ -311,7 +311,6 @@ const Statistic = React.memo((props) => {
             statistic: [],
             tools: [],
             administration: [],
-            logistic: [],
             integrate: [],
             uploaddownload: [],
         }
@@ -326,10 +325,6 @@ const Statistic = React.memo((props) => {
         for (let i = 0; i < list.administration.length; i++) {
             if(list.administration[i].name.toLowerCase().includes(search.toLowerCase()) && list.administration[i].role.includes(profile.role))
                 showList.administration.push(list.administration[i])
-        }
-        for (let i = 0; i < list.logistic.length; i++) {
-            if(list.logistic[i].name.toLowerCase().includes(search.toLowerCase()) && list.logistic[i].role.includes(profile.role))
-                showList.logistic.push(list.logistic[i])
         }
         for (let i = 0; i < list.integrate.length; i++) {
             if(list.integrate[i].name.toLowerCase().includes(search.toLowerCase()) && list.integrate[i].role.includes(profile.role))
@@ -394,7 +389,7 @@ const Statistic = React.memo((props) => {
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails className={classes.page}>
                                 {showList.uploaddownload.map((element, idx) =>
-                                    <Link key={`unload${idx}`} href={element.link}>
+                                    <Link key={`download${idx}`} href={element.link}>
                                         <a>
                                             <Card className={isMobileApp?classes.cardM:classes.cardD}>
                                                 <CardActionArea>
@@ -459,38 +454,6 @@ const Statistic = React.memo((props) => {
                             <ExpansionPanelDetails className={classes.page} >
                                 {showList.integrate.map((element, idx) =>
                                     <Link key={`integrate${idx}`} href={element.link}>
-                                        <a>
-                                            <Card className={isMobileApp?classes.cardM:classes.cardD}>
-                                                <CardActionArea>
-                                                    <div className={classes.line}>
-                                                        <h3 className={classes.input}>
-                                                            {element.name}
-                                                        </h3>
-                                                    </div>
-                                                </CardActionArea>
-                                            </Card>
-                                        </a>
-                                    </Link>
-                                )}
-                            </ExpansionPanelDetails>
-                        </ExpansionPanel>
-                        :
-                        null
-                }
-                {
-                    showList.logistic&&showList.logistic.length?
-                        <ExpansionPanel expanded={expanded === 'logistic'} onChange={handleChange('logistic')} style={{width: 'calc(100% - 20px)', margin: 10, background: '#F5F5F5'}}>
-                            <ExpansionPanelSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls='panel1a-content'
-                                id='panel1a-header'
-                                style={{background: '#fff'}}
-                            >
-                                <h3>Логистика</h3>
-                            </ExpansionPanelSummary>
-                            <ExpansionPanelDetails className={classes.page} >
-                                {showList.logistic.map((element, idx) =>
-                                    <Link key={`tool${idx}`} href={element.link}>
                                         <a>
                                             <Card className={isMobileApp?classes.cardM:classes.cardD}>
                                                 <CardActionArea>

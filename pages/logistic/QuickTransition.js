@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
-import pageListStyle from '../../src/styleMUI/statistic/statistic';
 import {useRouter} from 'next/router';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';

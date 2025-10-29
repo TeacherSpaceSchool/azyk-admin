@@ -39,15 +39,15 @@ const Employment = React.memo((props) => {
     //list
     let [list, setList] = useState(data.employments);
     const getList = async (skip) => {
-        const employments = await getEmployments({...listArgs, skip: skip||0});
+        const gettedData = await getEmployments({...listArgs, skip: skip||0});
         if(!skip) {
             unawaited(getCount)
-            setList(employments)
+            setList(gettedData)
             paginationWork.current = true;
             (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         }
-        else if(list.length) {
-            setList(list => [...list, ...employments])
+        else if(gettedData.length) {
+            setList(list => [...list, ...gettedData])
             paginationWork.current = true
         }
     }

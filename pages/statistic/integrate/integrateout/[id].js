@@ -23,65 +23,69 @@ import Table from '../../../../components/table/integrateout';
 const filters = [{name: 'Все', value: ''}, {name: 'Создан', value: 'create'}, {name: 'Обновлен', value: 'update'}, {name: 'На удаление', value: 'del'}, {name: 'Выполнен', value: 'check'}, {name: 'Ошибка', value: 'error'}]
 
 const IntegrateOutShoro = React.memo((props) => {
+    const router = useRouter()
     const classes = pageListStyle();
+    //props
     const {data} = props;
-    let [simpleStatistic, setSimpleStatistic] = useState(['0']);
-    const getSimpleStatistic = async () => setSimpleStatistic(type==='Возвраты'? await getStatisticOutXMLReturnedShoros({organization: router.query.id}) : await getStatisticOutXMLShoros({organization: router.query.id}))
-    let [list, setList] = useState(data.outXMLShoros);
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    const {search, filter, viewMode} = props.app;
+    //ref
     const initialRender = useRef(true);
     const paginationWork = useRef(true);
     const searchTimeOut = useRef(null);
-    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
-    const router = useRouter()
-    const {search, filter, viewMode} = props.app;
-    let [type, setType] = useState('Заказы');
-    const checkPagination = useCallback(async () => {
-        if(paginationWork.current) {
-            paginationWork.current = false
-            let addedList =
-                type==='Возвраты'?
-                    await getOutXMLReturnedShoros({search, filter, skip: list.length, organization: router.query.id})
-                    :
-                    await getOutXMLShoros({search, filter, skip: list.length, organization: router.query.id})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
+    //type
+    const [type, setType] = useState('Заказы');
+    //deps
+    const deps = [filter, type]
+    //listArgs
+    const listArgs = {filter, organization: router.query.id}
+    //stat
+    const [showStat, setShowStat] = useState(false);
+    const [stat, setStat] = useState(['0']);
+    const getStat = async () => setStat(type==='Возвраты'? await getStatisticOutXMLReturnedShoros({organization: router.query.id}) : await getStatisticOutXMLShoros({organization: router.query.id}))
+     //list
+    let [list, setList] = useState(data.outXMLShoros);
+    const getList = async (skip) => {
+        const gettedData = await (type==='Возвраты'?getOutXMLReturnedShoros:getOutXMLShoros)({...listArgs, search, skip: skip||0})
+        if(!skip) {
+            unawaited(getStat)
+            setList(gettedData)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         }
-    }, [search, filter, list])
-    const getList = async () => {
-        setList(type==='Возвраты'?
-            await getOutXMLReturnedShoros({search, filter, skip: 0, organization: router.query.id})
-            :
-            await getOutXMLShoros({search, filter, skip: 0, organization: router.query.id}))
-        paginationWork.current = true;
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
+        else if(gettedData.length) {
+            setList(list => [...list, ...gettedData])
+            paginationWork.current = true
+        }
     }
+    //filter
     useEffect(() => {
-        if(!initialRender.current) {
+        if(!initialRender.current)
+            unawaited(getList)
+        unawaited(getStat)
+    }, deps)
+    //search
+    useEffect(() => {
+        if(initialRender.current)
+            initialRender.current = false;
+        else {
             if(searchTimeOut.current)
                 clearTimeout(searchTimeOut.current)
             searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
     }, [search])
-    useEffect(() => {
-        if(initialRender.current) {
-            initialRender.current = false;
+    //pagination
+    const checkPagination = useCallback(async () => {
+        if(paginationWork.current) {
+            paginationWork.current = false
+            await getList(list.length)
         }
-        else {
-            unawaited(getList)
-        }
-        unawaited(getSimpleStatistic)
-    }, [filter, type])
-    let [showStat, setShowStat] = useState(false);
+    }, [search, list, ...deps])
+    //fab
     let [anchorEl, setAnchorEl] = useState(null);
-    let open = event => {
-        setAnchorEl(event.currentTarget);
-    };
-    let close = () => {
-        setAnchorEl(null);
-    };
-
+    let open = event => setAnchorEl(event.currentTarget);
+    let close = () => setAnchorEl(null);
+    //render
     return (
         <App checkPagination={checkPagination} list={list} setList={setList} searchShow filters={filters} pageName='Выгрузка интеграции 1С'>
             <Head>
@@ -89,14 +93,14 @@ const IntegrateOutShoro = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className='count' onClick={() =>setShowStat(!showStat)}>
-                        Выполнено: {formatAmount(simpleStatistic[0])}
+                        Выполнено: {formatAmount(stat[0])}
                         {
                             showStat?
                                 <>
                                     <br/>
-                                    Обработка: {formatAmount(simpleStatistic[1])}
+                                    Обработка: {formatAmount(stat[1])}
                                     <br/>
-                                    Ошибка: {formatAmount(simpleStatistic[2])}
+                                    Ошибка: {formatAmount(stat[2])}
                                 </>
                                 :
                                 null
@@ -138,7 +142,7 @@ const IntegrateOutShoro = React.memo((props) => {
                     const action = async () => {
                         type==='Возвраты'?await deleteOutXMLReturnedShoroAll(router.query.id):await deleteOutXMLShoroAll(router.query.id)
                         setList([])
-                        setSimpleStatistic(['0'])
+                        setStat(['0'])
                     }
                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                     showMiniDialog(true);

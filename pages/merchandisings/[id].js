@@ -37,14 +37,14 @@ const Merchandisings = React.memo((props) => {
     //list
     let [list, setList] = useState(data.merchandisings);
     const getList = async (skip) => {
-        const orders = await getMerchandisings({...listArgs, skip: skip||0})
+        const gettedData = await getMerchandisings({...listArgs, skip: skip||0})
         if(!skip) {
-            setList(orders)
+            setList(gettedData)
             paginationWork.current = true;
             (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         }
-        else if(list.length) {
-            setList(list => [...list, ...orders])
+        else if(gettedData.length) {
+            setList(list => [...list, ...gettedData])
             paginationWork.current = true
         }
     }

@@ -20,7 +20,7 @@ import * as appActions from '../../../redux/actions/app'
 const DownloadEmployments = React.memo((props) => {
     const classes = pageListStyle();
     const {data} = props;
-    let [organization, setOrganization] = useState({_id: 'all'});
+    let [organization, setOrganization] = useState(null);
     const {isMobileApp, city} = props.app;
     const {showLoad} = props.appActions;
     const initialRender = useRef(true);

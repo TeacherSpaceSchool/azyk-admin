@@ -27,39 +27,53 @@ const filters = [
 
 const History = React.memo((props) => {
     const classes = pageListStyle();
+    //props
     const {data} = props;
     const {search, filter, viewMode} = props.app;
+    //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
+    const paginationWork = useRef(true);
+    //deps
+    const deps = [filter]
+    //listArgs
+    const listArgs = {filter}
+    //list
     let [list, setList] = useState(data.histories);
-    const getList = async () => {
-        setList(await getHistories({search, filter, skip: 0}))
-        paginationWork.current = true;
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+    const getList = async (skip) => {
+        const gettedData = await getHistories({...listArgs, search, skip: skip||0});
+        if(!skip) {
+            setList(gettedData)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(gettedData.length) {
+            setList(list => [...list, ...gettedData])
+            paginationWork.current = true
+        }
     }
+    //filter
     useEffect(() => {
         if(!initialRender.current) unawaited(getList)
-    }, [filter])
+    }, deps)
+    //search
     useEffect(() => {
-        if(initialRender.current) {
+        if(initialRender.current)
             initialRender.current = false;
-        } else {
+        else {
             if(searchTimeOut.current)
                 clearTimeout(searchTimeOut.current)
             searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
     }, [search])
-    const paginationWork = useRef(true);
+    //pagination
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
             paginationWork.current = false
-            let addedList = await getHistories({search, filter, skip: list.length})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
+            await getList(list.length)
         }
-    }, [search, filter, list])
+    }, [search, list, ...deps])
+    //render
     return (
         <App searchShow filters={filters} checkPagination={checkPagination} pageName='История'>
             <Head>

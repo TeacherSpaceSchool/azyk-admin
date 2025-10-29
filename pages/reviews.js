@@ -31,14 +31,14 @@ const Reviews = React.memo((props) => {
     //list
     let [list, setList] = useState(data.reviews);
     const getList = async (skip) => {
-        const reviews = await getReviews({...listArgs, skip: skip||0})
+        const gettedData = await getReviews({...listArgs, skip: skip||0})
         if(!skip) {
-            setList(reviews)
+            setList(gettedData)
             paginationWork.current = true;
             (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         }
-        else if(list.length) {
-            setList(list => [...list, ...reviews])
+        else if(gettedData.length) {
+            setList(list => [...list, ...gettedData])
             paginationWork.current = true
         }
     }

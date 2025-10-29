@@ -110,8 +110,8 @@ export const downloadInvoices = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($organization: ID!, $dateStart: Date!, $forwarder: ID, $all: Boolean) {
-                        downloadInvoices(organization: $organization, dateStart: $dateStart, forwarder: $forwarder, all: $all)
+                    query ($organization: ID!, $dateStart: Date!, $all: Boolean) {
+                        downloadInvoices(organization: $organization, dateStart: $dateStart, all: $all)
                     }`,
             })
         return res.data.downloadInvoices

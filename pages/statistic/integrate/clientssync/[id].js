@@ -15,51 +15,67 @@ import RemoveIcon from '@material-ui/icons/Clear';
 import Confirmation from '../../../../components/dialog/Confirmation'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../../../redux/actions/mini_dialog'
-import {formatAmount} from '../../../../src/lib';
+import {formatAmount, unawaited} from '../../../../src/lib';
 import {viewModes} from '../../../../src/enum';
 import Table from '../../../../components/table/clients';
 
 const ClientsSync = React.memo((props) => {
-    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const classes = pageListStyle();
-    const {data} = props;
     const router = useRouter()
-    let [list, setList] = useState(data.clientsSync);
+    //props
+    const {data} = props;
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {search, city, viewMode} = props.app;
+    //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
     const paginationWork = useRef(true);
-    let [simpleStatistic, setSimpleStatistic] = useState(data.clientsSyncStatistic);
-    const checkPagination = useCallback(async () => {
-        if(paginationWork.current) {
-            paginationWork.current = false
-            let addedList = await getClientsSync({search, organization: router.query.id, skip: list.length, city})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
+    //deps
+    const deps = [city]
+    //listArgs
+    const listArgs = {organization: router.query.id, city}
+    //count
+    let [count, setCount] = useState('');
+    const getCount = async () => setCount(await getClientsSyncStatistic({search, ...listArgs}))
+    //list
+    let [list, setList] = useState(data.clientsSync);
+    const getList = async (skip) => {
+        const gettedData = await getClientsSync({...listArgs, search, skip: skip||0});
+        if(!skip) {
+            unawaited(getCount)
+            setList(gettedData)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
         }
-    }, [search, list, city])
+        else if(gettedData.length) {
+            setList(list => [...list, ...gettedData])
+            paginationWork.current = true
+        }
+    }
+    //filter
     useEffect(() => {
-        if(!initialRender.current) {
-            initialRender.current = false
+        if(!initialRender.current) unawaited(getList)
+    }, deps)
+    //search
+    useEffect(() => {
+        if(initialRender.current) {
+            initialRender.current = false;
+            unawaited(getCount)
         }
         else {
             if(searchTimeOut.current)
                 clearTimeout(searchTimeOut.current)
-            searchTimeOut.current = setTimeout(async () => {
-                // eslint-disable-next-line no-undef
-                const [clientsSync, clientsSyncStatistic] = await Promise.all([
-                    getClientsSync({search, organization: router.query.id, skip: 0}),
-                    getClientsSyncStatistic({search, organization: router.query.id})
-                ])
-                setList(clientsSync)
-                setSimpleStatistic(clientsSyncStatistic)
-                paginationWork.current = true;
-                (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-            }, 500)
+            searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
-    }, [search, city])
+    }, [search])
+    //pagination
+    const checkPagination = useCallback(async () => {
+        if(paginationWork.current) {
+            paginationWork.current = false
+            await getList(list.length)
+        }
+    }, [search, list, ...deps])
+    //render
     return (
         <App cityShow checkPagination={checkPagination} searchShow pageName={data.organization.name}>
             <Head>
@@ -73,7 +89,7 @@ const ClientsSync = React.memo((props) => {
                         <Table list={list}/>
                     :null}
                 <div className='count'>
-                    Интеграций: {formatAmount(simpleStatistic)}
+                    Интеграций: {formatAmount(count)}
                 </div>
             </div>
             <Fab onClick={() => {

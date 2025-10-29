@@ -18,32 +18,45 @@ import Table from '../../../../components/table/integrationLogs';
 const filters = [{name: 'Все', value: ''}, {name: '/:pass/put/item', value: '/:pass/put/item'}, {name: '/:pass/put/warehouse', value: '/:pass/put/warehouse'}, {name: '/:pass/put/stock', value: '/:pass/put/stock'}, {name: '/:pass/put/client', value: '/:pass/put/client'}, {name: '/:pass/put/employment', value: '/:pass/put/employment'}, {name: '/:pass/put/specialpriceclient', value: '/:pass/put/specialpriceclient'}, {name: '/:pass/put/limititemclient', value: '/:pass/put/limititemclient'}, {name: '/:pass/put/specialpricecategory', value: '/:pass/put/specialpricecategory'}]
 
 const IntegrationLog = React.memo((props) => {
+    const router = useRouter()
     const classes = pageListStyle();
+    //props
     const {data} = props;
     const {filter, viewMode} = props.app;
-    let [list, setList] = useState(data.integrationLogs);
+    //ref
     const paginationWork = useRef(true);
     const initialRender = useRef(true);
-    const router = useRouter()
-    const getList = async () => {
-        setList(await getIntegrationLogs({filter, organization: router.query.id, skip: 0}))
-        paginationWork.current = true;
-        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+    //deps
+    const deps = [filter]
+    //listArgs
+    const listArgs = {filter, organization: router.query.id}
+    //list
+    let [list, setList] = useState(data.integrationLogs);
+    const getList = async (skip) => {
+        const gettedData = await getIntegrationLogs({...listArgs, skip: skip||0})
+        if(!skip) {
+            setList(gettedData)
+            paginationWork.current = true;
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
+        }
+        else if(gettedData.length) {
+            setList(list => [...list, ...gettedData])
+            paginationWork.current = true
+        }
     }
+    //filter
     useEffect(() => {
         if(initialRender.current) initialRender.current = false
         else unawaited(getList)
-    }, [filter])
+    }, deps)
+    //pagination
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
             paginationWork.current = false
-            let addedList = await getIntegrationLogs({filter, organization: router.query.id, skip: list.length})
-            if(addedList.length) {
-                setList([...list, ...addedList])
-                paginationWork.current = true
-            }
+            await getList(list.length)
         }
-    }, [filter, list])
+    }, [list, ...deps])
+    //render
     return (
         <App checkPagination={checkPagination} list={list} setList={setList} filters={filters} pageName='Логи 1С'>
             <Head>

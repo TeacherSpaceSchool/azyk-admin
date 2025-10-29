@@ -164,7 +164,6 @@ const Id = React.memo((props) => {
                 {forwarder?<MenuItem onClick={() => {setSelectedOrders([...list]);close()}}>Выбрать все</MenuItem>:null}
                 {selectedOrders.length?<MenuItem onClick={() => {setSelectedOrders([]);close()}}>Отменить выбор</MenuItem>:null}
             </Menu></>:null}
-            <QuickTransition fab2={showSetting}/>
             <div className='count'>
                 Всего: {formatAmount(selectedOrders.length||list.length)}
                 <br/>
@@ -173,6 +172,7 @@ const Id = React.memo((props) => {
                 Тоннаж: {formatAmount(ordersData.weightSelected||ordersData.weightAll)} кг
             </div>
         </>:!date?`Укажите:${!date?' дату доставки;':''}`:null}
+        <QuickTransition fab2={showSetting}/>
     </App>
 })
 
