@@ -44,8 +44,9 @@ const StatisticTable =  React.memo(
                 }
                 exportToExcel(parsedData)
                 return false;
-            }/*,
-            onCellClick: (colData, colMeta) => {}*/
+            },
+            onCellClick: (colData, colMeta) => {
+            }
         }
         return <MuiThemeProvider theme={muiTheme}>
             <MUIDataTable

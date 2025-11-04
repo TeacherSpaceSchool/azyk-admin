@@ -27,6 +27,7 @@ export const printHTML = ({ title, data, template }) => {
             hyphens: auto;              /* пытается переносить по слогам, если возможно */
             overflow-wrap: break-word;
             text-align:left;
+            white-space: pre-wrap;
           }
           tr {
             page-break-inside: avoid; /* строки не разрывать */

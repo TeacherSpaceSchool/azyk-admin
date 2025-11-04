@@ -2,75 +2,89 @@ import Head from 'next/head';
 import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../../layouts/App';
 import { connect } from 'react-redux'
-import { getConsigFlows } from '../../../src/gql/consigFlow'
-import pageListStyle from '../../../src/styleMUI/organization/orgaizationsList'
-import CardConsigFlow from '../../../components/card/CardConsigFlow'
+import {getConsigFlowStatistic} from '../../../src/gql/consigFlow'
 import { useRouter } from 'next/router'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
 import * as appActions from '../../../redux/actions/app'
 import {bindActionCreators} from 'redux';
-import {unawaited} from '../../../src/lib';
-import {viewModes} from '../../../src/enum';
-import Table from '../../../components/table/consigflow/history';
+import {checkFloat, dayStartDefault, formatAmount, pdDatePicker, unawaited} from '../../../src/lib';
+import Table from '../../../components/table/consigflow/statistic';
 
 const ConsigFlow = React.memo((props) => {
-    const classes = pageListStyle();
     const router = useRouter()
     //props
     const {data} = props;
-    const {district, viewMode} = props.app;
+    const {district, date, search} = props.app;
     //ref
+    const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
-    const paginationWork = useRef(true);
     //deps
-    const deps = [district]
+    const deps = [district, date]
     //listArgs
-    const listArgs = {district, organization: router.query.id, ...router.query.invoice?{invoice: router.query.invoice}:{}, ...router.query.client?{client: router.query.client}:{}}
+    const listArgs = {district, organization: router.query.id, date, search}
     //list
     let [list, setList] = useState(data.list);
-    const getList = async (skip) => {
-        const gettedData = await getConsigFlows({...listArgs, skip: skip||0})
-        if(!skip) {
-            setList(gettedData)
-            paginationWork.current = true;
-            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
-        }
-        else if(gettedData.length) {
-            setList(list => [...list, ...gettedData])
-            paginationWork.current = true
-        }
+    const getList = async () => {
+        setList(await getConsigFlowStatistic(listArgs))
+        setPagination(100);
+        (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant' });
     }
+    //listData
+    let [listData, setListData] = useState({});
+    useEffect(() => {
+        listData = [0, 0, 0, 0]
+        for (const element of list) {
+            listData = [
+                listData[0] + checkFloat(element[2]),
+                listData[1] + checkFloat(element[3]),
+                listData[2] + checkFloat(element[4]),
+                listData[3] + checkFloat(element[5])
+            ]
+        }
+        setListData([checkFloat(listData[0]), checkFloat(listData[1]), checkFloat(listData[2]), checkFloat(listData[3])])
+    }, [list])
     //filter
     useEffect(() => {
-        if(initialRender.current) initialRender.current = false
-        else unawaited(getList)
+        if(!initialRender.current) unawaited(getList)
     }, deps)
-    //pagination
-    const checkPagination = useCallback(async () => {
-        if(paginationWork.current) {
-            paginationWork.current = false
-            await getList(list.length)
+    //search
+    useEffect(() => {
+        if(initialRender.current)
+            initialRender.current = false;
+        else {
+            if(searchTimeOut.current)
+                clearTimeout(searchTimeOut.current)
+            searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
         }
-    }, [list, ...deps])
+    }, [search])
+    //pagination
+    const [pagination, setPagination] = useState(100);
+    const checkPagination = useCallback(() => {
+        if(pagination<list.length)
+            setPagination(pagination => pagination+100)
+    }, [pagination, list])
     //render
     return (
-        <App checkPagination={checkPagination} searchShow pageName={data.organization?data.organization.name:'AZYK.STORE'}>
+        <App checkPagination={checkPagination} showDistrict searchShow dates pageName='Статистика(конс)'>
             <Head>
-                <title>{data.organization?data.organization.name:'AZYK.STORE'}</title>
+                <title>Статистика(конс)</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
-            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
-                {list?viewMode===viewModes.card?
-                        <>
-                            {list.map((element, idx) => {
-                                return <CardConsigFlow key={element._id} idx={idx} element={element} organization={router.query.id} list={list} setList={setList}/>
-                            })}
-                        </>
-                        :
-                        <Table list={list}/>
-                    :null}
+            <div style={{display: 'flex', flexDirection: 'row', marginBottom: 60}}>
+                <Table list={list} pagination={pagination}/>
+            </div>
+            <div className='count'>
+                Всего: {formatAmount(list.length)}
+                <br/>
+                Начало: {formatAmount(listData[0])} сом
+                <br/>
+                Взято: {formatAmount(listData[1])} сом
+                <br/>
+                Закрыто: {formatAmount(listData[2])} сом
+                <br/>
+                Конец: {formatAmount(listData[3])} сом
             </div>
         </App>
     )
@@ -78,7 +92,7 @@ const ConsigFlow = React.memo((props) => {
 
 ConsigFlow.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin', 'суперорганизация', 'организация', 'менеджер'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin', 'суперорганизация', 'организация', 'менеджер', 'агент'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -86,14 +100,14 @@ ConsigFlow.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
+    const date = new Date()
+    if (date.getHours() < dayStartDefault)
+        date.setDate(date.getDate() - 1)
+    ctx.store.getState().app.date = pdDatePicker(date)
+    ctx.store.getState().app.organization = ctx.query.id
     return {
         data: {
-            list: await getConsigFlows({
-                district: ctx.store.getState().app.district,
-                skip: 0, organization: ctx.query.id,
-                ...ctx.query.invoice?{invoice: ctx.query.invoice}:{},
-                ...ctx.query.client?{client: ctx.query.client}:{}
-            }, getClientGqlSsr(ctx.req))
+            list: await getConsigFlowStatistic({date, organization: ctx.query.id}, getClientGqlSsr(ctx.req))
         }
     };
 };

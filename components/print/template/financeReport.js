@@ -3,13 +3,14 @@ import {formatAmount, pdDDMMYYYY} from '../../../src/lib';
 export default ({list, forwarderData, date, filter, ordersData}) => {
     const columns = [
         {title: '№', style: 'width: 6.5mm;'},
-        {title: 'Адрес', style: 'width: 58.17mm;'},
+        {title: 'Адрес', style: 'width: 50.34mm;'},
         {title: 'Отгр-но', style: 'width: 14.73mm;'},
         {title: 'К оплате', style: 'width: 14.73mm;'},
         {title: 'Тип оплаты', style: 'width: 24.39mm;'},
         {title: 'Возврат', style: 'width: 14.73mm;'},
+        {title: 'Долг', style: 'width: 14.73mm;'},
         {title: 'СФ', style: 'width: 6.5mm;'},
-        {title: 'Комментарий', style: 'width: 50.12mm;'}
+        {title: 'Комментарий', style: 'width: 43.35mm;'}
     ]
 
     let html = `
@@ -33,8 +34,9 @@ export default ({list, forwarderData, date, filter, ordersData}) => {
             <td style="${columns[3].style}">${formatAmount(row[2] || '')}</td>
             <td style="${columns[4].style}">${row[3] || ''}</td>
             <td style="${columns[5].style}">${formatAmount(row[4] || '')}</td>
-            <td style="${columns[6].style}">${row[5] || ''}</td>
+            <td style="${columns[6].style}">${formatAmount(row[5] || '')}</td>
             <td style="${columns[7].style}">${row[6] || ''}</td>
+            <td style="${columns[8].style};">${row[7] || ''}</td>
           </tr>
         `, '')}
           <tr>
@@ -44,8 +46,9 @@ export default ({list, forwarderData, date, filter, ordersData}) => {
             <td style="border: none;${columns[3].style}">${formatAmount(ordersData.paymentPrice)}</td>
             <td style="border: none;${columns[4].style}"></td>
             <td style="border: none;${columns[5].style}">${formatAmount(ordersData.returnedPrice)}</td>
-            <td style="border: none;${columns[6].style}"></td>
+            <td style="border: none;${columns[6].style}">${formatAmount(ordersData.consigPrice)}</td>
             <td style="border: none;${columns[7].style}"></td>
+            <td style="border: none;${columns[8].style}"></td>
           </tr>
       </tbody>
     </table>

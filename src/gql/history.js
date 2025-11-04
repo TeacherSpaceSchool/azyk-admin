@@ -8,7 +8,7 @@ export const getHistories = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($search: String, $filter: String, $skip: Int!) {
+                    query ($search: String, $filter: String, $skip: Int) {
                         histories(search: $search, filter: $filter, skip: $skip) {
                             _id createdAt user {role} employment {_id name} client {_id name} object type model name data
                         }

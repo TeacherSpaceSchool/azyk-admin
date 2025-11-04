@@ -75,11 +75,13 @@ const Id = React.memo((props) => {
             allPrice: 0,
             paymentPrice: 0,
             returnedPrice: 0,
+            consigPrice: 0,
         }
         for (let i = 0; i < list.length; i++) {
             ordersData.allPrice = checkFloat(ordersData.allPrice + checkFloat(list[i][1]))
             ordersData.paymentPrice = checkFloat(ordersData.paymentPrice + checkFloat(list[i][2]))
             ordersData.returnedPrice = checkFloat(ordersData.returnedPrice + checkFloat(list[i][4]))
+            ordersData.consigPrice = checkFloat(ordersData.consigPrice + checkFloat(list[i][5]))
         }
         setOrdersData({...ordersData})
     }, [list])
@@ -95,17 +97,15 @@ const Id = React.memo((props) => {
             <title>Отчет по деньгам</title>
             <meta name='robots' content='noindex, nofollow'/>
         </Head>
-        {list.length?<>
-            <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 30}}>
-                <Table pagination={pagination} forwarderData={forwarderData} list={list}/>
-            </div>
-            <Fab
-                color='primary' className={classes.fab}
-                onClick={() => printHTML({ data: {list, forwarderData, date, filter, ordersData}, template: templateFinanceReport, title: `Отчет по деньгам ${pdDDMMYYYY(date)}`})}
-            >
-                <PrintIcon />
-            </Fab>
-        </>:!date||!forwarder?`Укажите:${!date?' дату доставки;':''}${!forwarder?' экспедитора;':''}`:null}
+        <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 45}}>
+            <Table pagination={pagination} forwarderData={forwarderData} list={list}/>
+        </div>
+        {list.length?<Fab
+            color='primary' className={classes.fab}
+            onClick={() => printHTML({ data: {list, forwarderData, date, filter, ordersData}, template: templateFinanceReport, title: `Отчет по деньгам ${pdDDMMYYYY(date)}`})}
+        >
+            <PrintIcon />
+        </Fab>:null}
         <QuickTransition fab2={list.length}/>
         <div className='count'>
             Всего: {formatAmount(list.length)}
@@ -115,13 +115,15 @@ const Id = React.memo((props) => {
             К оплате: {formatAmount(ordersData.paymentPrice)} сом
             <br/>
             Возврат: {formatAmount(ordersData.returnedPrice)} сом
+            <br/>
+            Долг: {formatAmount(ordersData.consigPrice)} сом
         </div>
     </App>
 })
 
 Id.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin', 'суперорганизация', 'организация', 'агент', 'менеджер'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin', 'суперорганизация', 'организация', 'менеджер'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'

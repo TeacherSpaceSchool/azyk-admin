@@ -9,11 +9,14 @@ import { useRouter } from 'next/router'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
 import initialApp from '../../../src/initialApp'
 import Router from 'next/router'
-import * as appActions from '../../../redux/actions/app'
+import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import {bindActionCreators} from 'redux';
 import {unawaited} from '../../../src/lib';
 import {viewModes} from '../../../src/enum';
 import Table from '../../../components/table/consigflow/history';
+import AddIcon from '@material-ui/icons/Add';
+import Fab from '@material-ui/core/Fab';
+import AddConsigFlow from '../../../components/dialog/AddConsigFlow';
 
 const ConsigFlow = React.memo((props) => {
     const classes = pageListStyle();
@@ -21,6 +24,8 @@ const ConsigFlow = React.memo((props) => {
     //props
     const {data} = props;
     const {district, viewMode} = props.app;
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
+    const {profile} = props.user;
     //ref
     const initialRender = useRef(true);
     const paginationWork = useRef(true);
@@ -56,29 +61,31 @@ const ConsigFlow = React.memo((props) => {
     }, [list, ...deps])
     //render
     return (
-        <App checkPagination={checkPagination} searchShow pageName={data.organization?data.organization.name:'AZYK.STORE'}>
+        <App checkPagination={checkPagination} showDistrict pageName='История(конс)'>
             <Head>
-                <title>{data.organization?data.organization.name:'AZYK.STORE'}</title>
+                <title>История(конс)</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
                 {list?viewMode===viewModes.card?
-                    <>
-                        {list.map((element, idx) => {
-                            return <CardConsigFlow key={element._id} idx={idx} element={element} organization={router.query.id} list={list} setList={setList}/>
-                        })}
-                        </>
+                        list.map(element => <CardConsigFlow key={element._id} element={element}/>)
                         :
                         <Table list={list}/>
                     :null}
             </div>
+            {['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)?<Fab color='primary' className={classes.fab} onClick={() => {
+                setMiniDialog('Добавить', <AddConsigFlow initialClient={router.query.client}/>)
+                showMiniDialog(true)
+            }}>
+                <AddIcon/>
+            </Fab>:null}
         </App>
     )
 })
 
 ConsigFlow.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin', 'суперорганизация', 'организация', 'менеджер'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin', 'суперорганизация', 'организация', 'менеджер', 'агент'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -86,6 +93,7 @@ ConsigFlow.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
+    ctx.store.getState().app.organization = ctx.query.id
     return {
         data: {
             list: await getConsigFlows({
@@ -107,7 +115,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        appActions: bindActionCreators(appActions, dispatch),
+        mini_dialogActions: bindActionCreators(mini_dialogActions, dispatch),
     }
 }
 

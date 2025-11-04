@@ -97,17 +97,15 @@ const FinanceReport = React.memo((props) => {
             <title>Сводная накладная</title>
             <meta name='robots' content='noindex, nofollow'/>
         </Head>
-        {list.length?<>
-            <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 50}}>
-                <Table pagination={pagination} forwarderData={forwarderData} list={list}/>
-            </div>
-            <Fab
-                color='primary' className={classes.fab}
-                onClick={() => printHTML({ data: {list, forwarderData, date, filter, ordersData}, template: templateSummaryInvoice, title: `Сводная накладная ${pdDDMMYYYY(date)}`})}
-            >
-                <PrintIcon />
-            </Fab>
-        </>:!filter||!date||!forwarder?`Укажите:${!filter?' рейс;':''}${!date?' дату доставки;':''}${!forwarder?' экспедитора;':''}`:null}
+        <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 60}}>
+            <Table pagination={pagination} forwarderData={forwarderData} list={list}/>
+        </div>
+        {list.length?<Fab
+            color='primary' className={classes.fab}
+            onClick={() => printHTML({ data: {list, forwarderData, date, filter, ordersData}, template: templateSummaryInvoice, title: `Сводная накладная ${pdDDMMYYYY(date)}`})}
+        >
+            <PrintIcon />
+        </Fab>:null}
         <QuickTransition fab2={list.length}/>
         <div className='count'>
             Всего: {formatAmount(list.length)}
@@ -125,7 +123,7 @@ const FinanceReport = React.memo((props) => {
 
 FinanceReport.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin', 'суперорганизация', 'организация', 'агент', 'менеджер'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin', 'суперорганизация', 'организация', 'менеджер'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'

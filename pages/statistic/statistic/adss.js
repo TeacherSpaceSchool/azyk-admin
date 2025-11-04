@@ -70,7 +70,7 @@ const AdssStatistic = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
-                <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignAdsss: 'flex-start'}}>
+                <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignContent: 'flex-start'}}>
                     <div className={classes.row}>
                         {
                             profile.role==='admin'?

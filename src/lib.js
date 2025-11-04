@@ -186,6 +186,12 @@ export const pdDDMM = (date) =>
     date = `${date.getDate()<10?'0':''}${date.getDate()}.${date.getMonth()<9?'0':''}${date.getMonth()+1}`
     return date
 }
+export const pdDDMMMM = (date) =>
+{
+    date = new Date(date)
+    date = `${date.getDate()<10?'0':''}${date.getDate()} ${months[date.getMonth()]}`
+    return date
+}
 export const pdDDMMYYHHMMCancel = (date) =>
 {
     date = new Date(date)
@@ -291,3 +297,18 @@ export const isSameUrl = (obj1, obj2) => {
 }
 
 export const isObject = v => v !== null && typeof v === 'object' && !Array.isArray(v);
+
+export const months = [
+    'январь',
+    'февраль',
+    'март',
+    'апрель',
+    'май',
+    'июнь',
+    'июль',
+    'август',
+    'сентябрь',
+    'октябрь',
+    'ноябрь',
+    'декабрь'
+]

@@ -1,9 +1,19 @@
 import React from 'react';
-import {formatAmount, getClientTitle, isEmpty, isNotEmpty, pdDDMMHHMM} from '../../../src/lib';
+import {formatAmount, getClientTitle, isEmpty, isNotEmpty, pdDDMM, pdDDMMHHMM, pdDDMMMM} from '../../../src/lib';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import CheckCircleOutline from '@material-ui/icons/CheckCircleOutline';
+import {bindActionCreators} from 'redux';
+import * as mini_dialogActions from '../../../redux/actions/mini_dialog';
+import {connect} from 'react-redux';
+import * as appActions from '../../../redux/actions/app';
+import {getEmployments} from '../../../src/gql/employment';
+import SetForwarder from '../../dialog/SetForwarder';
+import SetDate from '../../dialog/SetDate';
 
-const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList, selectedOrders, setSelectedOrders, pagination}) =>{
+const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList, selectedOrders, setSelectedOrders, pagination, app, appActions, mini_dialogActions}) =>{
+    const {organization, date, filter, isMobileApp} = app;
+    const {setForwarder} = appActions;
+    const {setMiniDialog, showMiniDialog} = mini_dialogActions;
     const columns = [
         {title: '', style: {width: 28.59}},
         {title: 'Адрес', style: {width: 300}},
@@ -14,8 +24,38 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
         ...!forwarderData?[{title: 'Экспедитор', style: {width: 250}}]:[],
     ]
     return <div style={{width: 'fit-content', background: 'white'}}>
-            {forwarderData?<div style={{zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}>{!middleList?<><span style={{color: '#707070'}}>Экспедитор:</span> {forwarderData.name}</>:null}</div>:null}
-            <div className='tableHead' style={forwarderData?{top: 31}:{}}>
+            <div
+                style={{zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}>
+                {!middleList?<>
+                    <span style={{cursor: 'pointer'}} onClick={async () => {
+                        const forwarders = await getEmployments({organization, search: '', filter: 'экспедитор', sort: 'name'});
+                        setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);
+                        showMiniDialog(true);
+                    }}>
+                        <span style={{color: '#707070'}}>Экспедитор:</span>&nbsp;
+                        <span style={!forwarderData?{color: '#ffb300'}:{display: 'inline-block', maxWidth: 230, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', verticalAlign: 'bottom'}}>
+                            {forwarderData?forwarderData.name:'указать'}
+                        </span>
+                    </span>
+                    &nbsp;&nbsp;&nbsp;
+                    <span style={{cursor: 'pointer'}} onClick={async () => {
+                        setMiniDialog('Доставка', <SetDate/>);
+                        showMiniDialog(true);
+                    }}>
+                        <span style={{color: '#707070'}}>Доставка:</span>&nbsp;
+                        <span style={!date?{color: 'red'}:{}}>{date?pdDDMMMM(date):'указать'}</span>
+                    </span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span style={{cursor: 'pointer'}} onClick={async () => {
+                        if(isMobileApp)
+                            await document.getElementById('mobile-menu-button').click();
+                        document.getElementById('filter-button').click();
+                    }}>
+                        <span style={{color: '#707070'}}>Рейс:</span>&nbsp;
+                        <span style={!filter?{color: '#ffb300'}:{}}>{filter?filter:'указать'}</span>
+                    </span>
+                </>:null}
+            </div>
+            <div className='tableHead' style={{top: 31}}>
                 {columns.map((column, idx) => {
                     return column?<React.Fragment key={`column${idx}`}>
                         <div className='tableCell' style={{...column.style, whiteSpace: 'nowrap', ...!idx?{margin: 0, padding: 5}:{}}}>
@@ -84,5 +124,19 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
     </div>;
 })
 
-export default Tables
+function mapStateToProps (state) {
+    return {
+        app: state.app,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        mini_dialogActions: bindActionCreators(mini_dialogActions, dispatch),
+        appActions: bindActionCreators(appActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Tables)
+
 

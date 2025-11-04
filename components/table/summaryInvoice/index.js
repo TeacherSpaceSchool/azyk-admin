@@ -1,7 +1,17 @@
 import React from 'react';
-import {formatAmount} from '../../../src/lib';
+import {formatAmount, pdDDMMMM} from '../../../src/lib';
+import {bindActionCreators} from 'redux';
+import * as mini_dialogActions from '../../../redux/actions/mini_dialog';
+import {connect} from 'react-redux';
+import {getEmployments} from '../../../src/gql/employment';
+import SetForwarder from '../../dialog/SetForwarder';
+import * as appActions from '../../../redux/actions/app';
+import SetDate from '../../dialog/SetDate';
 
-const Tables =  React.memo(({list, forwarderData, pagination}) =>{
+const Tables =  React.memo(({list, forwarderData, pagination, app, appActions, mini_dialogActions}) =>{
+    const {organization, date, filter, isMobileApp} = app;
+    const {setForwarder} = appActions;
+    const {setMiniDialog, showMiniDialog} = mini_dialogActions;
     const columns = [
         {title: 'Склад', style: {width: 200}},
         {title: 'Товар', style: {width: 300}},
@@ -11,17 +21,46 @@ const Tables =  React.memo(({list, forwarderData, pagination}) =>{
         {title: 'Тоннаж', style: {width: 60}},
     ]
     return <div style={{width: 'fit-content', background: 'white'}}>
-            {forwarderData?<div style={{zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}><span style={{color: '#707070'}}>Экспедитор:</span> {forwarderData.name}</div>:null}
-            <div className='tableHead' style={{top: 31}}>
-                {columns.map((column, idx) => {
-                    return column?<React.Fragment key={`column${idx}`}>
-                        <div className='tableCell' style={{...column.style, whiteSpace: 'nowrap'}}>
-                            {column.title}
-                        </div>
-                        <div className='tableBorder'/>
-                    </React.Fragment>:null
-                })}
-            </div>
+        <div
+            style={{zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}>
+            <span style={{cursor: 'pointer'}} onClick={async () => {
+                const forwarders = await getEmployments({organization, search: '', filter: 'экспедитор', sort: 'name'});
+                setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);
+                showMiniDialog(true);
+            }}>
+                <span style={{color: '#707070'}}>Экспедитор:</span>&nbsp;
+                <span style={!forwarderData?{color: 'red'}:{}}>
+                    {forwarderData?forwarderData.name:'указать'}
+                </span>
+            </span>
+            &nbsp;&nbsp;&nbsp;
+            <span style={{cursor: 'pointer'}} onClick={async () => {
+                setMiniDialog('Доставка', <SetDate/>);
+                showMiniDialog(true);
+            }}>
+                <span style={{color: '#707070'}}>Доставка:</span>&nbsp;
+                <span style={!date?{color: 'red'}:{}}>{date?pdDDMMMM(date):'указать'}</span>
+            </span>
+            &nbsp;&nbsp;&nbsp;
+            <span style={{cursor: 'pointer'}} onClick={async () => {
+                if(isMobileApp)
+                    await document.getElementById('mobile-menu-button').click();
+                document.getElementById('filter-button').click();
+            }}>
+                <span style={{color: '#707070'}}>Рейс:</span>&nbsp;
+                <span style={!filter?{color: 'red'}:{}}>{filter?filter:'указать'}</span>
+            </span>
+        </div>
+        <div className='tableHead' style={{top: 31}}>
+            {columns.map((column, idx) => {
+                return column?<React.Fragment key={`column${idx}`}>
+                    <div className='tableCell' style={{...column.style, whiteSpace: 'nowrap'}}>
+                        {column.title}
+                    </div>
+                    <div className='tableBorder'/>
+                </React.Fragment>:null
+            })}
+        </div>
         {list?list.map((row, idx) => {
             if(idx<pagination) {
                 return <div className='tableRow' key={`row${idx}`} style={{borderRight: '1px solid #00000040'}}>
@@ -42,5 +81,18 @@ const Tables =  React.memo(({list, forwarderData, pagination}) =>{
     </div>;
 })
 
-export default Tables
+function mapStateToProps (state) {
+    return {
+        app: state.app,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        mini_dialogActions: bindActionCreators(mini_dialogActions, dispatch),
+        appActions: bindActionCreators(appActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Tables)
 

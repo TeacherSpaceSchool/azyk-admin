@@ -1,15 +1,14 @@
 import React from 'react';
 import Table from '../../Table';
 import Row from './Row';
-import {connect} from 'react-redux';
 
-const Tables =  React.memo(({list, app}) =>{
-    const {isMobileApp} = app;
+const Tables =  React.memo(({list}) =>{
     const columns = [
-        {title: 'Создан\nСтатус', style: {width: 86}},
-        {title: 'Телефон', style: {width: 100}},
-        {title: 'Магазин\nАдрес', style: {width: isMobileApp?200:300}},
-        {title: 'Откуда узнали', style: {width: 200}},
+        {title: 'Создан', style: {width: 60}},
+        {title: 'Клиент', style: {width: 300}},
+        {title: 'Сумма', style: {width: 80}},
+        {title: 'Заказ', style: {width: 200}},
+        {title: '', style: {width: 60}},
     ]
     return <Table
         columns = {columns}
@@ -17,11 +16,5 @@ const Tables =  React.memo(({list, app}) =>{
     />;
 })
 
-function mapStateToProps (state) {
-    return {
-        app: state.app,
-    }
-}
-
-export default connect(mapStateToProps)(Tables)
+export default Tables
 

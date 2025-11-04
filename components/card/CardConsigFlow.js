@@ -1,68 +1,77 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import cardStyle from '../../src/styleMUI/subbrand/cardSubbrand'
 import { connect } from 'react-redux'
-import Button from '@material-ui/core/Button';
-import CardActions from '@material-ui/core/CardActions';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
-import TextField from '@material-ui/core/TextField';
+import {formatAmount, getClientTitle, pdDDMMYYHHMM} from '../../src/lib';
+import CardActions from '@material-ui/core/CardActions';
+import Button from '@material-ui/core/Button';
+import {getHistories} from '../../src/gql/history';
+import History from '../dialog/History';
+import {getOrder} from '../../src/gql/order';
+import Order from '../dialog/Order';
+import {setConsigFlow} from '../../src/gql/consigFlow';
 import Confirmation from '../dialog/Confirmation';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import {checkFloat, inputFloat} from '../../src/lib'
-import {useRouter} from 'next/router';
-import Switch from '@material-ui/core/Switch';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+import AddConsigFlow from '../dialog/AddConsigFlow';
 
 const CardStock = React.memo((props) => {
     const classes = cardStyle();
-    const router = useRouter();
     //props
-    const {element, setList, organization, idx, warehouses} = props;
-    const {showMiniDialog, setMiniDialog} = props.mini_dialogActions;
-    const {isMobileApp} = props.app;
+    const {element} = props;
     const {profile} = props.user;
+    const {isMobileApp} = props.app;
+    const {showMiniDialog, setMiniDialog} = props.mini_dialogActions;
     //render
     return (
         <div>
             <Card className={isMobileApp?classes.cardM:classes.cardD}>
-                    <CardContent>
-
-                    </CardContent>
-                {['admin', 'суперорганизация', 'организация'].includes(profile.role)?<CardActions>
-                    {
-                        element?
-                            <>
-                                <Button onClick={async () => {
-                                    const action = async () => {
-                                    }
-                                    setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                                    showMiniDialog(true)
-                                }} size='small' color='primary'>
-                                    Сохранить
-                                </Button>
-                                <Button size='small' color='secondary' onClick={() => {
-                                    const action = async () => {
-                                    }
-                                    setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
-                                    showMiniDialog(true)
-                                }}>
-                                    Удалить
-                                </Button>
-                            </>
-                            :
-                            <Button onClick={async () => {
-                                if(organization) {
-                                    const action = async () => {
-                                    }
-                                    setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                <CardContent>
+                    <div className={classes.row}>
+                        <div className={classes.nameField}>Создан:&nbsp;</div>
+                        <div className={classes.value}>{pdDDMMYYHHMM(element.createdAt)}</div>
+                    </div>
+                    <a href={`/client/${element.client._id}`} target='_blank'>
+                        <div className={classes.row}>
+                            <div className={classes.nameField}>Клиент:&nbsp;</div>
+                            <div className={classes.value}>{getClientTitle(element.client)}</div>
+                        </div>
+                    </a>
+                    <div className={classes.row}>
+                        <div className={classes.nameField}>Сумма:&nbsp;</div>
+                        <div className={classes.value}>{formatAmount(element.amount*element.sign)} сом</div>
+                    </div>
+                    {element.invoice?
+                        <div className={classes.row}>
+                            <div className={classes.nameField}>Заказ:&nbsp;</div>
+                            <div className={classes.value} style={{cursor: 'pointer', color: '#ffb300'}} onClick={async () => {
+                                let _element = await getOrder(element.invoice._id)
+                                if(_element) {
+                                    setMiniDialog('Заказ', <Order element={_element}/>);
                                     showMiniDialog(true)
                                 }
-                            }} size='small' color='primary'>
-                                Добавить
-                            </Button>}
-                </CardActions>:null}
+                            }}>{element.invoice.number}</div>
+                        </div>:null}
+                </CardContent>
+                <CardActions>
+                    {!element.invoice?<>
+                        {['суперорганизация', 'менеджер'].includes(profile.role)?<Button onClick={async () => {
+                            const histories = await getHistories({search: element._id, filter: 'ConsigFlowAzyk'});
+                            setMiniDialog('История', <History list={histories}/>);
+                            showMiniDialog(true)
+                        }}>История</Button>:null}
+                        {['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&!element.cancel?<Button style={{color: 'red'}} onClick={async () => {
+                            const action = async () => await setConsigFlow({_id: element._id, cancel: true})
+                            setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                            showMiniDialog(true)
+                        }}>Отмена</Button>:null}
+                    </>:null}
+                    {['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&!element.cancel&&element.sign===1?<Button onClick={() => {
+                        setMiniDialog('Оплатить', <AddConsigFlow initialClient={element.client._id} initialAmount={element.amount}/>)
+                        showMiniDialog(true)
+                    }}>Оплатить</Button>:null}
+                </CardActions>
             </Card>
         </div>
     );

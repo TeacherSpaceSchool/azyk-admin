@@ -421,91 +421,93 @@ const Order =  React.memo(
                         })
                     }
                 </div>
-                <div>
-                    <FormControlLabel
-                        disabled={changedOrders||!['обработка','принят'].includes(element.orders[0].status)||!editEmploymentRoles.includes(profile.role)}
-                        control={
-                            <Checkbox
-                                checked={taken}
-                                onChange={() => setTaken(!taken)}
-                                color='primary'
-                            />
-                        }
-                        label='Заказ принят'
-                    />
-                </div>
-                <div>
-                    <FormControlLabel
-                        disabled={changedOrders||element.orders[0].status!=='принят'||!['admin', 'суперэкспедитор', 'экспедитор'].includes(profile.role)}
-                        control={
-                            <Checkbox
-                                checked={confirmationForwarder}
-                                onChange={() => setConfirmationForwarder(!confirmationForwarder)}
-                                color='primary'
-                            />
-                        }
-                        label='Заказ доставлен'
-                    />
-                </div>
-                <div>
-                    <FormControlLabel
-                        disabled={changedOrders||element.orders[0].status!=='принят'||!['admin', 'client'].includes(profile.role)}
-                        control={
-                            <Checkbox
-                                checked={confirmationClient}
-                                onChange={() => setConfirmationClient(!confirmationClient)}
-                                color='primary'
-                            />
-                        }
-                        label='Заказ получен'
-                    />
-                </div>
-                <div>
-                    <FormControlLabel
-                        disabled={changedOrders||(
-                            ['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)?
-                                !['отмена','обработка'].includes(element.orders[0].status)
-                                :
-                                !(['client', ...editEmploymentRoles].includes(profile.role)&&['отмена','обработка'].includes(element.orders[0].status))
-                        )}
-                        control={
-                            <Checkbox
-                                checked={
-                                    !!(element.cancelClient||element.cancelForwarder?
-                                        element.cancelClient?
-                                            cancelClient
+                {setList?<>
+                    <div>
+                        <FormControlLabel
+                            disabled={changedOrders||!['обработка','принят'].includes(element.orders[0].status)||!editEmploymentRoles.includes(profile.role)}
+                            control={
+                                <Checkbox
+                                    checked={taken}
+                                    onChange={() => setTaken(!taken)}
+                                    color='primary'
+                                />
+                            }
+                            label='Заказ принят'
+                        />
+                    </div>
+                    <div>
+                        <FormControlLabel
+                            disabled={changedOrders||element.orders[0].status!=='принят'||!['admin', 'суперэкспедитор', 'экспедитор'].includes(profile.role)}
+                            control={
+                                <Checkbox
+                                    checked={confirmationForwarder}
+                                    onChange={() => setConfirmationForwarder(!confirmationForwarder)}
+                                    color='primary'
+                                />
+                            }
+                            label='Заказ доставлен'
+                        />
+                    </div>
+                    <div>
+                        <FormControlLabel
+                            disabled={changedOrders||element.orders[0].status!=='принят'||!['admin', 'client'].includes(profile.role)}
+                            control={
+                                <Checkbox
+                                    checked={confirmationClient}
+                                    onChange={() => setConfirmationClient(!confirmationClient)}
+                                    color='primary'
+                                />
+                            }
+                            label='Заказ получен'
+                        />
+                    </div>
+                    <div>
+                        <FormControlLabel
+                            disabled={changedOrders||(
+                                ['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)?
+                                    !['отмена','обработка'].includes(element.orders[0].status)
+                                    :
+                                    !(['client', ...editEmploymentRoles].includes(profile.role)&&['отмена','обработка'].includes(element.orders[0].status))
+                            )}
+                            control={
+                                <Checkbox
+                                    checked={
+                                        !!(element.cancelClient||element.cancelForwarder?
+                                            element.cancelClient?
+                                                cancelClient
+                                                :
+                                                cancelForwarder
                                             :
-                                            cancelForwarder
-                                        :
-                                        'client'===profile.role?
-                                            cancelClient
-                                            :
-                                            cancelForwarder)
-                                }
-                                onChange={() => {
-                                    if('client'===profile.role) setCancelClient(!cancelClient);
-                                    else if(['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)) {
-                                        if(element.cancelClient)
-                                            setCancelClient(!cancelClient)
-                                        else
-                                            setCancelForwarder(!cancelForwarder)
+                                            'client'===profile.role?
+                                                cancelClient
+                                                :
+                                                cancelForwarder)
                                     }
-                                    else setCancelForwarder(!cancelForwarder);
-                                }}
-                                color='secondary'
-                            />
-                        }
-                        label={
-                            !element.cancelClient&&!element.cancelForwarder?
-                                'Заказ отменен'
-                                :
-                                `Заказ отменен ${element.cancelClient?'клиентом':' поставщиком'}. Востановить заказ до ${element.cancelClient?pdDDMMYYHHMMCancel(element.cancelClient):pdDDMMYYHHMMCancel(element.cancelForwarder)}`
-                        }
-                    />
-                </div>
+                                    onChange={() => {
+                                        if('client'===profile.role) setCancelClient(!cancelClient);
+                                        else if(['admin', 'суперагент', 'суперэкспедитор'].includes(profile.role)) {
+                                            if(element.cancelClient)
+                                                setCancelClient(!cancelClient)
+                                            else
+                                                setCancelForwarder(!cancelForwarder)
+                                        }
+                                        else setCancelForwarder(!cancelForwarder);
+                                    }}
+                                    color='secondary'
+                                />
+                            }
+                            label={
+                                !element.cancelClient&&!element.cancelForwarder?
+                                    'Заказ отменен'
+                                    :
+                                    `Заказ отменен ${element.cancelClient?'клиентом':' поставщиком'}. Востановить заказ до ${element.cancelClient?pdDDMMYYHHMMCancel(element.cancelClient):pdDDMMYYHHMMCancel(element.cancelForwarder)}`
+                            }
+                        />
+                    </div>
+                </>:null}
                 <center>
                     {
-                        (profile.role==='client'||editEmploymentRoles.includes(profile.role))?
+                        setList&&(profile.role==='client'||editEmploymentRoles.includes(profile.role))?
                             <Button variant='contained' color='primary' onClick={() => {
                                 const action = async () => {
                                     if(!changedOrders) {

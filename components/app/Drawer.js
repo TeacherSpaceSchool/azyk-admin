@@ -39,6 +39,7 @@ import {isNotTestUser} from '../../src/lib';
 import Sign from '../dialog/Sign';
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import LocalShipping from '@material-ui/icons/LocalShipping';
+import MonetizationOn from '@material-ui/icons/MonetizationOn';
 import UnfoldMore from '@material-ui/icons/UnfoldMore';
 import UnfoldLess from '@material-ui/icons/UnfoldLess';
 
@@ -263,7 +264,7 @@ const MyDrawer = React.memo((props) => {
                         <Link href={profile.role==='admin'?'/organizations?path=logistic/financereport&title=Отчет по деньгам':'/logistic/financereport/[id]'}
                               as={profile.role==='admin'?'/organizations?path=logistic/financereport&title=Отчет по деньгам':`/logistic/financereport/${profile.organization}`}>
                             <ListItem style={{background: router.asPath.includes('logistic/financereport')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>
-                                <ListItemIcon/>
+                                <div style={{width: 56}}/>
                                 <ListItemText primary='Отчет по деньгам'/>
                             </ListItem>
                         </Link>
@@ -271,7 +272,7 @@ const MyDrawer = React.memo((props) => {
                         <Link href={profile.role==='admin'?'/organizations?path=logistic/changelogistic&title=Редактирование логистики':'/logistic/changelogistic/[id]'}
                               as={profile.role==='admin'?'/organizations?path=logistic/changelogistic&title=Редактирование логистики':`/logistic/changelogistic/${profile.organization}`}>
                             <ListItem style={{background: router.asPath.includes('logistic/changelogistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>
-                                <ListItemIcon/>
+                                <div style={{width: 56}}/>
                                 <ListItemText primary='Редактирование логистики'/>
                             </ListItem>
                         </Link>
@@ -279,7 +280,7 @@ const MyDrawer = React.memo((props) => {
                         <Link href={profile.role==='admin'?'/organizations?path=logistic/summaryinvoice&title=Отчет по деньгам':'/logistic/summaryinvoice/[id]'}
                               as={profile.role==='admin'?'/organizations?path=logistic/summaryinvoice&title=Отчет по деньгам':`/logistic/summaryinvoice/${profile.organization}`}>
                             <ListItem style={{background: router.asPath.includes('logistic/summaryinvoice')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>
-                                <ListItemIcon/>
+                                <div style={{width: 56}}/>
                                 <ListItemText primary='Сводная накладная'/>
                             </ListItem>
                         </Link>
@@ -342,10 +343,10 @@ const MyDrawer = React.memo((props) => {
                         :null
                 }
                 {
-                    ['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role)?
+                    ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)?
                         <>
                             <ListItem style={{background: router.asPath.includes('consigflow')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false); setUncover(uncover => uncover!=='consigflow'?'consigflow':'')}}>
-                                <ListItemIcon><LocalShipping color='inherit'/></ListItemIcon>
+                                <ListItemIcon><MonetizationOn color='inherit'/></ListItemIcon>
                                 <ListItemText primary='Консигнации' />
                                 {uncover.includes('consigflow') ? <UnfoldLess/> : <UnfoldMore/>}
                             </ListItem>
@@ -354,7 +355,7 @@ const MyDrawer = React.memo((props) => {
                                     <Link href={profile.role==='admin'?'/organizations?path=consigflow/history&title=История(конс)':'/consigflow/history/[id]'}
                                           as={profile.role==='admin'?'/organizations?path=consigflow/history&title=История(конс)':`/consigflow/history/${profile.organization}`}>
                                         <ListItem style={{background: router.asPath.includes('consigflow/history')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>
-                                            <ListItemIcon/>
+                                            <div style={{width: 56}}/>
                                             <ListItemText primary='История(конс)'/>
                                         </ListItem>
                                     </Link>
@@ -362,7 +363,7 @@ const MyDrawer = React.memo((props) => {
                                     <Link href={profile.role==='admin'?'/organizations?path=consigflow/statistic&title=Статистика(конс)':'/consigflow/statistic/[id]'}
                                           as={profile.role==='admin'?'/organizations?path=consigflow/statistic&title=Статистика(конс)':`/consigflow/statistic/${profile.organization}`}>
                                         <ListItem style={{background: router.asPath.includes('consigflow/statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>
-                                            <ListItemIcon/>
+                                            <div style={{width: 56}}/>
                                             <ListItemText primary='Статистика(конс)'/>
                                         </ListItem>
                                     </Link>
@@ -451,7 +452,7 @@ const MyDrawer = React.memo((props) => {
                     ['admin','суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)?
                         <>
                             <Link href={'/statistic'}>
-                                <ListItem style={{background: router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => showDrawer(false)}>
+                                <ListItem style={{background: router.pathname.includes('statistic')&&!router.pathname.includes('consigflow')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => showDrawer(false)}>
                                     <ListItemIcon><EqualizerIcon color='inherit'/></ListItemIcon>
                                     <ListItemText primary='Инструменты' />
                                 </ListItem>

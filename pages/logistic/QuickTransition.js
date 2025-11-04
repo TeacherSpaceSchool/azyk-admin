@@ -22,7 +22,7 @@ const QuickTransition = React.memo(({fab2}) => {
     //render
     return (
         <>
-            <Button style={{position: 'fixed', right: fab2?86:20, bottom: 28}} variant='contained' color='primary' onClick={handleClick} onMouseEnter={handleClick}>
+            <Button style={{position: 'fixed', right: fab2?86:20, bottom: 28}} variant='contained' color='primary' onClick={handleClick}>
                 Переход
             </Button>
             <Menu
@@ -31,7 +31,6 @@ const QuickTransition = React.memo(({fab2}) => {
                 keepMounted
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
-                MenuListProps={{onMouseLeave: (e) => handleClose(e)}}
             >
                 {!router.asPath.includes('logistic/financereport')?<Link href={'/logistic/financereport/[id]'} as={`/logistic/financereport/${router.query.id}`}>
                     <MenuItem onClick={handleClose}>Отчет по деньгам</MenuItem>

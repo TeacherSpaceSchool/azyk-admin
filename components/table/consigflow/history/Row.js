@@ -1,27 +1,80 @@
 import React from 'react';
-import {pdDDMMYY} from '../../../../src/lib';
+import {checkFloat, formatAmount, getClientTitle, pdDDMMYY} from '../../../../src/lib';
+import {getHistories} from '../../../../src/gql/history';
+import * as mini_dialogActions from '../../../../redux/actions/mini_dialog'
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+import History from '../../../dialog/History';
+import {getOrder} from '../../../../src/gql/order';
+import Order from '../../../dialog/Order';
+import AddConsigFlow from '../../../dialog/AddConsigFlow';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
+import {setConsigFlow} from '../../../../src/gql/consigFlow';
+import {setSpecialPriceClient} from '../../../../src/gql/specialPrice';
+import Confirmation from '../../../dialog/Confirmation';
 
-const Tables =  React.memo(({element, columns}) =>{
+const Tables =  React.memo(({element, columns, mini_dialogActions, user}) =>{
+    const {setMiniDialog, showMiniDialog} = mini_dialogActions;
+    const {profile} = user;
     return <div className='tableRow'>
         <div className='tableCell' style={columns[0].style}>
-            {pdDDMMYY(element.createdAt)}<br/>
-            <span style={{color: element.taken?'green':'orange'}}>{element.taken?'принят':'обработка'}</span>
+            {pdDDMMYY(element.createdAt)}
+            {element.cancel?<><br/><span style={{color: 'red'}}>отмена</span></>:null}
         </div>
         <div className='tableBorder'/>
         <div className='tableCell' style={columns[1].style}>
-            {element.phone}
+            <a href={`/client/${element.client._id}`} target='_blank'>
+                {getClientTitle(element.client)}
+            </a>
         </div>
         <div className='tableBorder'/>
         <div className='tableCell' style={columns[2].style}>
-            {element.name}<br/>
-            {element.address}
+            {formatAmount(element.amount*element.sign)}
         </div>
         <div className='tableBorder'/>
         <div className='tableCell' style={columns[3].style}>
-            {element.whereKnow}
+            {element.invoice?<span style={{cursor: 'pointer', color: '#ffb300'}} onClick={async () => {
+                let _element = await getOrder(element.invoice._id)
+                if(_element) {
+                    setMiniDialog('Заказ', <Order element={_element}/>);
+                    showMiniDialog(true)
+                }
+            }}>{element.invoice.number}</span>:null}
+        </div>
+        <div className='tableBorder'/>
+        <div className='tableCell' style={{cursor: 'pointer', color: '#ffb300', ...columns[4].style}}>
+            {!element.invoice?<>
+                {['суперорганизация', 'менеджер'].includes(profile.role)?<span onClick={async () => {
+                    const histories = await getHistories({search: element._id, filter: 'ConsigFlowAzyk'});
+                    setMiniDialog('История', <History list={histories}/>);
+                    showMiniDialog(true)
+                }}>История</span>:null}
+                {['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&!element.cancel?<span style={{color: 'red'}} onClick={async () => {
+                    const action = async () => await setConsigFlow({_id: element._id, cancel: true})
+                    setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
+                    showMiniDialog(true)
+                }}>Отмена</span>:null}
+            </>:null}
+            {['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&!element.cancel&&element.sign===1?<span onClick={() => {
+                setMiniDialog('Оплатить', <AddConsigFlow initialClient={element.client._id} initialAmount={element.amount}/>)
+                showMiniDialog(true)
+            }}>Оплатить</span>:null}
         </div>
     </div>
 })
 
-export default Tables
+function mapStateToProps (state) {
+    return {
+        user: state.user,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        mini_dialogActions: bindActionCreators(mini_dialogActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Tables)
 

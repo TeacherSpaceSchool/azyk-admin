@@ -35,11 +35,11 @@ export const getConsigFlowStatistic = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($date: Date!, $district: ID, $organization: ID!) {
-                        consigFlowStatistic(date: $date, district: $district, organization: $organization) {${ConsigFlow}}
+                    query ($date: Date!, $district: ID, $organization: ID!, $search: String) {
+                        consigFlowStatistic(date: $date, district: $district, organization: $organization, search: $search) 
                     }`,
             })
-        return res.data.consigFlows
+        return res.data.consigFlowStatistic
     } catch(err) {
         console.error(err)
     }

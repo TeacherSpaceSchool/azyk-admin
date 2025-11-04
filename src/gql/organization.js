@@ -29,6 +29,7 @@ const Organization = `
     autoAcceptAgent
     autoAcceptNight
     calculateStock
+    calculateConsig
     clientDuplicate
     divideBySubBrand
     warehouse
@@ -100,14 +101,26 @@ export const onoffOrganization = async (_id) => {
     }
 }
 
+const args1 = (r) => `$cities: [String]${r?'!':''}, $catalog: Upload, $miniInfo: String${r?'!':''}, $image: Upload${r?'!':''}, $priotiry: Int, $minimumOrder: Int, `+
+    `$agentHistory: Int, $name: String${r?'!':''}, $address: [String]${r?'!':''}, $email: [String]${r?'!':''}, $phone: [String]${r?'!':''}, $info: String${r?'!':''}, `+
+    `$refusal: Boolean${r?'!':''}, $unite: Boolean${r?'!':''}, $superagent: Boolean${r?'!':''}, $onlyDistrict: Boolean${r?'!':''}, $addedClient: Boolean${r?'!':''}, `+
+    `$agentSubBrand: Boolean${r?'!':''}, $clientSubBrand: Boolean${r?'!':''}, $onlyIntegrate: Boolean${r?'!':''}, $autoAcceptAgent: Boolean${r?'!':''}, `+
+    `$autoAcceptNight: Boolean${r?'!':''}, $calculateStock: Boolean${r?'!':''}, $calculateConsig: Boolean${r?'!':''}, $clientDuplicate: Boolean${r?'!':''}, `+
+    `$divideBySubBrand: Boolean${r?'!':''}, $dateDelivery: Boolean${r?'!':''}, $warehouse: String${r?'!':''}, $pass: String`
+const args2 = 'cities: $cities, catalog: $catalog, miniInfo: $miniInfo, image: $image, priotiry: $priotiry, minimumOrder: $minimumOrder,  agentHistory: $agentHistory, '+
+    'name: $name, address: $address, email: $email, phone: $phone, info: $info, refusal: $refusal, unite: $unite, superagent: $superagent, onlyDistrict: $onlyDistrict, '+
+    'addedClient: $addedClient, agentSubBrand: $agentSubBrand, clientSubBrand: $clientSubBrand, onlyIntegrate: $onlyIntegrate, autoAcceptAgent: $autoAcceptAgent, '+
+    'autoAcceptNight: $autoAcceptNight, calculateStock: $calculateStock, calculateConsig: $calculateConsig, clientDuplicate: $clientDuplicate, '+
+    'divideBySubBrand: $divideBySubBrand, dateDelivery: $dateDelivery, warehouse: $warehouse, pass: $pass'
+
 export const addOrganization = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($cities: [String]!, $catalog: Upload, $miniInfo: String!, $image: Upload!, $priotiry: Int, $minimumOrder: Int, $agentHistory: Int, $name: String!, $address: [String]!, $email: [String]!, $phone: [String]!, $info: String!, $refusal: Boolean!, $unite: Boolean!, $superagent: Boolean!, $onlyDistrict: Boolean!, $addedClient: Boolean!, $agentSubBrand: Boolean!, $clientSubBrand: Boolean!, $onlyIntegrate: Boolean!, $autoAcceptAgent: Boolean!, $autoAcceptNight: Boolean!, $calculateStock: Boolean!, $clientDuplicate: Boolean!, $divideBySubBrand: Boolean!, $dateDelivery: Boolean!, $warehouse: String!, $pass: String) {
-                        addOrganization(cities: $cities, catalog: $catalog, miniInfo: $miniInfo, image: $image, priotiry: $priotiry, minimumOrder: $minimumOrder,  agentHistory: $agentHistory, name: $name, address: $address, email: $email, phone: $phone, info: $info, refusal: $refusal, unite: $unite, superagent: $superagent, onlyDistrict: $onlyDistrict, addedClient: $addedClient, agentSubBrand: $agentSubBrand, clientSubBrand: $clientSubBrand, onlyIntegrate: $onlyIntegrate, autoAcceptAgent: $autoAcceptAgent, autoAcceptNight: $autoAcceptNight, calculateStock: $calculateStock, clientDuplicate: $clientDuplicate, divideBySubBrand: $divideBySubBrand, dateDelivery: $dateDelivery, warehouse: $warehouse, pass: $pass)
+                    mutation (${args1(true)}) {
+                        addOrganization(${args2})
                     }`})
         return res.data.addOrganization
     } catch(err) {
@@ -121,8 +134,8 @@ export const setOrganization = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($cities: [String], $catalog: Upload, $miniInfo: String, $_id: ID!, $refusal: Boolean, $priotiry: Int, $image: Upload, $minimumOrder: Int, $agentHistory: Int, $name: String, $address: [String], $email: [String], $phone: [String], $info: String, $unite: Boolean, $superagent: Boolean, $onlyDistrict: Boolean, $addedClient: Boolean, $agentSubBrand: Boolean, $clientSubBrand: Boolean, $onlyIntegrate: Boolean, $autoAcceptAgent: Boolean, $autoAcceptNight: Boolean, $calculateStock: Boolean, $clientDuplicate: Boolean, $divideBySubBrand: Boolean, $dateDelivery: Boolean, $warehouse: String, $pass: String) {
-                        setOrganization(cities: $cities, catalog: $catalog, miniInfo: $miniInfo, _id: $_id, priotiry: $priotiry, refusal: $refusal, image: $image, minimumOrder: $minimumOrder, agentHistory: $agentHistory, name: $name, address: $address, unite: $unite, superagent: $superagent, email: $email, phone: $phone, info: $info, addedClient: $addedClient, agentSubBrand: $agentSubBrand, clientSubBrand: $clientSubBrand, onlyDistrict: $onlyDistrict, onlyIntegrate: $onlyIntegrate, divideBySubBrand: $divideBySubBrand, autoAcceptAgent: $autoAcceptAgent, autoAcceptNight: $autoAcceptNight, calculateStock: $calculateStock, clientDuplicate: $clientDuplicate, dateDelivery: $dateDelivery, warehouse: $warehouse, pass: $pass) 
+                    mutation ($_id: ID!, ${args1()}) {
+                        setOrganization(_id: $_id, ${args2}) 
                     }`})
         return res.data.setOrganization
     } catch(err) {

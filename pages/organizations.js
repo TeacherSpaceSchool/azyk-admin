@@ -98,7 +98,7 @@ const Organization = React.memo((props) => {
             <div className='count'>
                 Всего: {formatAmount(list.length)}
             </div>
-            <div className={classes.page}>
+            <div className={classes.page} style={viewMode===viewModes.table?{paddingTop: 0}:{}}>
                 {list?viewMode===viewModes.card?
                         <>
                             {

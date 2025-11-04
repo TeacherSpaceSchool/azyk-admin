@@ -52,6 +52,7 @@ const Organization = React.memo((props) => {
     let [agentSubBrand, setAgentSubBrand] = useState(data.organization&&data.organization.agentSubBrand!==null?data.organization.agentSubBrand:false);
     let [clientSubBrand, setClientSubBrand] = useState(data.organization&&data.organization.clientSubBrand!==null?data.organization.clientSubBrand:false);
     let [calculateStock, setCalculateStock] = useState(data.organization&&data.organization.calculateStock!==null?data.organization.calculateStock:false);
+    let [calculateConsig, setCalculateConsig] = useState(data.organization&&data.organization.calculateConsig!==null?data.organization.calculateConsig:false);
     let [autoAcceptAgent, setAutoAcceptAgent] = useState(data.organization&&data.organization.autoAcceptAgent!==null?data.organization.autoAcceptAgent:false);
     let [autoAcceptNight, setAutoAcceptNight] = useState(data.organization&&data.organization.autoAcceptNight!==null?data.organization.autoAcceptNight:false);
     let [clientDuplicate, setClientDuplicate] = useState(data.organization&&data.organization.clientDuplicate!==null?data.organization.clientDuplicate:false);
@@ -309,6 +310,17 @@ const Organization = React.memo((props) => {
                                                 }
                                                 label='Подсчет остатков'
                                             />
+                                            <FormControlLabel
+                                                control={
+                                                    <Switch
+                                                        checked={calculateConsig}
+                                                        onChange={() => {setCalculateConsig(!calculateConsig)}}
+                                                        color='primary'
+                                                        inputProps={{ 'aria-label': 'primary checkbox' }}
+                                                    />
+                                                }
+                                                label='Подсчет консигнаций'
+                                            />
                                             <br/>
                                             <div className={classes.geo} style={{color: warehouse&&warehouse.length?'#ffb300':'red'}} onClick={() => {
                                                 setFullDialog('Геолокация', <Geo change geo={warehouse} setAddressGeo={setWarehouse}/>)
@@ -512,6 +524,7 @@ const Organization = React.memo((props) => {
                                                                 agentSubBrand,
                                                                 clientSubBrand,
                                                                 calculateStock,
+                                                                calculateConsig,
                                                                 autoAcceptAgent,
                                                                 autoAcceptNight,
                                                                 clientDuplicate,
@@ -559,6 +572,7 @@ const Organization = React.memo((props) => {
                                                     if(agentSubBrand!==data.organization.agentSubBrand)editElement.agentSubBrand = agentSubBrand
                                                     if(clientSubBrand!==data.organization.clientSubBrand)editElement.clientSubBrand = clientSubBrand
                                                     if(calculateStock!==data.organization.calculateStock)editElement.calculateStock = calculateStock
+                                                    if(calculateConsig!==data.organization.calculateConsig)editElement.calculateConsig = calculateConsig
                                                     if(autoAcceptAgent!==data.organization.autoAcceptAgent)editElement.autoAcceptAgent = autoAcceptAgent
                                                     if(autoAcceptNight!==data.organization.autoAcceptNight)editElement.autoAcceptNight = autoAcceptNight
                                                     if(clientDuplicate!==data.organization.clientDuplicate)editElement.clientDuplicate = clientDuplicate

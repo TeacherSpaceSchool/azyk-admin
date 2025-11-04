@@ -45,6 +45,7 @@ const Id = React.memo((props) => {
     const {showLoad} = props.appActions;
     const {showMiniDialog, setMiniDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
+    const {profile} = props.user;
     //forwarderData
     let [forwarderData, setForwarderData] = useState(null);
     useEffect(() => {(async () => {
@@ -135,7 +136,6 @@ const Id = React.memo((props) => {
             <title>Редактирование логистики</title>
             <meta name='robots' content='noindex, nofollow'/>
         </Head>
-        {list.length?<>
             <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 30}}>
                 <Table forwarderByClient={forwarderByClient} pagination={pagination} forwarderData={forwarderData} list={double?list.slice(0, middleList):list} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>
                 {double?<Table forwarderByClient={forwarderByClient} pagination={pagination} middleList={middleList} forwarderData={forwarderData} list={list.slice(middleList)} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>:null}
@@ -171,8 +171,7 @@ const Id = React.memo((props) => {
                 <br/>
                 Тоннаж: {formatAmount(ordersData.weightSelected||ordersData.weightAll)} кг
             </div>
-        </>:!date?`Укажите:${!date?' дату доставки;':''}`:null}
-        <QuickTransition fab2={showSetting}/>
+        {profile.role!=='агент'?<QuickTransition fab2={showSetting}/>:null}
     </App>
 })
 

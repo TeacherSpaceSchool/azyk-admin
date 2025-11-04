@@ -228,6 +228,7 @@ const MyAppBar = React.memo((props) => {
                                 {
                                     cityShow||clientNetworkShow||dates||searchShow||filters||sorts?
                                         <IconButton
+                                            id='mobile-menu-button'
                                             style={{background: date||organization||agent||showForwarder||showDistrict||city||filter?'rgba(51, 143, 255, 0.29)': 'transparent'}}
                                             aria-owns={openMobileMenu ? 'menu-appbar' : null}
                                             aria-haspopup='true'
@@ -267,7 +268,7 @@ const MyAppBar = React.memo((props) => {
                                     }
                                     {filters&&filters.length?
                                         [
-                                            <MenuItem key='filterMenu' onClick={handleMenuFilter} style={{background: filter?'rgba(255, 179, 0, 0.15)': '#fff'}}>
+                                            <MenuItem id='filter-button' key='filterMenu' onClick={handleMenuFilter} style={{background: filter?'rgba(255, 179, 0, 0.15)': '#fff'}}>
                                                 <div style={{display: 'flex', color: '#606060'}}>
                                                     <FilterList/>&nbsp;{filter?(filters.find(elem=>filter===elem.value))?(filters.find(elem=>filter===elem.value)).name:'Фильтр':'Фильтр'}
                                                 </div>
@@ -939,6 +940,7 @@ const MyAppBar = React.memo((props) => {
                                     <>
                                         <Tooltip title='Фильтр'>
                                             <IconButton
+                                                id='filter-button'
                                                 style={{background: filter?'rgba(51, 143, 255, 0.29)': 'transparent'}}
                                                 aria-owns={openFilter ? 'menu-appbar' : null}
                                                 aria-haspopup='true'
