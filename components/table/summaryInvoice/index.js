@@ -7,10 +7,11 @@ import {getEmployments} from '../../../src/gql/employment';
 import SetForwarder from '../../dialog/SetForwarder';
 import * as appActions from '../../../redux/actions/app';
 import SetDate from '../../dialog/SetDate';
+import CloseIcon from '@material-ui/icons/Close';
 
 const Tables =  React.memo(({list, forwarderData, pagination, app, appActions, mini_dialogActions}) =>{
     const {organization, date, filter, isMobileApp} = app;
-    const {setForwarder} = appActions;
+    const {setForwarder, setFilter} = appActions;
     const {setMiniDialog, showMiniDialog} = mini_dialogActions;
     const columns = [
         {title: 'Склад', style: {width: 200}},
@@ -22,7 +23,7 @@ const Tables =  React.memo(({list, forwarderData, pagination, app, appActions, m
     ]
     return <div style={{width: 'fit-content', background: 'white'}}>
         <div
-            style={{zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}>
+            style={{display: 'flex', alignItems: 'center', zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}>
             <span style={{cursor: 'pointer'}} onClick={async () => {
                 const forwarders = await getEmployments({organization, search: '', filter: 'экспедитор', sort: 'name'});
                 setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);
@@ -33,6 +34,7 @@ const Tables =  React.memo(({list, forwarderData, pagination, app, appActions, m
                     {forwarderData?forwarderData.name:'указать'}
                 </span>
             </span>
+            {!isMobileApp&&forwarderData?<CloseIcon style={{fontSize: 20, color: 'red', cursor: 'pointer'}} onClick={() => setForwarder(null)}/>:null}
             &nbsp;&nbsp;&nbsp;
             <span style={{cursor: 'pointer'}} onClick={async () => {
                 setMiniDialog('Доставка', <SetDate/>);
@@ -50,6 +52,7 @@ const Tables =  React.memo(({list, forwarderData, pagination, app, appActions, m
                 <span style={{color: '#707070'}}>Рейс:</span>&nbsp;
                 <span style={!filter?{color: 'red'}:{}}>{filter?filter:'указать'}</span>
             </span>
+            {!isMobileApp&&filter?<CloseIcon style={{fontSize: 20, color: 'red', cursor: 'pointer'}} onClick={() => setFilter(null)}/>:null}
         </div>
         <div className='tableHead' style={{top: 31}}>
             {columns.map((column, idx) => {

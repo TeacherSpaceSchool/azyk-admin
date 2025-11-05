@@ -192,6 +192,12 @@ export const pdDDMMMM = (date) =>
     date = `${date.getDate()<10?'0':''}${date.getDate()} ${months[date.getMonth()]}`
     return date
 }
+export const pdMMMMYYYY = (date) =>
+{
+    date = new Date(date)
+    date = `${months[date.getMonth()]} ${date.getFullYear()}`
+    return date
+}
 export const pdDDMMYYHHMMCancel = (date) =>
 {
     date = new Date(date)
@@ -293,7 +299,7 @@ function getBasePath(path) {
 
 // Функция сравнения объектов
 export const isSameUrl = (obj1, obj2) => {
-    return getBasePath(obj1) === getBasePath(obj2)||obj1.includes('/logistic/')&&obj2.includes('/logistic/');
+    return getBasePath(obj1) === getBasePath(obj2)||obj1.includes('logistic/')&&obj2.includes('logistic/')||obj1.includes('consigflow/')&&obj2.includes('consigflow/');
 }
 
 export const isObject = v => v !== null && typeof v === 'object' && !Array.isArray(v);

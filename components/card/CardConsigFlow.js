@@ -32,12 +32,14 @@ const CardStock = React.memo((props) => {
                         <div className={classes.nameField}>Создан:&nbsp;</div>
                         <div className={classes.value}>{pdDDMMYYHHMM(element.createdAt)}</div>
                     </div>
-                    <a href={`/client/${element.client._id}`} target='_blank'>
-                        <div className={classes.row}>
-                            <div className={classes.nameField}>Клиент:&nbsp;</div>
-                            <div className={classes.value}>{getClientTitle(element.client)}</div>
-                        </div>
-                    </a>
+                    <Link href={'/client/[id]'} as={`/client/${element.client._id}`}>
+                        <a>
+                            <div className={classes.row}>
+                                <div className={classes.nameField}>Клиент:&nbsp;</div>
+                                <div className={classes.value}>{getClientTitle(element.client)}</div>
+                            </div>
+                        </a>
+                    </Link>
                     <div className={classes.row}>
                         <div className={classes.nameField}>Сумма:&nbsp;</div>
                         <div className={classes.value}>{formatAmount(element.amount*element.sign)} сом</div>

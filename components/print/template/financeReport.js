@@ -36,7 +36,7 @@ export default ({list, forwarderData, date, filter, ordersData}) => {
             <td style="${columns[5].style}">${formatAmount(row[4] || '')}</td>
             <td style="${columns[6].style}">${formatAmount(row[5] || '')}</td>
             <td style="${columns[7].style}">${row[6] || ''}</td>
-            <td style="${columns[8].style};">${row[7] || ''}</td>
+            <td style="${columns[8].style};">${row[8] || ''}</td>
           </tr>
         `, '')}
           <tr>

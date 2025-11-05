@@ -199,7 +199,7 @@ Id.getInitialProps = async function(ctx) {
     const forwarderByClient = {}
     for(const district of districts)
         for(const client of district.client) {
-            forwarderByClient[client._id] = district.forwarder?district.forwarder.name:'Не указан'
+            forwarderByClient[client._id] = district.forwarder?district.forwarder:null
         }
     return {data: {forwarderByClient}};
 };

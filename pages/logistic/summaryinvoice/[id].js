@@ -102,7 +102,7 @@ const FinanceReport = React.memo((props) => {
         </div>
         {list.length?<Fab
             color='primary' className={classes.fab}
-            onClick={() => printHTML({ data: {list, forwarderData, date, filter, ordersData}, template: templateSummaryInvoice, title: `Сводная накладная ${pdDDMMYYYY(date)}`})}
+            onClick={() => printHTML({ data: {list, forwarderData, date, filter}, template: templateSummaryInvoice, title: `Сводная накладная ${pdDDMMYYYY(date)}`})}
         >
             <PrintIcon />
         </Fab>:null}

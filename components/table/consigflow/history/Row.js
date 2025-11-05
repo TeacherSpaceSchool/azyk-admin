@@ -8,11 +8,9 @@ import History from '../../../dialog/History';
 import {getOrder} from '../../../../src/gql/order';
 import Order from '../../../dialog/Order';
 import AddConsigFlow from '../../../dialog/AddConsigFlow';
-import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
 import {setConsigFlow} from '../../../../src/gql/consigFlow';
-import {setSpecialPriceClient} from '../../../../src/gql/specialPrice';
 import Confirmation from '../../../dialog/Confirmation';
+import Link from 'next/link';
 
 const Tables =  React.memo(({element, columns, mini_dialogActions, user}) =>{
     const {setMiniDialog, showMiniDialog} = mini_dialogActions;
@@ -24,9 +22,11 @@ const Tables =  React.memo(({element, columns, mini_dialogActions, user}) =>{
         </div>
         <div className='tableBorder'/>
         <div className='tableCell' style={columns[1].style}>
-            <a href={`/client/${element.client._id}`} target='_blank'>
-                {getClientTitle(element.client)}
-            </a>
+            <Link href={'/client/[id]'} as={`/client/${element.client._id}`}>
+                <a>
+                    {getClientTitle(element.client)}
+                </a>
+            </Link>
         </div>
         <div className='tableBorder'/>
         <div className='tableCell' style={columns[2].style}>
@@ -34,7 +34,7 @@ const Tables =  React.memo(({element, columns, mini_dialogActions, user}) =>{
         </div>
         <div className='tableBorder'/>
         <div className='tableCell' style={columns[3].style}>
-            {element.invoice?<span style={{cursor: 'pointer', color: '#ffb300'}} onClick={async () => {
+            {element.invoice?<span style={{cursor: 'pointer'}} onClick={async () => {
                 let _element = await getOrder(element.invoice._id)
                 if(_element) {
                     setMiniDialog('Заказ', <Order element={_element}/>);

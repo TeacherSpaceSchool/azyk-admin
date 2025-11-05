@@ -12,7 +12,7 @@ import {dayStartDefault, pdDatePicker} from '../../src/lib'
 
 const SetDate =  React.memo(
     (props) =>{
-        const {classes} = props;
+        const {classes, type} = props;
         const {isMobileApp, date} = props.app;
         let [dateChange, setDateChange] = useState(null);
         useEffect(() => {
@@ -34,10 +34,8 @@ const SetDate =  React.memo(
                     style={{width: width}}
                     className={classes.textField}
                     label='Дата'
-                    type='date'
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
+                    type={type||'date'}
+                    InputLabelProps={{shrink: true}}
                     value={dateChange}
                     onChange={ event => setDateChange(event.target.value) }
                     onKeyPress={event => {

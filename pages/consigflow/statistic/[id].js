@@ -11,6 +11,7 @@ import * as appActions from '../../../redux/actions/app'
 import {bindActionCreators} from 'redux';
 import {checkFloat, dayStartDefault, formatAmount, pdDatePicker, unawaited} from '../../../src/lib';
 import Table from '../../../components/table/consigflow/statistic';
+import {getDistricts} from '../../../src/gql/district';
 
 const ConsigFlow = React.memo((props) => {
     const router = useRouter()
@@ -20,6 +21,11 @@ const ConsigFlow = React.memo((props) => {
     //ref
     const searchTimeOut = useRef(null);
     const initialRender = useRef(true);
+    //districtData
+    let [districtData, setDistrictData] = useState(null);
+    useEffect(() => {
+        setDistrictData(data.districtById[district])
+    }, [district])
     //deps
     const deps = [district, date]
     //listArgs
@@ -73,7 +79,7 @@ const ConsigFlow = React.memo((props) => {
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <div style={{display: 'flex', flexDirection: 'row', marginBottom: 60}}>
-                <Table list={list} pagination={pagination}/>
+                <Table list={list} pagination={pagination} districtData={districtData}/>
             </div>
             <div className='count'>
                 Всего: {formatAmount(list.length)}
@@ -105,10 +111,17 @@ ConsigFlow.getInitialProps = async function(ctx) {
         date.setDate(date.getDate() - 1)
     ctx.store.getState().app.date = pdDatePicker(date)
     ctx.store.getState().app.organization = ctx.query.id
+    // eslint-disable-next-line no-undef
+    const [list, districts] = await Promise.all([
+        getConsigFlowStatistic({date, organization: ctx.query.id}, getClientGqlSsr(ctx.req)),
+        getDistricts({organization: ctx.query.id, search: '', sort: '-name'}, getClientGqlSsr(ctx.req))
+    ])
+    const districtById = {}
+    for(const district of districts) {
+        districtById[district._id] = district
+    }
     return {
-        data: {
-            list: await getConsigFlowStatistic({date, organization: ctx.query.id}, getClientGqlSsr(ctx.req))
-        }
+        data: {list, districtById}
     };
 };
 

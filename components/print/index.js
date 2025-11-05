@@ -13,11 +13,12 @@ export const printHTML = ({ title, data, template }) => {
         }
         p {margin-bottom: 1mm; margin-top: 0}
       body, body * {
-        font-size: 9pt;
+        font-size: 8pt;
       }
           table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
           }
           th, td {
             font-weight: 500;

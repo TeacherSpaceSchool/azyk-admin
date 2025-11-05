@@ -1,5 +1,5 @@
 import React from 'react';
-import {formatAmount, getClientTitle, isEmpty, isNotEmpty, pdDDMM, pdDDMMHHMM, pdDDMMMM} from '../../../src/lib';
+import {formatAmount, getClientTitle, isEmpty, isNotEmpty, pdDDMMHHMM, pdDDMMMM} from '../../../src/lib';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import CheckCircleOutline from '@material-ui/icons/CheckCircleOutline';
 import {bindActionCreators} from 'redux';
@@ -9,10 +9,13 @@ import * as appActions from '../../../redux/actions/app';
 import {getEmployments} from '../../../src/gql/employment';
 import SetForwarder from '../../dialog/SetForwarder';
 import SetDate from '../../dialog/SetDate';
+import {getOrder} from '../../../src/gql/order';
+import Order from '../../dialog/Order';
+import CloseIcon from '@material-ui/icons/Close';
 
 const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList, selectedOrders, setSelectedOrders, pagination, app, appActions, mini_dialogActions}) =>{
     const {organization, date, filter, isMobileApp} = app;
-    const {setForwarder} = appActions;
+    const {setForwarder, setFilter} = appActions;
     const {setMiniDialog, showMiniDialog} = mini_dialogActions;
     const columns = [
         {title: '', style: {width: 28.59}},
@@ -23,9 +26,16 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
         {title: 'Создан', style: {width: 75}},
         ...!forwarderData?[{title: 'Экспедитор', style: {width: 250}}]:[],
     ]
+    const openOrder = async (row) => {
+        let _element = await getOrder(row._id)
+        if(_element) {
+            setMiniDialog('Заказ', <Order element={_element}/>);
+            showMiniDialog(true)
+        }
+    }
     return <div style={{width: 'fit-content', background: 'white'}}>
             <div
-                style={{zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}>
+                style={{display: 'flex', alignItems: 'center', zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}>
                 {!middleList?<>
                     <span style={{cursor: 'pointer'}} onClick={async () => {
                         const forwarders = await getEmployments({organization, search: '', filter: 'экспедитор', sort: 'name'});
@@ -33,10 +43,11 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
                         showMiniDialog(true);
                     }}>
                         <span style={{color: '#707070'}}>Экспедитор:</span>&nbsp;
-                        <span style={!forwarderData?{color: '#ffb300'}:{display: 'inline-block', maxWidth: 230, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', verticalAlign: 'bottom'}}>
+                        <span style={!forwarderData?{color: '#ffb300'}:{display: 'inline-block', maxWidth: 210, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', verticalAlign: 'bottom'}}>
                             {forwarderData?forwarderData.name:'указать'}
                         </span>
                     </span>
+                    {!isMobileApp&&forwarderData?<CloseIcon style={{fontSize: 20, color: 'red', cursor: 'pointer'}} onClick={() => setForwarder(null)}/>:null}
                     &nbsp;&nbsp;&nbsp;
                     <span style={{cursor: 'pointer'}} onClick={async () => {
                         setMiniDialog('Доставка', <SetDate/>);
@@ -53,6 +64,7 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
                         <span style={{color: '#707070'}}>Рейс:</span>&nbsp;
                         <span style={!filter?{color: '#ffb300'}:{}}>{filter?filter:'указать'}</span>
                     </span>
+                    {!isMobileApp&&filter?<CloseIcon style={{fontSize: 20, color: 'red', cursor: 'pointer'}} onClick={() => setFilter(null)}/>:null}
                 </>:null}
             </div>
             <div className='tableHead' style={{top: 31}}>
@@ -74,17 +86,18 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
             if(idx<pagination) {
                 if (middleList)
                     idx += middleList
-                return <div className='tableRow' key={`row${idx}`} style={{borderRight: '1px solid #00000040', cursor: 'pointer'}} onClick={() => {
-                    setSelectedOrders(selectedOrders => {
-                        if (isEmpty(index)) {
-                            selectedOrders.push(row)
-                        } else {
-                            selectedOrders.splice(index, 1)
-                        }
-                        return [...selectedOrders]
-                    })
-                }}>
-                    <div className='tableCell' style={{display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 0, padding: 5, ...columns[0].style}}>
+                const forwarder = row.forwarder||(forwarderByClient[row.client._id]||{name: 'Не указан'})
+                return <div className='tableRow' key={`row${idx}`} style={{cursor: 'pointer', borderRight: '1px solid #00000040'}}>
+                    <div className='tableCell' style={{display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 0, padding: 5, ...columns[0].style}} onClick={() => {
+                        setSelectedOrders(selectedOrders => {
+                            if (isEmpty(index)) {
+                                selectedOrders.push(row)
+                            } else {
+                                selectedOrders.splice(index, 1)
+                            }
+                            return [...selectedOrders]
+                        })
+                    }}>
                         {
                             isNotEmpty(index) ?
                                 <CheckCircle style={{color: '#ffb300', fontSize: 18.59}}/>
@@ -93,29 +106,29 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
                         }
                     </div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[1].style}>
+                    <div className='tableCell' style={columns[1].style} onClick={() => openOrder(row)}>
                         {getClientTitle({address: [row.address]})}
                     </div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[2].style}>
+                    <div className='tableCell' style={columns[2].style} onClick={() => openOrder(row)}>
                         {row.track}
                     </div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[3].style}>
+                    <div className='tableCell' style={columns[3].style} onClick={() => openOrder(row)}>
                         {formatAmount(row.allPrice - row.returnedPrice)}
                     </div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[4].style}>
+                    <div className='tableCell' style={columns[4].style} onClick={() => openOrder(row)}>
                         {formatAmount(row.allTonnage)}
                     </div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[5].style}>
+                    <div className='tableCell' style={columns[5].style} onClick={() => openOrder(row)}>
                         {pdDDMMHHMM(row.createdAt)}
                     </div>
                     {!forwarderData?<>
                         <div className='tableBorder'/>
-                        <div className='tableCell' style={columns[6].style}>
-                            {row.forwarder?row.forwarder.name:(forwarderByClient[row.client._id]||'Не указан')}
+                        <div className='tableCell' style={columns[6].style} onClick={() => setForwarder(forwarder._id)}>
+                            {forwarder.name}
                         </div>
                     </>:null}
                 </div>

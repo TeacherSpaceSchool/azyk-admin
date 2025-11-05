@@ -1,6 +1,6 @@
-import {formatAmount, isEmpty, pdDDMMYYYY} from '../../../src/lib';
+import {checkFloat, formatAmount, isEmpty, pdDDMMYYYY} from '../../../src/lib';
 
-export default ({list, forwarderData, date, filter, ordersData}) => {
+export default ({list, forwarderData, date, filter}) => {
     const columns = [
         {title: '№', style: 'width: 6.5mm;'},
         {title: 'Товар', style: 'width: 104mm;'},
@@ -10,6 +10,7 @@ export default ({list, forwarderData, date, filter, ordersData}) => {
         {title: 'Тоннаж', style: 'width: 20mm;'},
     ]
     let rowIdx = 1;
+    let invoiceData
     let html = `
     ${list.reduce((acc, row, idx) => {
         
@@ -18,6 +19,7 @@ export default ({list, forwarderData, date, filter, ordersData}) => {
         const isFirst = isEmpty(prevRow)||prevRow[0]!==row[0]
         const isLast = isEmpty(nextRow)||nextRow[0]!==row[0]
         if(isFirst) {
+            invoiceData = {countAll: 0, packageAll: 0, priceAll: 0, weightAll: 0}
             rowIdx = 1
             acc += `
               <p style="font-size: 11pt;text-align:center;page-break-before: always; margin-top: 5mm">Общий отпуск от ${pdDDMMYYYY(date)}</p>
@@ -46,15 +48,19 @@ export default ({list, forwarderData, date, filter, ordersData}) => {
                 <td style="${columns[5].style}">${formatAmount(row[5] || '')}</td>
               </tr>
             `
+        invoiceData.countAll = checkFloat(invoiceData.countAll + checkFloat(row[2]))
+        invoiceData.packageAll = checkFloat(invoiceData.packageAll + checkFloat(row[3]))
+        invoiceData.priceAll = checkFloat(invoiceData.priceAll + checkFloat(row[4]))
+        invoiceData.weightAll = checkFloat(invoiceData.weightAll + checkFloat(row[5]))
         if(isLast)
             acc += `
               <tr>
                 <td style="border: none;${columns[0].style}"></td>
                 <td style="border: none;text-align:right;${columns[1].style}">Итого:</td>
-                <td style="border: none;${columns[2].style}">${formatAmount(ordersData.countAll)}</td>
-                <td style="border: none;${columns[3].style}">${formatAmount(ordersData.packageAll)}</td>
-                <td style="border: none;${columns[5].style}">${formatAmount(ordersData.priceAll)}</td>
-                <td style="border: none;${columns[5].style}">${formatAmount(ordersData.weightAll)}</td>
+                <td style="border: none;${columns[2].style}">${formatAmount(invoiceData.countAll)}</td>
+                <td style="border: none;${columns[3].style}">${formatAmount(invoiceData.packageAll)}</td>
+                <td style="border: none;${columns[5].style}">${formatAmount(invoiceData.priceAll)}</td>
+                <td style="border: none;${columns[5].style}">${formatAmount(invoiceData.weightAll)}</td>
               </tr>
               </tbody>
             </table>
