@@ -149,7 +149,7 @@ const MyDrawer = React.memo((props) => {
                     ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент', 'суперагент', 'экспедитор'].includes(profile.role)?
                         <>
                         <Link href={'/clients'}>
-                            <ListItem style={{background: router.pathname.includes('client')&&!router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => showDrawer(false)}>
+                            <ListItem style={{background: router.pathname.includes('client')&&!router.pathname.includes('statistic')&&!router.pathname.includes('fhoclient')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => showDrawer(false)}>
                                 <ListItemIcon><GroupIcon color='inherit'/></ListItemIcon>
                                 <ListItemText primary='Клиенты' />
                             </ListItem>
