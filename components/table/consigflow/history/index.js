@@ -1,6 +1,4 @@
 import React from 'react';
-import Table from '../../Table';
-import Row from './Row';
 import {useRouter} from 'next/router';
 import {bindActionCreators} from 'redux';
 import * as mini_dialogActions from '../../../../redux/actions/mini_dialog';
@@ -9,8 +7,7 @@ import {connect} from 'react-redux';
 import {getDistricts} from '../../../../src/gql/district';
 import SetDistrict from '../../../dialog/SetDistrict';
 import CloseIcon from '@material-ui/icons/Close';
-import SetDate from '../../../dialog/SetDate';
-import {formatAmount, getClientTitle, pdDDMMYY, pdMMMMYYYY} from '../../../../src/lib';
+import {formatAmount, getClientTitle, pdDDMMYY} from '../../../../src/lib';
 import Link from 'next/link';
 import {getOrder} from '../../../../src/gql/order';
 import Order from '../../../dialog/Order';
@@ -21,8 +18,9 @@ import Confirmation from '../../../dialog/Confirmation';
 import AddConsigFlow from '../../../dialog/AddConsigFlow';
 
 const Tables =  React.memo(({list, app, user, districtData, mini_dialogActions, appActions}) =>{
+    const router = useRouter();
     let {profile} = user;
-    let {date, isMobileApp, organization} = app;
+    let {isMobileApp, organization} = app;
     const {setMiniDialog, showMiniDialog} = mini_dialogActions;
     const {setDistrict} = appActions;
     const columns = [
@@ -93,7 +91,10 @@ const Tables =  React.memo(({list, app, user, districtData, mini_dialogActions, 
                             showMiniDialog(true)
                         }}>История</span>:null}
                         {['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&!element.cancel?<span style={{color: 'red'}} onClick={async () => {
-                            const action = async () => await setConsigFlow({_id: element._id, cancel: true})
+                            const action = async () => {
+                                await setConsigFlow({_id: element._id, cancel: true})
+                                router.reload()
+                            }
                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                             showMiniDialog(true)
                         }}>Отмена</span>:null}

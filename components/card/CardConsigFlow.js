@@ -16,8 +16,10 @@ import {setConsigFlow} from '../../src/gql/consigFlow';
 import Confirmation from '../dialog/Confirmation';
 import AddConsigFlow from '../dialog/AddConsigFlow';
 import Link from 'next/link';
+import {useRouter} from 'next/router';
 
 const CardStock = React.memo((props) => {
+    const router = useRouter();
     const classes = cardStyle();
     //props
     const {element} = props;
@@ -65,7 +67,10 @@ const CardStock = React.memo((props) => {
                             showMiniDialog(true)
                         }}>История</Button>:null}
                         {['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&!element.cancel?<Button style={{color: 'red'}} onClick={async () => {
-                            const action = async () => await setConsigFlow({_id: element._id, cancel: true})
+                            const action = async () => {
+                                await setConsigFlow({_id: element._id, cancel: true})
+                                router.reload()
+                            }
                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                             showMiniDialog(true)
                         }}>Отмена</Button>:null}
