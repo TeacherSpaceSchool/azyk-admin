@@ -87,7 +87,7 @@ const Tables =  React.memo(({list, app, user, districtData, mini_dialogActions, 
                 <div className='tableBorder'/>
                 <div className='tableCell' style={{cursor: 'pointer', color: '#ffb300', ...columns[4].style}}>
                     {!element.invoice?<>
-                        {['суперорганизация', 'менеджер'].includes(profile.role)?<span onClick={async () => {
+                        {['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role)?<span onClick={async () => {
                             const histories = await getHistories({search: element._id, filter: 'ConsigFlowAzyk'});
                             setMiniDialog('История', <History list={histories}/>);
                             showMiniDialog(true)

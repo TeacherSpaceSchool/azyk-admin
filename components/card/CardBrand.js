@@ -8,12 +8,11 @@ import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import IconButton from '@material-ui/core/IconButton';
-import Done from '@material-ui/icons/Done';
 import { checkInt, inputInt } from '../../src/lib'
 import { setOrganization } from '../../src/gql/organization'
 import { setSubBrand } from '../../src/gql/subBrand'
 import CardActions from '@material-ui/core/CardActions';
+import Button from '@material-ui/core/Button';
 
 const CardBrand = React.memo((props) => {
     const classes = cardOrganizationStyle();
@@ -79,7 +78,7 @@ const CardBrand = React.memo((props) => {
                                         endAdornment={
                                             priotiry!=element.priotiry?
                                                 <InputAdornment position='end'>
-                                                    <IconButton onClick={async () => {
+                                                    <Button variant='text' size='small' color='primary' onClick={async () => {
                                                         priotiry = checkInt(priotiry)
                                                         if(element.type==='subBrand')
                                                             await setSubBrand({_id: element._id, priotiry})
@@ -93,8 +92,8 @@ const CardBrand = React.memo((props) => {
                                                             return [...list]
                                                         })
                                                     }}>
-                                                        <Done />
-                                                    </IconButton>
+                                                        Сохранить
+                                                    </Button>
                                                 </InputAdornment>
                                                 :
                                                 null

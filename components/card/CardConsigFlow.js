@@ -15,6 +15,7 @@ import Order from '../dialog/Order';
 import {setConsigFlow} from '../../src/gql/consigFlow';
 import Confirmation from '../dialog/Confirmation';
 import AddConsigFlow from '../dialog/AddConsigFlow';
+import Link from 'next/link';
 
 const CardStock = React.memo((props) => {
     const classes = cardStyle();
@@ -58,7 +59,7 @@ const CardStock = React.memo((props) => {
                 </CardContent>
                 <CardActions>
                     {!element.invoice?<>
-                        {['суперорганизация', 'менеджер'].includes(profile.role)?<Button onClick={async () => {
+                        {['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role)?<Button onClick={async () => {
                             const histories = await getHistories({search: element._id, filter: 'ConsigFlowAzyk'});
                             setMiniDialog('История', <History list={histories}/>);
                             showMiniDialog(true)

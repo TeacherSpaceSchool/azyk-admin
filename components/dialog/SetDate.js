@@ -8,7 +8,7 @@ import * as appActions from '../../redux/actions/app'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
-import {dayStartDefault, pdDatePicker} from '../../src/lib'
+import {dayStartDefault, pdDatePicker, rowReverseDialog} from '../../src/lib'
 
 const SetDate =  React.memo(
     (props) =>{
@@ -46,7 +46,7 @@ const SetDate =  React.memo(
                     }}
                 />
                 <br/>
-                <div>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant="contained" color='primary' onClick={() => {
                        setDate(new Date(dateChange))
                        showMiniDialog(false);

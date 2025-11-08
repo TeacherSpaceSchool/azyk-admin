@@ -15,6 +15,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import * as snackbarActions from '../../redux/actions/snackbar';
 import {setInvoicesLogic} from '../../src/gql/order';
 import {getEmployments} from '../../src/gql/employment';
+import {rowReverseDialog} from '../../src/lib';
 
 const tracks = [1, 2, 3, 4, 5];
 
@@ -66,7 +67,7 @@ const ChangeLogistic =  React.memo(
                         </FormControl>
                 }
                 <br/>
-                <div>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant='contained' color='primary' onClick={async () => {
                        if(forwarder||track) {
                            await setInvoicesLogic({track, ...forwarder?{forwarder: forwarder._id}:{}, invoices, dateDelivery})

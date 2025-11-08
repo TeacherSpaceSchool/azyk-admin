@@ -6,26 +6,30 @@ import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Button from '@material-ui/core/Button';
+import {rowReverseDialog} from '../../src/lib';
 
 const VideoViewer =  React.memo(
     (props) =>{
+        const {isMobileApp} = props.app;
         const {showFullDialog} = props.mini_dialogActions;
         const {classes, video} = props;
         return (
             <div className={classes.column}>
                 <iframe style={{height: window.innerHeight-145, width: window.innerWidth-48}} src={video} frameborder='0' allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture' allowfullscreen='allowfullscreen'/>
-                <center>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant='contained' color='secondary' onClick={() => {showFullDialog(false);}} className={classes.button}>
                             Закрыть
                     </Button>
-                </center>
+                </div>
             </div>
         );
     }
 )
 
-function mapStateToProps () {
-    return {}
+function mapStateToProps (state) {
+    return {
+        app: state.app
+    }
 }
 
 function mapDispatchToProps(dispatch) {

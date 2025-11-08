@@ -10,11 +10,7 @@ import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import { getClient, onoffClient, setClient, addClient, deleteClient } from '../../src/gql/client'
-import Remove from '@material-ui/icons/Delete';
-import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -231,9 +227,9 @@ const Client = React.memo((props) => {
                                         className={classes.input}
                                         InputProps={{
                                             endAdornment: <InputAdornment position='end'>
-                                                <IconButton onClick={handleHide}>
-                                                    {hide ? <VisibilityOff />:<Visibility />  }
-                                                </IconButton>
+                                                <Button variant='text' size='small' color='primary' onClick={handleHide}>
+                                                    {hide?'Показать':'Скрыть'}
+                                                </Button>
                                             </InputAdornment>
                                         }}
                                     />
@@ -297,9 +293,9 @@ const Client = React.memo((props) => {
                                                     error={!validPhone(element)}
                                                     endAdornment={
                                                         <InputAdornment position='end'>
-                                                            <IconButton onClick={() => deletePhone(idx)}>
-                                                                <Remove/>
-                                                            </IconButton>
+                                                            <Button variant='text' size='small' color='secondary' onClick={() => deletePhone(idx)}>
+                                                                Удалить
+                                                            </Button>
                                                         </InputAdornment>
                                                     }
                                                 />

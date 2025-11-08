@@ -9,7 +9,7 @@ import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import {getClients} from '../../src/gql/client';
-import {checkFloat, getClientTitle, inputFloat} from '../../src/lib';
+import {checkFloat, getClientTitle, inputFloat, rowReverseDialog} from '../../src/lib';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -117,7 +117,7 @@ const AddConsigFlow =  React.memo(
                     />
                 </div>
                 <br/>
-                <div>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant='contained' color='primary' onClick={async () => {
                         if(initialClient) client = {_id: initialClient}
                         amount = checkFloat(amount||initialAmount)

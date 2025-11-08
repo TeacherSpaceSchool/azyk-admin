@@ -7,15 +7,13 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as userActions from '../../redux/actions/user'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import classNames from 'classnames';
-import IconButton from '@material-ui/core/IconButton';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
+import {rowReverseDialog} from '../../src/lib';
 
 const Sign =  React.memo(
     (props) =>{
@@ -65,9 +63,9 @@ const Sign =  React.memo(
                         }}
                         endAdornment={
                             <InputAdornment position='end'>
-                                <IconButton onClick={handleHide}>
-                                    {hide ? <VisibilityOff />:<Visibility />  }
-                                </IconButton>
+                                <Button variant='text' size='small' color='primary' onClick={handleHide}>
+                                    {hide?'Показать':'Скрыть'}
+                                </Button>
                             </InputAdornment>
                         }
                     />
@@ -83,7 +81,7 @@ const Sign =  React.memo(
                     <div style={{width: width}}>Если забыли пароль или хотите зарегестрироваться, то перейдите в разде "Контакты" свяжитесь с нашими специалистами.</div>
                 </div>
                 <br/>
-                <div>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant="contained" color='primary' onClick={() => {
                         if(loginEnter&&passEnter)
                             signin({login: loginEnter, password: passEnter})

@@ -8,11 +8,13 @@ import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import { Map, YMaps, Placemark } from 'react-yandex-maps';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import {rowReverseDialog} from '../../src/lib';
 
 const Geos =  React.memo(
     (props) =>{
         const {showFullDialog} = props.mini_dialogActions;
         const {classes, geos} = props;
+        const {isMobileApp} = props.app;
         let [load, setLoad] = useState(true);
         return (
             <YMaps>
@@ -37,19 +39,21 @@ const Geos =  React.memo(
                             </Map>
                         </div>
                     </div>
-                    <center>
+                    <div style={rowReverseDialog(isMobileApp)}>
                         <Button variant='contained' color='secondary' onClick={() => {showFullDialog(false);}} className={classes.button}>
                             Закрыть
                         </Button>
-                    </center>
+                    </div>
                 </div>
             </YMaps>
         );
     }
 )
 
-function mapStateToProps () {
-    return {}
+function mapStateToProps (state) {
+    return {
+        app: state.app
+    }
 }
 
 function mapDispatchToProps(dispatch) {

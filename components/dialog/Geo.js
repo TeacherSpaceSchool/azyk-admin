@@ -12,9 +12,11 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Confirmation from './Confirmation'
 import Fab from '@material-ui/core/Fab';
 import GpsFixed from '@material-ui/icons/GpsFixed';
+import {rowReverseDialog} from '../../src/lib';
 
 const Geo =  React.memo(
     (props) =>{
+        const {isMobileApp} = props.app;
         const {showSnackBar} = props.snackbarActions;
         const {showFullDialog, setMiniDialog, showMiniDialog} = props.mini_dialogActions;
         const {classes, geo, name, idx, setAddressGeo, change} = props;
@@ -52,7 +54,7 @@ const Geo =  React.memo(
                             </Map>
                         </div>
                     </div>
-                    <center>
+                    <div style={rowReverseDialog(isMobileApp)}>
                         {
                             change?
                                 <Button variant='contained' color='primary' onClick={() => {
@@ -70,7 +72,7 @@ const Geo =  React.memo(
                         <Button variant='contained' color='secondary' onClick={() => {showFullDialog(false);}} className={classes.button}>
                             Закрыть
                         </Button>
-                    </center>
+                    </div>
                 </div>
                 {
                     change?
@@ -83,8 +85,10 @@ const Geo =  React.memo(
     }
 )
 
-function mapStateToProps () {
-    return {}
+function mapStateToProps (state) {
+    return {
+        app: state.app
+    }
 }
 
 function mapDispatchToProps(dispatch) {

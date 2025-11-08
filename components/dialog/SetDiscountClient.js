@@ -14,7 +14,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { getClients } from '../../src/gql/client'
 import Confirmation from './Confirmation'
 import { saveDiscountClients } from '../../src/gql/discountClient'
-import {checkInt, getClientTitle} from '../../src/lib'
+import {checkInt, getClientTitle, rowReverseDialog} from '../../src/lib'
 
 const SetDiscountClient =  React.memo(
     (props) =>{
@@ -101,7 +101,7 @@ const SetDiscountClient =  React.memo(
                     }
                 />
                 <br/>
-                <div>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant="contained" color='primary' onClick={async () => {
                         if(client&&client._id) {
                             const action = async () => {

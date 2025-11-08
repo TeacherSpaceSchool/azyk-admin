@@ -9,6 +9,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import {rowReverseDialog} from '../../src/lib';
 
 const SetOrganizations =  React.memo(
     (props) =>{
@@ -41,7 +42,7 @@ const SetOrganizations =  React.memo(
                     )}
                 />
                 <br/>
-                <div>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant="contained" color='primary' onClick={() => {
                        if(organizationChange)
                            setOrganization(organizationChange._id)

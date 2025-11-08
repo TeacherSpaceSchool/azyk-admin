@@ -10,7 +10,7 @@ import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Checkbox from '@material-ui/core/Checkbox';
 import * as snackbarActions from '../../redux/actions/snackbar'
-import {isEmpty, isNotEmpty} from '../../src/lib';
+import {isEmpty, isNotEmpty, rowReverseDialog} from '../../src/lib';
 
 const OrderAdss =  React.memo(
     (props) =>{
@@ -54,7 +54,7 @@ const OrderAdss =  React.memo(
                     else if(isNotEmpty(index)) return <CardAds element={element}/>
                 }):null}
                 <br/>
-                <div>
+                <div style={rowReverseDialog(isMobileApp)}>
                     {
                         profile.role!=='client'?
                             <Button variant="contained" color='primary' onClick={async () => {

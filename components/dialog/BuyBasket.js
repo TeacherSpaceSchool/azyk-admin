@@ -21,7 +21,7 @@ import Link from 'next/link';
 import WhatshotIcon from '@material-ui/icons/Whatshot';
 import { addBasket } from '../../src/gql/basket';
 import { addAgentHistoryGeo } from '../../src/gql/agentHistoryGeo'
-import {dayStartDefault, formatAmount, getGeoDistance, unawaited} from '../../src/lib'
+import {dayStartDefault, formatAmount, getGeoDistance, rowReverseDialog, unawaited} from '../../src/lib'
 import { getDeliveryDate } from '../../src/gql/deliveryDate';
 import { pdDDMMYYYYWW } from '../../src/lib';
 import { putOfflineOrders } from '../../src/service/idb/offlineOrders';
@@ -166,7 +166,7 @@ const BuyBasket =  React.memo(
                 }
                 <div style={{width: width}} className={classes.itogo}><b>Итого:</b>&nbsp;{formatAmount(allPrice)} сом</div>
                 <br/>
-                <div>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant='contained' color='primary' onClick={async () => {
                         if(unlock.current) {
                             unlock.current = false

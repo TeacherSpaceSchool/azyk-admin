@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import cardItemStyle from '../../src/styleMUI/item/cardItem'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -12,12 +11,10 @@ import Confirmation from '../dialog/Confirmation'
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import { setItem } from '../../src/gql/items'
-import Done from '@material-ui/icons/Done';
 import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import IconButton from '@material-ui/core/IconButton';
 import {checkFloat, inputFloat, checkInt, inputInt, formatAmount} from '../../src/lib'
 
 const CardItem = React.memo((props) => {
@@ -129,65 +126,63 @@ const CardItem = React.memo((props) => {
                 }
                 {setList?['admin', 'суперорганизация', 'организация'].includes(profile.role)?
                     <>
-                        <div className={classes.row}>
-                            <FormControl className={classes.input}>
-                                <InputLabel htmlFor={`adornment-price${element._id}`}>Цена</InputLabel>
-                                <Input
-                                    id={`adornment-price${element._id}`}
-                                    type={ isMobileApp?'number':'text'}
-                                    value={price}
-                                    onChange={(event) => {setPrice(inputFloat(event.target.value))}}
-                                    endAdornment={
-                                        price!=element.price?
-                                            <InputAdornment position='end'>
-                                                <IconButton onClick={async () => {
-                                                    price = checkFloat(price)
-                                                    if(price>0) {
-                                                        await setItem({_id: element._id, price})
-                                                    }
-                                                    setList(list => {
-                                                        list[idx].price = price
-                                                        return [...list]
-                                                    })
-                                                }}>
-                                                    <Done />
-                                                </IconButton>
-                                            </InputAdornment>
-                                            :
-                                            null
-                                    }
-                                />
-                            </FormControl>
-                            &nbsp;&nbsp;
-                            <FormControl className={classes.input}>
-                                <InputLabel htmlFor={`adornment-priotiry${element._id}`}>Приоритет</InputLabel>
-                                <Input
-                                    id={`adornment-priotiry${element._id}`}
-                                    type={ isMobileApp?'number':'text'}
-                                    value={priotiry}
-                                    onChange={(event) => {setPriotiry(inputInt(event.target.value))}}
-                                    endAdornment={
-                                        priotiry!=element.priotiry?
-                                            <InputAdornment position='end'>
-                                                <IconButton onClick={async () => {
-                                                    priotiry = checkInt(priotiry)
-                                                    await setItem({_id: element._id, priotiry})
-                                                    setList(list => {
-                                                        list[idx].priotiry = priotiry
-                                                        list = list.sort((a, b) =>  b.priotiry - a.priotiry);
-                                                        return [...list]
-                                                    })
-                                                }}>
-                                                    <Done />
-                                                </IconButton>
-                                            </InputAdornment>
-                                            :
-                                            null
-                                    }
-                                />
-                            </FormControl>
-                        </div>
-                        <br/>
+                        <FormControl className={classes.input}>
+                                    <InputLabel htmlFor={`adornment-price${element._id}`}>Цена</InputLabel>
+                                    <Input
+                                        id={`adornment-price${element._id}`}
+                                        type={ isMobileApp?'number':'text'}
+                                        value={price}
+                                        onChange={(event) => {setPrice(inputFloat(event.target.value))}}
+                                        endAdornment={
+                                            price!=element.price?
+                                                <InputAdornment position='end'>
+                                                    <Button variant='text' size='small' color='primary' onClick={async () => {
+                                                        price = checkFloat(price)
+                                                        if(price>0) {
+                                                            await setItem({_id: element._id, price})
+                                                        }
+                                                        setList(list => {
+                                                            list[idx].price = price
+                                                            return [...list]
+                                                        })
+                                                    }}>
+                                                        Сохранить
+                                                    </Button>
+                                                </InputAdornment>
+                                                :
+                                                null
+                                        }
+                                    />
+                                </FormControl>
+                        <div style={{height: 10}}/>
+                        <FormControl className={classes.input}>
+                                    <InputLabel htmlFor={`adornment-priotiry${element._id}`}>Приоритет</InputLabel>
+                                    <Input
+                                        id={`adornment-priotiry${element._id}`}
+                                        type={ isMobileApp?'number':'text'}
+                                        value={priotiry}
+                                        onChange={(event) => {setPriotiry(inputInt(event.target.value))}}
+                                        endAdornment={
+                                            priotiry!=element.priotiry?
+                                                <InputAdornment position='end'>
+                                                    <Button variant='text' size='small' color='primary' onClick={async () => {
+                                                        priotiry = checkInt(priotiry)
+                                                        await setItem({_id: element._id, priotiry})
+                                                        setList(list => {
+                                                            list[idx].priotiry = priotiry
+                                                            list = list.sort((a, b) =>  b.priotiry - a.priotiry);
+                                                            return [...list]
+                                                        })
+                                                    }}>
+                                                        Сохранить
+                                                    </Button>
+                                                </InputAdornment>
+                                                :
+                                                null
+                                        }
+                                    />
+                                </FormControl>
+                        <div style={{height: 10}}/>
                     </>
                     :
                     <Link href={`/${profile.role==='client'?'catalog':'item'}/[id]`} as={`/${profile.role==='client'?'catalog':'item'}/${profile.role==='client'?element.organization:element._id}`}>
@@ -201,7 +196,7 @@ const CardItem = React.memo((props) => {
                 }
                 {setList&&['admin', 'суперорганизация', 'организация'].includes(profile.role)?
                     element.del!=='deleted'?
-                        <>
+                        <div style={{display: 'flex', width: '100%', justifyContent: 'space-between', ...isMobileApp?{flexDirection: 'row-reverse'}:{}}}>
                             <Button onClick={async () => {
                                 const action = async () => {
                                     await onoffItem(element._id)
@@ -225,7 +220,7 @@ const CardItem = React.memo((props) => {
                             }} size='small' color='secondary'>
                                 Удалить
                             </Button>
-                        </>
+                        </div>
                         :
                         null
                     :

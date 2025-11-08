@@ -36,8 +36,6 @@ import { getOrganizations } from '../../src/gql/organization'
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
-import IconButton from '@material-ui/core/IconButton';
-import RemoveIcon from '@material-ui/icons/Remove';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
@@ -444,16 +442,14 @@ const Merchandising = React.memo((props) => {
                                             }}
                                             endAdornment={
                                                 <InputAdornment position='end'>
-                                                    <IconButton
-                                                        onClick={() => {
-                                                            if(router.query.id==='new') {
-                                                                fhos.splice(idx, 1)
-                                                                setFhos([...fhos])
-                                                            }
-                                                        }}
-                                                    >
-                                                        <RemoveIcon/>
-                                                    </IconButton>
+                                                    <Button variant='text' size='small' color='secondary' onClick={() => {
+                                                        if(router.query.id==='new') {
+                                                            fhos.splice(idx, 1)
+                                                            setFhos([...fhos])
+                                                        }
+                                                    }}>
+                                                        Удалить
+                                                    </Button>
                                                 </InputAdornment>
                                             }
                                         />

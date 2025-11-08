@@ -21,9 +21,6 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import Remove from '@material-ui/icons/Remove';
-import IconButton from '@material-ui/core/IconButton';
-import InputAdornment from '@material-ui/core/InputAdornment';
 
 const CardAds = React.memo((props) => {
     const classes = cardAdsStyle();
@@ -197,33 +194,41 @@ const CardAds = React.memo((props) => {
                                     <>
                                     {targetItems?targetItems.map((element, idx) => {
                                         return(<>
-                                            <FormControl className={classes.input}>
-                                                <InputLabel>Целевой товар</InputLabel>
-                                                <Select
-                                                    multiple
-                                                    value={element.xids}
-                                                    onChange={(event) => {
-                                                        targetItems[idx].xids = event.target.value
-                                                        setTargetItems([...targetItems])
-                                                    }}
-                                                    input={<Input />}
-                                                    MenuProps={{
-                                                        PaperProps: {
-                                                            style: {
-                                                                maxHeight: 226,
-                                                                width: 250,
-                                                            },
-                                                        }
-                                                    }}
-                                                >
-                                                    {items?items.map((item) => (
-                                                        <MenuItem key={item.name} value={item._id}>
-                                                            {item.name}
-                                                        </MenuItem>
-                                                    )):null}
-                                                </Select>
-                                            </FormControl>
-                                            <br/>
+                                            <div style={{display: 'flex'}}>
+                                                <FormControl className={classes.input}>
+                                                    <InputLabel>Целевой товар</InputLabel>
+                                                    <Select
+                                                        multiple
+                                                        value={element.xids}
+                                                        onChange={(event) => {
+                                                            targetItems[idx].xids = event.target.value
+                                                            setTargetItems([...targetItems])
+                                                        }}
+                                                        input={<Input />}
+                                                        MenuProps={{
+                                                            PaperProps: {
+                                                                style: {
+                                                                    maxHeight: 226,
+                                                                    width: 250,
+                                                                },
+                                                            }
+                                                        }}
+                                                    >
+                                                        {items?items.map((item) => (
+                                                            <MenuItem key={item.name} value={item._id}>
+                                                                {item.name}
+                                                            </MenuItem>
+                                                        )):null}
+                                                    </Select>
+                                                </FormControl>
+                                                <div style={{width: 10}}/>
+                                                <Button variant='text' size='small' color='secondary' onClick={() => {
+                                                    targetItems.splice(idx, 1)
+                                                    setTargetItems([...targetItems])
+                                                }}>
+                                                    Удалить
+                                                </Button>
+                                            </div>
                                             <br/>
                                             <FormControl className={classes.input}>
                                                 <InputLabel>Цель</InputLabel>
@@ -268,18 +273,6 @@ const CardAds = React.memo((props) => {
                                                                 targetItems[idx].targetPrice = checkInt(event.target.value)
                                                             setTargetItems([...targetItems])
                                                         }}
-                                                        endAdornment={
-                                                            <InputAdornment position='end'>
-                                                                <IconButton
-                                                                    onClick={() => {
-                                                                        targetItems.splice(idx, 1)
-                                                                        setTargetItems([...targetItems])
-                                                                    }}
-                                                                >
-                                                                    <Remove/>
-                                                                </IconButton>
-                                                            </InputAdornment>
-                                                        }
                                                     />
                                                 </FormControl>
                                                 <FormControlLabel

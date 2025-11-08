@@ -24,12 +24,13 @@ const ConsigFlow = React.memo((props) => {
     const router = useRouter()
     //props
     const {data} = props;
-    const {district, viewMode} = props.app;
+    const {district, viewMode, search} = props.app;
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {profile} = props.user;
     //ref
     const initialRender = useRef(true);
     const paginationWork = useRef(true);
+    const searchTimeOut = useRef(null);
     //districtData
     let [districtData, setDistrictData] = useState(null);
     useEffect(() => {
@@ -38,7 +39,7 @@ const ConsigFlow = React.memo((props) => {
     //deps
     const deps = [district]
     //listArgs
-    const listArgs = {district, organization: router.query.id, ...router.query.invoice?{invoice: router.query.invoice}:{}, ...router.query.client?{client: router.query.client}:{}}
+    const listArgs = {district, search, organization: router.query.id, ...router.query.invoice?{invoice: router.query.invoice}:{}, ...router.query.client?{client: router.query.client}:{}}
     //list
     let [list, setList] = useState(data.list);
     const getList = async (skip) => {
@@ -58,6 +59,16 @@ const ConsigFlow = React.memo((props) => {
         if(initialRender.current) initialRender.current = false
         else unawaited(getList)
     }, deps)
+    //search
+    useEffect(() => {
+        if(initialRender.current)
+            initialRender.current = false;
+        else {
+            if(searchTimeOut.current)
+                clearTimeout(searchTimeOut.current)
+            searchTimeOut.current = setTimeout(() => unawaited(getList), 500)
+        }
+    }, [search])
     //pagination
     const checkPagination = useCallback(async () => {
         if(paginationWork.current) {
@@ -67,7 +78,7 @@ const ConsigFlow = React.memo((props) => {
     }, [list, ...deps])
     //render
     return (
-        <App checkPagination={checkPagination} showDistrict pageName='История(конс)'>
+        <App searchShow={!router.query.client} checkPagination={checkPagination} showDistrict pageName='История(конс)'>
             <Head>
                 <title>История(конс)</title>
                 <meta name='robots' content='noindex, nofollow'/>
@@ -104,7 +115,7 @@ ConsigFlow.getInitialProps = async function(ctx) {
     ctx.store.getState().app.organization = ctx.query.id
     // eslint-disable-next-line no-undef
     const [list, districts] = await Promise.all([
-        getConsigFlows({district: ctx.store.getState().app.district, skip: 0, organization: ctx.query.id, ...ctx.query.invoice?{invoice: ctx.query.invoice}:{}, ...ctx.query.client?{client: ctx.query.client}:{}}, getClientGqlSsr(ctx.req)),
+        getConsigFlows({district: ctx.store.getState().app.district, search: ctx.store.getState().app.search, skip: 0, organization: ctx.query.id, ...ctx.query.invoice?{invoice: ctx.query.invoice}:{}, ...ctx.query.client?{client: ctx.query.client}:{}}, getClientGqlSsr(ctx.req)),
         getDistricts({organization: ctx.query.id, search: '', sort: '-name'}, getClientGqlSsr(ctx.req))
     ])
     const districtById = {}

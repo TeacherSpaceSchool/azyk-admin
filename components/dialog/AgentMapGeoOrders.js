@@ -6,11 +6,13 @@ import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
+import {rowReverseDialog} from '../../src/lib';
 
 const AgentMapGeoOrders =  React.memo(
     (props) =>{
         const {classes, orders, setIndexOrder} = props;
         const {showMiniDialog} = props.mini_dialogActions;
+        const {isMobileApp} = props.app;
         return (
             <div className={classes.column}>
                 {
@@ -36,18 +38,20 @@ const AgentMapGeoOrders =  React.memo(
                         )
                     })
                 }
-                <center>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant="contained" color="secondary" onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
-                </center>
+                </div>
             </div>
         );
     }
 )
 
-function mapStateToProps () {
-    return {}
+function mapStateToProps (state) {
+    return {
+        app: state.app
+    }
 }
 
 function mapDispatchToProps(dispatch) {

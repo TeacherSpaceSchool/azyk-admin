@@ -7,11 +7,12 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
-import { checkInt } from '../../src/lib'
+import {checkInt, rowReverseDialog} from '../../src/lib'
 
 const SetPackage =  React.memo(
     (props) =>{
         const {action, classes, idx} = props;
+        const {isMobileApp} = props.app;
         const {showMiniDialog} = props.mini_dialogActions;
         let [count, setCount] = useState('');
         let handleCount =  (event) => {
@@ -33,7 +34,7 @@ const SetPackage =  React.memo(
                 />
                 <br/>
                 <br/>
-                <div>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant='contained' color='primary' onClick={async () => {
                         action(idx, count);
                         showMiniDialog(false);
@@ -49,8 +50,10 @@ const SetPackage =  React.memo(
     }
 )
 
-function mapStateToProps () {
-    return {}
+function mapStateToProps (state) {
+    return {
+        app: state.app
+    }
 }
 
 function mapDispatchToProps(dispatch) {

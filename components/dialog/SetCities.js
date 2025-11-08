@@ -9,7 +9,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { setCityCookie } from '../../src/lib'
+import {rowReverseDialog, setCityCookie} from '../../src/lib'
 import * as lib from '../../src/lib'
 
 const SetCities =  React.memo(
@@ -45,7 +45,7 @@ const SetCities =  React.memo(
                     )}
                 />
                 <br/>
-                <div>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant="contained" color='primary' onClick={ () => {
                         setOrganization(null)
                         setCity(cityChange)

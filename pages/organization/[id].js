@@ -16,8 +16,6 @@ import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import { onoffOrganization, addOrganization, setOrganization } from '../../src/gql/organization'
-import Remove from '@material-ui/icons/Delete';
-import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Confirmation from '../../components/dialog/Confirmation'
@@ -429,9 +427,9 @@ const Organization = React.memo((props) => {
                                                 onChange={(event) => {editAddress(event, idx)}}
                                                 endAdornment={
                                                     <InputAdornment position='end'>
-                                                        <IconButton onClick={() => deleteAddress(idx)}>
-                                                            <Remove/>
-                                                        </IconButton>
+                                                        <Button variant='text' size='small' color='secondary' onClick={() => deleteAddress(idx)}>
+                                                            Удалить
+                                                        </Button>
                                                     </InputAdornment>
                                                 }
                                             />
@@ -451,13 +449,9 @@ const Organization = React.memo((props) => {
                                                 onChange={(event) => {editEmail(event, idx)}}
                                                 endAdornment={
                                                     <InputAdornment position='end'>
-                                                        <IconButton
-                                                            onClick={() => {
-                                                                deleteEmail(idx)
-                                                            }}
-                                                                                                                    >
-                                                            <Remove/>
-                                                        </IconButton>
+                                                        <Button variant='text' size='small' color='secondary' onClick={() => deleteEmail(idx)}>
+                                                            Удалить
+                                                        </Button>
                                                     </InputAdornment>
                                                 }
                                             />
@@ -477,13 +471,9 @@ const Organization = React.memo((props) => {
                                                 onChange={(event) => {editPhone(event, idx)}}
                                                 endAdornment={
                                                     <InputAdornment position='end'>
-                                                        <IconButton
-                                                            onClick={() => {
-                                                                deletePhone(idx)
-                                                            }}
-                                                                                                                    >
-                                                            <Remove/>
-                                                        </IconButton>
+                                                        <Button variant='text' size='small' color='secondary' onClick={() => deletePhone(idx)}>
+                                                            Удалить
+                                                        </Button>
                                                     </InputAdornment>
                                                 }
                                             />

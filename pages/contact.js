@@ -11,8 +11,6 @@ import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import * as snackbarActions from '../redux/actions/snackbar'
-import Remove from '@material-ui/icons/Remove';
-import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -23,7 +21,6 @@ import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Sign from '../components/dialog/Sign';
 import {maxImageSize} from '../src/lib';
-
 
 const Contact = React.memo((props) => {
     const classes = contactStyle();
@@ -142,13 +139,9 @@ const Contact = React.memo((props) => {
                                                     onChange={(event) => {editAddress(event, idx)}}
                                                     endAdornment={
                                                         <InputAdornment position='end'>
-                                                            <IconButton
-                                                                onClick={() => {
-                                                                    deleteAddress(idx)
-                                                                }}
-                                                            >
-                                                                <Remove/>
-                                                            </IconButton>
+                                                            <Button variant='text' size='small' color='secondary' onClick={() => deleteAddress(idx)}>
+                                                                Удалить
+                                                            </Button>
                                                         </InputAdornment>
                                                     }
                                                 />
@@ -167,9 +160,9 @@ const Contact = React.memo((props) => {
                                                     onChange={(event) => {editEmail(event, idx)}}
                                                     endAdornment={
                                                         <InputAdornment position='end'>
-                                                            <IconButton onClick={() => deleteEmail(idx)}>
-                                                                <Remove/>
-                                                            </IconButton>
+                                                            <Button variant='text' size='small' color='secondary' onClick={() => deleteEmail(idx)}>
+                                                                Удалить
+                                                            </Button>
                                                         </InputAdornment>
                                                     }
                                                 />
@@ -190,13 +183,9 @@ const Contact = React.memo((props) => {
                                                     onChange={(event) => {editPhone(event, idx)}}
                                                     endAdornment={
                                                         <InputAdornment position='end'>
-                                                            <IconButton
-                                                                onClick={() => {
-                                                                    deletePhone(idx)
-                                                                }}
-                                                            >
-                                                                <Remove/>
-                                                            </IconButton>
+                                                            <Button variant='text' size='small' color='secondary' onClick={() => deletePhone(idx)}>
+                                                                Удалить
+                                                            </Button>
                                                         </InputAdornment>
                                                     }
                                                 />

@@ -11,7 +11,7 @@ import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Router from 'next/router'
 import Link from 'next/link';
 import { addAgentHistoryGeo } from '../../src/gql/agentHistoryGeo'
-import {dayStartDefault, formatAmount, getGeoDistance, unawaited} from '../../src/lib'
+import {dayStartDefault, formatAmount, getGeoDistance, rowReverseDialog, unawaited} from '../../src/lib'
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import { getDeliveryDate } from '../../src/gql/deliveryDate';
@@ -110,7 +110,7 @@ const ReturnedConfirmed =  React.memo(
                 />
                 <div style={{width: width}} className={classes.itogo}><b>Итого:</b>&nbsp;{formatAmount(allPrice)}&nbsp;сом</div>
                 <br/>
-                <div>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant='contained' color='primary' onClick={async () => {
                         if(unlock.current) {
                             unlock.current = false

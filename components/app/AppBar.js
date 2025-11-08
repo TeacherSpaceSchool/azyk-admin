@@ -17,7 +17,6 @@ import appbarStyle from '../../src/styleMUI/appbar'
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
 import Paper from '@material-ui/core/Paper';
-import Cancel from '@material-ui/icons/Cancel';
 import ClientNetworksIcon from '@material-ui/icons/DeviceHub';
 import Input from '@material-ui/core/Input';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -53,6 +52,7 @@ import {viewModes} from '../../src/enum';
 import SetClientNetwork from '../dialog/SetClientNetwork';
 import {getClientNetworks} from '../../src/gql/clientNetwork';
 import SetForwarder from '../dialog/SetForwarder';
+import Button from '@material-ui/core/Button';
 
 const MyAppBar = React.memo((props) => {
     //props
@@ -198,9 +198,9 @@ const MyAppBar = React.memo((props) => {
                                        onChange={handleSearch}
                                        endAdornment={
                                            <InputAdornment position='end'>
-                                               <IconButton onClick={() => {setSearch('');setOpenSearch(false)}}>
-                                                   <Cancel />
-                                               </IconButton>
+                                               <Button variant='text' size='small' color='secondary' onClick={() => {setSearch('');setOpenSearch(false)}}>
+                                                   Закрыть
+                                               </Button>
                                            </InputAdornment>
                                        }/>
                             </Paper>
@@ -637,9 +637,9 @@ const MyAppBar = React.memo((props) => {
                                        onChange={handleSearch}
                                        endAdornment={
                                            <InputAdornment position='end'>
-                                               <IconButton onClick={() => {setSearch('');setOpenSearch(false)}}>
-                                                   <Cancel />
-                                               </IconButton>
+                                               <Button variant='text' size='small' color='secondary' onClick={() => {setSearch('');setOpenSearch(false)}}>
+                                                   Закрыть
+                                               </Button>
                                            </InputAdornment>
                                        }/>
                             </Paper>

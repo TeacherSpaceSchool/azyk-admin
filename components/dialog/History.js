@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Button from '@material-ui/core/Button';
+import {pdDDMMHHMM, rowReverseDialog} from '../../src/lib';
 
 const historyTypes = {
     0: 'create',
@@ -16,23 +17,26 @@ const historyTypes = {
 const History =  React.memo((props) =>{
     const {showMiniDialog} = props.mini_dialogActions;
     const {classes, list} = props;
+    const {isMobileApp} = props.app;
     return (
         <div className={classes.column}>
             {list.map((element) => {
                 const {createdAt, user, employment, client, type, data} = element
-                return `${createdAt} ${user.role} ${employment?employment.name:''}${client?client.name:''} ${historyTypes[type]}${data?` ${data}`:''}`
+                return <div>{pdDDMMHHMM(createdAt)} {user.role} {employment?employment.name:''}{client?client.name:''} {historyTypes[type]}{data?` ${data}`:''}</div>
             })}
-            <center>
+            <div style={rowReverseDialog(isMobileApp)}>
                 <Button variant='contained' color='secondary' onClick={() => showMiniDialog(false)} className={classes.button}>
                     Закрыть
                 </Button>
-            </center>
+            </div>
         </div>
     );
 })
 
-function mapStateToProps () {
-    return {}
+function mapStateToProps (state) {
+    return {
+        app: state.app
+    }
 }
 
 function mapDispatchToProps(dispatch) {

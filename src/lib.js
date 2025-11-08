@@ -318,3 +318,5 @@ export const months = [
     'ноябрь',
     'декабрь'
 ]
+
+export const rowReverseDialog = (isMobileApp) => {return {display: 'flex', flexDirection: 'row-reverse', width: '100%', ...isMobileApp?{justifyContent: 'space-between'}:{justifyContent: 'center'}}}

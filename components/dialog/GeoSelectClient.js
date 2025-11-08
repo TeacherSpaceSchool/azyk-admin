@@ -13,12 +13,14 @@ import Confirmation from './Confirmation'
 import Fab from '@material-ui/core/Fab';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import {rowReverseDialog} from '../../src/lib';
 
 
 const GeoSelectClient =  React.memo(
     (props) =>{
         const {showFullDialog, setMiniDialog, showMiniDialog} = props.mini_dialogActions;
         const {classes, clients, selectClient} = props;
+        const {isMobileApp} = props.app;
         let [yellowData, setYellowData] = useState([]);
         let [show, setShow] = useState(false);
         let [geo1, setGeo1] = useState([42.86745, 74.592635]);
@@ -135,7 +137,7 @@ const GeoSelectClient =  React.memo(
                             </Map>
                         </div>
                     </div>
-                    <center>
+                    <div style={rowReverseDialog(isMobileApp)}>
                         <Button variant='contained' color='primary' onClick={async () => {
                             const action = () => {
                                 showFullDialog(false);
@@ -155,7 +157,7 @@ const GeoSelectClient =  React.memo(
                         <Button variant='contained' color='secondary' onClick={() => {showFullDialog(false);}} className={classes.button}>
                             Закрыть
                         </Button>
-                    </center>
+                    </div>
                 </div>
                 <Fab color={show?'primary':'secondary'} className={classes.fabGeo} onClick={() =>setShow(!show)}>
                     {show?<Visibility/>:<VisibilityOff/>}
@@ -165,8 +167,10 @@ const GeoSelectClient =  React.memo(
     }
 )
 
-function mapStateToProps () {
-    return {}
+function mapStateToProps (state) {
+    return {
+        app: state.app
+    }
 }
 
 function mapDispatchToProps(dispatch) {

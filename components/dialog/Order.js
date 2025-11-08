@@ -15,14 +15,12 @@ import {
     checkFloat,
     isNotEmpty,
     getClientTitle,
-    formatAmount
+    formatAmount, rowReverseDialog
 } from '../../src/lib'
 import Confirmation from './Confirmation'
 import Geo from '../../components/dialog/Geo'
 import OrderAdss from '../../components/dialog/OrderAdss'
 import HistoryOrder from '../../components/dialog/HistoryOrder'
-import IconButton from '@material-ui/core/IconButton';
-import CancelIcon from '@material-ui/icons/Cancel';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import {checkInt} from '../../redux/constants/other';
@@ -326,13 +324,15 @@ const Order =  React.memo(
                             const isLast = idx===(orders.length+1)
                             return <div key={order.item._id} className={classes.column}>
                                 <div className={classes.row}>
-                                    <div className={classes.nameField}>Товар:&nbsp;</div>
-                                    <a href={`/item/${order.item._id}`} target='_blank'>
-                                        <div className={classes.value}>{order.item.name}</div>
-                                    </a>
-                                    {isProcessing?<IconButton onClick={() => remove(idx)} color='secondary' className={classes.button}>
-                                        <CancelIcon style={{height: 20, width: 20}}/>
-                                    </IconButton>:null}
+                                    <div style={{display: 'flex', width: '100%', marginRight: 10}}>
+                                        <div className={classes.nameField}>Товар:&nbsp;</div>
+                                        <a href={`/item/${order.item._id}`} target='_blank'>
+                                            <div className={classes.value}>{order.item.name}</div>
+                                        </a>
+                                    </div>
+                                    {isProcessing?<Button onClick={() => remove(idx)} size='small' color='secondary'>
+                                        Удалить
+                                    </Button>:null}
                                 </div>
                                 <div className={classes.row}>
                                     <div className={classes.nameField}>Количество{order.returned?' (факт./итого)':''}:&nbsp;</div>
@@ -505,7 +505,7 @@ const Order =  React.memo(
                         />
                     </div>
                 </>:null}
-                <center>
+                <div style={rowReverseDialog(isMobileApp)}>
                     {
                         setList&&(profile.role==='client'||editEmploymentRoles.includes(profile.role))?
                             <Button variant='contained' color='primary' onClick={() => {
@@ -553,7 +553,7 @@ const Order =  React.memo(
                     <Button variant='contained' color='secondary' onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
-                </center>
+                </div>
             </div>
         );
     }

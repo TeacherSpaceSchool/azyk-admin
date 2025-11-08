@@ -18,8 +18,8 @@ export const getConsigFlows = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($skip: Int!, $client: ID, $district: ID, $invoice: ID, $organization: ID!) {
-                        consigFlows(skip: $skip, client: $client, district: $district, invoice: $invoice, organization: $organization) {${ConsigFlow}}
+                    query ($skip: Int!, $client: ID, $district: ID, $invoice: ID, $organization: ID!, $search: String) {
+                        consigFlows(skip: $skip, client: $client, district: $district, invoice: $invoice, organization: $organization, search: $search) {${ConsigFlow}}
                     }`,
             })
         return res.data.consigFlows

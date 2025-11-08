@@ -8,11 +8,9 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
-import {pdDDMMYYHHMM, checkFloat, pdDDMMYYYYWW, getClientTitle, formatAmount} from '../../src/lib'
+import {pdDDMMYYHHMM, checkFloat, pdDDMMYYYYWW, getClientTitle, formatAmount, rowReverseDialog} from '../../src/lib'
 import Confirmation from './Confirmation'
 import Geo from '../../components/dialog/Geo'
-import IconButton from '@material-ui/core/IconButton';
-import CancelIcon from '@material-ui/icons/Cancel';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
@@ -183,13 +181,15 @@ const Returned =  React.memo(
                                 return(
                                     <div key={item._id} className={classes.column}>
                                         <div className={classes.row}>
-                                            <div className={classes.nameField}>Товар:&nbsp;</div>
-                                            <a href={`/item/${item._id}`} target='_blank'>
-                                                <div className={classes.value}>{item.item}</div>
-                                            </a>
-                                            <IconButton onClick={() => remove(idx)} color='secondary' className={classes.button}>
-                                                <CancelIcon style={{height: 20, width: 20}}/>
-                                            </IconButton>
+                                            <div style={{display: 'flex', width: '100%', marginRight: 10}}>
+                                                <div className={classes.nameField}>Товар:&nbsp;</div>
+                                                <a href={`/item/${item._id}`} target='_blank'>
+                                                    <div className={classes.value}>{item.item}</div>
+                                                </a>
+                                            </div>
+                                            <Button onClick={() => remove(idx)} size='small' color='secondary'>
+                                                Удалить
+                                            </Button>
                                         </div>
                                         <div className={classes.row}>
                                             <div className={classes.nameField}>Количество:&nbsp;</div>
@@ -264,7 +264,7 @@ const Returned =  React.memo(
                         }
                     />
                 </div>
-                <div>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant='contained' color='primary' onClick={() => {
                             const action = async () => {
                                 let returned = {returned: element._id}

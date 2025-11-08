@@ -345,7 +345,7 @@ const MyDrawer = React.memo((props) => {
                 {
                     ['admin', 'суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)?
                         <>
-                            <ListItem style={{background: router.asPath.includes('consigflow')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false); setUncover(uncover => uncover!=='consigflow'?'consigflow':'')}}>
+                            <ListItem style={{background: router.asPath.includes('consigflow')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {setUncover(uncover => uncover!=='consigflow'?'consigflow':'')}}>
                                 <ListItemIcon><MonetizationOn color='inherit'/></ListItemIcon>
                                 <ListItemText primary='Консигнации' />
                                 {uncover.includes('consigflow') ? <UnfoldLess/> : <UnfoldMore/>}

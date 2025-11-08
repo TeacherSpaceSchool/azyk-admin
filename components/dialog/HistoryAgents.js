@@ -6,7 +6,7 @@ import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
-import { pdDDMMYYHHMM } from '../../src/lib'
+import {pdDDMMYYHHMM, rowReverseDialog} from '../../src/lib'
 import Link from 'next/link';
 
 const HistoryAgents =  React.memo(
@@ -38,11 +38,11 @@ const HistoryAgents =  React.memo(
                     )
                 }
                 <br/>
-                <center>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant='contained' color='secondary' onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
-                </center>
+                </div>
             </div>
         );
     }

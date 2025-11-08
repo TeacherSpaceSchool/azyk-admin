@@ -13,12 +13,14 @@ import Router from 'next/router'
 import Fab from '@material-ui/core/Fab';
 import GpsFixed from '@material-ui/icons/GpsFixed';
 import GeoSelectClient from './GeoSelectClient';
+import {rowReverseDialog} from '../../src/lib';
 
 const Geo =  React.memo(
     (props) =>{
         const {showFullDialog, setFullDialog} = props.mini_dialogActions;
         const {showSnackBar} = props.snackbarActions;
         const {profile} = props.user;
+        const {isMobileApp} = props.app;
         const {classes, clients, unselectedClient, selectClient} = props;
         let [geo, setGeo] = useState(null);
         let [follow, setFollow] = useState(false);
@@ -112,7 +114,7 @@ const Geo =  React.memo(
                             </div>
                         }
                     </div>
-                    <center>
+                    <div style={rowReverseDialog(isMobileApp)}>
                         {
                             unselectedClient&&profile.role==='admin'?
                                 <Button variant='contained' color='primary' onClick={() => {setFullDialog('Редактировать район',
@@ -125,7 +127,7 @@ const Geo =  React.memo(
                         <Button variant='contained' color='secondary' onClick={() => {showFullDialog(false);}} className={classes.button}>
                             Закрыть
                         </Button>
-                    </center>
+                    </div>
                 </div>
                 <Fab color={follow?'primary':'secondary'} className={classes.fabGeo} onClick={() =>setFollow(!follow)}>
                     <GpsFixed/>
@@ -137,7 +139,8 @@ const Geo =  React.memo(
 
 function mapStateToProps (state) {
     return {
-        user: state.user
+        user: state.user,
+        app: state.app
     }
 }
 

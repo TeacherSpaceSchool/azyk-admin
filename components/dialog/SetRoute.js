@@ -7,6 +7,7 @@ import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Order from './Order';
 import Button from '@material-ui/core/Button';
+import {rowReverseDialog} from '../../src/lib';
 
 const Geo =  React.memo(
     (props) =>{
@@ -32,11 +33,11 @@ const Geo =  React.memo(
                         </Button>
                     </a>
                 </center>
-                <center>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant='contained' color='secondary' onClick={() => {showMiniDialog(false);}} className={classes.button}>
                         Закрыть
                     </Button>
-                </center>
+                </div>
             </div>
         );
     }

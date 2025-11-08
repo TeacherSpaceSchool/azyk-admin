@@ -8,6 +8,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import dialogContentStyle from '../../src/styleMUI/dialogContent'
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import {rowReverseDialog} from '../../src/lib';
 
 const SetClientNetwork =  React.memo(
     (props) =>{
@@ -40,7 +41,7 @@ const SetClientNetwork =  React.memo(
                     )}
                 />
                 <br/>
-                <div>
+                <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant='contained' color='primary' onClick={async () => {
                        if(clientNetworkChange)
                            await setClientNetwork(clientNetworkChange._id)
