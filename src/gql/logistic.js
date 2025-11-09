@@ -1,5 +1,6 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
+import {Invoice} from './order';
 
 export const getFinanceReport = async (variables, client) => {
     try{
@@ -9,7 +10,7 @@ export const getFinanceReport = async (variables, client) => {
                 variables,
                 query: gql`
                     query ($organization: ID!, $track: Int, $forwarder: ID!, $dateDelivery: Date!) {
-                        financeReport(organization: $organization, track: $track, forwarder: $forwarder, dateDelivery: $dateDelivery)
+                        financeReport(organization: $organization, track: $track, forwarder: $forwarder, dateDelivery: $dateDelivery) {${Invoice}}
                     }`,
             })
         return res.data.financeReport

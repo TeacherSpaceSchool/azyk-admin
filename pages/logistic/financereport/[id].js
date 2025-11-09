@@ -5,7 +5,15 @@ import { connect } from 'react-redux'
 import pageListStyle from '../../../src/styleMUI/statistic/statistic'
 import Router, {useRouter} from 'next/router'
 import initialApp from '../../../src/initialApp'
-import {checkFloat, dayStartDefault, formatAmount, pdDatePicker, pdDDMMYYYY, unawaited} from '../../../src/lib'
+import {
+    checkFloat,
+    dayStartDefault,
+    formatAmount,
+    getClientTitle,
+    pdDatePicker,
+    pdDDMMYYYY,
+    unawaited
+} from '../../../src/lib'
 import { bindActionCreators } from 'redux'
 import Fab from '@material-ui/core/Fab';
 import PrintIcon from '@material-ui/icons/Print';
@@ -26,6 +34,13 @@ const filters = [
     {name: 'Рейс 4', value: 4},
     {name: 'Рейс 5', value: 5},
 ]
+export const toTableRow = (invoice) => {
+    const allPrice = invoice.allPrice - invoice.returnedPrice
+    return [
+        getClientTitle({address: [invoice.address]}), formatAmount(allPrice),formatAmount(['Наличные'].includes(invoice.paymentMethod)?allPrice:0),
+        invoice.paymentMethod, formatAmount(invoice.returned), formatAmount(invoice.consig), invoice.inv===0?'нет':'да', invoice.info
+    ]
+}
 
 const Id = React.memo((props) => {
     const classes = pageListStyle();
@@ -78,10 +93,11 @@ const Id = React.memo((props) => {
             consigPrice: 0,
         }
         for (let i = 0; i < list.length; i++) {
-            ordersData.allPrice = checkFloat(ordersData.allPrice + checkFloat(list[i][1]))
-            ordersData.paymentPrice = checkFloat(ordersData.paymentPrice + checkFloat(list[i][2]))
-            ordersData.returnedPrice = checkFloat(ordersData.returnedPrice + checkFloat(list[i][4]))
-            ordersData.consigPrice = checkFloat(ordersData.consigPrice + checkFloat(list[i][5]))
+            const allPrice = checkFloat(list[i].allPrice - list[i].returnedPrice)
+            ordersData.allPrice = checkFloat(ordersData.allPrice + allPrice)
+            ordersData.paymentPrice = checkFloat(ordersData.paymentPrice + ['Наличные'].includes(list[i].paymentMethod)?allPrice:0)
+            ordersData.returnedPrice = checkFloat(ordersData.returnedPrice + checkFloat(list[i].returned))
+            ordersData.consigPrice = checkFloat(ordersData.consigPrice + checkFloat(list[i].consig))
         }
         setOrdersData({...ordersData})
     }, [list])

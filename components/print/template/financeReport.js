@@ -1,4 +1,5 @@
 import {formatAmount, pdDDMMYYYY} from '../../../src/lib';
+import {toTableRow} from '../../../pages/logistic/financereport/[id]';
 
 export default ({list, forwarderData, date, filter, ordersData}) => {
     const columns = [
@@ -26,19 +27,22 @@ export default ({list, forwarderData, date, filter, ordersData}) => {
         </tr>
       </thead>
       <tbody>
-        ${list.reduce((acc, row, idx) => acc + `
-          <tr>
-            <td style="${columns[0].style}">${idx + 1}</td>
-            <td style="${columns[1].style}">${row[0] || ''}</td>
-            <td style="${columns[2].style}">${formatAmount(row[1] || '')}</td>
-            <td style="${columns[3].style}">${formatAmount(row[2] || '')}</td>
-            <td style="${columns[4].style}">${row[3] || ''}</td>
-            <td style="${columns[5].style}">${formatAmount(row[4] || '')}</td>
-            <td style="${columns[6].style}">${formatAmount(row[5] || '')}</td>
-            <td style="${columns[7].style}">${row[6] || ''}</td>
-            <td style="${columns[8].style};">${row[8] || ''}</td>
-          </tr>
-        `, '')}
+        ${list.reduce((acc, invoice, idx) => {
+            const row = toTableRow(invoice)
+            return acc + `
+              <tr>
+                <td style="${columns[0].style}">${idx + 1}</td>
+                <td style="${columns[1].style}">${row[0]}</td>
+                <td style="${columns[2].style}">${row[1]}</td>
+                <td style="${columns[3].style}">${row[2]}</td>
+                <td style="${columns[4].style}">${row[3]}</td>
+                <td style="${columns[5].style}">${row[4]}</td>
+                <td style="${columns[6].style}">${row[5]}</td>
+                <td style="${columns[7].style}">${row[6]}</td>
+                <td style="${columns[8].style};">${row[7]}</td>
+              </tr>
+            `
+        }, '')}
           <tr>
             <td style="border: none;${columns[0].style}"></td>
             <td style="border: none;text-align:right;${columns[1].style}">Итого:</td>

@@ -244,7 +244,7 @@ export const checkDate = (date) => {
 
 export const getClientTitle = client => client&&client.address&&client.address[0]?`${client.address[0][2]}${client.address[0][0]&&client.address[0][2]?', ':''}${client.address[0][0]}`:'';
 
-export const formatAmount = amount => amount&&amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009');
+export const formatAmount = amount => isNotEmpty(amount)?amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009'):'';
 
 export const handleDateRange = ({type, value, setDateRange,  maxMonthPeriod = 12}) => {
     setDateRange(dateRange => {

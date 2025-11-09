@@ -1,5 +1,5 @@
 import React from 'react';
-import {formatAmount, pdDDMMMM} from '../../../src/lib';
+import {formatAmount, getClientTitle, pdDDMMHHMM, pdDDMMMM} from '../../../src/lib';
 import {bindActionCreators} from 'redux';
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog';
 import {connect} from 'react-redux';
@@ -8,6 +8,7 @@ import {getEmployments} from '../../../src/gql/employment';
 import SetForwarder from '../../dialog/SetForwarder';
 import SetDate from '../../dialog/SetDate';
 import CloseIcon from '@material-ui/icons/Close';
+import {toTableRow} from '../../../pages/logistic/financereport/[id]';
 
 const Tables =  React.memo(({list, forwarderData, pagination, app, appActions, mini_dialogActions}) =>{
     const {organization, date, filter, isMobileApp} = app;
@@ -65,24 +66,25 @@ const Tables =  React.memo(({list, forwarderData, pagination, app, appActions, m
                 </React.Fragment>:null
             })}
         </div>
-        {list?list.map((row, idx) => {
+        {list?list.map((invoice, idx) => {
             if(idx<pagination) {
+                const row = toTableRow(invoice)
                 return <div className='tableRow' key={`row${idx}`} style={{borderRight: '1px solid #00000040'}}>
                     <div className='tableCell' style={columns[0].style}>{row[0]}</div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[1].style}>{formatAmount(row[1])}</div>
+                    <div className='tableCell' style={columns[1].style}>{row[1]}</div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[2].style}>{formatAmount(row[2])}</div>
+                    <div className='tableCell' style={columns[2].style}>{row[2]}</div>
                     <div className='tableBorder'/>
                     <div className='tableCell' style={columns[3].style}>{row[3]}</div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[4].style}>{formatAmount(row[4])}</div>
+                    <div className='tableCell' style={columns[4].style}>{row[4]}</div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[5].style}>{formatAmount(row[5])}</div>
+                    <div className='tableCell' style={columns[5].style}>{row[5]}</div>
                     <div className='tableBorder'/>
                     <div className='tableCell' style={columns[6].style}>{row[6]}</div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[7].style}>{row[7]}<br/>{row[8]}</div>
+                    <div className='tableCell' style={columns[7].style}>{invoice.agent?'Агент:':'Онлайн:'} {pdDDMMHHMM(invoice.createdAt)}<br/>{row[7]}</div>
                 </div>
             }
         }):[]}

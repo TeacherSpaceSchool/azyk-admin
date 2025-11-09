@@ -55,7 +55,7 @@ const Id = React.memo((props) => {
     //deps
     const deps = [filter, date, agent, district, forwarder]
     //listArgs
-    const listArgs = {search, track: filter, filter: '', dateDelivery: date, date: '', organization: router.query.id, agent, district, forwarder}
+    const listArgs = {search, track: filter, filter: 'принят', dateDelivery: date, date: '', organization: router.query.id, agent, district, forwarder}
     //selectedOrders
     let [selectedOrders, setSelectedOrders] = useState([]);
     //list
