@@ -136,7 +136,7 @@ const MyDrawer = React.memo((props) => {
                         <>
                             <Link href={!profile.organization?'/organizations?path=ads&title=Акции':'/ads/[id]'}
                                   as={!profile.organization?'/organizations?path=ads&title=Акции':`/ads/${profile.organization}`}>
-                                <ListItem style={{background: router.asPath.includes('ads')&&!router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => showDrawer(false)}>
+                                <ListItem style={{background: !router.asPath.includes('summaryadss')&&router.asPath.includes('ads')&&!router.pathname.includes('statistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => showDrawer(false)}>
                                     <ListItemIcon><WhatshotIcon color='inherit'/></ListItemIcon>
                                     <ListItemText primary='Акции' />
                                 </ListItem>
@@ -261,6 +261,14 @@ const MyDrawer = React.memo((props) => {
                     </ListItem>
                     <Divider/>
                     {uncover.includes('logistic')?<>
+                        <Link href={profile.role==='admin'?'/organizations?path=logistic/summaryadss&title=Акционная накладная':'/logistic/summaryadss/[id]'}
+                              as={profile.role==='admin'?'/organizations?path=logistic/summaryadss&title=Акционная накладная':`/logistic/summaryadss/${profile.organization}`}>
+                            <ListItem style={{background: router.asPath.includes('logistic/summaryadss')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>
+                                <div style={{width: 56}}/>
+                                <ListItemText primary='Акционная накладная'/>
+                            </ListItem>
+                        </Link>
+                        <Divider/>
                         <Link href={profile.role==='admin'?'/organizations?path=logistic/financereport&title=Отчет по деньгам':'/logistic/financereport/[id]'}
                               as={profile.role==='admin'?'/organizations?path=logistic/financereport&title=Отчет по деньгам':`/logistic/financereport/${profile.organization}`}>
                             <ListItem style={{background: router.asPath.includes('logistic/financereport')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>

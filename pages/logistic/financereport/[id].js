@@ -24,7 +24,13 @@ import * as appActions from '../../../redux/actions/app'
 import * as snackbarActions from '../../../redux/actions/snackbar'
 import {printHTML} from '../../../components/print';
 import templateFinanceReport from '../../../components/print/template/financeReport';
+import templateInvoices from '../../../components/print/template/invoices';
 import QuickTransition from '../QuickTransition';
+import {getOrganization} from '../../../src/gql/organization';
+import {getClientGqlSsr} from '../../../src/getClientGQL';
+import {getDistricts} from '../../../src/gql/district';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const filters = [
     {name: 'Все', value: null},
@@ -34,10 +40,14 @@ const filters = [
     {name: 'Рейс 4', value: 4},
     {name: 'Рейс 5', value: 5},
 ]
+
+const paymentPrice = (invoice) => {
+    return ['Наличные'].includes(invoice.paymentMethod)?checkFloat(invoice.allPrice - checkFloat(invoice.returned)):0
+}
+
 export const toTableRow = (invoice) => {
-    const allPrice = invoice.allPrice - invoice.returnedPrice
     return [
-        getClientTitle({address: [invoice.address]}), formatAmount(allPrice),formatAmount(['Наличные'].includes(invoice.paymentMethod)?allPrice:0),
+        getClientTitle({address: [invoice.address]}), formatAmount(invoice.allPrice),formatAmount(paymentPrice(invoice)),
         invoice.paymentMethod, formatAmount(invoice.returned), formatAmount(invoice.consig), invoice.inv===0?'нет':'да', invoice.info
     ]
 }
@@ -49,6 +59,7 @@ const Id = React.memo((props) => {
     const contentRef = useRef();
     //props
     const {filter, date, forwarder} = props.app;
+    const {organizationData, agentByClient} = props.data;
     const {showLoad} = props.appActions;
     const {showSnackBar} = props.snackbarActions;
     //forwarderData
@@ -63,21 +74,22 @@ const Id = React.memo((props) => {
     const listArgs = {track: filter, dateDelivery: date, organization: router.query.id, forwarder}
     //list
     let [list, setList] = useState([]);
-    const getList = async (excel) => {
+    let [returneds, setReturneds] = useState([]);
+    const getList = async () => {
+        list = []
+        returneds = []
         if(date&&forwarder) {
             showLoad(true)
-            const list = await getFinanceReport({...listArgs, excel})
+            const financeReport = await getFinanceReport(listArgs)
+            list = financeReport.invoices
+            returneds = financeReport.returneds
             showLoad(false)
-            if (!excel) {
-                setList(list);
-                setPagination(100);
-                (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
-            } else window.open(list[0][0], '_blank');
+            setPagination(100);
+            (document.getElementsByClassName('App-body'))[0].scroll({top: 0, left: 0, behavior: 'instant'});
         }
-        else {
-            setList([])
-            showSnackBar(`Укажите:${!date?' дату доставки;':''}${!forwarder?' экспедитора;':''}`)
-        }
+        else showSnackBar(`Укажите:${!date?' дату доставки;':''}${!forwarder?' экспедитора;':''}`)
+        setList(list);
+        setReturneds(returneds)
     }
     //filter
     useEffect(() => {
@@ -93,11 +105,11 @@ const Id = React.memo((props) => {
             consigPrice: 0,
         }
         for (let i = 0; i < list.length; i++) {
-            const allPrice = checkFloat(list[i].allPrice - list[i].returnedPrice)
+            const allPrice = checkFloat(list[i].allPrice)
             ordersData.allPrice = checkFloat(ordersData.allPrice + allPrice)
-            ordersData.paymentPrice = checkFloat(ordersData.paymentPrice + ['Наличные'].includes(list[i].paymentMethod)?allPrice:0)
+            ordersData.paymentPrice = checkFloat(ordersData.paymentPrice + paymentPrice(list[i]))
             ordersData.returnedPrice = checkFloat(ordersData.returnedPrice + checkFloat(list[i].returned))
-            ordersData.consigPrice = checkFloat(ordersData.consigPrice + checkFloat(list[i].consig))
+            if(list[i].consig) ordersData.consigPrice = checkFloat(ordersData.consigPrice + checkFloat(list[i].consig))
         }
         setOrdersData({...ordersData})
     }, [list])
@@ -107,6 +119,10 @@ const Id = React.memo((props) => {
         if(pagination<list.length)
             setPagination(pagination => pagination+100)
     }, [pagination, list])
+    //print
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const handleClick = (event) => setAnchorEl(event.currentTarget);
+    const handleClose = () => setAnchorEl(null);
     //render
     return <App showForwarder pageName='Отчет по деньгам' dates checkPagination={checkPagination} filters={filters}>
         <Head>
@@ -116,12 +132,28 @@ const Id = React.memo((props) => {
         <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 45}}>
             <Table pagination={pagination} forwarderData={forwarderData} list={list}/>
         </div>
-        {list.length?<Fab
-            color='primary' className={classes.fab}
-            onClick={() => printHTML({ data: {list, forwarderData, date, filter, ordersData}, template: templateFinanceReport, title: `Отчет по деньгам ${pdDDMMYYYY(date)}`})}
-        >
-            <PrintIcon />
-        </Fab>:null}
+        {list.length?<>
+            <Fab
+                color='primary' className={classes.fab}
+                onClick={handleClick}
+            >
+                <PrintIcon />
+            </Fab>
+            <Menu
+                id='simple-menu'
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+            >
+                <MenuItem onClick={() => {
+                    printHTML({ data: {list, forwarderData, date, filter, ordersData}, template: templateFinanceReport, title: `Отчет по деньгам ${pdDDMMYYYY(date)}`})
+                }}>Отчет по деньгам</MenuItem>
+                <MenuItem onClick={() => {
+                    printHTML({ data: {invoices: list, returneds, forwarderData, organizationData, date, agentByClient}, template: templateInvoices, title: `Накладные ${pdDDMMYYYY(date)}`})
+                }}>Накладные</MenuItem>
+            </Menu>
+        </>:null}
         <QuickTransition fab2={list.length}/>
         <div className='count'>
             Всего: {formatAmount(list.length)}
@@ -150,14 +182,22 @@ Id.getInitialProps = async function(ctx) {
     ctx.store.getState().app.organization = ctx.query.id
     if(!ctx.store.getState().app.date) {
         let date = new Date()
-        date.setDate(date.getDate() + 1)
         if (date.getHours() < dayStartDefault)
             date.setDate(date.getDate() - 1)
         ctx.store.getState().app.date = pdDatePicker(date)
     }
     if(!ctx.store.getState().app.filter)
         ctx.store.getState().app.filter = null
-    return {};
+    // eslint-disable-next-line no-undef
+    const [districts, organizationData] = await Promise.all([
+        getDistricts({search: '', sort: '-name', organization: ctx.query.id}, getClientGqlSsr(ctx.req)),
+        getOrganization(ctx.query.id, getClientGqlSsr(ctx.req))
+    ]);
+    const agentByClient = {}
+    for(const district of districts)
+        for(const client of district.client)
+            agentByClient[client._id] = district.agent?district.agent:null
+    return {data: {organizationData, agentByClient}};
 };
 
 function mapStateToProps (state) {

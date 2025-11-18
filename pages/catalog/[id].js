@@ -138,11 +138,11 @@ const Catalog = React.memo((props) => {
             //данные
             // eslint-disable-next-line no-undef
             let [limitItemClients, stocks, specialPricesData, specialPriceCategoriesData, discountClient] = await Promise.all([
-                getLimitItemClients({client: profile._id, organization: router.query.id}),
-                getStocks({unlimited: false, client: profile._id, search: '', organization: router.query.id}),
-                getSpecialPriceClients({client: profile._id, organization: router.query.id}),
-                getSpecialPriceCategories({client: profile._id, organization: router.query.id}),
-                getDiscountClient({client: profile._id, organization: router.query.id})
+                getLimitItemClients({client: profile.client, organization: router.query.id}),
+                getStocks({unlimited: false, client: profile.client, search: '', organization: router.query.id}),
+                getSpecialPriceClients({client: profile.client, organization: router.query.id}),
+                getSpecialPriceCategories({client: profile.client, organization: router.query.id}),
+                getDiscountClient({client: profile.client, organization: router.query.id})
             ]);
             //перебор лимитов
             if(limitItemClients&&limitItemClients.length)
@@ -191,7 +191,7 @@ const Catalog = React.memo((props) => {
         // eslint-disable-next-line no-undef
         let [adss, client, fhoClient] = await Promise.all([
             getAdss({search: '', organization: router.query.id}),
-            getClient(profile._id),
+            getClient(profile.client),
             getFhoClient({_id: profile.client, organization: router.query.id})
         ]);
         setAdss(adss)

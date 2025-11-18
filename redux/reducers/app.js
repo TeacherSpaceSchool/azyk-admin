@@ -15,7 +15,7 @@ import {
 } from '../constants/app'
 import {viewModes} from '../../src/enum';
 
-const initialState = {
+export const initialStateApp = {
     lastPath: '',
     showAppBar: true,
     drawer: false,
@@ -29,7 +29,7 @@ const initialState = {
     viewMode: viewModes.card,
 }
 
-export default function mini_dialog(state = initialState, action) {
+export default function mini_dialog(state = initialStateApp, action) {
     switch (action.type) {
         case SHOW_APPBAR:
             return {...state, showAppBar: action.payload}

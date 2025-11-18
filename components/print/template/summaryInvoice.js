@@ -1,9 +1,9 @@
-import {checkFloat, formatAmount, isEmpty, pdDDMMYYYY} from '../../../src/lib';
+import {checkFloat, formatAmount, isEmpty, pdDDMMMMYYYY} from '../../../src/lib';
 
 export default ({list, forwarderData, date, filter}) => {
     const columns = [
-        {title: '№', style: 'width: 6.5mm;'},
-        {title: 'Товар', style: 'width: 104mm;'},
+        {title: '№', style: 'width: 6mm;'},
+        {title: 'Товар', style: 'width: 100.5mm;'},
         {title: 'Кол-во', style: 'width: 20mm;'},
         {title: 'Уп-ок', style: 'width: 20mm;'},
         {title: 'Сумма', style: 'width: 20mm;'},
@@ -22,7 +22,7 @@ export default ({list, forwarderData, date, filter}) => {
             invoiceData = {countAll: 0, packageAll: 0, priceAll: 0, weightAll: 0}
             rowIdx = 1
             acc += `
-              <p style="font-size: 11pt;text-align:center;page-break-before: always; margin-top: 5mm">Общий отпуск от ${pdDDMMYYYY(date)}</p>
+              <p style="font-size: 11pt;text-align:center;page-break-before: always; margin-top: 5mm">Общий отпуск от ${pdDDMMMMYYYY(date)}</p>
               <p>Склад: ${row[0]}</p>
               <p style="display: flex; justify-content: space-between;">
                 <span>Экспедитор: ${forwarderData.name}</span>

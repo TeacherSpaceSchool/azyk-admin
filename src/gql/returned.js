@@ -1,7 +1,7 @@
 import { gql } from 'apollo-boost';
 import { SingletonApolloClient } from '../singleton/client';
 
-const Returned = `
+export const Returned = `
     _id
     createdAt
     dateDelivery

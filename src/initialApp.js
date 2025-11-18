@@ -56,7 +56,7 @@ export default async (ctx) => {
             ctx.store.getState().user.profile = {}
         }
     }
-    //только есл \и не тот же маршрут
+    //только если не тот же маршрут
     if(!isSameUrl(ctx.store.getState().app.lastPath, url)) {
         //поиск
         ctx.store.getState().app.search = ''
@@ -66,6 +66,8 @@ export default async (ctx) => {
         ctx.store.getState().app.filter = ''
         //дата
         ctx.store.getState().app.date = ''
+        //forwarder
+        ctx.store.getState().app.forwarder = null
         //district
         ctx.store.getState().app.district = null
         //agent

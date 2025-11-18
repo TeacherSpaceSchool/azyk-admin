@@ -44,6 +44,7 @@ const Organization = React.memo((props) => {
     let [onlyDistrict, setOnlyDistrict] = useState(data.organization&&data.organization.onlyDistrict!==null?data.organization.onlyDistrict:false);
     let [unite, setUnite] = useState(data.organization&&data.organization.unite!=null?data.organization.unite:false);
     let [pass, setPass] = useState(data.organization&&data.organization.pass?data.organization.pass:'');
+    let [requisites, setRequisites] = useState(data.organization&&data.organization.requisites?data.organization.requisites:'');
     let [superagent, setSuperagent] = useState(data.organization&&data.organization.superagent!=null?data.organization.superagent:false);
     let [onlyIntegrate, setOnlyIntegrate] = useState(data.organization&&data.organization.onlyIntegrate!==null?data.organization.onlyIntegrate:false);
     let [addedClient, setAddedClient] = useState(data.organization&&data.organization.addedClient!==null?data.organization.addedClient:false);
@@ -487,6 +488,13 @@ const Organization = React.memo((props) => {
                                     </Button>
                                     <TextField
                                         multiline
+                                        label='Реквизиты'
+                                        value={requisites}
+                                        className={isMobileApp?classes.inputM:classes.inputD}
+                                        onChange={(event) => {setRequisites(event.target.value)}}
+                                    />
+                                    <TextField
+                                        multiline
                                         label='Информация'
                                         error={!info}
                                         value={info}
@@ -503,6 +511,7 @@ const Organization = React.memo((props) => {
                                                                 catalog,
                                                                 cities,
                                                                 pass,
+                                                                requisites,
                                                                 miniInfo,
                                                                 priotiry: checkInt(priotiry),
                                                                 refusal,
@@ -547,6 +556,7 @@ const Organization = React.memo((props) => {
                                                     let editElement = {_id: data.organization._id}
                                                     if(image)editElement.image = image
                                                     if(pass!==data.organization.pass)editElement.pass = pass
+                                                    if(requisites!==data.organization.requisites)editElement.requisites = requisites
                                                     if(name.length&&name!==data.organization.name)editElement.name = name
                                                     if(cities.length&&JSON.stringify(cities)!==JSON.stringify(data.organization.cities)) editElement.cities = cities
                                                     if(address.length&&address!==data.organization.address)editElement.address = address

@@ -1,5 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
+import {navigationKeyTable} from '../../../src/lib';
 
 const Tables =  React.memo(({middleList, app, list, items, setBasketChange}) =>{
     const {isMobileApp} = app;
@@ -30,10 +31,11 @@ const Tables =  React.memo(({middleList, app, list, items, setBasketChange}) =>{
                     {row.name}
                 </div>
                 <div className='tableBorder'/>
-                <div className='tableCell' style={columns[1].style} onClick={() => document.getElementById(`catalogCount${idx}`).focus()}>
+                <div className='tableCell' style={columns[1].style}>
                     <input style={{width: widthNbmr, outline: 'none', border: 'none', fontWeight: 500, fontFamily: 'Roboto, serif'}}
                            type={isMobileApp?'number':'text'} value={items[row._id]&&items[row._id].count?items[row._id].count:''}
-                           onChange={(event) => setBasketChange(idx, event.target.value)} id={`catalogCount${idx}`}/>
+                           onChange={(event) => setBasketChange(idx, event.target.value)}
+                           id={`R${idx}C${0}`} onKeyDown={event => navigationKeyTable({event, row: idx, column: 0, list, middleList})}/>
                 </div>
                 <div className='tableBorder'/>
                 <div className='tableCell' style={columns[2].style}>

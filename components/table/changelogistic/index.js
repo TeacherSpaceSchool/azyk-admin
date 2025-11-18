@@ -12,8 +12,9 @@ import SetDate from '../../dialog/SetDate';
 import {getOrder} from '../../../src/gql/order';
 import Order from '../../dialog/Order';
 import CloseIcon from '@material-ui/icons/Close';
+import ChangeLogistic from '../../dialog/ChangeLogistic';
 
-const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList, selectedOrders, setSelectedOrders, pagination, app, appActions, mini_dialogActions}) =>{
+const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList, setList, selectedOrders, setSelectedOrders, pagination, app, appActions, mini_dialogActions}) =>{
     const {organization, date, filter, isMobileApp} = app;
     const {setForwarder, setFilter} = appActions;
     const {setMiniDialog, showMiniDialog} = mini_dialogActions;
@@ -22,6 +23,7 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
         {title: 'Адрес', style: {width: 300}},
         {title: 'Рейс', style: {width: 30}},
         {title: 'Сумма', style: {width: 60}},
+        {title: 'Способ оп-ты', style: {width: 90}},
         {title: 'Вес', style: {width: 40}},
         {title: 'Создан', style: {width: 75}},
         ...!forwarderData?[{title: 'Экспедитор', style: {width: 250}}]:[],
@@ -32,6 +34,11 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
             setMiniDialog('Заказ', <Order element={_element}/>);
             showMiniDialog(true)
         }
+    }
+    const changePaymentMethod = (invoice) => {
+        setMiniDialog('Логистика', <ChangeLogistic
+            dateDelivery={date} type={'paymentMethod'} invoices={[invoice._id]} setList={setList}/>)
+        showMiniDialog(true)
     }
     return <div style={{width: 'fit-content', background: 'white'}}>
             <div
@@ -118,16 +125,20 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
                         {formatAmount(row.allPrice - row.returnedPrice)}
                     </div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[4].style} onClick={() => openOrder(row)}>
-                        {formatAmount(row.allTonnage)}
+                    <div className='tableCell' style={columns[4].style} onClick={() => changePaymentMethod(row)}>
+                        {row.paymentMethod}
                     </div>
                     <div className='tableBorder'/>
                     <div className='tableCell' style={columns[5].style} onClick={() => openOrder(row)}>
+                        {formatAmount(row.allTonnage)}
+                    </div>
+                    <div className='tableBorder'/>
+                    <div className='tableCell' style={columns[6].style} onClick={() => openOrder(row)}>
                         {pdDDMMHHMM(row.createdAt)}
                     </div>
                     {!forwarderData?<>
                         <div className='tableBorder'/>
-                        <div className='tableCell' style={columns[6].style} onClick={() => setForwarder(forwarder._id)}>
+                        <div className='tableCell' style={columns[7].style} onClick={() => setForwarder(forwarder._id)}>
                             {forwarder.name}
                         </div>
                     </>:null}

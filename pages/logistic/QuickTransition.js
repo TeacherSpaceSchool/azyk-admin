@@ -32,6 +32,9 @@ const QuickTransition = React.memo(({fab2}) => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
+                {!router.asPath.includes('logistic/summaryadss')?<Link href={'/logistic/summaryadss/[id]'} as={`/logistic/summaryadss/${router.query.id}`}>
+                    <MenuItem onClick={handleClose}>Акционная накладная</MenuItem>
+                </Link>:null}
                 {!router.asPath.includes('logistic/financereport')?<Link href={'/logistic/financereport/[id]'} as={`/logistic/financereport/${router.query.id}`}>
                     <MenuItem onClick={handleClose}>Отчет по деньгам</MenuItem>
                 </Link>:null}

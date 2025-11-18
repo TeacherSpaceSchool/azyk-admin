@@ -22,7 +22,7 @@ const tracks = [1, 2, 3, 4, 5];
 const ChangeLogistic =  React.memo(
     (props) =>{
         //props
-        const {classes, type, invoices, getList, setSelectedOrders, dateDelivery} = props;
+        const {classes, type, invoices, setList, dateDelivery} = props;
         const {showSnackBar} = props.snackbarActions;
         const {organization} = props.app;
         const {isMobileApp} = props.app;
@@ -40,40 +40,65 @@ const ChangeLogistic =  React.memo(
         let handleTrack =  (event) => {
             setTrack(event.target.value)
         };
+        //paymentMethod
+        let paymentMethods = ['Наличные', 'Перечисление', 'Консигнация']
+        let [paymentMethod, setPaymentMethod] = useState(null);
+        let handlePaymentMethod =  (event) => {
+            setPaymentMethod(event.target.value)
+        };
         //render
         return (
             <div className={classes.main}>
-                {
-                    type==='forwarder'?
-                        <Autocomplete
-                            style={{width: width}}
-                            className={classes.textField}
-                            options={forwarders}
-                            getOptionLabel={option => option.name}
-                            value={forwarder}
-                            onChange={(event, newValue) => setForwarder(newValue)}
-                            noOptionsText='Ничего не найдено'
-                            renderInput={params => <TextField {...params} label='Экспедитор' fullWidth/>}
-                        />
-                        :
-                        <FormControl style={{width: width}} className={classes.input}>
-                            <InputLabel>Рейс</InputLabel>
-                            <Select
-                                value={track}
-                                onChange={handleTrack}
-                            >
-                                {tracks.map((element) => <MenuItem key={element} value={element}>{element}</MenuItem>)}
-                            </Select>
-                        </FormControl>
-                }
+                {type==='forwarder'?
+                    <Autocomplete
+                        style={{width: width}}
+                        className={classes.textField}
+                        options={forwarders}
+                        getOptionLabel={option => option.name}
+                        value={forwarder}
+                        onChange={(event, newValue) => setForwarder(newValue)}
+                        noOptionsText='Ничего не найдено'
+                        renderInput={params => <TextField {...params} label='Экспедитор' fullWidth/>}
+                    />:null}
+                {type==='track'?<FormControl style={{width: width}} className={classes.input}>
+                    <InputLabel>Рейс</InputLabel>
+                    <Select
+                        value={track}
+                        onChange={handleTrack}
+                    >
+                        {tracks.map((element) => <MenuItem key={element} value={element}>{element}</MenuItem>)}
+                    </Select>
+                </FormControl>:null}
+                {type==='paymentMethod'?<FormControl style={{width: width}} className={classes.input}>
+                        <InputLabel>Способ оплаты</InputLabel>
+                        <Select value={paymentMethod} onChange={handlePaymentMethod}>
+                            {paymentMethods.map((element) =>
+                                <MenuItem key={element} value={element} >{element}</MenuItem>
+                            )}
+                        </Select>
+                    </FormControl>:null}
                 <br/>
                 <div style={rowReverseDialog(isMobileApp)}>
                     <Button variant='contained' color='primary' onClick={async () => {
-                       if(forwarder||track) {
-                           await setInvoicesLogic({track, ...forwarder?{forwarder: forwarder._id}:{}, invoices, dateDelivery})
-                           ///setSelectedOrders([])
+                       if(paymentMethod||forwarder||track) {
+                           await setInvoicesLogic({
+                               track,
+                               paymentMethod,
+                               ...forwarder?{forwarder: forwarder._id}:{},
+                               invoices,
+                               dateDelivery
+                           })
                            showMiniDialog(false);
-                           await getList()
+                           setList(list => {
+                               return list.map(invoice => {
+                                   if(invoices.includes(invoice._id)) {
+                                       if (forwarder) invoice.forwarder = forwarder
+                                       if (track) invoice.track = track
+                                       if (paymentMethod) invoice.paymentMethod = paymentMethod
+                                   }
+                                   return invoice
+                               })
+                           })
                        } else showSnackBar('Заполните все поля')
                     }} className={classes.button}>
                         Сохранить

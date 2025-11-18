@@ -3,7 +3,7 @@ import {pdDDMMYY} from '../../../src/lib';
 import Link from 'next/link';
 
 const Tables =  React.memo(({element, columns}) =>{
-    return <Link href='/employment/[id]' as={`/employment/${element.user._id}`}>
+    return <Link href='/employment/[id]' as={`/employment/${element._id}`}>
         <div className='tableRow tablePointer'>
             <div className='tableCell' style={columns[0].style}>
                 {pdDDMMYY(element.createdAt)}<br/>

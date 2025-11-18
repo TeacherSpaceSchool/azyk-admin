@@ -142,7 +142,7 @@ const Client = React.memo((props) => {
             <Card className={classes.page}>
                 <CardContent className={isMobileApp?classes.column:classes.row} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     {router.query.id==='new'||data.client?
-                        ['admin', 'суперагент', 'суперорганизация', 'организация', 'агент', 'экспедитор'].includes(profile.role)/*||(data.client.user&&profile._id===data.client.user._id)*/?
+                        ['admin', 'суперагент', 'суперорганизация', 'организация', 'агент', 'экспедитор'].includes(profile.role)?
                                 <>
                                 <div className={classes.column}>
                                     <label htmlFor='contained-button-file'>
@@ -333,7 +333,7 @@ const Client = React.memo((props) => {
                                     </FormControl>
                                     <div className={classes.row}>
                                         {
-                                            (router.query.id!=='new'&&['суперорганизация', 'организация', 'агент', 'экспедитор', 'admin', 'суперагент'].includes(profile.role))/*||(data.client.user&&profile._id===data.client.user._id)*/?
+                                            (router.query.id!=='new'&&['суперорганизация', 'организация', 'агент', 'экспедитор', 'admin', 'суперагент'].includes(profile.role))?
                                                 <>
                                                 <Button onClick={() => {
                                                     let checkPhone = true

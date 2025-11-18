@@ -70,7 +70,7 @@ const App = React.memo(props => {
                 scrollPostionStore[router.asPath] = appBody.scrollTop
                 sessionStorage.scrollPostionStore = JSON.stringify(scrollPostionStore)
             }
-            if(!url.includes(router.asPath)/*&&!router.asPath.includes(url)*/&&!reloadPage)
+            if(url.split('?')[0]!==router.asPath.split('?')[0]/*&&!router.asPath.includes(url)*/&&!reloadPage)
                 setReloadPage(true)
             if(err&&err.cancelled&&reloadPage)
                 setReloadPage(false)

@@ -193,7 +193,7 @@ const Client = React.memo((props) => {
                                         <Select
                                             value={role}
                                             onChange={handleRole}
-                                            inputProps={{readOnly: data.employment&&profile._id===data.employment.user._id||!['admin'].includes(profile.role),}}
+                                            inputProps={{readOnly: data.employment&&profile.employment===data.employment._id||!['admin'].includes(profile.role),}}
                                         >
                                             {(organization&&organization._id==='super'?superRoles:roles).map((element) => {
                                                 return <MenuItem key={element} value={element}>{element}</MenuItem>
@@ -263,7 +263,7 @@ const Client = React.memo((props) => {
                                                     </Button>
 
                                                     {
-                                                        profile._id!==data.employment.user._id&&['admin'].includes(profile.role)?
+                                                        profile.employment!==data.employment._id&&['admin'].includes(profile.role)?
                                                             <>
                                                                 <Button onClick={async () => {
                                                                     const action = async () => {
@@ -290,7 +290,7 @@ const Client = React.memo((props) => {
                                                             null
                                                     }
                                                     {
-                                                        profile._id===data.employment.user._id?
+                                                        profile.employment===data.employment._id?
                                                             <Button onClick={async () => {
                                                                 const action = () => logout(true)
                                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)

@@ -1,21 +1,21 @@
-import {formatAmount, pdDDMMYYYY} from '../../../src/lib';
+import {formatAmount, pdDDMMMMYYYY} from '../../../src/lib';
 import {toTableRow} from '../../../pages/logistic/financereport/[id]';
 
 export default ({list, forwarderData, date, filter, ordersData}) => {
     const columns = [
-        {title: '№', style: 'width: 6.5mm;'},
-        {title: 'Адрес', style: 'width: 50.34mm;'},
-        {title: 'Отгр-но', style: 'width: 14.73mm;'},
-        {title: 'К оплате', style: 'width: 14.73mm;'},
-        {title: 'Тип оплаты', style: 'width: 24.39mm;'},
-        {title: 'Возврат', style: 'width: 14.73mm;'},
-        {title: 'Долг', style: 'width: 14.73mm;'},
-        {title: 'СФ', style: 'width: 6.5mm;'},
-        {title: 'Комментарий', style: 'width: 43.35mm;'}
+        {title: '№',          style: 'width: 6mm;'},
+        {title: 'Адрес',      style: 'width: 46.1mm;'},
+        {title: 'Отгр-но',    style: 'width: 14.37mm;'},
+        {title: 'К оплате',   style: 'width: 14.37mm;'},
+        {title: 'Тип оплаты', style: 'width: 23.80mm;'},
+        {title: 'Возврат',    style: 'width: 14.37mm;'},
+        {title: 'Долг',       style: 'width: 14.37mm;'},
+        {title: 'СФ',         style: 'width: 6.35mm;'},
+        {title: 'Комментарий',style: 'width: 40mm;'}
     ]
 
     let html = `
-    <p style="font-size: 11pt;">Отчет по деньгам ${pdDDMMYYYY(date)}</p>
+    <p style="font-size: 11pt;">Отчет по деньгам ${pdDDMMMMYYYY(date)}</p>
     <p style="display: flex; justify-content: space-between;">
       <span>Экспедитор: ${forwarderData.name}</span>
       ${filter?`<span>Рейс: ${filter}</span>`:''}

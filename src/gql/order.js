@@ -21,7 +21,7 @@ export const Invoice = `
     allTonnage
     city
     orders {${Order}}
-    client { _id name email phone user {_id}}
+    client { _id name email phone inn user {_id}}
     allPrice
     returnedPrice
     info
@@ -43,6 +43,8 @@ export const Invoice = `
     sync
     inv
     dateDelivery
+    returned
+    consig
 `
 
 export const getOrders = async (variables, client) => {
@@ -168,8 +170,8 @@ export const setInvoicesLogic = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($dateDelivery: Date, $track: Int, $forwarder: ID, $invoices: [ID]!) {
-                        setInvoicesLogic(dateDelivery: $dateDelivery, track: $track, forwarder: $forwarder, invoices: $invoices)
+                    mutation ($dateDelivery: Date, $track: Int, $forwarder: ID, $invoices: [ID]!, $paymentMethod: String) {
+                        setInvoicesLogic(dateDelivery: $dateDelivery, track: $track, forwarder: $forwarder, invoices: $invoices, paymentMethod: $paymentMethod)
                     }`})
         return res.data.setInvoicesLogic
     } catch(err) {

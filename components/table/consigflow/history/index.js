@@ -7,7 +7,7 @@ import {connect} from 'react-redux';
 import {getDistricts} from '../../../../src/gql/district';
 import SetDistrict from '../../../dialog/SetDistrict';
 import CloseIcon from '@material-ui/icons/Close';
-import {formatAmount, getClientTitle, pdDDMMYY} from '../../../../src/lib';
+import {formatAmount, getClientTitle, pdDDMMYY, pdDDMMYYYY} from '../../../../src/lib';
 import Link from 'next/link';
 import {getOrder} from '../../../../src/gql/order';
 import Order from '../../../dialog/Order';
@@ -16,6 +16,8 @@ import History from '../../../dialog/History';
 import {setConsigFlow} from '../../../../src/gql/consigFlow';
 import Confirmation from '../../../dialog/Confirmation';
 import AddConsigFlow from '../../../dialog/AddConsigFlow';
+import {printHTML} from '../../../print';
+import templateConsignation from '../../../print/template/consignation';
 
 const Tables =  React.memo(({list, app, user, districtData, mini_dialogActions, appActions}) =>{
     const router = useRouter();
@@ -99,10 +101,22 @@ const Tables =  React.memo(({list, app, user, districtData, mini_dialogActions, 
                             showMiniDialog(true)
                         }}>Отмена</span>:null}
                     </>:null}
-                    {['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&!element.cancel&&element.sign===1?<span onClick={() => {
-                        setMiniDialog('Оплатить', <AddConsigFlow initialClient={element.client._id} initialAmount={element.amount}/>)
-                        showMiniDialog(true)
-                    }}>Оплатить</span>:null}
+                    {/*['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&*/!element.cancel?<span onClick={async () => {
+                        if(element.sign===1) {
+                            setMiniDialog('Оплатить', <AddConsigFlow initialClient={element.client._id} initialAmount={element.amount}/>)
+                            showMiniDialog(true)
+                        }
+                        else {
+                            const histories = await getHistories({search: element._id, filter: 'ConsigFlowAzyk'});
+                            if(!histories||!histories[0]||!histories[0].user||histories[0].user._id===profile._id) {
+                                printHTML({
+                                    data: {histories, element},
+                                    template: templateConsignation,
+                                    title: `Оплата консигнации ${pdDDMMYYYY(element.cretedAt)}`
+                                })
+                            }
+                        }
+                    }}>{element.sign===1?'Оплатить':'Печать'}</span>:null}
                 </div>
             </div>
         }):[]}

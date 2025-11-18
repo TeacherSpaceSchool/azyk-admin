@@ -353,7 +353,7 @@ const Order =  React.memo(
                                                         </div>
                                                         :
                                                         <div className={classes.addPackaging} style={{color: '#ffb300'}}>
-                                                            Упаковок: {(order.count/order.item.packaging)}
+                                                            Упаковок: {checkFloat(order.count/order.item.packaging)}
                                                         </div>
                                                 }
                                             </div>

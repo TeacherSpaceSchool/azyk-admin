@@ -21,7 +21,7 @@ const CardEmployment = React.memo((props) => {
     let [status, setStatus] = useState(element?element.user.status:'');
     return (
         <Card className={isMobileApp?classes.cardM:classes.cardD}>
-            <Link href='/employment/[id]' as={`/employment/${element.user._id}`}>
+            <Link href='/employment/[id]' as={`/employment/${element._id}`}>
                 <CardActionArea>
                             <CardContent>
                                 <div className={classes.row}>
@@ -75,7 +75,7 @@ const CardEmployment = React.memo((props) => {
                         </CardActionArea>
             </Link>
             {
-                element.del!=='deleted'&&(profile.role === 'admin' || ['суперорганизация', 'организация'].includes(profile.role)) && profile._id!==element.user._id ?
+                element.del!=='deleted'&&(profile.role === 'admin' || ['суперорганизация', 'организация'].includes(profile.role)) && profile.employment!==element._id ?
                     <CardActions>
                         <Button onClick={async () => {
                             const action = async () => {

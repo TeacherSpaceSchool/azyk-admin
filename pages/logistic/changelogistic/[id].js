@@ -102,7 +102,7 @@ const Id = React.memo((props) => {
         const priceField = selectedOrders.length?'priceSelected':'priceAll'
         const weightField = selectedOrders.length?'weightSelected':'weightAll'
         for (let i = 0; i < iterableList.length; i++) {
-            ordersData[priceField] = checkFloat(ordersData[priceField] + (iterableList[i].allPrice - iterableList[i].returnedPrice))
+            ordersData[priceField] = checkFloat(ordersData[priceField] + iterableList[i].allPrice)
             ordersData[weightField] = checkFloat(ordersData[weightField] + iterableList[i].allTonnage)
         }
         setOrdersData({...ordersData})
@@ -118,13 +118,13 @@ const Id = React.memo((props) => {
     let open = event => setAnchorEl(event.currentTarget);
     let close = () => setAnchorEl(null);
     //double
-    const double = contentRef.current&&contentRef.current.offsetWidth>=(forwarderData?1180:1700)
+    const double = contentRef.current&&contentRef.current.offsetWidth>=(forwarderData?1360:1880)
     //middleList
     const middleList = list?Math.ceil(list.length/2):0
     //changeLogistic
     const changeLogistic = (type) => {
         close()
-        setMiniDialog('Логистика', <ChangeLogistic dateDelivery={date} setSelectedOrders={setSelectedOrders} type={type} invoices={selectedOrders.map(selectedOrder => selectedOrder._id)} getList={getList}/>)
+        setMiniDialog('Логистика', <ChangeLogistic dateDelivery={date} type={type} invoices={selectedOrders.map(selectedOrder => selectedOrder._id)} setList={setList}/>)
         showMiniDialog(true)
     }
     //showSetting
@@ -137,8 +137,8 @@ const Id = React.memo((props) => {
             <meta name='robots' content='noindex, nofollow'/>
         </Head>
             <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 30}}>
-                <Table forwarderByClient={forwarderByClient} pagination={pagination} forwarderData={forwarderData} list={double?list.slice(0, middleList):list} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>
-                {double?<Table forwarderByClient={forwarderByClient} pagination={pagination} middleList={middleList} forwarderData={forwarderData} list={list.slice(middleList)} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>:null}
+                <Table setList={setList} forwarderByClient={forwarderByClient} pagination={pagination} forwarderData={forwarderData} list={double?list.slice(0, middleList):list} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>
+                {double?<Table setList={setList} forwarderByClient={forwarderByClient} pagination={pagination} middleList={middleList} forwarderData={forwarderData} list={list.slice(middleList)} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>:null}
             </div>
             {showSetting?<><Fab onClick={open} color='primary' className={classes.fab}>
                 <SettingsIcon />
@@ -188,7 +188,6 @@ Id.getInitialProps = async function(ctx) {
     ctx.store.getState().app.organization = ctx.query.id
     if(!ctx.store.getState().app.date) {
         let date = new Date()
-        date.setDate(date.getDate() + 1)
         if (date.getHours() < dayStartDefault)
             date.setDate(date.getDate() - 1)
         ctx.store.getState().app.date = pdDatePicker(date)

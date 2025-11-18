@@ -1,9 +1,10 @@
 import React from 'react';
-import {checkFloat, formatAmount} from '../../../src/lib';
+import {checkFloat, navigationKeyTable} from '../../../src/lib';
 import {connect} from 'react-redux';
 import SetPackage from '../../dialog/SetPackage';
 import {bindActionCreators} from 'redux';
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog';
+import PackageInput from '../../app/PackageInput';
 
 const Tables =  React.memo(({middleList, app, mini_dialogActions, list, stockClient, basket, setBasketChange, setPackage}) =>{
     const {isMobileApp} = app;
@@ -44,19 +45,17 @@ const Tables =  React.memo(({middleList, app, mini_dialogActions, list, stockCli
                     </div>
                     <div className='tableBorder'/>
                 </>:null}
-                <div className='tableCell' style={columns[2].style} onClick={() => document.getElementById(`catalogCount${idx}`).focus()}>
+                <div className='tableCell' style={columns[2].style}>
                     <input style={{width: widthNbmr, outline: 'none', border: 'none', fontWeight: 500, fontFamily: 'Roboto, serif'}}
-                           readOnly={/*!row.apiece*/false} type={isMobileApp?'number':'text'} value={basket[row._id]&&basket[row._id].count?basket[row._id].count:''}
-                           onChange={(event) => setBasketChange(idx, event.target.value)} id={`catalogCount${idx}`}/>
+                           readOnly={/*!row.apiece*/false} type={isMobileApp?'number':'text'} onChange={(event) => setBasketChange(idx, event.target.value)}
+                           value={basket[row._id]&&basket[row._id].count?basket[row._id].count:''}
+                           id={`R${idx}C${0}`} onKeyDown={event => navigationKeyTable({event, row: idx, column: 0, list, middleList})}/>
                 </div>
                 <div className='tableBorder'/>
-                <div className='tableCell' style={{...columns[3].style, cursor: 'pointer'}} onClick={() => {
-                    setMiniDialog('Упаковок', <SetPackage
-                        action={setPackage}
-                        idx={idx}/>)
-                    showMiniDialog(true)
-                }}>
-                    {basket[row._id]&&basket[row._id].count?checkFloat(basket[row._id].count/(row.packaging?row.packaging:1)):''}
+                <div className='tableCell' style={{...columns[3].style, cursor: 'pointer'}}>
+                    <PackageInput style={{width: widthNbmr, outline: 'none', border: 'none', fontWeight: 500, fontFamily: 'Roboto, serif'}}
+                                  basket={basket} row={row} rowIndex={idx} action={setPackage} id={`R${idx}C${1}`}
+                                  onKeyDown={event => navigationKeyTable({event, row: idx, column: 1, list, middleList})}/>
                 </div>
                 <div className='tableBorder'/>
                 <div className='tableCell' style={columns[4].style}>

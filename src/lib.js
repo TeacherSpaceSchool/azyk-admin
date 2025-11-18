@@ -130,7 +130,7 @@ export const inputInt = (str) => {
 }
 export const checkFloat = (float) => {
     float = parseFloat(float)
-    return isNaN(float)?0:Math.round(float * 10)/10
+    return isNaN(float)?0:Math.round(float * 100)/100
 }
 export const pdDDMMYYYY = (date) =>
 {
@@ -196,6 +196,12 @@ export const pdMMMMYYYY = (date) =>
 {
     date = new Date(date)
     date = `${months[date.getMonth()]} ${date.getFullYear()}`
+    return date
+}
+export const pdDDMMMMYYYY = (date) =>
+{
+    date = new Date(date)
+    date = `${date.getDate()} ${months1[date.getMonth()]} ${date.getFullYear()}`
     return date
 }
 export const pdDDMMYYHHMMCancel = (date) =>
@@ -319,4 +325,70 @@ export const months = [
     'декабрь'
 ]
 
+export const months1 = [
+    'января',
+    'февраля',
+    'марта',
+    'апреля',
+    'мая',
+    'июня',
+    'июля',
+    'августа',
+    'сентября',
+    'октября',
+    'ноября',
+    'декабря'
+]
+
 export const rowReverseDialog = (isMobileApp) => {return {display: 'flex', flexDirection: 'row-reverse', width: '100%', ...isMobileApp?{justifyContent: 'space-between'}:{justifyContent: 'center'}}}
+
+export const navigationKeyTable = ({ event, row, column, list, middleList }) => {
+    const key = event.key;
+    if (!['ArrowDown', 'Enter', 'Tab', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(key)) return;
+
+    const target = event.target;
+    const selectionStart = target.selectionStart ?? 0;
+    const selectionEnd = target.selectionEnd ?? 0;
+    const value = target.value ?? '';
+    const isSelect = selectionStart===0&&selectionEnd===value.length
+
+    // --- навигация по строкам ---
+    if (['ArrowDown', 'Enter', 'Tab'].includes(key)) {
+        event.preventDefault();
+        row += 1;
+        if (!document.getElementById(`R${row}C${column}`)) row = 0;
+    } else if (key === 'ArrowUp') {
+        event.preventDefault();
+        row -= 1;
+        if (!document.getElementById(`R${row}C${column}`)) row = (list.length - 1) + (middleList || 0);
+    }
+
+    // --- навигация по колонкам ---
+    else if (key === 'ArrowLeft' && (!selectionStart&&!selectionEnd||isSelect)) {
+        event.preventDefault();
+        column -= 1;
+    } else if (key === 'ArrowRight' && (selectionStart===value.length&&selectionEnd===value.length||isSelect)) {
+        event.preventDefault();
+        column += 1;
+    }
+
+    const element = document.getElementById(`R${row}C${column}`);
+    if (!element) return;
+
+    // --- корректная обработка по типу элемента ---
+    const tag = element.tagName.toLowerCase();
+
+    if (tag === 'input' || tag === 'textarea') {
+        // сначала фокусируем, потом выделяем весь текст
+        element.focus();
+        // делаем select в следующем кадре (иначе может не сработать)
+        requestAnimationFrame(() => {
+            try {
+                element.select();
+            } catch {/**/}
+        });
+    } else if (tag === 'div') {
+        // у div нет focus/select — только click
+        element.click();
+    }
+};

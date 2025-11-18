@@ -22,7 +22,7 @@ export const printHTML = ({ title, data, template }) => {
           }
           th, td {
             font-weight: 500;
-            border: 0.2mm solid #000;
+            border: 0.5mm solid #000;
             padding: 1mm;
             word-break: break-all;      /* ломает слово в любом месте */
             hyphens: auto;              /* пытается переносить по слогам, если возможно */
