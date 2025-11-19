@@ -294,7 +294,7 @@ const Catalog = React.memo((props) => {
     }, [pagination, list])
     //поиск
     useEffect(() => {
-        if(brands)
+        if(brands&&Array.isArray(brands))
             setList([...brands.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))])
     }, [search, brands])
     //изображения фхо

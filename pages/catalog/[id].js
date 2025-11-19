@@ -54,7 +54,8 @@ const Catalog = React.memo((props) => {
     const [brands, setBrands] = useState(data.brands);
     const [list, setList] = useState([]);
     useEffect(() => {
-        setList([...brands.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))])
+        if(brands&&Array.isArray(brands))
+            setList([...brands.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))])
     }, [search, brands])
     //allPrice
     let [allPrice, setAllPrice] = useState(0);
