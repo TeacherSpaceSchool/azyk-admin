@@ -137,7 +137,7 @@ FinanceReport.getInitialProps = async function(ctx) {
         ctx.store.getState().app.date = pdDatePicker(date)
     }
     if(!ctx.store.getState().app.filter) {
-        ctx.store.getState().app.filter = null
+        ctx.store.getState().app.filter = 1
     }
     return {};
 };

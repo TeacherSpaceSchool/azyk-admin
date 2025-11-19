@@ -372,12 +372,12 @@ const Order =  React.memo(
                                 {
                                     isProcessingOrTaken&&editEmploymentRoles.includes(profile.role)?
                                         <>
-                                            {!isProcessing&&element.organization.refusal?
+                                            {!isProcessing&&element.organization.refusal&&(setList||order.returned)?
                                                 <div onClick={() => {setShowReturn(showReturn => ({...showReturn, [order._id]: !showReturn[order._id]}))}} style={showReturn[order._id]?{background: '#ffb300'}:{}} className={classes.minibtn}>ОТКАЗ</div>
                                                 :
                                                 null
                                             }
-                                            {showReturn[order._id]?<>
+                                            {setList&&showReturn[order._id]?<>
                                                 <br/>
                                                 <div className={classes.row}>
                                                     <div className={classes.nameField}>Отказ:&nbsp;</div>

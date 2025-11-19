@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
@@ -14,6 +14,7 @@ const SetDate =  React.memo(
     (props) =>{
         const {classes, type} = props;
         const {isMobileApp, date} = props.app;
+        const dateRef = useRef(null);
         let [dateChange, setDateChange] = useState(null);
         useEffect(() => {
             if(date) {
@@ -37,13 +38,15 @@ const SetDate =  React.memo(
                     type={type||'date'}
                     InputLabelProps={{shrink: true}}
                     value={dateChange}
-                    onChange={ event => setDateChange(event.target.value) }
+                    onInput={ event => setDateChange(event.target.value)}
                     onKeyPress={event => {
                         if(event.key === 'Enter') {
                             setDate(new Date(dateChange))
-                            showMiniDialog(false);
+                            showMiniDialog(false)
                         }
                     }}
+                    inputRef={dateRef}
+                    onClick={() => dateRef.current.showPicker()}
                 />
                 <br/>
                 <div style={rowReverseDialog(isMobileApp)}>

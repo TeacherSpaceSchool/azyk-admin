@@ -10,7 +10,6 @@ import * as snackbarActions from '../../../redux/actions/snackbar';
 
 const Tables =  React.memo(({element, columns, user, buy, snackbarActions}) =>{
     const {profile} = user;
-    const {showSnackBar} = snackbarActions;
     return <Link href='/client/[id]' as={`/client/${element._id}`}>
         <div className='tableRow tablePointer'>
             <div className='tableCell' style={columns[0].style}>
