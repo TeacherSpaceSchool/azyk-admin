@@ -33,7 +33,7 @@ const FinanceReport = React.memo((props) => {
     //ref
     const contentRef = useRef();
     //props
-    const {filter, date, forwarder} = props.app;
+    const {filter, date, forwarder, isMobileApp} = props.app;
     const {showLoad} = props.appActions;
     const {showSnackBar} = props.snackbarActions;
     //forwarderData
@@ -89,6 +89,12 @@ const FinanceReport = React.memo((props) => {
         }
         setOrdersData({...ordersData})
     }, [list])
+    //
+    useEffect(() => {if(!filter) (async () => {
+        if(isMobileApp)
+            await document.getElementById('mobile-menu-button').click();
+        document.getElementById('filter-button').click();
+    })()}, [filter])
     //render
     return <App showForwarder pageName='Сводная накладная' dates checkPagination={checkPagination} filters={filters}>
         <Head>
@@ -135,9 +141,6 @@ FinanceReport.getInitialProps = async function(ctx) {
         if (date.getHours() < dayStartDefault)
             date.setDate(date.getDate() - 1)
         ctx.store.getState().app.date = pdDatePicker(date)
-    }
-    if(!ctx.store.getState().app.filter) {
-        ctx.store.getState().app.filter = 1
     }
     return {};
 };

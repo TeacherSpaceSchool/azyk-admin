@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import cardErrorStyle from '../../src/styleMUI/offlineorder/cardOfflineOrder'
@@ -10,13 +10,14 @@ import Router from 'next/router'
 import { addAgentHistoryGeo } from '../../src/gql/agentHistoryGeo'
 import { getGeoDistance } from '../../src/lib'
 import { addOrders } from '../../src/gql/order'
-import { addBasket } from '../../src/gql/basket'
 import { deleteOfflineOrderByKey } from '../../src/service/idb/offlineOrders';
 
 const CardOfflineOrder = React.memo((props) => {
     const classes = cardErrorStyle();
+    const {profile} = props.user;
     const {element, list, setList, idx} = props;
     const {isMobileApp} = props.app;
+    const stamp = useMemo(() => `${new Date().getTime()}${profile._id}`, [])
     return (
         <Card className={isMobileApp?classes.cardM:classes.cardD}>
             <CardContent>
@@ -59,14 +60,9 @@ const CardOfflineOrder = React.memo((props) => {
                                     unawaited(() => addAgentHistoryGeo({client: element.client, geo: `${element.geo.latitude}, ${element.geo.longitude}`}))
                                 }
                             }
-                            for (let i = 0; i < element.basket.length; i++) {
-                                if(element.basket[i].count > 0)
-                                    await addBasket({
-                                        item: element.basket[i]._id,
-                                        count: element.basket[i].count
-                                    })
-                            }
                             await addOrders({
+                                stamp,
+                                baskets: Object.values(element.basket),
                                 inv: element.inv,
                                 unite: element.unite,
                                 info: element.info,
@@ -97,7 +93,8 @@ const CardOfflineOrder = React.memo((props) => {
 
 function mapStateToProps (state) {
     return {
-        app: state.app
+        app: state.app,
+        user: state.user
     }
 }
 

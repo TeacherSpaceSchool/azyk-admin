@@ -54,6 +54,7 @@ const Organization = React.memo((props) => {
     let [calculateConsig, setCalculateConsig] = useState(data.organization&&data.organization.calculateConsig!==null?data.organization.calculateConsig:false);
     let [autoAcceptAgent, setAutoAcceptAgent] = useState(data.organization&&data.organization.autoAcceptAgent!==null?data.organization.autoAcceptAgent:false);
     let [autoAcceptNight, setAutoAcceptNight] = useState(data.organization&&data.organization.autoAcceptNight!==null?data.organization.autoAcceptNight:false);
+    let [divideBySubBrand1C, setDivideBySubBrand1C] = useState(data.organization&&data.organization.divideBySubBrand1C!==null?data.organization.divideBySubBrand1C:false);
     let [clientDuplicate, setClientDuplicate] = useState(data.organization&&data.organization.clientDuplicate!==null?data.organization.clientDuplicate:false);
     let [divideBySubBrand, setDivideBySubBrand] = useState(data.organization&&data.organization.divideBySubBrand!==null?data.organization.divideBySubBrand:false);
     let [dateDelivery, setDateDelivery] = useState(data.organization&&data.organization.dateDelivery!==null?data.organization.dateDelivery:false);
@@ -298,6 +299,19 @@ const Organization = React.memo((props) => {
                                                     }
                                                     label='Делить по подбрендам'
                                                 />
+                                                <FormControlLabel
+                                                    control={
+                                                        <Switch
+                                                            checked={divideBySubBrand1C}
+                                                            onChange={() => {
+                                                                setDivideBySubBrand1C(!divideBySubBrand1C)
+                                                            }}
+                                                            color='primary'
+                                                            inputProps={{ 'aria-label': 'primary checkbox' }}
+                                                        />
+                                                    }
+                                                    label='Делить по подбрендам 1С'
+                                                />
                                             <FormControlLabel
                                                 control={
                                                     <Switch
@@ -526,6 +540,7 @@ const Organization = React.memo((props) => {
                                                                 calculateConsig,
                                                                 autoAcceptAgent,
                                                                 autoAcceptNight,
+                                                                divideBySubBrand1C,
                                                                 clientDuplicate,
                                                                 divideBySubBrand,
                                                                 dateDelivery,
@@ -575,6 +590,7 @@ const Organization = React.memo((props) => {
                                                     if(calculateConsig!==data.organization.calculateConsig)editElement.calculateConsig = calculateConsig
                                                     if(autoAcceptAgent!==data.organization.autoAcceptAgent)editElement.autoAcceptAgent = autoAcceptAgent
                                                     if(autoAcceptNight!==data.organization.autoAcceptNight)editElement.autoAcceptNight = autoAcceptNight
+                                                    if(divideBySubBrand1C!==data.organization.divideBySubBrand1C)editElement.divideBySubBrand1C = divideBySubBrand1C
                                                     if(clientDuplicate!==data.organization.clientDuplicate)editElement.clientDuplicate = clientDuplicate
                                                     if(divideBySubBrand!==data.organization.divideBySubBrand)editElement.divideBySubBrand = divideBySubBrand
                                                     if(dateDelivery!==data.organization.dateDelivery)editElement.dateDelivery = dateDelivery

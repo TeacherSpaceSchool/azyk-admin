@@ -16,7 +16,6 @@ import { getClient, getClients } from '../src/gql/client'
 import TextField from '@material-ui/core/TextField';
 import { getClientGqlSsr } from '../src/getClientGQL'
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { deleteBasketAll } from '../src/gql/basket';
 import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
 import initialApp from '../src/initialApp'
@@ -538,7 +537,6 @@ Catalog.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     //данные
-    unawaited(() => deleteBasketAll(getClientGqlSsr(ctx.req)))
     // eslint-disable-next-line no-undef
     const [brands, brandOrganizations, client] = await Promise.all([
         organization?getBrands({organization, search: '', sort: '-priotiry'}, getClientGqlSsr(ctx.req)):null,

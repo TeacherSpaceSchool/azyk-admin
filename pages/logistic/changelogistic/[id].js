@@ -102,7 +102,7 @@ const Id = React.memo((props) => {
         const priceField = selectedOrders.length?'priceSelected':'priceAll'
         const weightField = selectedOrders.length?'weightSelected':'weightAll'
         for (let i = 0; i < iterableList.length; i++) {
-            ordersData[priceField] = checkFloat(ordersData[priceField] + iterableList[i].allPrice)
+            ordersData[priceField] = checkFloat(ordersData[priceField] + iterableList[i].allPrice - iterableList[i].returnedPrice)
             ordersData[weightField] = checkFloat(ordersData[weightField] + iterableList[i].allTonnage)
         }
         setOrdersData({...ordersData})

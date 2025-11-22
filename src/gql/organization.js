@@ -28,6 +28,7 @@ const Organization = `
     dateDelivery
     autoAcceptAgent
     autoAcceptNight
+    divideBySubBrand1C
     calculateStock
     calculateConsig
     clientDuplicate
@@ -107,12 +108,12 @@ const args1 = (r) => `$cities: [String]${r?'!':''}, $catalog: Upload, $miniInfo:
     `$refusal: Boolean${r?'!':''}, $unite: Boolean${r?'!':''}, $superagent: Boolean${r?'!':''}, $onlyDistrict: Boolean${r?'!':''}, $addedClient: Boolean${r?'!':''}, `+
     `$agentSubBrand: Boolean${r?'!':''}, $clientSubBrand: Boolean${r?'!':''}, $onlyIntegrate: Boolean${r?'!':''}, $autoAcceptAgent: Boolean${r?'!':''}, `+
     `$autoAcceptNight: Boolean${r?'!':''}, $calculateStock: Boolean${r?'!':''}, $calculateConsig: Boolean${r?'!':''}, $clientDuplicate: Boolean${r?'!':''}, `+
-    `$divideBySubBrand: Boolean${r?'!':''}, $dateDelivery: Boolean${r?'!':''}, $warehouse: String${r?'!':''}, $pass: String, $requisites: String`
+    `$divideBySubBrand: Boolean${r?'!':''}, $divideBySubBrand1C: Boolean${r?'!':''}, $dateDelivery: Boolean${r?'!':''}, $warehouse: String${r?'!':''}, $pass: String, $requisites: String`
 const args2 = 'cities: $cities, catalog: $catalog, miniInfo: $miniInfo, image: $image, priotiry: $priotiry, minimumOrder: $minimumOrder,  agentHistory: $agentHistory, '+
     'name: $name, address: $address, email: $email, phone: $phone, info: $info, refusal: $refusal, unite: $unite, superagent: $superagent, onlyDistrict: $onlyDistrict, '+
     'addedClient: $addedClient, agentSubBrand: $agentSubBrand, clientSubBrand: $clientSubBrand, onlyIntegrate: $onlyIntegrate, autoAcceptAgent: $autoAcceptAgent, '+
     'autoAcceptNight: $autoAcceptNight, calculateStock: $calculateStock, calculateConsig: $calculateConsig, clientDuplicate: $clientDuplicate, '+
-    'divideBySubBrand: $divideBySubBrand, dateDelivery: $dateDelivery, warehouse: $warehouse, pass: $pass, requisites: $requisites'
+    'divideBySubBrand: $divideBySubBrand, divideBySubBrand1C: $divideBySubBrand1C, dateDelivery: $dateDelivery, warehouse: $warehouse, pass: $pass, requisites: $requisites'
 
 export const addOrganization = async (variables) => {
     try{

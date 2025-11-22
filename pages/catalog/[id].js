@@ -17,7 +17,6 @@ import Image from '../../components/dialog/Image'
 import { useRouter } from 'next/router'
 import { getClient } from '../../src/gql/client'
 import { getClientGqlSsr } from '../../src/getClientGQL'
-import { deleteBasketAll } from '../../src/gql/basket';
 import Divider from '@material-ui/core/Divider';
 import initialApp from '../../src/initialApp'
 import { getOrganization } from '../../src/gql/organization'
@@ -351,7 +350,6 @@ Catalog.getInitialProps = async function(ctx) {
             ctx.res.end()
         } else
             Router.push('/contact')
-    unawaited(() => deleteBasketAll(getClientGqlSsr(ctx.req)))
     if(ctx.query.search) {
         ctx.store.getState().app.search = ctx.query.search
     }

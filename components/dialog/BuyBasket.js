@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
@@ -19,7 +19,6 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Router from 'next/router'
 import Link from 'next/link';
 import WhatshotIcon from '@material-ui/icons/Whatshot';
-import { addBasket } from '../../src/gql/basket';
 import { addAgentHistoryGeo } from '../../src/gql/agentHistoryGeo'
 import {dayStartDefault, formatAmount, getGeoDistance, rowReverseDialog, unawaited} from '../../src/lib'
 import { getDeliveryDate } from '../../src/gql/deliveryDate';
@@ -56,7 +55,6 @@ const BuyBasket =  React.memo(
             (async () => {
                 if(unlock.current) {
                     unlock.current = false
-                    for(const key in basket) unawaited(() => addBasket({item: basket[key]._id, count: basket[key].count}))
                     const deliveryDate = await getDeliveryDate({client: client._id, organization: organization._id})
                     if(deliveryDate) {
                         deliveryDays = deliveryDate.days
@@ -82,6 +80,7 @@ const BuyBasket =  React.memo(
                 }
             })()
         }, [])
+        const stamp = useMemo(() => `${new Date().getTime()}${profile._id}`, [])
         return (
             <div className={classes.main}>
                 {
@@ -185,6 +184,8 @@ const BuyBasket =  React.memo(
                                            }
                                        }
                                        await addOrders({
+                                           stamp,
+                                           baskets: Object.values(basket).map(basket => {return {_id: basket._id, count: basket.count}}),
                                            inv,
                                            unite: organization.unite,
                                            info,

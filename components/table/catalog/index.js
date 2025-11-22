@@ -52,7 +52,7 @@ const Tables =  React.memo(({middleList, app, mini_dialogActions, list, stockCli
                            id={`R${idx}C${0}`} onKeyDown={event => navigationKeyTable({event, row: idx, column: 0, list, middleList})}/>
                 </div>
                 <div className='tableBorder'/>
-                <div className='tableCell' style={{...columns[3].style, cursor: 'pointer'}}>
+                <div className='tableCell' style={columns[3].style}>
                     <PackageInput style={{width: widthNbmr, outline: 'none', border: 'none', fontWeight: 500, fontFamily: 'Roboto, serif'}}
                                   basket={basket} row={row} rowIndex={idx} action={setPackage} id={`R${idx}C${1}`}
                                   onKeyDown={event => navigationKeyTable({event, row: idx, column: 1, list, middleList})}/>

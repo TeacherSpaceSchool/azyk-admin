@@ -42,7 +42,7 @@ const filters = [
 ]
 
 const paymentPrice = (invoice) => {
-    return ['Наличные'].includes(invoice.paymentMethod)?checkFloat(invoice.allPrice - checkFloat(invoice.returned)):0
+    return ['Наличные'].includes(invoice.paymentMethod)?checkFloat(invoice.allPrice - invoice.returnedPrice - checkFloat(invoice.returned)):0
 }
 
 export const toTableRow = (invoice) => {
