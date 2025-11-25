@@ -41,7 +41,7 @@ const Tables =  React.memo(({element, idx, columns, setList, user, mini_dialogAc
         </div>
         <div className='tableBorder'/>
         <div className='tableCell' style={columns[2].style}>
-            {element.returnedPrice?`${formatAmount(element.allPrice-element.returnedPrice)}\n${formatAmount(element.allPrice)}`:formatAmount(element.allPrice)}
+            {element.rejectedPrice?`${formatAmount(element.allPrice-element.rejectedPrice)}\n${formatAmount(element.allPrice)}`:formatAmount(element.allPrice)}
         </div>
         <div className='tableBorder'/>
         <div className='tableCell' style={{...columns[3].style, ...!element.address[1]?{color: 'red'}:{}}}>

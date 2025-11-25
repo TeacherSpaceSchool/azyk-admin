@@ -282,7 +282,7 @@ const SubBrand = React.memo((props) => {
                                             <Button onClick={() => {
                                                 const action = async () => {
                                                     await deleteSubBrand(data.subBrand._id)
-                                                    Router.push(`/subBrands/${data.subBrand.organization?data.subBrand.organization._id:'super'}`)
+                                                    Router.push('/subbrands')
                                                 }
                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                 showMiniDialog(true)

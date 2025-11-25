@@ -34,6 +34,7 @@ const FinanceReport = React.memo((props) => {
     const contentRef = useRef();
     //props
     const {filter, date, forwarder, isMobileApp} = props.app;
+    const {profile} = props.user;
     const {showLoad} = props.appActions;
     const {showSnackBar} = props.snackbarActions;
     //forwarderData
@@ -95,6 +96,9 @@ const FinanceReport = React.memo((props) => {
             await document.getElementById('mobile-menu-button').click();
         document.getElementById('filter-button').click();
     })()}, [filter])
+    //showSetting
+    const [showSetting, setShowSetting] = useState(false)
+    useEffect(() => {setShowSetting(profile.role!=='экспедитор'&&list.length)}, [list])
     //render
     return <App showForwarder pageName='Сводная накладная' dates checkPagination={checkPagination} filters={filters}>
         <Head>
@@ -104,13 +108,13 @@ const FinanceReport = React.memo((props) => {
         <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 60}}>
             <Table pagination={pagination} forwarderData={forwarderData} list={list}/>
         </div>
-        {list.length?<Fab
+        {showSetting?<Fab
             color='primary' className={classes.fab}
             onClick={() => printHTML({ data: {list, forwarderData, date, filter}, template: templateSummaryInvoice, title: `Сводная накладная ${pdDDMMYYYY(date)}`})}
         >
             <PrintIcon />
         </Fab>:null}
-        <QuickTransition fab2={list.length}/>
+        <QuickTransition fab2={showSetting}/>
         <div className='count'>
             Всего: {formatAmount(list.length)}
             <br/>
@@ -127,7 +131,7 @@ const FinanceReport = React.memo((props) => {
 
 FinanceReport.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin', 'суперорганизация', 'организация', 'менеджер'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin', 'суперорганизация', 'организация', 'менеджер', 'экспедитор'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -136,6 +140,8 @@ FinanceReport.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     ctx.store.getState().app.organization = ctx.query.id
+    if(ctx.store.getState().user.profile.role==='экспедитор')
+        ctx.store.getState().app.forwarder = ctx.store.getState().user.profile.employment
     if(!ctx.store.getState().app.date) {
         let date = new Date()
         if (date.getHours() < dayStartDefault)
@@ -147,7 +153,8 @@ FinanceReport.getInitialProps = async function(ctx) {
 
 function mapStateToProps (state) {
     return {
-        app: state.app
+        app: state.app,
+        user: state.user,
     }
 }
 

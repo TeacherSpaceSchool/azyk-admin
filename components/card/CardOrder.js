@@ -113,8 +113,8 @@ const CardOrder = React.memo((props) => {
                     {
                         element.agent?
                             <div className={classes.row}>
-                                <div className={classes.nameField}>Агент: &nbsp;</div>
-                                <div className={classes.value}>{element.agent.name}</div>
+                                <div className={classes.nameField}>Сотрудник: &nbsp;</div>
+                                <div className={classes.value}>{`${element.agent.user?`${element.agent.user.role} `:''}${element.agent.name}`}</div>
                             </div>
                             :
                             null
@@ -159,9 +159,9 @@ const CardOrder = React.memo((props) => {
                             null
                     }
                     <div className={classes.row}>
-                        <div className={classes.nameField}>Сумма{element.returnedPrice?' (факт./итого)':''}:</div>
+                        <div className={classes.nameField}>Сумма{element.rejectedPrice?' (факт./итого)':''}:</div>
                         <div className={classes.value}>
-                            {element.returnedPrice?`${formatAmount(element.allPrice-element.returnedPrice)} сом/${formatAmount(element.allPrice)} сом`:`${formatAmount(element.allPrice)} сом`}
+                            {element.rejectedPrice?`${formatAmount(element.allPrice-element.rejectedPrice)} сом/${formatAmount(element.allPrice)} сом`:`${formatAmount(element.allPrice)} сом`}
                         </div>
                     </div>
                     {

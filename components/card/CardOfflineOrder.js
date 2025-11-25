@@ -62,7 +62,7 @@ const CardOfflineOrder = React.memo((props) => {
                             }
                             await addOrders({
                                 stamp,
-                                baskets: Object.values(element.basket),
+                                baskets: element.baskets,
                                 inv: element.inv,
                                 unite: element.unite,
                                 info: element.info,

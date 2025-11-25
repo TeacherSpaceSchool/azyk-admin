@@ -42,7 +42,7 @@ const filters = [
 ]
 
 const paymentPrice = (invoice) => {
-    return ['Наличные'].includes(invoice.paymentMethod)?checkFloat(invoice.allPrice - invoice.returnedPrice - checkFloat(invoice.returned)):0
+    return ['Наличные'].includes(invoice.paymentMethod)?checkFloat(invoice.allPrice - invoice.rejectedPrice - checkFloat(invoice.returned)):0
 }
 
 export const toTableRow = (invoice) => {
@@ -58,6 +58,7 @@ const Id = React.memo((props) => {
     //ref
     const contentRef = useRef();
     //props
+    const {profile} = props.user;
     const {filter, date, forwarder} = props.app;
     const {organizationData, agentByClient} = props.data;
     const {showLoad} = props.appActions;
@@ -123,6 +124,9 @@ const Id = React.memo((props) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const handleClick = (event) => setAnchorEl(event.currentTarget);
     const handleClose = () => setAnchorEl(null);
+    //showSetting
+    const [showSetting, setShowSetting] = useState(false)
+    useEffect(() => {setShowSetting(profile.role!=='экспедитор'&&list.length)}, [list])
     //render
     return <App showForwarder pageName='Отчет по деньгам' dates checkPagination={checkPagination} filters={filters}>
         <Head>
@@ -132,7 +136,7 @@ const Id = React.memo((props) => {
         <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 45}}>
             <Table pagination={pagination} forwarderData={forwarderData} list={list}/>
         </div>
-        {list.length?<>
+        {showSetting?<>
             <Fab
                 color='primary' className={classes.fab}
                 onClick={handleClick}
@@ -154,7 +158,7 @@ const Id = React.memo((props) => {
                 }}>Накладные</MenuItem>
             </Menu>
         </>:null}
-        <QuickTransition fab2={list.length}/>
+        <QuickTransition fab2={showSetting}/>
         <div className='count'>
             Всего: {formatAmount(list.length)}
             <br/>
@@ -171,7 +175,7 @@ const Id = React.memo((props) => {
 
 Id.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin', 'суперорганизация', 'организация', 'менеджер'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin', 'суперорганизация', 'организация', 'менеджер', 'экспедитор'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -188,6 +192,8 @@ Id.getInitialProps = async function(ctx) {
     }
     if(!ctx.store.getState().app.filter)
         ctx.store.getState().app.filter = null
+    if(ctx.store.getState().user.profile.role==='экспедитор')
+        ctx.store.getState().app.forwarder = ctx.store.getState().user.profile.employment
     // eslint-disable-next-line no-undef
     const [districts, organizationData] = await Promise.all([
         getDistricts({search: '', sort: '-name', organization: ctx.query.id}, getClientGqlSsr(ctx.req)),
@@ -202,7 +208,8 @@ Id.getInitialProps = async function(ctx) {
 
 function mapStateToProps (state) {
     return {
-        app: state.app
+        app: state.app,
+        user: state.user,
     }
 }
 

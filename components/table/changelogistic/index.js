@@ -14,8 +14,10 @@ import Order from '../../dialog/Order';
 import CloseIcon from '@material-ui/icons/Close';
 import ChangeLogistic from '../../dialog/ChangeLogistic';
 
-const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList, setList, selectedOrders, setSelectedOrders, pagination, app, appActions, mini_dialogActions}) =>{
+const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList, setList, user, selectedOrders, setSelectedOrders, pagination, app, appActions, mini_dialogActions}) =>{
     const {organization, date, filter, isMobileApp} = app;
+    const {profile} = user;
+    const isEdit = profile.role!=='экспедитор'
     const {setForwarder, setFilter} = appActions;
     const {setMiniDialog, showMiniDialog} = mini_dialogActions;
     const columns = [
@@ -24,14 +26,14 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
         {title: 'Рейс', style: {width: 30}},
         {title: 'Сумма', style: {width: 60}},
         {title: 'Способ оп-ты', style: {width: 90}},
-        {title: 'Вес', style: {width: 40}},
+        {title: 'Тоннаж', style: {width: 60}},
         {title: 'Создан', style: {width: 75}},
         ...!forwarderData?[{title: 'Экспедитор', style: {width: 250}}]:[],
     ]
-    const openOrder = async (row) => {
-        let _element = await getOrder(row._id)
+    const openOrder = async (idx) => {
+        let _element = await getOrder(list[idx]._id)
         if(_element) {
-            setMiniDialog('Заказ', <Order element={_element}/>);
+            setMiniDialog('Заказ', <Order element={_element} setList={setList} idx={idx}/>);
             showMiniDialog(true)
         }
     }
@@ -44,7 +46,7 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
             <div
                 style={{display: 'flex', alignItems: 'center', zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}>
                 {!middleList?<>
-                    <span style={{cursor: 'pointer'}} onClick={async () => {
+                    {profile.role!=='экспедитор'?<><span style={{cursor: 'pointer'}} onClick={async () => {
                         const forwarders = await getEmployments({organization, search: '', filter: 'экспедитор', sort: 'name'});
                         setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);
                         showMiniDialog(true);
@@ -55,7 +57,7 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
                         </span>
                     </span>
                     {!isMobileApp&&forwarderData?<CloseIcon style={{fontSize: 20, color: 'red', cursor: 'pointer'}} onClick={() => setForwarder(null)}/>:null}
-                    &nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;</>:null}
                     <span style={{cursor: 'pointer'}} onClick={async () => {
                         setMiniDialog('Доставка', <SetDate/>);
                         showMiniDialog(true);
@@ -76,7 +78,7 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
             </div>
             <div className='tableHead' style={{top: 31}}>
                 {columns.map((column, idx) => {
-                    return column?<React.Fragment key={`column${idx}`}>
+                    return column&&(idx||isEdit)?<React.Fragment key={`column${idx}`}>
                         <div className='tableCell' style={{...column.style, whiteSpace: 'nowrap', ...!idx?{margin: 0, padding: 5}:{}}}>
                             {column.title}
                         </div>
@@ -95,7 +97,7 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
                     idx += middleList
                 const forwarder = row.forwarder||(forwarderByClient[row.client._id]||{name: 'Не указан'})
                 return <div className='tableRow' key={`row${idx}`} style={{cursor: 'pointer', borderRight: '1px solid #00000040'}}>
-                    <div className='tableCell' style={{display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 0, padding: 5, ...columns[0].style}} onClick={() => {
+                    {isEdit?<><div className='tableCell' style={{display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 0, padding: 5, ...columns[0].style}} onClick={() => {
                         setSelectedOrders(selectedOrders => {
                             if (isEmpty(index)) {
                                 selectedOrders.push(row)
@@ -112,28 +114,28 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
                                 <CheckCircleOutline style={{color: '#00000040', fontSize: 18.59}}/>
                         }
                     </div>
-                    <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[1].style} onClick={() => openOrder(row)}>
+                    <div className='tableBorder'/></>:null}
+                    <div className='tableCell' style={columns[1].style} onClick={() => openOrder(idx)}>
                         {getClientTitle({address: [row.address]})}
                     </div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[2].style} onClick={() => openOrder(row)}>
+                    <div className='tableCell' style={columns[2].style} onClick={() => openOrder(idx)}>
                         {row.track}
                     </div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[3].style} onClick={() => openOrder(row)}>
-                        {formatAmount(row.allPrice - row.returnedPrice)}
+                    <div className='tableCell' style={columns[3].style} onClick={() => openOrder(idx)}>
+                        {formatAmount(row.allPrice - row.rejectedPrice)}
                     </div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[4].style} onClick={() => changePaymentMethod(row)}>
+                    <div className='tableCell' style={columns[4].style} onClick={() => isEdit?changePaymentMethod(row):openOrder(idx)}>
                         {row.paymentMethod}
                     </div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[5].style} onClick={() => openOrder(row)}>
+                    <div className='tableCell' style={columns[5].style} onClick={() => openOrder(idx)}>
                         {formatAmount(row.allTonnage)}
                     </div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[6].style} onClick={() => openOrder(row)}>
+                    <div className='tableCell' style={columns[6].style} onClick={() => openOrder(idx)}>
                         {pdDDMMHHMM(row.createdAt)}
                     </div>
                     {!forwarderData?<>
@@ -151,6 +153,7 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
 function mapStateToProps (state) {
     return {
         app: state.app,
+        user: state.user,
     }
 }
 

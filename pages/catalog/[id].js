@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import pageListStyle from '../../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat, isNotEmpty, isEmpty, unawaited, formatAmount} from '../../src/lib';
+import {checkInt, checkFloat, isNotEmpty, isEmpty, formatAmount} from '../../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'

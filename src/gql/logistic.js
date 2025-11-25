@@ -47,8 +47,8 @@ export const getSummaryAdss = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($organization: ID!, $agent: ID, $forwarder: ID, $dateDelivery: Date!) {
-                        summaryAdss(organization: $organization, agent: $agent, forwarder: $forwarder, dateDelivery: $dateDelivery)
+                    query ($organization: ID!, $track: Int, $agent: ID, $forwarder: ID, $dateDelivery: Date!) {
+                        summaryAdss(organization: $organization, track: $track, agent: $agent, forwarder: $forwarder, dateDelivery: $dateDelivery)
                     }`,
             })
         return res.data.summaryAdss

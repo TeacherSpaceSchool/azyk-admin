@@ -56,24 +56,33 @@ const BuyBasket =  React.memo(
                 if(unlock.current) {
                     unlock.current = false
                     const deliveryDate = await getDeliveryDate({client: client._id, organization: organization._id})
-                    if(deliveryDate) {
+                    if (deliveryDate) {
                         deliveryDays = deliveryDate.days
                         /*if(!agent)
                             deliveryDays[6] = false*/
                         setDeliveryDays([...deliveryDays])
                     }
-                    for (let i = 0; i < 7; i++) {
-                        let day = new Date()
-                        if(day.getHours()>=dayStartDefault)
-                            day.setDate(day.getDate()+1)
-                        day.setDate(day.getDate()+i)
-                        day.setHours(dayStartDefault, 0, 0, 0)
-                        let dayWeek = day.getDay() === 0 ? 6 : (day.getDay() - 1)
-                        week[dayWeek] = day
-                        if(!dateDelivery&&deliveryDays[dayWeek]) {
-                            dateDelivery = day
-                            setDateDelivery(dateDelivery)
+                    if(profile.role!=='экспедитор') {
+                        for (let i = 0; i < 7; i++) {
+                            let day = new Date()
+                            if (day.getHours() >= dayStartDefault)
+                                day.setDate(day.getDate() + 1)
+                            day.setDate(day.getDate() + i)
+                            day.setHours(dayStartDefault, 0, 0, 0)
+                            let dayWeek = day.getDay() === 0 ? 6 : (day.getDay() - 1)
+                            week[dayWeek] = day
+                            if (!dateDelivery && deliveryDays[dayWeek]) {
+                                dateDelivery = day
+                                setDateDelivery(dateDelivery)
+                            }
                         }
+                    }
+                    else {
+                        let day = new Date()
+                        day.setHours(dayStartDefault, 0, 0, 0)
+                        week[0] = day
+                        dateDelivery = day
+                        setDateDelivery(dateDelivery)
                     }
                     setWeek([...week])
                     unlock.current = true
@@ -97,10 +106,9 @@ const BuyBasket =  React.memo(
                         null
                 }
                 <div style={{width: width}} className={classes.itogo}><b>Адрес доставки: &nbsp;</b>{client.address[0][0]}</div>
-                <Link href={'client/[id]'} as={`/client/${client._id}`}>
+                {!['экспедитор', 'клиент'].includes(profile.role)?<><Link href={'client/[id]'} as={`/client/${client._id}`}>
                     Изменить адрес
-                </Link>
-                <br/>
+                </Link><br/></>:null}
                 <Input
                     style={{width: width}}
                     placeholder='Комментарий'
@@ -176,6 +184,12 @@ const BuyBasket =  React.memo(
                                    sessionStorage.catalog = '{}'
                                    sessionStorage.removeItem('catalogID')
                                    sessionStorage.removeItem('client')
+                                   // eslint-disable-next-line no-undef
+                                   const seen = new Set();
+                                   const baskets = Object.values(basket)
+                                       .filter(b => b.count)
+                                       .filter(b => {if (seen.has(b._id)) return false; seen.add(b._id); return true;})
+                                       .map(b => ({ _id: b._id, count: b.count }));
                                    if(navigator.onLine) {
                                        if(agent&&geo&&client.address[0][1].includes(', ')) {
                                            let distance = getGeoDistance(geo.coords.latitude, geo.coords.longitude, ...(client.address[0][1].split(', ')))
@@ -185,7 +199,7 @@ const BuyBasket =  React.memo(
                                        }
                                        await addOrders({
                                            stamp,
-                                           baskets: Object.values(basket).map(basket => {return {_id: basket._id, count: basket.count}}),
+                                           baskets,
                                            inv,
                                            unite: organization.unite,
                                            info,
@@ -206,7 +220,7 @@ const BuyBasket =  React.memo(
                                            organization: organization._id,
                                            client: client._id,
                                            dateDelivery,
-                                           basket,
+                                           baskets,
                                            address: client.address[0],
                                            name: client.name,
                                            allPrice: `${formatAmount(allPrice)} сом`

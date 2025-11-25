@@ -102,7 +102,7 @@ const Id = React.memo((props) => {
         const priceField = selectedOrders.length?'priceSelected':'priceAll'
         const weightField = selectedOrders.length?'weightSelected':'weightAll'
         for (let i = 0; i < iterableList.length; i++) {
-            ordersData[priceField] = checkFloat(ordersData[priceField] + iterableList[i].allPrice - iterableList[i].returnedPrice)
+            ordersData[priceField] = checkFloat(ordersData[priceField] + iterableList[i].allPrice - iterableList[i].rejectedPrice)
             ordersData[weightField] = checkFloat(ordersData[weightField] + iterableList[i].allTonnage)
         }
         setOrdersData({...ordersData})
@@ -129,7 +129,7 @@ const Id = React.memo((props) => {
     }
     //showSetting
     const [showSetting, setShowSetting] = useState(false)
-    useEffect(() => {setShowSetting(list.length&&(selectedOrders.length||forwarder))}, [list, selectedOrders, forwarder])
+    useEffect(() => {setShowSetting(profile.role!=='экспедитор'&&list.length&&(selectedOrders.length||forwarder))}, [list, selectedOrders, forwarder])
     //render
     return <App searchShow showDistrict agents showForwarder pageName='Редактирование логистики' dates checkPagination={checkPagination} filters={filters}>
         <Head>
@@ -177,7 +177,7 @@ const Id = React.memo((props) => {
 
 Id.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['суперорганизация', 'организация', 'admin', 'менеджер', 'агент'].includes(ctx.store.getState().user.profile.role))
+    if(!['суперорганизация', 'организация', 'admin', 'менеджер', 'агент', 'экспедитор'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -194,6 +194,8 @@ Id.getInitialProps = async function(ctx) {
     }
     if(!ctx.store.getState().app.filter)
         ctx.store.getState().app.filter = null
+    if(ctx.store.getState().user.profile.role==='экспедитор')
+        ctx.store.getState().app.forwarder = ctx.store.getState().user.profile.employment
     const districts = await getDistricts({search: '', sort: '-name', organization: ctx.query.id}, getClientGqlSsr(ctx.req));
     const forwarderByClient = {}
     for(const district of districts)

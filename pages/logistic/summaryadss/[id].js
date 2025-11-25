@@ -11,12 +11,21 @@ import * as appActions from '../../../redux/actions/app'
 import Fab from '@material-ui/core/Fab';
 import Table from '../../../components/table/summaryAdss';
 import {getEmployment} from '../../../src/gql/employment';
-import {getSummaryAdss, setSettedSummaryAds} from '../../../src/gql/logistic';
+import {getSummaryAdss} from '../../../src/gql/logistic';
 import PrintIcon from '@material-ui/icons/Print';
 import * as snackbarActions from '../../../redux/actions/snackbar';
 import {printHTML} from '../../../components/print';
 import templateSummaryAdss from '../../../components/print/template/summaryAdss';
 import QuickTransition from '../QuickTransition';
+
+const filters = [
+    {name: 'Все', value: null},
+    {name: 'Рейс 1', value: 1},
+    {name: 'Рейс 2', value: 2},
+    {name: 'Рейс 3', value: 3},
+    {name: 'Рейс 4', value: 4},
+    {name: 'Рейс 5', value: 5},
+]
 
 const FinanceReport = React.memo((props) => {
     const classes = pageListStyle();
@@ -24,7 +33,8 @@ const FinanceReport = React.memo((props) => {
     //ref
     const contentRef = useRef();
     //props
-    const {date, forwarder, agent} = props.app;
+    const {profile} = props.user;
+    const {date, forwarder, agent, filter} = props.app;
     const {showLoad} = props.appActions;
     const {showSnackBar} = props.snackbarActions;
     //forwarderData
@@ -34,9 +44,9 @@ const FinanceReport = React.memo((props) => {
         else setForwarderData(null)
     })()}, [forwarder])
     //deps
-    const deps = [agent, date, forwarder]
+    const deps = [agent, date, forwarder, filter]
     //listArgs
-    const listArgs = {dateDelivery: date, organization: router.query.id, forwarder, agent}
+    const listArgs = {dateDelivery: date, ...filter?{track: filter}:{}, organization: router.query.id, forwarder, agent}
     //list
     let [list, setList] = useState([]);
     const getList = async () => {
@@ -78,8 +88,11 @@ const FinanceReport = React.memo((props) => {
         }
         setOrdersData({...ordersData})
     }, [list])
+    //showSetting
+    const [showSetting, setShowSetting] = useState(false)
+    useEffect(() => {setShowSetting(profile.role!=='экспедитор'&&list.length&&!forwarderData)}, [list, forwarder])
     //render
-    return <App showForwarder agents pageName='Акционная накладная' dates checkPagination={checkPagination}>
+    return <App showForwarder agents pageName='Акционная накладная' dates checkPagination={checkPagination} filters={filters}>
         <Head>
             <title>Акционная накладная</title>
             <meta name='robots' content='noindex, nofollow'/>
@@ -87,13 +100,13 @@ const FinanceReport = React.memo((props) => {
         <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 60}}>
             <Table pagination={pagination} forwarderData={forwarderData} list={list} setList={setList}/>
         </div>
-        {list.length&&!forwarderData?<Fab
+        {showSetting?<Fab
             color='primary' className={classes.fab}
             onClick={() => printHTML({ data: {list, forwarderData, date, ordersData}, template: templateSummaryAdss, title: `Акционная накладная ${pdDDMMYYYY(date)}`})}
         >
             <PrintIcon />
         </Fab>:null}
-        <QuickTransition fab2={list.length&&!forwarderData}/>
+        <QuickTransition fab2={showSetting}/>
         <div className='count'>
             Всего: {formatAmount(list.length)}
             <br/>
@@ -108,7 +121,7 @@ const FinanceReport = React.memo((props) => {
 
 FinanceReport.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['admin', 'суперорганизация', 'организация', 'менеджер'].includes(ctx.store.getState().user.profile.role))
+    if(!['admin', 'суперорганизация', 'организация', 'агент', 'экспедитор', 'менеджер'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -117,6 +130,8 @@ FinanceReport.getInitialProps = async function(ctx) {
         } else
             Router.push('/contact')
     ctx.store.getState().app.organization = ctx.query.id
+    if(ctx.store.getState().user.profile.role==='экспедитор')
+        ctx.store.getState().app.forwarder = ctx.store.getState().user.profile.employment
     if(!ctx.store.getState().app.date) {
         let date = new Date()
         if (date.getHours() < dayStartDefault)
@@ -128,7 +143,8 @@ FinanceReport.getInitialProps = async function(ctx) {
 
 function mapStateToProps (state) {
     return {
-        app: state.app
+        app: state.app,
+        user: state.user,
     }
 }
 

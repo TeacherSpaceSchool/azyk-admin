@@ -24,6 +24,7 @@ import HistoryOrder from '../../components/dialog/HistoryOrder'
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import {checkInt} from '../../redux/constants/other';
+import ChangeLogistic from './ChangeLogistic';
 
 const editEmploymentRoles = ['экспедитор', 'admin', 'суперорганизация', 'организация', 'менеджер', 'агент', 'суперагент', 'суперэкспедитор']
 const statusColor = {'обработка': 'orange', 'принят': 'blue', 'выполнен': 'green', 'отмена': 'red'}
@@ -37,6 +38,8 @@ const Order =  React.memo(
         const {showMiniDialog, setMiniDialog, showFullDialog, setFullDialog} = props.mini_dialogActions;
         const {classes, element, setList, idx} = props;
         const width = isMobileApp? (window.innerWidth-112) : 500;
+        //отменен
+        const isCanceling = element.orders[0].status==='отмена'
         //в обработке
         const isProcessing = element.orders[0].status==='обработка'
         //isProcessingOrTaken
@@ -62,9 +65,9 @@ const Order =  React.memo(
         //заказ изменен
         let [changedOrders, setChangedOrders] = useState(false);
         //пересчет заказа
-        const calculateOrder = ({idx, count, returned}) => {
-            if(isNotEmpty(returned))
-                orders[idx].returned = returned
+        const calculateOrder = ({idx, count, rejected}) => {
+            if(isNotEmpty(rejected))
+                orders[idx].rejected = rejected
             else if(isNotEmpty(count)) {
                 orders[idx].allPrice = checkFloat(orders[idx].allPrice / orders[idx].count * count)
                 orders[idx].count = count
@@ -86,23 +89,23 @@ const Order =  React.memo(
             }
         }
         //добавить упаковку на отказ
-        let addReturnedPackage = (idx) => {
-            let returned = (checkInt(orders[idx].returned / orders[idx].item.packaging) + 1) * orders[idx].item.packaging
-            if(returned<=orders[idx].count)
-                orders[idx].returned = returned
+        let addRejectedPackage = (idx) => {
+            let rejected = (checkInt(orders[idx].rejected / orders[idx].item.packaging) + 1) * orders[idx].item.packaging
+            if(rejected<=orders[idx].count)
+                orders[idx].rejected = rejected
             else
-                orders[idx].returned = orders[idx].count
+                orders[idx].rejected = orders[idx].count
             setOrders([...orders])
         }
-        let incrementReturned = (idx) => {
-            if(orders[idx].returned<orders[idx].count) {
-                orders[idx].returned += 1
+        let incrementRejected = (idx) => {
+            if(orders[idx].rejected<orders[idx].count) {
+                orders[idx].rejected += 1
                 setOrders([...orders])
             }
         }
-        let decrementReturned  = (idx) => {
-            if(orders[idx].returned>0) {
-                orders[idx].returned -= 1
+        let decrementRejected  = (idx) => {
+            if(orders[idx].rejected>0) {
+                orders[idx].rejected -= 1
                 setOrders([...orders])
             }
         }
@@ -128,7 +131,7 @@ const Order =  React.memo(
         const calculatePriceAfterReturn = () => {
             priceAfterReturn = 0
             for(const order of orders) {
-                priceAfterReturn += (order.allPrice-order.returned*(order.allPrice / order.count))
+                priceAfterReturn += (order.allPrice-order.rejected*(order.allPrice / order.count))
             }
             setPriceAfterReturn(checkFloat(priceAfterReturn))
         }
@@ -227,8 +230,8 @@ const Order =  React.memo(
                     element.agent?
                         <a href={`/employment/${element.agent._id}`} target='_blank'>
                             <div className={classes.row}>
-                                <div className={classes.nameField}>Агент: &nbsp;</div>
-                                <div className={classes.value}>{element.agent.name}</div>
+                                <div className={classes.nameField}>Сотрудник: &nbsp;</div>
+                                <div className={classes.value}>{`${element.agent.user?`${element.agent.user.role} `:''}${element.agent.name}`}</div>
                             </div>
                         </a>
                         :
@@ -307,7 +310,11 @@ const Order =  React.memo(
                         :
                         null
                 }
-                <div className={classes.row}>
+                <div className={classes.row} style={setList&&!isCanceling?{cursor: 'pointer'}:{}} onClick={() => {if(setList&&!isCanceling) {
+                    setMiniDialog('Логистика', <ChangeLogistic
+                        dateDelivery={element.dateDelivery} type={'paymentMethod'} invoices={[element._id]} setList={setList}/>)
+                    showMiniDialog(true)
+                }}}>
                     <div className={classes.nameField}>Способ оплаты:&nbsp;</div>
                     <div className={classes.value}>{element.paymentMethod}</div>
                 </div>
@@ -335,7 +342,7 @@ const Order =  React.memo(
                                     </Button>:null}
                                 </div>
                                 <div className={classes.row}>
-                                    <div className={classes.nameField}>Количество{order.returned?' (факт./итого)':''}:&nbsp;</div>
+                                    <div className={classes.nameField}>Количество{order.rejected?' (факт./итого)':''}:&nbsp;</div>
                                     {
                                         isProcessing?
                                             <div className={classes.column}>
@@ -359,20 +366,20 @@ const Order =  React.memo(
                                             </div>
                                             :
                                             <div className={classes.value}>
-                                                {`${order.returned?`${order.count-order.returned} ${order.item.unit||'шт'}/`:''}${order.count} ${order.item.unit||'шт'}`}
+                                                {`${order.rejected?`${order.count-order.rejected} ${order.item.unit||'шт'}/`:''}${order.count} ${order.item.unit||'шт'}`}
                                             </div>
                                     }
                                 </div>
                                 <div className={classes.row}>
-                                    <div className={classes.nameField}>Сумма{order.returned?' (факт./итого)':''}:&nbsp;</div>
+                                    <div className={classes.nameField}>Сумма{order.rejected?' (факт./итого)':''}:&nbsp;</div>
                                     <div className={classes.value}>
-                                        {`${order.returned?`${checkFloat(order.allPrice/order.count*(order.count-order.returned))} сом/`:''}${order.allPrice} сом`}
+                                        {`${order.rejected?`${checkFloat(order.allPrice/order.count*(order.count-order.rejected))} сом/`:''}${order.allPrice} сом`}
                                     </div>
                                 </div>
                                 {
                                     isProcessingOrTaken&&editEmploymentRoles.includes(profile.role)?
                                         <>
-                                            {!isProcessing&&element.organization.refusal&&(setList||order.returned)?
+                                            {!isProcessing&&element.organization.refusal&&(setList||order.rejected)?
                                                 <div onClick={() => {setShowReturn(showReturn => ({...showReturn, [order._id]: !showReturn[order._id]}))}} style={showReturn[order._id]?{background: '#ffb300'}:{}} className={classes.minibtn}>ОТКАЗ</div>
                                                 :
                                                 null
@@ -384,20 +391,20 @@ const Order =  React.memo(
                                                     <div className={classes.column}>
                                                         <div className={classes.row}>
                                                             <div className={classes.counterbtn} onClick={() => {
-                                                                decrementReturned(idx)
+                                                                decrementRejected(idx)
                                                             }}>-
                                                             </div>
                                                             <div
-                                                                className={classes.value}>{order.returned}&nbsp;
+                                                                className={classes.value}>{order.rejected}&nbsp;
                                                                 {order.item.unit?order.item.unit:'шт'}
                                                             </div>
                                                             <div className={classes.counterbtn} onClick={() => {
-                                                                incrementReturned(idx)
+                                                                incrementRejected(idx)
                                                             }}>+
                                                             </div>
                                                         </div>
                                                         <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={() => {
-                                                            addReturnedPackage(idx)
+                                                            addRejectedPackage(idx)
                                                         }}>
                                                             Добавить упаковку
                                                         </div>
@@ -406,11 +413,11 @@ const Order =  React.memo(
                                             </>:null}
                                         </>
                                         :
-                                        order.returned?
+                                        order.rejected?
                                             <>
                                                 <div className={classes.row}>
                                                     <div className={classes.nameField}>Отказ:&nbsp;</div>
-                                                    <div className={classes.value}>{order.returned}&nbsp;{order.item.unit?order.item.unit:'шт'}</div>
+                                                    <div className={classes.value}>{order.rejected}&nbsp;{order.item.unit?order.item.unit:'шт'}</div>
                                                 </div>
                                             </>
                                             :
@@ -525,7 +532,7 @@ const Order =  React.memo(
                                             return {
                                                 _id: order._id,
                                                 name: order.item.name,
-                                                returned: taken !== true ? 0 : order.returned,
+                                                rejected: taken !== true ? 0 : order.rejected,
                                                 count: order.count,
                                                 allPrice: order.allPrice,
                                                 allTonnage: order.allTonnage,

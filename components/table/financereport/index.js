@@ -1,5 +1,5 @@
 import React from 'react';
-import {formatAmount, getClientTitle, pdDDMMHHMM, pdDDMMMM} from '../../../src/lib';
+import {pdDDMMHHMM, pdDDMMMM} from '../../../src/lib';
 import {bindActionCreators} from 'redux';
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog';
 import {connect} from 'react-redux';
@@ -10,8 +10,9 @@ import SetDate from '../../dialog/SetDate';
 import CloseIcon from '@material-ui/icons/Close';
 import {toTableRow} from '../../../pages/logistic/financereport/[id]';
 
-const Tables =  React.memo(({list, forwarderData, pagination, app, appActions, mini_dialogActions}) =>{
+const Tables =  React.memo(({list, forwarderData, pagination, app, user, appActions, mini_dialogActions}) =>{
     const {organization, date, filter, isMobileApp} = app;
+    const {profile} = user;
     const {setForwarder, setFilter} = appActions;
     const {setMiniDialog, showMiniDialog} = mini_dialogActions;
     const columns = [
@@ -26,18 +27,20 @@ const Tables =  React.memo(({list, forwarderData, pagination, app, appActions, m
     ]
     return <div style={{width: 'fit-content', background: 'white'}}>
         <div style={{display: 'flex', alignItems: 'center', zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}>
-            <span style={{cursor: 'pointer'}} onClick={async () => {
-                const forwarders = await getEmployments({organization, search: '', filter: 'экспедитор', sort: 'name'});
-                setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);
-                showMiniDialog(true);
-            }}>
+            {profile.role!=='экспедитор'?<>
+                <span style={{cursor: 'pointer'}} onClick={async () => {
+                    const forwarders = await getEmployments({organization, search: '', filter: 'экспедитор', sort: 'name'});
+                    setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);
+                    showMiniDialog(true);
+                }}>
                 <span style={{color: '#707070'}}>Экспедитор:</span>&nbsp;
-                <span style={!forwarderData?{color: 'red'}:{}}>
+                    <span style={!forwarderData?{color: 'red'}:{}}>
                     {forwarderData?forwarderData.name:'указать'}
                 </span>
             </span>
-            {!isMobileApp&&forwarderData?<CloseIcon style={{fontSize: 20, color: 'red', cursor: 'pointer'}} onClick={() => setForwarder(null)}/>:null}
-            &nbsp;&nbsp;&nbsp;
+                {!isMobileApp&&forwarderData?<CloseIcon style={{fontSize: 20, color: 'red', cursor: 'pointer'}} onClick={() => setForwarder(null)}/>:null}
+                &nbsp;&nbsp;&nbsp;
+            </>:null}
             <span style={{cursor: 'pointer'}} onClick={async () => {
                 setMiniDialog('Доставка', <SetDate/>);
                 showMiniDialog(true);
@@ -94,6 +97,7 @@ const Tables =  React.memo(({list, forwarderData, pagination, app, appActions, m
 function mapStateToProps (state) {
     return {
         app: state.app,
+        user: state.user,
     }
 }
 

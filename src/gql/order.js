@@ -9,7 +9,7 @@ const Order = `
     item {_id image name apiece unit priotiry packaging weight price}
     count
     allPrice
-    returned
+    rejected
     status
 `
 
@@ -17,13 +17,13 @@ export const Invoice = `
     _id
     createdAt
     updatedAt
-    agent {_id name}
+    agent {_id name user {role}}
     allTonnage
     city
     orders {${Order}}
     client { _id name email phone inn user {_id}}
     allPrice
-    returnedPrice
+    rejectedPrice
     info
     address
     paymentMethod
@@ -93,7 +93,7 @@ export const getOrderHistorys = async (invoice, client) => {
                             createdAt
                             editor
                             status
-                            orders {item count returned}
+                            orders {item count rejected}
                         }
                     }`,
             })

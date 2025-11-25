@@ -226,9 +226,10 @@ const CardIntegrate = React.memo((props) => {
                                         })
                                         setSimpleStatistic(simpleStatistic => {
                                             const idx = type==='агент'?1:type==='товар'?3:type==='клиент'?4:2
-                                            if(isNotEmpty(simpleStatistic[idx]))
+                                            if(isNotEmpty(simpleStatistic)&&isNotEmpty(simpleStatistic[idx])) {
                                                 simpleStatistic[idx] = checkInt(simpleStatistic[idx]) + 1
-                                            return [...simpleStatistic]
+                                                return [...simpleStatistic]
+                                            }
                                         })
                                     }
                                     setMiniDialog('Вы уверены?', <Confirmation action={action}/>)

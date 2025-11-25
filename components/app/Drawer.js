@@ -248,22 +248,28 @@ const MyDrawer = React.memo((props) => {
                         </>
                         :null
                 }
-                {['admin', 'суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)?profile.role==='агент'?<Link href={'/logistic/changelogistic/[id]'} as={`/logistic/changelogistic/${profile.organization}`}>
+                {['admin', 'суперорганизация', 'организация', 'менеджер', 'экспедитор', 'агент'].includes(profile.role)?profile.role==='агент'?<><Link href={'/logistic/changelogistic/[id]'} as={`/logistic/changelogistic/${profile.organization}`}>
                     <ListItem style={{background: router.asPath.includes('logistic/changelogistic')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>
                         <ListItemIcon><LocalShipping color="inherit"/></ListItemIcon>
                         <ListItemText primary='Редактирование логистики'/>
                     </ListItem>
-                </Link>:<>
+                </Link>
+                    <Divider/></>:<>
                     <ListItem style={{background: router.asPath.includes('logistic') ? 'rgba(255, 179, 0, 0.15)' : '#ffffff'}} button onClick={() => setUncover(uncover => uncover !== 'logistic' ? 'logistic' : '')}>
-                        <ListItemIcon><LocalShipping color="inherit"/></ListItemIcon>
-                        <ListItemText primary="Логистика"/>
+                        <ListItemIcon><LocalShipping color='inherit'/></ListItemIcon>
+                        <ListItemText primary='Логистика'/>
                         {uncover.includes('logistic') ? <UnfoldLess/> : <UnfoldMore/>}
                     </ListItem>
                     <Divider/>
                     {uncover.includes('logistic')?<>
-                        <Link href={profile.role==='admin'?'/organizations?path=logistic/summaryadss&title=Акционная накладная':'/logistic/summaryadss/[id]'}
-                              as={profile.role==='admin'?'/organizations?path=logistic/summaryadss&title=Акционная накладная':`/logistic/summaryadss/${profile.organization}`}>
-                            <ListItem style={{background: router.asPath.includes('logistic/summaryadss')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>
+                        <Link
+                            href={profile.role === 'admin' ? '/organizations?path=logistic/summaryadss&title=Акционная накладная' : '/logistic/summaryadss/[id]'}
+                            as={profile.role === 'admin' ? '/organizations?path=logistic/summaryadss&title=Акционная накладная' : `/logistic/summaryadss/${profile.organization}`}>
+                            <ListItem
+                                style={{background: router.asPath.includes('logistic/summaryadss') ? 'rgba(255, 179, 0, 0.15)' : '#ffffff'}}
+                                button onClick={() => {
+                                showDrawer(false);
+                            }}>
                                 <div style={{width: 56}}/>
                                 <ListItemText primary='Акционная накладная'/>
                             </ListItem>

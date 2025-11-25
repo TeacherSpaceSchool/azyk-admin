@@ -181,7 +181,7 @@ const MyAppBar = React.memo((props) => {
                         onClick={() => {showDrawer(!drawer)}}
                         color='inherit'
                     >
-                        <Badge variant='dot' invisible={openSearch||!isMobileApp||!unread.orders&&!unread.returneds} color='secondary'>
+                        <Badge variant='dot' invisible={openSearch||!isMobileApp||!unread.orders} color='secondary'>
                             <MenuIcon/>
                         </Badge>
                     </IconButton>

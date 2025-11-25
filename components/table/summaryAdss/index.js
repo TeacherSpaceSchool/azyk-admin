@@ -10,9 +10,10 @@ import SetDate from '../../dialog/SetDate';
 import CloseIcon from '@material-ui/icons/Close';
 import SetSettedSummaryAds from '../../dialog/SetSettedSummaryAds';
 
-const Tables =  React.memo(({list, setList, forwarderData, pagination, app, appActions, mini_dialogActions}) =>{
-    const {organization, date, isMobileApp} = app;
-    const {setForwarder} = appActions;
+const Tables =  React.memo(({list, setList, forwarderData, pagination, app, user, appActions, mini_dialogActions}) =>{
+    const {organization, date, isMobileApp, filter} = app;
+    const {profile} = user;
+    const {setForwarder, setFilter} = appActions;
     const {setMiniDialog, showMiniDialog} = mini_dialogActions;
     const columns = [
         {title: forwarderData?'Клиент':'Экспедитор', style: {width: forwarderData?300:250}},
@@ -24,18 +25,20 @@ const Tables =  React.memo(({list, setList, forwarderData, pagination, app, appA
     return <div style={{width: 'fit-content', background: 'white'}}>
         <div
             style={{display: 'flex', alignItems: 'center', zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}>
-            <span style={{cursor: 'pointer'}} onClick={async () => {
-                const forwarders = await getEmployments({organization, search: '', filter: 'экспедитор', sort: 'name'});
-                setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);
-                showMiniDialog(true);
-            }}>
-                <span style={{color: '#707070'}}>Экспедитор:</span>&nbsp;
-                <span style={!forwarderData?{color: 'red'}:{}}>
-                    {forwarderData?forwarderData.name:'указать'}
+            {profile.role!=='экспедитор'?<>
+                <span style={{cursor: 'pointer'}} onClick={async () => {
+                    const forwarders = await getEmployments({organization, search: '', filter: 'экспедитор', sort: 'name'});
+                    setMiniDialog('Экспедитор', <SetForwarder setForwarder={setForwarder} forwarders={forwarders}/>);
+                    showMiniDialog(true);
+                }}>
+                    <span style={{color: '#707070'}}>Экспедитор:</span>&nbsp;
+                    <span style={!forwarderData?{color: 'red'}:{}}>
+                        {forwarderData?forwarderData.name:'указать'}
+                    </span>
                 </span>
-            </span>
-            {!isMobileApp&&forwarderData?<CloseIcon style={{fontSize: 20, color: 'red', cursor: 'pointer'}} onClick={() => setForwarder(null)}/>:null}
-            &nbsp;&nbsp;&nbsp;
+                {!isMobileApp&&forwarderData?<CloseIcon style={{fontSize: 20, color: 'red', cursor: 'pointer'}} onClick={() => setForwarder(null)}/>:null}
+                &nbsp;&nbsp;&nbsp;
+            </>:null}
             <span style={{cursor: 'pointer'}} onClick={async () => {
                 setMiniDialog('Доставка', <SetDate/>);
                 showMiniDialog(true);
@@ -43,6 +46,16 @@ const Tables =  React.memo(({list, setList, forwarderData, pagination, app, appA
                 <span style={{color: '#707070'}}>Доставка:</span>&nbsp;
                 <span style={!date?{color: 'red'}:{}}>{date?pdDDMMMM(date):'указать'}</span>
             </span>
+            &nbsp;&nbsp;&nbsp;
+            <span style={{cursor: 'pointer'}} onClick={async () => {
+                if(isMobileApp)
+                    await document.getElementById('mobile-menu-button').click();
+                document.getElementById('filter-button').click();
+            }}>
+                <span style={{color: '#707070'}}>Рейс:</span>&nbsp;
+                <span style={!filter?{color: '#ffb300'}:{}}>{filter?filter:'указать'}</span>
+            </span>
+            {!isMobileApp&&filter?<CloseIcon style={{fontSize: 20, color: 'red', cursor: 'pointer'}} onClick={() => setFilter(null)}/>:null}
         </div>
         <div className='tableHead' style={{top: 31}}>
             {columns.map((column, idx) => {
@@ -64,10 +77,10 @@ const Tables =  React.memo(({list, setList, forwarderData, pagination, app, appA
                     <div className='tableCell' style={columns[1].style}>{row[1]}</div>
                     <div className='tableBorder'/>
                     <div className='tableCell' style={{...!forwarderData?{cursor: 'pointer'}:{}, ...columns[2].style}} onClick={() => {
-                        if(!forwarderData) {
+                        /*if(!forwarderData&&['суперорганизация', 'организация', 'admin', 'менеджер'].includes(profile.role)) {
                             setMiniDialog('Изменить', <SetSettedSummaryAds idx={idx} list={list} setList={setList}/>);
                             showMiniDialog(true);
-                        }
+                        }*/
                     }}>{formatAmount(row[2])}</div>
                     <div className='tableBorder'/>
                     <div className='tableCell' style={columns[3].style}>{formatAmount(row[3])}</div>
@@ -82,6 +95,7 @@ const Tables =  React.memo(({list, setList, forwarderData, pagination, app, appA
 function mapStateToProps (state) {
     return {
         app: state.app,
+        user: state.user,
     }
 }
 

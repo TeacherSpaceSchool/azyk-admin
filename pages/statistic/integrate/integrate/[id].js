@@ -36,7 +36,7 @@ const Integrate = React.memo((props) => {
     //simpleStatistic
     let [showStat, setShowStat] = useState(false);
     let [simpleStatistic, setSimpleStatistic] = useState(null);
-    const getSimpleStatistic = async () => setSimpleStatistic(await getIntegrate1CsSimpleStatistic({search, ...listArgs}))
+    const getSimpleStatistic = async () => {setSimpleStatistic(await getIntegrate1CsSimpleStatistic({search, ...listArgs}))}
     //list
     let [list, setList] = useState(data.integrate1Cs);
     const getList = async (skip) => {
@@ -61,8 +61,10 @@ const Integrate = React.memo((props) => {
     }, deps)
     //search
     useEffect(() => {
-        if(initialRender.current)
+        if(initialRender.current) {
             initialRender.current = false;
+            unawaited(getSimpleStatistic)
+        }
         else {
             if(searchTimeOut.current)
                 clearTimeout(searchTimeOut.current)

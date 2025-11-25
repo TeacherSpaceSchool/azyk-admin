@@ -56,7 +56,7 @@ export default ({invoices, returneds, forwarderData, organizationData, agentByCl
                   <tbody>
                     ${items.reduce((acc, item, idx) => {
                         const itemName = item.item.name||item.item
-                        const count = isInvoice?checkFloat(item.count - item.returned):item.count
+                        const count = isInvoice?checkFloat(item.count - item.rejected):item.count
                         const packaging = isInvoice?checkFloat(count/item.item.packaging):0
                         const allPrice = isInvoice?checkFloat(item.allPrice/item.count*count):item.allPrice
                         const weight = isInvoice?item.allTonnage:item.weight
