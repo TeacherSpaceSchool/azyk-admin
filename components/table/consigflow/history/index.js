@@ -101,7 +101,7 @@ const Tables =  React.memo(({list, app, user, districtData, mini_dialogActions, 
                             showMiniDialog(true)
                         }}>Отмена</span>:null}
                     </>:null}
-                    {/*['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&*/!element.cancel?<span onClick={async () => {
+                    {['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&!element.cancel?<span onClick={async () => {
                         if(element.sign===1) {
                             setMiniDialog('Оплатить', <AddConsigFlow initialClient={element.client._id} initialAmount={element.amount}/>)
                             showMiniDialog(true)

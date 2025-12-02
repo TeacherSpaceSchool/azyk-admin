@@ -95,6 +95,8 @@ const Client = React.memo((props) => {
         if(router.query.id!=='new'&&organization&&!organization.name)
             setOrganization({name: 'AZYK.STORE', _id: 'super'})
     }, [])
+    //isEdit
+    const isEdit = profile.role==='admin'||['суперорганизация', 'организация'].includes(profile.role)&&!role.includes('организация')
     //render
     return (
         <App cityShow={router.query.id==='new'} pageName={router.query.id==='new'?'Добавить':data.employment!==null?data.employment.name:'Ничего не найдено'}>
@@ -106,8 +108,7 @@ const Client = React.memo((props) => {
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
                     {
                         router.query.id==='new'||data.employment!==null?
-                            ['admin', 'суперорганизация', 'организация'].includes(profile.role)?
-                                <>
+                             <>
                                     <TextField
                                         error={!login}
                                         autoComplete='off'
@@ -115,8 +116,9 @@ const Client = React.memo((props) => {
                                         value={login}
                                         className={classes.input}
                                         onChange={(event) => {setLogin(event.target.value)}}
+                                        inputProps={{readOnly: !isEdit}}
                                     />
-                                    <TextField
+                                    {isEdit?<TextField
                                         autoComplete='new-password'
                                         label='Новый пароль'
                                         type={hide ? 'password' : 'text' }
@@ -131,13 +133,14 @@ const Client = React.memo((props) => {
                                                 </Button>
                                             </InputAdornment>
                                         }}
-                                    />
+                                    />:null}
                                     <TextField
                                         error={!name}
                                         label='Имя'
                                         value={name}
                                         className={classes.input}
                                         onChange={(event) => {setName(event.target.value)}}
+                                        inputProps={{readOnly: !isEdit}}
                                     />
                                     {phone?phone.map((element, idx) =>
                                         <FormControl key={`phone${idx}`} className={classes.input}>
@@ -148,6 +151,7 @@ const Client = React.memo((props) => {
                                                 className={classes.input}
                                                 onChange={(event) => {editPhone(event, idx)}}
                                                 error={!validPhone(element)}
+                                                readOnly={!isEdit}
                                                 endAdornment={
                                                     <InputAdornment position='end'>
                                                         <Button variant='text' size='small' color='secondary' onClick={() => deletePhone(idx)}>
@@ -158,16 +162,16 @@ const Client = React.memo((props) => {
                                             />
                                         </FormControl>
                                     ): null}
-                                    <Button onClick={() => addPhone()} size='small' color='primary'>
+                                    {isEdit?<><Button onClick={() => addPhone()} size='small' color='primary'>
                                         Добавить телефон
-                                    </Button>
-                                    <br/>
+                                    </Button><br/></>:null}
                                     <TextField
                                         autoComplete='off'
                                         label='email'
                                         value={email}
                                         className={classes.input}
                                         onChange={(event) => {setEmail(event.target.value)}}
+                                        inputProps={{readOnly: !isEdit}}
                                     />
                                     {router.query.id==='new'&&profile.role==='admin'?
                                         <FormControl error={!organization} className={classes.input}>
@@ -200,7 +204,7 @@ const Client = React.memo((props) => {
                                             })}
                                         </Select>
                                     </FormControl>
-                                    <div className={classes.row}>
+                                    {isEdit?<div className={classes.row}>
                                         {
                                             router.query.id==='new'?
                                                 <Button onClick={() => {
@@ -303,10 +307,8 @@ const Client = React.memo((props) => {
                                                     }
                                                 </>
                                         }
-                                    </div>
+                                    </div>:null}
                                 </>
-                                :
-                                'Ничего не найдено'
                             :
                             'Ничего не найдено'
                     }
@@ -318,7 +320,7 @@ const Client = React.memo((props) => {
 
 Client.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['суперорганизация', 'организация', 'admin'].includes(ctx.store.getState().user.profile.role))
+    if(ctx.store.getState().user.profile.role!=='admin'&&!ctx.store.getState().user.profile.employment)
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'

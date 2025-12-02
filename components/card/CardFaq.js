@@ -12,13 +12,10 @@ import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Confirmation from '../dialog/Confirmation'
-import PdfViewer from '../../components/dialog/PdfViewer'
-import VideoViewer from '../../components/dialog/VideoViewer'
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-import {maxFileSize} from '../../src/lib';
 
 const CardFaq = React.memo((props) => {
     const classes = cardFaqStyle();
@@ -28,9 +25,6 @@ const CardFaq = React.memo((props) => {
     //addCard
     let [title, setTitle] = useState(element&&element.title?element.title:'');
     let [video, setVideo] = useState(element&&element.video?element.video:'');
-    let handleVideo =  (event) => {
-        setVideo(event.target.value)
-    };
     let handleTitle =  (event) => {
         setTitle(event.target.value)
     };
@@ -39,7 +33,7 @@ const CardFaq = React.memo((props) => {
     let handleTypex =  (event) => {
         setTypex(event.target.value)
     };
-    const {setMiniDialog, showMiniDialog, showFullDialog, setFullDialog} = props.mini_dialogActions;
+    const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
     let faqRef = useRef(null);
     return (

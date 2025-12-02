@@ -1,5 +1,5 @@
 import React from 'react';
-import {formatAmount, getClientTitle, isEmpty, isNotEmpty, pdDDMMHHMM, pdDDMMMM} from '../../../src/lib';
+import {formatAmount, getClientTitle, isEmpty, isNotEmpty, pdDDMM, pdDDMMMM} from '../../../src/lib';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import CheckCircleOutline from '@material-ui/icons/CheckCircleOutline';
 import {bindActionCreators} from 'redux';
@@ -13,6 +13,7 @@ import {getOrder} from '../../../src/gql/order';
 import Order from '../../dialog/Order';
 import CloseIcon from '@material-ui/icons/Close';
 import ChangeLogistic from '../../dialog/ChangeLogistic';
+import ChangeDateDelivery from '../../dialog/ChangeDateDelivery';
 
 const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList, setList, user, selectedOrders, setSelectedOrders, pagination, app, appActions, mini_dialogActions}) =>{
     const {organization, date, filter, isMobileApp} = app;
@@ -27,7 +28,7 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
         {title: 'Сумма', style: {width: 60}},
         {title: 'Способ оп-ты', style: {width: 90}},
         {title: 'Тоннаж', style: {width: 60}},
-        {title: 'Создан', style: {width: 75}},
+        {title: 'Доставка', style: {width: 75}},
         ...!forwarderData?[{title: 'Экспедитор', style: {width: 250}}]:[],
     ]
     const openOrder = async (idx) => {
@@ -62,7 +63,7 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
                         setMiniDialog('Доставка', <SetDate/>);
                         showMiniDialog(true);
                     }}>
-                        <span style={{color: '#707070'}}>Доставка:</span>&nbsp;
+                        <span style={{color: '#707070'}}>Создан:</span>&nbsp;
                         <span style={!date?{color: 'red'}:{}}>{date?pdDDMMMM(date):'указать'}</span>
                     </span>&nbsp;&nbsp;&nbsp;&nbsp;
                     <span style={{cursor: 'pointer'}} onClick={async () => {
@@ -135,8 +136,12 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
                         {formatAmount(row.allTonnage)}
                     </div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[6].style} onClick={() => openOrder(idx)}>
-                        {pdDDMMHHMM(row.createdAt)}
+                    <div className='tableCell' style={columns[6].style} onClick={() => {
+                            setMiniDialog('Дата доставки', <ChangeDateDelivery
+                                dateDelivery={row.dateDelivery} invoices={[row._id]} setList={setList}/>)
+                            showMiniDialog(true)
+                    }}>
+                        {pdDDMM(row.dateDelivery)}
                     </div>
                     {!forwarderData?<>
                         <div className='tableBorder'/>

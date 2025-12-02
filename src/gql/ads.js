@@ -7,14 +7,11 @@ const Ads = `
     image
     url
     xid
-    xidNumber
     title
     count
     item {_id name}
-    targetItems {xids count sum type targetPrice}
     targetPrice
-    multiplier
-    targetType
+    paymentMethods
 `
 
 export const getAdsOrganizations = async (client) => {
@@ -60,8 +57,8 @@ export const addAds = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($image: Upload!, $url: String!, $xid: String, $xidNumber: Int, $title: String!, $organization: ID!, $item: ID, $count: Int, $targetItems: [TargetItemInput], $targetPrice: Int, $multiplier: Boolean, $targetType: String) {
-                        addAds(image: $image, url: $url, xid: $xid, xidNumber: $xidNumber, title: $title, organization: $organization, item: $item, count: $count, targetItems: $targetItems, targetPrice: $targetPrice, multiplier: $multiplier, targetType: $targetType) {${Ads}}
+                    mutation ($image: Upload!, $url: String!, $xid: String, $title: String!, $organization: ID!, $item: ID!, $count: Int!, $targetPrice: Int!, $paymentMethods: [String]!) {
+                        addAds(image: $image, url: $url, xid: $xid, title: $title, organization: $organization, item: $item, count: $count, targetPrice: $targetPrice, paymentMethods: $paymentMethods) {${Ads}}
                     }`})
         return res.data.addAds
     } catch(err) {
@@ -75,8 +72,8 @@ export const setAds = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($xid: String, $xidNumber: Int, $_id: ID!, $image: Upload, $url: String, $title: String, $item: ID, $count: Int, $targetItems: [TargetItemInput], $targetPrice: Int, $multiplier: Boolean, $targetType: String) {
-                        setAds(xid: $xid, xidNumber: $xidNumber, _id: $_id, image: $image, url: $url, title: $title, item: $item, count: $count, targetItems: $targetItems, targetPrice: $targetPrice, multiplier: $multiplier, targetType: $targetType)
+                    mutation ($xid: String, $_id: ID!, $image: Upload, $url: String, $title: String, $item: ID, $count: Int, $targetPrice: Int, $paymentMethods: [String]) {
+                        setAds(xid: $xid, _id: $_id, image: $image, url: $url, title: $title, item: $item, count: $count, targetPrice: $targetPrice, paymentMethods: $paymentMethods)
                     }`})
         return res.data.setAds
     } catch(err) {

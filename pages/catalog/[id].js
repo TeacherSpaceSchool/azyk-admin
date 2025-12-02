@@ -207,13 +207,13 @@ const Catalog = React.memo((props) => {
             </Head>
             <Card className={classes.page}>
                 <CardContent className={classes.column} style={isMobileApp?{}:{justifyContent: 'start', alignItems: 'flex-start'}}>
-                    {isMobileApp&&fhoClient&&!fhoClient.images.length?<>
+                    {/*isMobileApp&&fhoClient&&!fhoClient.images.length?<>
                         <center style={{ fontWeight: 'bold', width: '100%', cursor: 'pointer'}}
                                 onClick={() => router.push(`/fhoclient/${fhoClient._id}`)}>
                             📸 Добавьте фото полки или ФХО — и получите 🎁 упаковку воды Tien Shan Legend 1.0L! 💧✨
                         </center>
                         <Divider style={{marginTop: 10, marginBottom: 10}}/>
-                    </>:null}
+                    </>:null*/}
                     {
                         data.district?
                             <>

@@ -90,7 +90,7 @@ const FinanceReport = React.memo((props) => {
     }, [list])
     //showSetting
     const [showSetting, setShowSetting] = useState(false)
-    useEffect(() => {setShowSetting(profile.role!=='экспедитор'&&list.length&&!forwarderData)}, [list, forwarder])
+    useEffect(() => {setShowSetting(profile.role!=='экспедитор'&&list.length)}, [list])
     //render
     return <App showForwarder agents pageName='Акционная накладная' dates checkPagination={checkPagination} filters={filters}>
         <Head>

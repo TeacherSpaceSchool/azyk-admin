@@ -340,7 +340,9 @@ export const months1 = [
     'декабря'
 ]
 
-export const rowReverseDialog = (isMobileApp) => {return {display: 'flex', flexDirection: 'row-reverse', width: '100%', ...isMobileApp?{justifyContent: 'space-between'}:{justifyContent: 'center'}}}
+export const rowReverseDialog = (isMobileApp) => {
+    return {display: 'flex', /*flexDirection: 'row-reverse', */width: '100%', ...isMobileApp?{justifyContent: 'space-between'}:{justifyContent: 'center'}}
+}
 
 export const navigationKeyTable = ({ event, row, column, list, middleList }) => {
     const key = event.key;

@@ -5,7 +5,7 @@ import cardStyle from '../../src/styleMUI/subbrand/cardSubbrand'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
-import {formatAmount, getClientTitle, pdDDMMYYHHMM} from '../../src/lib';
+import {formatAmount, getClientTitle, pdDDMMYYHHMM, pdDDMMYYYY} from '../../src/lib';
 import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import {getHistories} from '../../src/gql/history';
@@ -17,6 +17,8 @@ import Confirmation from '../dialog/Confirmation';
 import AddConsigFlow from '../dialog/AddConsigFlow';
 import Link from 'next/link';
 import {useRouter} from 'next/router';
+import {printHTML} from '../print';
+import templateConsignation from '../print/template/consignation';
 
 const CardStock = React.memo((props) => {
     const router = useRouter();
@@ -61,12 +63,12 @@ const CardStock = React.memo((props) => {
                 </CardContent>
                 <CardActions>
                     {!element.invoice?<>
-                        {['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role)?<Button onClick={async () => {
+                        {['admin', 'суперорганизация', 'организация', 'менеджер'].includes(profile.role)?<Button color='primary' onClick={async () => {
                             const histories = await getHistories({search: element._id, filter: 'ConsigFlowAzyk'});
                             setMiniDialog('История', <History list={histories}/>);
                             showMiniDialog(true)
                         }}>История</Button>:null}
-                        {['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&!element.cancel?<Button style={{color: 'red'}} onClick={async () => {
+                        {['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&!element.cancel?<Button color='secondary' onClick={async () => {
                             const action = async () => {
                                 await setConsigFlow({_id: element._id, cancel: true})
                                 router.reload()
@@ -75,10 +77,22 @@ const CardStock = React.memo((props) => {
                             showMiniDialog(true)
                         }}>Отмена</Button>:null}
                     </>:null}
-                    {['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&!element.cancel&&element.sign===1?<Button onClick={() => {
-                        setMiniDialog('Оплатить', <AddConsigFlow initialClient={element.client._id} initialAmount={element.amount}/>)
-                        showMiniDialog(true)
-                    }}>Оплатить</Button>:null}
+                    {['суперорганизация', 'организация', 'менеджер', 'агент'].includes(profile.role)&&!element.cancel?<Button color='primary' onClick={async () => {
+                        if(element.sign===1) {
+                            setMiniDialog('Оплатить', <AddConsigFlow initialClient={element.client._id} initialAmount={element.amount}/>)
+                            showMiniDialog(true)
+                        }
+                        else {
+                            const histories = await getHistories({search: element._id, filter: 'ConsigFlowAzyk'});
+                            if(!histories||!histories[0]||!histories[0].user||histories[0].user._id===profile._id) {
+                                printHTML({
+                                    data: {histories, element},
+                                    template: templateConsignation,
+                                    title: `Оплата консигнации ${pdDDMMYYYY(element.cretedAt)}`
+                                })
+                            }
+                        }
+                    }}>{element.sign===1?'Оплатить':'Печать'}</Button>:null}
                 </CardActions>
             </Card>
         </div>

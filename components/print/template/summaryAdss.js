@@ -3,7 +3,7 @@ import {formatAmount, pdDDMMMMYYYY} from '../../../src/lib';
 export default ({list, forwarderData, date, ordersData}) => {
     const columns = [
         {title: '№',          style: 'width: 6mm;'},
-        {title: 'Экспедитор', style: 'width: 60.5mm;'},
+        {title: forwarderData?'Клиент':'Экспедитор', style: 'width: 60.5mm;'},
         {title: 'Товар',      style: 'width: 60mm;'},
         {title: 'Кол-во',     style: 'width: 20mm;'},
         {title: 'Уп-ок',      style: 'width: 20mm;'},
@@ -12,7 +12,7 @@ export default ({list, forwarderData, date, ordersData}) => {
 
     let html = `
     <p style="font-size: 11pt;">Акционная накладная ${pdDDMMMMYYYY(date)}</p>
-    ${forwarderData?`${<p>Экспедитор: ${forwarderData.name}</p>}`:''}
+    ${forwarderData?`<p>Экспедитор: ${forwarderData.name}</p>`:''}
     <table>
       <thead>
         <tr>

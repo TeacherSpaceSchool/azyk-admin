@@ -1,14 +1,12 @@
 import React from 'react';
-import {checkFloat, navigationKeyTable} from '../../../src/lib';
+import {navigationKeyTable} from '../../../src/lib';
 import {connect} from 'react-redux';
-import SetPackage from '../../dialog/SetPackage';
 import {bindActionCreators} from 'redux';
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog';
 import PackageInput from '../../app/PackageInput';
 
 const Tables =  React.memo(({middleList, app, mini_dialogActions, list, stockClient, basket, setBasketChange, setPackage}) =>{
     const {isMobileApp} = app;
-    const {setMiniDialog, showMiniDialog} = mini_dialogActions;
     const hasStock = Object.values(stockClient).length
     let titleWidth = 300
     let widthNbmr = 55

@@ -19,8 +19,6 @@ import Table from '../../../components/table/changelogistic';
 import {getEmployment} from '../../../src/gql/employment';
 import ChangeLogistic from '../../../components/dialog/ChangeLogistic';
 import QuickTransition from '../QuickTransition';
-import {getDistricts} from '../../../src/gql/district';
-import {getClientGqlSsr} from '../../../src/getClientGQL';
 import ChangeDateDelivery from '../../../components/dialog/ChangeDateDelivery';
 
 const sort = 'createdAt'
@@ -47,8 +45,6 @@ const Id = React.memo((props) => {
     const {showMiniDialog, setMiniDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
     const {profile} = props.user;
-    //typDate
-    let [typeDate, setTypeDate] = useState('Доставка');
     //forwarderData
     let [forwarderData, setForwarderData] = useState(null);
     useEffect(() => {(async () => {
@@ -56,9 +52,9 @@ const Id = React.memo((props) => {
         else setForwarderData(null)
     })()}, [forwarder])
     //deps
-    const deps = [filter, date, agent, district, forwarder, typeDate]
+    const deps = [filter, date, agent, district, forwarder]
     //listArgs
-    const listArgs = {...typeDate==='Доставка'?{dateDelivery: date, date: ''}:{date}, search, track: filter, filter: 'принят', organization: router.query.id, agent, district, forwarder}
+    const listArgs = {search, track: filter, filter: 'принят', date, organization: router.query.id, agent, district, forwarder}
     //selectedOrders
     let [selectedOrders, setSelectedOrders] = useState([]);
     //list
@@ -74,7 +70,7 @@ const Id = React.memo((props) => {
         }
         else {
             setList([])
-            showSnackBar(`Укажите:${!date?' дату доставки;':''}`)
+            showSnackBar(`Укажите:${!date?' дату заказа;':''}`)
         }
     }
     //filter
@@ -124,24 +120,18 @@ const Id = React.memo((props) => {
     const double = contentRef.current&&contentRef.current.offsetWidth>=(forwarderData?1360:1880)
     //middleList
     const middleList = list?Math.ceil(list.length/2):0
-    //changeLogistic
-    const changeLogistic = (type) => {
-        close()
-        setMiniDialog('Логистика', <ChangeLogistic dateDelivery={date} type={type} invoices={selectedOrders.map(selectedOrder => selectedOrder._id)} setList={setList}/>)
-        showMiniDialog(true)
-    }
     //showSetting
     const [showSetting, setShowSetting] = useState(false)
     useEffect(() => {setShowSetting(profile.role!=='экспедитор'&&list.length&&(selectedOrders.length||forwarder))}, [list, selectedOrders, forwarder])
     //render
-    return <App searchShow showDistrict agents showForwarder pageName='Редактирование логистики' dates checkPagination={checkPagination} filters={filters}>
+    return <App searchShow showDistrict agents showForwarder pageName='Редактирование даты доставки' dates checkPagination={checkPagination} filters={filters}>
         <Head>
-            <title>Редактирование логистики</title>
+            <title>Редактирование даты доставки</title>
             <meta name='robots' content='noindex, nofollow'/>
         </Head>
             <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 30}}>
-                <Table setTypeDate={setTypeDate} typeDate={typeDate} setList={setList} forwarderByClient={forwarderByClient} pagination={pagination} forwarderData={forwarderData} list={double?list.slice(0, middleList):list} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>
-                {double?<Table setTypeDate={setTypeDate} typeDate={typeDate} setList={setList} forwarderByClient={forwarderByClient} pagination={pagination} middleList={middleList} forwarderData={forwarderData} list={list.slice(middleList)} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>:null}
+                <Table setList={setList} forwarderByClient={forwarderByClient} pagination={pagination} forwarderData={forwarderData} list={double?list.slice(0, middleList):list} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>
+                {double?<Table setList={setList} forwarderByClient={forwarderByClient} pagination={pagination} middleList={middleList} forwarderData={forwarderData} list={list.slice(middleList)} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>:null}
             </div>
             {showSetting?<><Fab onClick={open} color='primary' className={classes.fab}>
                 <SettingsIcon />
@@ -161,13 +151,11 @@ const Id = React.memo((props) => {
                 }}
             >
                 {selectedOrders.length?<>
-                    <MenuItem onClick={() => changeLogistic('track')}>Изменить рейс</MenuItem>
-                    <MenuItem onClick={() => changeLogistic('forwarder')}>Изменить экспедитора</MenuItem>
-                    {typeDate!=='Доставка'?<MenuItem onClick={() => {
+                    <MenuItem onClick={() => {
                         setMiniDialog('Дата доставки', <ChangeDateDelivery
                             invoices={selectedOrders.map(selectedOrder => selectedOrder._id)} setList={setList}/>)
                         showMiniDialog(true)
-                    }}>Изменить дату доставки</MenuItem>:null}
+                    }}>Изменить дату доставки</MenuItem>
                 </>:null}
                 {forwarder?<MenuItem onClick={() => {setSelectedOrders([...list]);close()}}>Выбрать все</MenuItem>:null}
                 {selectedOrders.length?<MenuItem onClick={() => {setSelectedOrders([]);close()}}>Отменить выбор</MenuItem>:null}
@@ -185,7 +173,7 @@ const Id = React.memo((props) => {
 
 Id.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['суперорганизация', 'организация', 'admin', 'менеджер', 'агент', 'экспедитор'].includes(ctx.store.getState().user.profile.role))
+    if(!['суперорганизация', 'организация', 'admin', 'менеджер'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'
@@ -202,15 +190,7 @@ Id.getInitialProps = async function(ctx) {
     }
     if(!ctx.store.getState().app.filter)
         ctx.store.getState().app.filter = null
-    if(ctx.store.getState().user.profile.role==='экспедитор')
-        ctx.store.getState().app.forwarder = ctx.store.getState().user.profile.employment
-    const districts = await getDistricts({search: '', sort: '-name', organization: ctx.query.id}, getClientGqlSsr(ctx.req));
-    const forwarderByClient = {}
-    for(const district of districts)
-        for(const client of district.client) {
-            forwarderByClient[client._id] = district.forwarder?district.forwarder:null
-        }
-    return {data: {forwarderByClient}};
+    return {data: {}};
 };
 
 function mapStateToProps (state) {

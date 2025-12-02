@@ -590,7 +590,7 @@ const MyAppBar = React.memo((props) => {
                                     onClose={handleCloseProfile}
                                 >
                                     {
-                                        isNotTestUser(profile)&&profile.role==='client'?
+                                        isNotTestUser(profile)?
                                             <MenuItem key='profile'>
                                                 <Link href={`/${profile.role==='client'?'client':'employment'}/[id]`} as={`/${profile.role==='client'?'client':'employment'}/${profile._id}`}>
                                                     <a style={{display: 'flex', color: '#606060'}}>
@@ -1045,7 +1045,7 @@ const MyAppBar = React.memo((props) => {
                                     onClose={handleCloseProfile}
                                 >
                                     {
-                                        isNotTestUser(profile)&&profile.role==='client'?
+                                        isNotTestUser(profile)?
                                             <MenuItem>
                                                 <Link href={`/${profile.role==='client'?'client':'employment'}/[id]`} as={`/${profile.role==='client'?'client':'employment'}/${profile._id}`}>
                                                     <a style={{display: 'flex', color: '#606060'}}>

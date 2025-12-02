@@ -170,7 +170,7 @@ export const setInvoicesLogic = async (variables) => {
         const res = await client.mutate({
             variables,
             mutation : gql`
-                    mutation ($dateDelivery: Date, $track: Int, $forwarder: ID, $invoices: [ID]!, $paymentMethod: String) {
+                    mutation ($dateDelivery: Date!, $track: Int, $forwarder: ID, $invoices: [ID]!, $paymentMethod: String) {
                         setInvoicesLogic(dateDelivery: $dateDelivery, track: $track, forwarder: $forwarder, invoices: $invoices, paymentMethod: $paymentMethod)
                     }`})
         return res.data.setInvoicesLogic
@@ -219,6 +219,21 @@ export const deleteOrder = async (variables) => {
                         deleteOrder(_id: $_id)
                     }`})
         return res.data.deleteOrder
+    } catch(err) {
+        console.error(err)
+    }
+}
+
+export const setInvoicesDateDelivery = async (variables) => {
+    try{
+        const client = new SingletonApolloClient().getClient()
+        const res = await client.mutate({
+            variables,
+            mutation : gql`
+                    mutation ($dateDelivery: Date!, $invoices: [ID]!) {
+                        setInvoicesDateDelivery(dateDelivery: $dateDelivery, invoices: $invoices)
+                    }`})
+        return res.data.setInvoicesDateDelivery
     } catch(err) {
         console.error(err)
     }

@@ -299,6 +299,16 @@ const MyDrawer = React.memo((props) => {
                             </ListItem>
                         </Link>
                         <Divider/>
+                        {!['экспедитор'].includes(profile.role)?<>
+                            <Link href={profile.role==='admin'?'/organizations?path=logistic/changedatedelivery&title=Редактирование даты доставки':'/logistic/changedatedelivery/[id]'}
+                                  as={profile.role==='admin'?'/organizations?path=logistic/changedatedelivery&title=Редактирование даты доставки':`/logistic/changedatedelivery/${profile.organization}`}>
+                                <ListItem style={{background: router.asPath.includes('logistic/changedatedelivery')?'rgba(255, 179, 0, 0.15)':'#ffffff'}} button onClick={() => {showDrawer(false);}}>
+                                    <div style={{width: 56}}/>
+                                    <ListItemText primary='Редактирование даты доставки'/>
+                                </ListItem>
+                            </Link>
+                            <Divider/>
+                        </>:null}
                     </>:null}
                 </>:null}
                 {

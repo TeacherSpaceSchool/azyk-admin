@@ -327,7 +327,7 @@ const District = React.memo((props) => {
                                                         client,
                                                         name,
                                                         agent: agent&&agent._id,
-                                                        warehouse: warehouse._id,
+                                                        warehouse: warehouse&&warehouse._id,
                                                         manager: manager&&manager._id,
                                                         forwarder: forwarder&&forwarder._id,
                                                     })

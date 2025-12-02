@@ -57,7 +57,8 @@ const AgentRoute = React.memo((props) => {
     };
     let [clients, setClients] = useState(data.agentRoute?data.agentRoute.clients:[[],[],[],[],[],[],[]]);
     let [allClient, setAllClient] = useState([]);
-    let [selectType, setSelectType] = useState(['агент', 'суперагент'].includes(profile.role)?'Выбранные':'Все');
+    const isEdit = ['суперорганизация', 'организация', 'admin', 'менеджер'].includes(profile.role)
+    let [selectType, setSelectType] = useState(isEdit?'Все':'Выбранные');
     let [filtredClient, setFiltredClient] = useState([]);
     const checkPagination = useCallback(() => {
         if(pagination<filtredClient.length)
@@ -102,10 +103,9 @@ const AgentRoute = React.memo((props) => {
         if(district&&allClient.length) {
             let filtredClient = [...allClient]
             if(search)
-                filtredClient = filtredClient.filter(element=>
-                    (element.name.toLowerCase()).includes(search.toLowerCase())||
-                    ((element.address.filter(addres=>addres[0]&&addres[0].toLowerCase().includes(search.toLowerCase()))).length)||
-                    ((element.address.filter(addres=>addres[2]&&addres[2].toLowerCase().includes(search.toLowerCase()))).length)
+                filtredClient = filtredClient.filter(element => element&&((element.name.toLowerCase()).includes(search.toLowerCase()) ||
+                        ((element.address.filter(addres => addres[0] && addres[0].toLowerCase().includes(search.toLowerCase()))).length) ||
+                        ((element.address.filter(addres => addres[2] && addres[2].toLowerCase().includes(search.toLowerCase()))).length))
                 )
             setFiltredClient([...filtredClient])
         }
@@ -158,18 +158,20 @@ const AgentRoute = React.memo((props) => {
                             />
                         }
                         <br/>
-                        <div style={{ justifyContent: 'center' }} className={classes.row}>
-                            <div style={{background: selectType==='Все'?'#ffb300':'#ffffff'}} onClick={() => setSelectType('Все')} className={classes.selectType}>
-                                Все
-                            </div>
-                            <div style={{background: selectType==='Свободные'?'#ffb300':'#ffffff'}} onClick={() => setSelectType('Свободные')} className={classes.selectType}>
-                                Своб
-                            </div>
-                            <div style={{background: selectType==='Выбранные'?'#ffb300':'#ffffff'}} onClick={() => setSelectType('Выбранные')} className={classes.selectType}>
-                                Выбр
-                            </div>
-                        </div>
-                        <br/>
+                            {isEdit?<>
+                                <div style={{ justifyContent: 'center' }} className={classes.row}>
+                                    <div style={{background: selectType==='Все'?'#ffb300':'#ffffff'}} onClick={() => setSelectType('Все')} className={classes.selectType}>
+                                        Все
+                                    </div>
+                                    <div style={{background: selectType==='Свободные'?'#ffb300':'#ffffff'}} onClick={() => setSelectType('Свободные')} className={classes.selectType}>
+                                        Своб
+                                    </div>
+                                    <div style={{background: selectType==='Выбранные'?'#ffb300':'#ffffff'}} onClick={() => setSelectType('Выбранные')} className={classes.selectType}>
+                                        Выбр
+                                    </div>
+                                </div>
+                                <br/>
+                            </>:null}
                             <div style={{ justifyContent: 'center' }} className={classes.row}>
                                 <div style={{background: dayWeek===0?'#ffb300':'#ffffff'}} onClick={() => {setDayWeek(0)}} className={classes.selectType}>
                                     {`ПН ${clients[0].length}`}
@@ -202,7 +204,7 @@ const AgentRoute = React.memo((props) => {
                                             <div key={element._id} style={isMobileApp ? {alignItems: 'baseline'} : {}}
                                                  className={isMobileApp ? classes.column : classes.row}>
                                                 <div className={isMobileApp ? classes.row : classes.column}>
-                                                    <Checkbox checked={selected}
+                                                    {isEdit?<Checkbox checked={selected}
                                                               onChange={() => {
                                                                   if(!selected) {
                                                                       clients[dayWeek].push(element._id)
@@ -211,7 +213,7 @@ const AgentRoute = React.memo((props) => {
                                                                   }
                                                                   setClients([...clients])
                                                               }}
-                                                    />
+                                                    />:null}
                                                     {
                                                         selectType==='Выбранные'?
                                                             <>
@@ -297,7 +299,7 @@ const AgentRoute = React.memo((props) => {
                                     }} size='small' color='primary'>
                                         Сохранить
                                     </Button>
-                                    {['суперорганизация', 'организация', 'менеджер', 'admin'].includes(profile.role)?
+                                    {isEdit?
                                         <>
                                         <Button onClick={() => {
                                             const action = async () => {
@@ -326,7 +328,7 @@ const AgentRoute = React.memo((props) => {
 
 AgentRoute.getInitialProps = async function(ctx) {
     await initialApp(ctx)
-    if(!['суперорганизация', 'организация', 'admin', 'менеджер', 'суперагент', 'агент', 'суперагент'].includes(ctx.store.getState().user.profile.role))
+    if(!['суперорганизация', 'организация', 'admin', 'менеджер', 'суперагент', 'агент'].includes(ctx.store.getState().user.profile.role))
         if(ctx.res) {
             ctx.res.writeHead(302, {
                 Location: '/contact'

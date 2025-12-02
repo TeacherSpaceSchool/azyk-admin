@@ -14,13 +14,10 @@ import * as snackbarActions from '../../redux/actions/snackbar'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import Confirmation from '../dialog/Confirmation'
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import Input from '@material-ui/core/Input';
 
 const CardAds = React.memo((props) => {
     const classes = cardAdsStyle();
@@ -48,27 +45,17 @@ const CardAds = React.memo((props) => {
     let handleCount=  (event) => {
         setCount(checkInt(event.target.value))
     };
-    let [xidNumber, setXidNumber] = useState(element?element.xidNumber:'');
-    let handleXidNumber=  (event) => {
-        setXidNumber(checkInt(event.target.value))
-    };
     let [item, setItem] = useState(element?element.item:null);
-    let [targetItems, setTargetItems ] = useState(element?element.targetItems.map(targetItem=>{return {xids: targetItem.xids, count: targetItem.count, sum: targetItem.sum, type: targetItem.type, targetPrice: targetItem.targetPrice}}):[]);
     let [targetPrice, setTargetPrice ] = useState(element?element.targetPrice:'');
-    let handleTargetPrice =  (event) => {
-        setTargetPrice(checkInt(event.target.value))
-    };
-    let [multiplier , setMultiplier] = useState(element?element.multiplier:false);
-    let [targetType, setTargetType] = useState(element?element.targetType:'Цена');
-    let handleTargetType =  (event) => {
-        setTargetItems([])
-        setTargetType(event.target.value)
-    };
-    const targetTypes = ['Цена', 'Товар']
-    const targetItemsTypes = ['Количество', 'Цена']
+    let handleTargetPrice =  (event) => setTargetPrice(checkInt(event.target.value));
     let [url, setUrl] = useState(element?element.url:'');
     let handleUrl =  (event) => {
         setUrl(event.target.value)
+    };
+    let allPaymentMethods = ['Наличные', 'Перечисление', 'Консигнация']
+    let [paymentMethods, setPaymentMethods] = useState(element&&element.paymentMethods?element.paymentMethods:[]);
+    let handlePaymentMethods =  (event) => {
+        setPaymentMethods(event.target.value)
     };
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
@@ -126,183 +113,35 @@ const CardAds = React.memo((props) => {
                                 />
                             <br/>
                             <br/>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={multiplier}
-                                        onChange={() => {setMultiplier(!multiplier)}}
-                                        color='primary'
-                                        inputProps={{ 'aria-label': 'primary checkbox' }}
-                                    />
-                                }
-                                label='Множитель'
-                            />
-                            <br/>
-                            <br/>
-                            <div className={classes.row}>
                                 <TextField
                                     label='ID'
                                     value={xid}
-                                    className={classes.inputHalf}
+                                    className={classes.input}
                                     onChange={handleXid}
                                 />
-                                <TextField
-                                    label='Номер ID'
-                                    value={xidNumber}
-                                    className={classes.inputHalf}
-                                    onChange={handleXidNumber}
-                                />
-                            </div>
                             <br/>
                             <br/>
+                            <TextField
+                                label='Целевая цена'
+                                value={targetPrice}
+                                error={!targetPrice}
+                                type={ isMobileApp?'number':'text'}
+                                className={classes.input}
+                                onChange={handleTargetPrice}
+                            />
                             <FormControl className={classes.input}>
-                                <InputLabel>Цель</InputLabel>
+                                <InputLabel>Способы оплаты</InputLabel>
                                 <Select
-                                    value={targetType}
-                                    onChange={handleTargetType}
-                                    input={<Input/>}
-                                    MenuProps={{
-                                        PaperProps: {
-                                            style: {
-                                                maxHeight: 226,
-                                                width: 250,
-                                            },
-                                        }
-                                    }}
+                                    error={!paymentMethods.length}
+                                    multiple
+                                    value={paymentMethods}
+                                    onChange={handlePaymentMethods}
                                 >
-                                    {targetTypes.map((targetType) => (
-                                        <MenuItem key={targetType} value={targetType}>
-                                            {targetType}
-                                        </MenuItem>
-                                    ))}
+                                    {allPaymentMethods.map((element) =>
+                                        <MenuItem key={element} value={element}>{element}</MenuItem>
+                                    )}
                                 </Select>
                             </FormControl>
-                            <br/>
-                            <br/>
-                            {
-                                targetType==='Цена'?
-                                    <>
-                                    <TextField
-                                        label='Целевая цена'
-                                        value={targetPrice}
-                                        type={ isMobileApp?'number':'text'}
-                                        className={classes.input}
-                                        onChange={handleTargetPrice}
-                                    />
-                                    </>
-                                    :
-                                    <>
-                                    {targetItems?targetItems.map((element, idx) => {
-                                        return(<>
-                                            <div style={{display: 'flex'}}>
-                                                <FormControl className={classes.input}>
-                                                    <InputLabel>Целевой товар</InputLabel>
-                                                    <Select
-                                                        multiple
-                                                        value={element.xids}
-                                                        onChange={(event) => {
-                                                            targetItems[idx].xids = event.target.value
-                                                            setTargetItems([...targetItems])
-                                                        }}
-                                                        input={<Input />}
-                                                        MenuProps={{
-                                                            PaperProps: {
-                                                                style: {
-                                                                    maxHeight: 226,
-                                                                    width: 250,
-                                                                },
-                                                            }
-                                                        }}
-                                                    >
-                                                        {items?items.map((item) => (
-                                                            <MenuItem key={item.name} value={item._id}>
-                                                                {item.name}
-                                                            </MenuItem>
-                                                        )):null}
-                                                    </Select>
-                                                </FormControl>
-                                                <div style={{width: 10}}/>
-                                                <Button variant='text' size='small' color='secondary' onClick={() => {
-                                                    targetItems.splice(idx, 1)
-                                                    setTargetItems([...targetItems])
-                                                }}>
-                                                    Удалить
-                                                </Button>
-                                            </div>
-                                            <br/>
-                                            <FormControl className={classes.input}>
-                                                <InputLabel>Цель</InputLabel>
-                                                <Select
-                                                    value={targetItems[idx].type}
-                                                    onChange={(event) => {
-                                                        targetItems[idx].type = event.target.value
-                                                        targetItems[idx].count = 0
-                                                        targetItems[idx].targetPrice = 0
-                                                        setTargetItems([...targetItems])
-                                                    }}
-                                                    input={<Input/>}
-                                                    MenuProps={{
-                                                        PaperProps: {
-                                                            style: {
-                                                                maxHeight: 226,
-                                                                width: 250,
-                                                            },
-                                                        }
-                                                    }}
-                                                >
-                                                    {targetItemsTypes.map((targetItemsType) => (
-                                                        <MenuItem key={targetItemsType} value={targetItemsType}>
-                                                            {targetItemsType}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
-                                            <br/>
-                                            <br/>
-                                            <div className={classes.row}>
-                                                <FormControl className={classes.inputHalf}>
-                                                    <InputLabel>{targetItems[idx].type==='Количество'?'Целевое количество':'Целевая цена'}</InputLabel>
-                                                    <Input
-                                                        placeholder={targetItems[idx].type==='Количество'?'Целевое количество':'Целевая цена'}
-                                                        type={ isMobileApp?'number':'text'}
-                                                        value={targetItems[idx].type==='Количество'?element.count:element.targetPrice}
-                                                        onChange={(event) => {
-                                                            if(targetItems[idx].type==='Количество')
-                                                                targetItems[idx].count = checkInt(event.target.value)
-                                                            else
-                                                                targetItems[idx].targetPrice = checkInt(event.target.value)
-                                                            setTargetItems([...targetItems])
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormControlLabel
-                                                    className={classes.inputHalf}
-                                                    control={
-                                                        <Switch
-                                                            checked={element.sum}
-                                                            onChange={() => {
-                                                                targetItems[idx].sum = !targetItems[idx].sum
-                                                                setTargetItems([...targetItems])
-                                                            }}
-                                                            color='primary'
-                                                            inputProps={{ 'aria-label': 'primary checkbox' }}
-                                                        />
-                                                    }
-                                                    label='Суммировать'
-                                                />
-                                            </div>
-                                            <br/>
-                                            <br/>
-                                        </>)
-                                        }
-                                    ):null}
-                                    <Button onClick={async () => {
-                                        setTargetItems([...targetItems, {xids: [], count: 0, sum: false, type: 'Количество', targetPrice: 0}])
-                                    }} size='small' color='primary'>
-                                        Добавить товар
-                                    </Button>
-                                    </>
-                            }
                         </CardContent>
                         <CardActions>
                             {
@@ -310,16 +149,16 @@ const CardAds = React.memo((props) => {
                                         <>
                                         <Button onClick={async () => {
                                             let editElement = {_id: element._id}
-                                            if(title && title !== element.title) editElement.title = title
-                                            if(xid.length && xid !== element.xid) editElement.xid = xid
-                                            if(url.length && url !== element.url) editElement.url = url
-                                            if(count !== element.count) editElement.count = checkInt(count)
-                                            if(xidNumber !== element.xidNumber) editElement.xidNumber = checkInt(xidNumber)
-                                            editElement.targetItems = targetItems
-                                            if(targetPrice !== element.targetPrice) editElement.targetPrice = checkInt(targetPrice)
-                                            if(multiplier !== element.multiplier) editElement.multiplier = multiplier
-                                            if(targetType !== element.targetType) editElement.targetType = targetType
-                                            editElement.item = item ? item._id : null
+                                            if(title&&title !== element.title) editElement.title = title
+                                            if(xid !== element.xid) editElement.xid = xid
+                                            if(url !== element.url) editElement.url = url
+                                            if(count&&count !== element.count) editElement.count = checkInt(count)
+                                            if(paymentMethods.length&&JSON.stringify(paymentMethods) !== JSON.stringify(editElement.paymentMethods)) editElement.paymentMethods = paymentMethods
+                                            if(targetPrice&&targetPrice !== element.targetPrice) editElement.targetPrice = checkInt(targetPrice)
+                                            if(item&&(!element.item||item._id!==element.item._id)) {
+                                                console.log(item)
+                                                editElement.item = item._id
+                                            }
                                             if(image) editElement.image = image
                                             const action = async () => await setAds(editElement, organization)
                                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
@@ -343,11 +182,11 @@ const CardAds = React.memo((props) => {
                                         </>
                                         :
                                         <Button onClick={async () => {
-                                            if(item && count && image && title) {
+                                            if(image&&title&&item&&count&&targetPrice&&paymentMethods.length) {
                                                 const action = async () => {
                                                     const element = {
-                                                        xidNumber: checkInt(xidNumber), xid, count: checkInt(count), item: item?item._id:null, organization, image,
-                                                        url, title, targetItems, targetPrice: checkInt(targetPrice), multiplier, targetType
+                                                        xid, image, url, title, organization, item: item._id, count: checkInt(count),
+                                                        targetPrice: checkInt(targetPrice), paymentMethods
                                                     }
                                                     const res = await addAds(element);
                                                     setList(list => [res, ...list])
@@ -358,6 +197,7 @@ const CardAds = React.memo((props) => {
                                                     setXid('')
                                                     setCount('')
                                                     setTargetPrice('')
+                                                    setPaymentMethods(allPaymentMethods)
                                                     setItem(null)
                                                 }
                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)

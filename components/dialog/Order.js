@@ -25,6 +25,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import {checkInt} from '../../redux/constants/other';
 import ChangeLogistic from './ChangeLogistic';
+import ChangeDateDelivery from './ChangeDateDelivery';
 
 const editEmploymentRoles = ['экспедитор', 'admin', 'суперорганизация', 'организация', 'менеджер', 'агент', 'суперагент', 'суперэкспедитор']
 const statusColor = {'обработка': 'orange', 'принят': 'blue', 'выполнен': 'green', 'отмена': 'red'}
@@ -38,6 +39,10 @@ const Order =  React.memo(
         const {showMiniDialog, setMiniDialog, showFullDialog, setFullDialog} = props.mini_dialogActions;
         const {classes, element, setList, idx} = props;
         const width = isMobileApp? (window.innerWidth-112) : 500;
+        //longClick
+        const longClickRef = useRef(null);
+        const startLongClick = (action) => longClickRef.current = setTimeout(action, 600)
+        const endLongClick = () => clearTimeout(longClickRef.current);
         //отменен
         const isCanceling = element.orders[0].status==='отмена'
         //в обработке
@@ -97,18 +102,19 @@ const Order =  React.memo(
                 orders[idx].rejected = orders[idx].count
             setOrders([...orders])
         }
-        let incrementRejected = (idx) => {
+        let incrementRejected = (idx, long) => {
             if(orders[idx].rejected<orders[idx].count) {
-                orders[idx].rejected += 1
+                orders[idx].rejected = long?orders[idx].count:(orders[idx].rejected+1)
                 setOrders([...orders])
             }
         }
-        let decrementRejected  = (idx) => {
+        let decrementRejected  = (idx, long) => {
             if(orders[idx].rejected>0) {
-                orders[idx].rejected -= 1
+                orders[idx].rejected = long?0:(orders[idx].rejected-1)
                 setOrders([...orders])
             }
         }
+        //удалить позицию
         let remove = (idx) => {
             if(orders.length>1) {
                 orders.splice(idx, 1)
@@ -144,6 +150,7 @@ const Order =  React.memo(
                 calculateAllPrice()
             }
         }, [orders])
+        //render
         return (
             <div className={classes.column} style={{width: width}}>
                 <div className={classes.row}>
@@ -177,7 +184,11 @@ const Order =  React.memo(
                 </div>
                 {
                     element.dateDelivery?
-                        <div className={classes.row}>
+                        <div className={classes.row} style={setList&&!isCanceling?{cursor: 'pointer'}:{}} onClick={() => {if(setList&&!isCanceling&&!profile.client) {
+                            setMiniDialog('Дата доставки', <ChangeDateDelivery
+                                dateDelivery={element.dateDelivery} invoices={[element._id]} setList={setList}/>)
+                            showMiniDialog(true)
+                        }}}>
                             <div className={classes.nameField}>Дата доставки:&nbsp;</div>
                             <div className={classes.value}>{pdDDMMYYYYWW(element.dateDelivery)}</div>
                         </div>
@@ -310,7 +321,7 @@ const Order =  React.memo(
                         :
                         null
                 }
-                <div className={classes.row} style={setList&&!isCanceling?{cursor: 'pointer'}:{}} onClick={() => {if(setList&&!isCanceling) {
+                <div className={classes.row} style={setList&&!isCanceling?{cursor: 'pointer'}:{}} onClick={() => {if(setList&&!isCanceling&&!profile.client) {
                     setMiniDialog('Логистика', <ChangeLogistic
                         dateDelivery={element.dateDelivery} type={'paymentMethod'} invoices={[element._id]} setList={setList}/>)
                     showMiniDialog(true)
@@ -390,17 +401,27 @@ const Order =  React.memo(
                                                     <div className={classes.nameField}>Отказ:&nbsp;</div>
                                                     <div className={classes.column}>
                                                         <div className={classes.row}>
-                                                            <div className={classes.counterbtn} onClick={() => {
-                                                                decrementRejected(idx)
-                                                            }}>-
+                                                            <div className={classes.counterbtn}
+                                                                 onClick={() => decrementRejected(idx)}
+                                                                 onMouseDown={() => startLongClick(() => decrementRejected(idx, true))}
+                                                                 onTouchStart={() => startLongClick(() => decrementRejected(idx, true))}
+                                                                 onMouseUp={endLongClick}
+                                                                 onMouseLeave={endLongClick}
+                                                                 onTouchEnd={endLongClick}
+                                                            >-
                                                             </div>
                                                             <div
                                                                 className={classes.value}>{order.rejected}&nbsp;
                                                                 {order.item.unit?order.item.unit:'шт'}
                                                             </div>
-                                                            <div className={classes.counterbtn} onClick={() => {
-                                                                incrementRejected(idx)
-                                                            }}>+
+                                                            <div className={classes.counterbtn}
+                                                                 onClick={() => incrementRejected(idx)}
+                                                                 onMouseDown={() => startLongClick(() => incrementRejected(idx, true))}
+                                                                 onTouchStart={() => startLongClick(() => incrementRejected(idx, true))}
+                                                                 onMouseUp={endLongClick}
+                                                                 onMouseLeave={endLongClick}
+                                                                 onTouchEnd={endLongClick}
+                                                            >+
                                                             </div>
                                                         </div>
                                                         <div className={classes.addPackaging} style={{color: '#ffb300'}} onClick={() => {

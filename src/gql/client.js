@@ -83,8 +83,8 @@ export const getClientsSimpleStatistic = async (variables, client) => {
             .query({
                 variables,
                 query: gql`
-                    query ($search: String!, $filter: String!, $date: String, $city: String, $network: ID) {
-                        clientsSimpleStatistic(search: $search, filter: $filter, date: $date, city: $city, network: $network)
+                    query ($search: String!, $filter: String!, $date: String, $city: String, $district: ID, $network: ID) {
+                        clientsSimpleStatistic(search: $search, filter: $filter, date: $date, district: $district, city: $city, network: $network)
                     }`,
             })
         return res.data.clientsSimpleStatistic
