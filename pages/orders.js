@@ -39,8 +39,8 @@ const Orders = React.memo((props) => {
     const listArgs = {search, filter, date, organization, city, agent, district, forwarder}
     //simpleStatistic
     let [showStat, setShowStat] = useState(false);
-    let [simpleStatistic, setSimpleStatistic] = useState(['0']);
-    const getSimpleStatistic = async () => setSimpleStatistic(await getInvoicesSimpleStatistic(listArgs))
+    let [simpleStatistic, setSimpleStatistic] = useState([]);
+    const getSimpleStatistic = async () => setSimpleStatistic(await getInvoicesSimpleStatistic(listArgs)||[])
     //list
     let [list, setList] = useState(data.orders);
     const getList = async (skip) => {

@@ -33,8 +33,8 @@ const Returneds = React.memo((props) => {
     //listArgs
     const listArgs = {search, date, city}
     //simpleStatistic
-    let [simpleStatistic, setSimpleStatistic] = useState(['0']);
-    const getSimpleStatistic = async () => setSimpleStatistic(await getReturnedsSimpleStatistic(listArgs))
+    let [simpleStatistic, setSimpleStatistic] = useState([]);
+    const getSimpleStatistic = async () => setSimpleStatistic(await getReturnedsSimpleStatistic(listArgs)||[])
     //list
     let [list, setList] = useState(data.returneds);
     const getList = async (skip) => {
