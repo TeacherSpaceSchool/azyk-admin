@@ -31,7 +31,6 @@ const Client = React.memo((props) => {
     //list
     let [list, setList] = useState(data.clients);
     const getList = async (skip) => {
-        console.log(district)
         const gettedData = await getClients({...listArgs, skip: skip||0})
         if(!skip) {
             unawaited(getSimpleStatistic)

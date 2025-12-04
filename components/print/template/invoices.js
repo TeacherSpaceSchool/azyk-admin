@@ -33,7 +33,7 @@ export default ({invoices, returneds, forwarderData, organizationData, agentByCl
     let html = `
         ${list.reduce((acc, invoice) => {
             const isInvoice = !!invoice.orders
-            const items = invoice.orders||invoice.items
+            const items = [...invoice.orders||invoice.items]
             let invoiceData = {countAll: 0, packageAll: 0, priceAll: 0, weightAll: 0}
             const invoiceS = `<div style="${items.length>13?'page-break-before: always':'min-height: 145mm'};">
             <p style="font-size: 11pt;">${organizationData.name} Накладная ${isInvoice?'Продажа':'Возврат'} №${invoice.number} от ${pdDDMMMMYYYY(date)} г.</p>
@@ -73,6 +73,16 @@ export default ({invoices, returneds, forwarderData, organizationData, agentByCl
                                 <td style="${columns[5].style}">${formatAmount(weight)}</td>
                               </tr>`
                     }, '')}
+                    ${invoice.adss&&invoice.adss.length?invoice.adss.reduce((acc, ads) => {
+                        return acc+`<tr>
+                                        <td style="${columns[0].style}">*</td>
+                                        <td style="${columns[1].style}">Акция: ${ads.item.name}</td>
+                                        <td style="${columns[2].style}">${formatAmount(ads.count)}</td>
+                                        <td style="${columns[3].style}">${formatAmount(checkFloat(ads.count/ads.item.packaging))}</td>
+                                        <td style="${columns[4].style}">${formatAmount(0)}</td>
+                                        <td style="${columns[5].style}">${formatAmount(checkFloat(ads.count*ads.item.weight))}</td>
+                                      </tr>`
+                    }, ''):''}
                     <tr>
                       <td style="border: none;${columns[0].style}"></td>
                       <td style="border: none;text-align:right;${columns[1].style}">Итого:</td>

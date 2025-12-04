@@ -45,6 +45,8 @@ const Id = React.memo((props) => {
     const {showMiniDialog, setMiniDialog} = props.mini_dialogActions;
     const {showSnackBar} = props.snackbarActions;
     const {profile} = props.user;
+    //
+    const typeDate = 'Создан'
     //forwarderData
     let [forwarderData, setForwarderData] = useState(null);
     useEffect(() => {(async () => {
@@ -130,8 +132,8 @@ const Id = React.memo((props) => {
             <meta name='robots' content='noindex, nofollow'/>
         </Head>
             <div ref={contentRef} style={{display: 'flex', flexDirection: 'row', marginBottom: 30}}>
-                <Table setList={setList} forwarderByClient={forwarderByClient} pagination={pagination} forwarderData={forwarderData} list={double?list.slice(0, middleList):list} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>
-                {double?<Table setList={setList} forwarderByClient={forwarderByClient} pagination={pagination} middleList={middleList} forwarderData={forwarderData} list={list.slice(middleList)} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>:null}
+                <Table typeDate={typeDate} setList={setList} forwarderByClient={forwarderByClient} pagination={pagination} forwarderData={forwarderData} list={double?list.slice(0, middleList):list} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>
+                {double?<Table typeDate={typeDate} setList={setList} forwarderByClient={forwarderByClient} pagination={pagination} middleList={middleList} forwarderData={forwarderData} list={list.slice(middleList)} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders}/>:null}
             </div>
             {showSetting?<><Fab onClick={open} color='primary' className={classes.fab}>
                 <SettingsIcon />

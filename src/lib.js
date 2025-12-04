@@ -394,3 +394,5 @@ export const navigationKeyTable = ({ event, row, column, list, middleList }) => 
         element.click();
     }
 };
+
+export const selectedMainColor = 'rgba(255, 179, 0, 0.15)'

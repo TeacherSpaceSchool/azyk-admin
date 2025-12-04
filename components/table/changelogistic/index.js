@@ -1,5 +1,14 @@
 import React from 'react';
-import {formatAmount, getClientTitle, isEmpty, isNotEmpty, pdDDMM, pdDDMMMM} from '../../../src/lib';
+import {
+    formatAmount,
+    getClientTitle,
+    isEmpty,
+    isNotEmpty,
+    pdDDMM,
+    pdDDMMHHMM,
+    pdDDMMMM,
+    selectedMainColor
+} from '../../../src/lib';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import CheckCircleOutline from '@material-ui/icons/CheckCircleOutline';
 import {bindActionCreators} from 'redux';
@@ -13,9 +22,11 @@ import {getOrder} from '../../../src/gql/order';
 import Order from '../../dialog/Order';
 import CloseIcon from '@material-ui/icons/Close';
 import ChangeLogistic from '../../dialog/ChangeLogistic';
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
 import ChangeDateDelivery from '../../dialog/ChangeDateDelivery';
 
-const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList, setList, user, selectedOrders, setSelectedOrders, pagination, app, appActions, mini_dialogActions}) =>{
+const Tables =  React.memo(({list, typeDate, setTypeDate, forwarderByClient, forwarderData, middleList, setList, user, selectedOrders, setSelectedOrders, pagination, app, appActions, mini_dialogActions}) =>{
     const {organization, date, filter, isMobileApp} = app;
     const {profile} = user;
     const isEdit = profile.role!=='экспедитор'
@@ -28,7 +39,7 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
         {title: 'Сумма', style: {width: 60}},
         {title: 'Способ оп-ты', style: {width: 90}},
         {title: 'Тоннаж', style: {width: 60}},
-        {title: 'Доставка', style: {width: 75}},
+        {title: typeDate==='Доставка'?'Создан':'Доставка', style: {width: 75}},
         ...!forwarderData?[{title: 'Экспедитор', style: {width: 250}}]:[],
     ]
     const openOrder = async (idx) => {
@@ -43,6 +54,14 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
             dateDelivery={date} type={'paymentMethod'} invoices={[invoice._id]} setList={setList}/>)
         showMiniDialog(true)
     }
+    //menu
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const handleClick = (event) => {
+        if(setTypeDate) setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
     return <div style={{width: 'fit-content', background: 'white'}}>
             <div
                 style={{display: 'flex', alignItems: 'center', zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}>
@@ -59,12 +78,22 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
                     </span>
                     {!isMobileApp&&forwarderData?<CloseIcon style={{fontSize: 20, color: 'red', cursor: 'pointer'}} onClick={() => setForwarder(null)}/>:null}
                     &nbsp;&nbsp;&nbsp;</>:null}
-                    <span style={{cursor: 'pointer'}} onClick={async () => {
-                        setMiniDialog('Доставка', <SetDate/>);
-                        showMiniDialog(true);
-                    }}>
-                        <span style={{color: '#707070'}}>Создан:</span>&nbsp;
-                        <span style={!date?{color: 'red'}:{}}>{date?pdDDMMMM(date):'указать'}</span>
+                    <span style={{cursor: 'pointer'}}>
+                        <span style={{color: '#707070'}} onClick={handleClick}>{typeDate}:</span>&nbsp;
+                        <Menu
+                            id='simple-menu'
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                        >
+                            <MenuItem style={typeDate==='Доставка'?{background: selectedMainColor}:{}} onClick={() => {setTypeDate('Доставка');handleClose();}}>Доставка</MenuItem>
+                            <MenuItem style={typeDate==='Создан'?{background: selectedMainColor}:{}} onClick={() => {setTypeDate('Создан');handleClose();}}>Создан</MenuItem>
+                        </Menu>
+                        <span style={!date?{color: 'red'}:{}} onClick={async () => {
+                            setMiniDialog('Доставка', <SetDate/>);
+                            showMiniDialog(true);
+                        }}>{date?pdDDMMMM(date):'указать'}</span>
                     </span>&nbsp;&nbsp;&nbsp;&nbsp;
                     <span style={{cursor: 'pointer'}} onClick={async () => {
                         if(isMobileApp)
@@ -137,11 +166,15 @@ const Tables =  React.memo(({list, forwarderByClient, forwarderData, middleList,
                     </div>
                     <div className='tableBorder'/>
                     <div className='tableCell' style={columns[6].style} onClick={() => {
+                        if(typeDate==='Доставка')
+                            openOrder(idx)
+                        else {
                             setMiniDialog('Дата доставки', <ChangeDateDelivery
                                 dateDelivery={row.dateDelivery} invoices={[row._id]} setList={setList}/>)
                             showMiniDialog(true)
+                        }
                     }}>
-                        {pdDDMM(row.dateDelivery)}
+                        {typeDate==='Доставка'?pdDDMMHHMM(row.createdAt):pdDDMM(row.dateDelivery)}
                     </div>
                     {!forwarderData?<>
                         <div className='tableBorder'/>

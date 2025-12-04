@@ -26,6 +26,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import {checkInt} from '../../redux/constants/other';
 import ChangeLogistic from './ChangeLogistic';
 import ChangeDateDelivery from './ChangeDateDelivery';
+import {getStocks} from '../../src/gql/stock';
+import {getLimitItemClients} from '../../src/gql/limitItemClient';
 
 const editEmploymentRoles = ['экспедитор', 'admin', 'суперорганизация', 'организация', 'менеджер', 'агент', 'суперагент', 'суперэкспедитор']
 const statusColor = {'обработка': 'orange', 'принят': 'blue', 'выполнен': 'green', 'отмена': 'red'}
@@ -81,9 +83,50 @@ const Order =  React.memo(
             setOrders([...orders])
 
         }
+        //stock
+        let [stockByItem, setStockByItem] = useState({});
+        useEffect(() => {(async () => {
+            stockByItem = {}
+            // eslint-disable-next-line no-undef
+            let [limitItemClients, stocks] = await Promise.all([
+                getLimitItemClients({client: element.client._id, organization: element.organization._id}),
+                getStocks({unlimited: false, client: element.client._id, search: '', organization: element.organization._id}),
+            ]);
+            if(stocks&&stocks.length) {
+                for (const stock of stocks)
+                    stockByItem[stock.item._id] = stock.count
+                for (const order of orders) {
+                    if(isNotEmpty(stockByItem[order.item._id]))
+                        stockByItem[order.item._id] += order.count
+                }
+            }
+            //перебор лимитов
+            if(limitItemClients&&limitItemClients.length)
+                for(const element of limitItemClients)
+                    if(isNotEmpty(element.limit)&&stockByItem[element.item._id]>element.limit)
+                        stockByItem[element.item._id] = element.limit
+            setStockByItem({...stockByItem})
+        })()}, [])
+        const checkStockItem = (idx, newCount) => {
+            let checked = true
+            const stock = stockByItem[orders[idx].item._id]
+            if(isNotEmpty(stock))
+                checked = stock>=newCount
+            if(!checked)
+                showSnackBar('Недостаточно остатков')
+            return checked
+        }
         //count
-        const addPackage = (idx) => calculateOrder({idx, count: (checkInt(orders[idx].count/orders[idx].item.packaging)+1)*orders[idx].item.packaging})
-        let increment = (idx) => calculateOrder({idx, count: orders[idx].item.apiece?orders[idx].count+1:orders[idx].count+orders[idx].item.packaging})
+        const addPackage = (idx) => {
+            const newCount = (checkInt(orders[idx].count/orders[idx].item.packaging)+1)*orders[idx].item.packaging
+            if(checkStockItem(idx, newCount))
+                calculateOrder({idx, count: newCount})
+        }
+        let increment = (idx) => {
+            const newCount = orders[idx].item.apiece?orders[idx].count+1:orders[idx].count+orders[idx].item.packaging
+            if(checkStockItem(idx, newCount))
+                calculateOrder({idx, count: newCount})
+        }
         let decrement = (idx) => {
             let price = orders[idx].allPrice/orders[idx].count
             const decrementCount = orders[idx].item.apiece?1:orders[idx].item.packaging

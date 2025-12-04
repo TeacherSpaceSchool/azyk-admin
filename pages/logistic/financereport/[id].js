@@ -6,13 +6,7 @@ import pageListStyle from '../../../src/styleMUI/statistic/statistic'
 import Router, {useRouter} from 'next/router'
 import initialApp from '../../../src/initialApp'
 import {
-    checkFloat,
-    dayStartDefault,
-    formatAmount,
-    getClientTitle,
-    pdDatePicker,
-    pdDDMMYYYY,
-    unawaited
+    checkFloat, dayStartDefault, formatAmount, getClientTitle, pdDatePicker, pdDDMMYYYY, unawaited
 } from '../../../src/lib'
 import { bindActionCreators } from 'redux'
 import Fab from '@material-ui/core/Fab';
@@ -46,9 +40,19 @@ const paymentPrice = (invoice) => {
 }
 
 export const toTableRow = (invoice) => {
+    const adsItems = {}
+    for(const ads of invoice.adss) {
+        if(!adsItems[ads.item._id]) adsItems[ads.item._id] = {count: 0, name: ads.item.name}
+        adsItems[ads.item._id].count += ads.count
+    }
+    let adsItemsTitle = ''
+    for(const adsItem of Object.values(adsItems)) {
+        adsItemsTitle += `${adsItem.name}: ${adsItem.count} ${adsItem.unit||'шт'}\n`
+    }
     return [
         getClientTitle({address: [invoice.address]}), formatAmount(invoice.allPrice),formatAmount(paymentPrice(invoice)),
-        invoice.paymentMethod, formatAmount(invoice.returned), formatAmount(invoice.consig), invoice.inv===0?'нет':'да', invoice.info
+        invoice.paymentMethod, formatAmount(invoice.returned), formatAmount(invoice.consig), invoice.inv===0?'нет':'да',
+        adsItemsTitle, invoice.info
     ]
 }
 

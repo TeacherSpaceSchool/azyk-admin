@@ -28,7 +28,7 @@ export const Invoice = `
     address
     paymentMethod
     discount
-    adss {_id title}
+    adss {_id title count item {_id name unit packaging weight}}
     editor
     number
     confirmationForwarder

@@ -23,6 +23,7 @@ const Tables =  React.memo(({list, forwarderData, pagination, app, user, appActi
         {title: 'Возврат', style: {width: 60}},
         {title: 'Долг', style: {width: 60}},
         {title: 'СФ', style: {width: 25}},
+        {title: 'Акции', style: {width: 200}},
         {title: 'Комментарий', style: {width: 200}},
     ]
     return <div style={{width: 'fit-content', background: 'white'}}>
@@ -87,7 +88,14 @@ const Tables =  React.memo(({list, forwarderData, pagination, app, user, appActi
                     <div className='tableBorder'/>
                     <div className='tableCell' style={columns[6].style}>{row[6]}</div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={columns[7].style}>{invoice.agent?'Агент:':'Онлайн:'} {pdDDMMHHMM(invoice.createdAt)}<br/>{row[7]}</div>
+                    <div className='tableCell' style={columns[7].style}>
+                        {row[7]}
+                    </div>
+                    <div className='tableBorder'/>
+                    <div className='tableCell' style={columns[8].style}>
+                        {invoice.agent?'Агент':'Онлайн'}: {pdDDMMHHMM(invoice.createdAt)}<br/>
+                        {row[8]}
+                    </div>
                 </div>
             }
         }):[]}

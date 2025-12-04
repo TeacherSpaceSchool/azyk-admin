@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import Button from '@material-ui/core/Button';
 import CardActions from '@material-ui/core/CardActions';
 import { deleteAds, addAds, setAds } from '../../src/gql/ads'
-import {checkInt, maxImageSize} from '../../src/lib'
+import {checkInt, maxImageSize, selectedMainColor} from '../../src/lib'
 import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as snackbarActions from '../../redux/actions/snackbar'
@@ -102,8 +102,8 @@ const CardAds = React.memo((props) => {
                                     renderInput={params => (
                                         <TextField {...params} error={!item} label='Товар' fullWidth />
                                     )}/>
-                                <br/>
-                                <TextField
+                            <br/>
+                            <TextField
                                     type={ isMobileApp?'number':'text'}
                                     label='Количество'
                                     error={!count}
@@ -129,6 +129,8 @@ const CardAds = React.memo((props) => {
                                 className={classes.input}
                                 onChange={handleTargetPrice}
                             />
+                            <br/>
+                            <br/>
                             <FormControl className={classes.input}>
                                 <InputLabel>Способы оплаты</InputLabel>
                                 <Select
@@ -138,7 +140,7 @@ const CardAds = React.memo((props) => {
                                     onChange={handlePaymentMethods}
                                 >
                                     {allPaymentMethods.map((element) =>
-                                        <MenuItem key={element} value={element}>{element}</MenuItem>
+                                        <MenuItem style={paymentMethods.includes(element)?{background: selectedMainColor}:{}} key={element} value={element}>{element}</MenuItem>
                                     )}
                                 </Select>
                             </FormControl>
@@ -156,7 +158,6 @@ const CardAds = React.memo((props) => {
                                             if(paymentMethods.length&&JSON.stringify(paymentMethods) !== JSON.stringify(editElement.paymentMethods)) editElement.paymentMethods = paymentMethods
                                             if(targetPrice&&targetPrice !== element.targetPrice) editElement.targetPrice = checkInt(targetPrice)
                                             if(item&&(!element.item||item._id!==element.item._id)) {
-                                                console.log(item)
                                                 editElement.item = item._id
                                             }
                                             if(image) editElement.image = image

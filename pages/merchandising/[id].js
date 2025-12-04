@@ -42,6 +42,7 @@ import * as appActions from '../../redux/actions/app'
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import {dayStartDefault, getClientTitle, maxImageSize} from '../../src/lib';
+import {checkInt} from '../../redux/constants/other';
 
 const marks = [
     {
@@ -617,12 +618,12 @@ const Merchandising = React.memo((props) => {
                                                         client: client._id,
                                                         productAvailability,
                                                         productInventory,
-                                                        productConditions,
-                                                        productLocation,
+                                                        productConditions: checkInt(productConditions),
+                                                        productLocation: checkInt(productLocation),
                                                         images,
                                                         fhos: fhos.map((fho) => {delete fho.previews; return fho}),
                                                         needFho,
-                                                        stateProduct,
+                                                        stateProduct: checkInt(stateProduct),
                                                         type,
                                                         comment,
                                                         geo
