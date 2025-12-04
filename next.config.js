@@ -6,34 +6,38 @@ module.exports =
         withCSS(
             withSass(
                 withOffline({
+                    dontAutoRegister: false,
+                    generateInDevMode: false,
+                    // Workbox настройки
                     workboxOpts: {
                         skipWaiting: true,
                         clientsClaim: true,
                         importScripts: ['/sw-push-listener.js'],
+                        // Очень важно — НИЧЕГО кроме изображений больше не кэшируем
+                        exclude: [
+                            /\/_next\/static\/.*/,   // Next.js JS бандлы
+                            /\/_next\/data\/.*/,     // Data JSON
+                            /\.js$/,                 // Скрипты
+                            /\.json$/,               // JSON
+                            /graphql/                // GraphQL POST
+                        ],
                         runtimeCaching: [
+                            // Кэшируем только картинки
                             {
-                                urlPattern: /^http?.*\/images\/.*/,
-                                handler: 'NetworkOnly'
-                            },
-                            /*{
-                                urlPattern: /^https?.*\.!(png|gif|jpg|jpeg|svg)/,
-                                handler: 'NetworkFirst',
+                                urlPattern: /\.(?:png|jpg|jpeg|gif|svg|ico)$/,
+                                handler: 'CacheFirst',
                                 options: {
-                                    cacheName: 'cache',
+                                    cacheName: 'static-images',
                                     expiration: {
-                                        maxAgeSeconds: 5*24*60*60
-                                    }
-                                },
-                            },*/
-                            {
-                                urlPattern: /^https?.*/,
-                                handler: 'NetworkFirst',
-                                options: {
-                                    cacheName: 'cache',
-                                    expiration: {
-                                        maxAgeSeconds: 5*24*60*60
+                                        maxEntries: 200,
+                                        maxAgeSeconds: 30 * 24 * 60 * 60
                                     }
                                 }
+                            },
+                            // Все остальное — всегда только сеть
+                            {
+                                urlPattern: /^https?.*/,
+                                handler: 'NetworkOnly'
                             }
                         ]
                     },

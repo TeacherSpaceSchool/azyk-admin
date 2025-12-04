@@ -1,12 +1,15 @@
 let notificationUrl = 'https://azyk.store';
-///очистка старого кеша
-self.addEventListener('activate', (event) => {
+// Полная очистка всех кэшей при активации
+self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(cacheNames =>
             // eslint-disable-next-line no-undef
             Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)))
         )
     );
+
+    self.clients.claim();
+    self.skipWaiting();
 });
 //notification registered feature for getting update automatically from server api
 self.addEventListener('push', function (event) {
