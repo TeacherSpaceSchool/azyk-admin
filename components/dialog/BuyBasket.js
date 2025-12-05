@@ -58,23 +58,25 @@ const BuyBasket =  React.memo(
                     const deliveryDate = await getDeliveryDate({client: client._id, organization: organization._id})
                     if (deliveryDate) {
                         deliveryDays = deliveryDate.days
-                        /*if(!agent)
-                            deliveryDays[6] = false*/
                         setDeliveryDays([...deliveryDays])
                     }
                     if(profile.role!=='экспедитор') {
-                        for (let i = 0; i < 7; i++) {
+                        let idx = 0
+                        while(week.length<7) {
                             let day = new Date()
                             if (day.getHours() >= dayStartDefault)
                                 day.setDate(day.getDate() + 1)
-                            day.setDate(day.getDate() + i)
+                            day.setDate(day.getDate() + idx)
                             day.setHours(dayStartDefault, 0, 0, 0)
                             let dayWeek = day.getDay() === 0 ? 6 : (day.getDay() - 1)
-                            week[dayWeek] = day
-                            if (!dateDelivery && deliveryDays[dayWeek]) {
-                                dateDelivery = day
-                                setDateDelivery(dateDelivery)
+                            if(deliveryDays[dayWeek]) {
+                                week.push(day)
+                                if (!dateDelivery) {
+                                    dateDelivery = day
+                                    setDateDelivery(dateDelivery)
+                                }
                             }
+                            idx += 1
                         }
                     }
                     else {

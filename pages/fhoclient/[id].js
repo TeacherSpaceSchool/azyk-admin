@@ -11,8 +11,7 @@ import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import {resizeImg} from '../../src/resizeImg'
-import { useRouter } from 'next/router'
-import Router from 'next/router'
+import Router, { useRouter } from 'next/router'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import TextField from '@material-ui/core/TextField';
 import Confirmation from '../../components/dialog/Confirmation'
@@ -216,7 +215,7 @@ const FhoClient = React.memo((props) => {
                                                         organization: organization._id,
                                                         client: client._id
                                                     })
-                                                    if(res) Router.replace(`/fhoclient/${res}`)
+                                                    if(res) await router.back()
                                                 }
                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                 showMiniDialog(true)
@@ -231,8 +230,6 @@ const FhoClient = React.memo((props) => {
                                                     await setFhoClient({_id: router.query.id, deletedImages, uploads})
                                                     if (['агент', 'client'].includes(profile.role))
                                                         router.back()
-                                                    else
-                                                        router.reload()
                                                 }
                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                 showMiniDialog(true)
@@ -246,7 +243,7 @@ const FhoClient = React.memo((props) => {
                                         <Button onClick={() => {
                                             const action = async () => {
                                                 await deleteFhoClient(router.query.id)
-                                                Router.back()
+                                                router.back()
                                             }
                                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                             showMiniDialog(true)

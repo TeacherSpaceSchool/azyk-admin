@@ -161,6 +161,11 @@ const Statistic = React.memo((props) => {
                 role: ['admin']
             },
             {
+                name: 'Принудительное обновление',
+                link: '/statistic/administration/forceupdate',
+                role: ['admin']
+            },
+            {
                 name: 'Пуш-уведомления',
                 link: '/statistic/administration/notificationStatistic',
                 role: ['admin']
