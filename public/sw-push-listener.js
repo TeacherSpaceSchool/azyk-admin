@@ -30,7 +30,7 @@ self.addEventListener('push', function (event) {
             })
         );
     }
-    else
+    else {
         event.waitUntil(
             self.registration.showNotification(_data.title, {
                 badge: 'https://azyk.store/static/192x192.png',
@@ -42,6 +42,7 @@ self.addEventListener('push', function (event) {
                 data: _data
             })
         );
+    }
 });
 
 //notification url redirect event click
