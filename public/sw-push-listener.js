@@ -23,12 +23,10 @@ self.addEventListener('push', function (event) {
             const cacheNames = await caches.keys();
             // eslint-disable-next-line no-undef
             await Promise.all(cacheNames.map(name => caches.delete(name)));
-
             // Перезагрузка всех вкладок
             const clientList = await self.clients.matchAll({ type: 'window' });
-            for (const client of clientList) {
+            for (const client of clientList)
                 client.navigate(client.url);
-            }
         }
         self.registration.showNotification(_data.title, {
             badge: 'https://azyk.store/static/192x192.png',

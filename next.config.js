@@ -6,6 +6,10 @@ module.exports =
         withCSS(
             withSass(
                 withOffline({
+                    // каждый билд получает уникальный BUILD_ID (timestamp)
+                    generateBuildId: async () => {
+                        return Date.now().toString();
+                    },
                     dontAutoRegister: false,
                     generateInDevMode: false,
                     // Workbox настройки
