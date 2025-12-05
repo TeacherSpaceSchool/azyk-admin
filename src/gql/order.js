@@ -120,7 +120,7 @@ export const getOrder = async (_id, client) => {
     }
 }
 
-export const addOrders = async (variables) => {
+export const addOrders1 = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
         const res = await client.mutate({

@@ -58,7 +58,7 @@ export const getReturnedsSimpleStatistic = async (variables, client) => {
     }
 }
 
-export const addReturned = async (variables) => {
+export const addReturned1 = async (variables) => {
     try{
         const client = new SingletonApolloClient().getClient()
         const res = await client.mutate({

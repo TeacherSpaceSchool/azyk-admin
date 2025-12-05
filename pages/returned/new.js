@@ -19,7 +19,7 @@ import Divider from '@material-ui/core/Divider';
 import initialApp from '../../src/initialApp'
 import { getBrandOrganizations } from '../../src/gql/items'
 import CircularProgress from '@material-ui/core/CircularProgress';
-import ReturnedConfirmed from '../../components/dialog/ReturnedConfirmed'
+import ReturnedConfirmed1 from '../../components/dialog/ReturnedConfirmed1'
 import Table from '../../components/table/catalogReturned';
 
 const Catalog = React.memo((props) => {
@@ -275,7 +275,7 @@ const Catalog = React.memo((props) => {
                 <div className={isMobileApp?classes.buyM:classes.buyD} onClick={() => {
                     if(allPrice>0) {
                         if(client) {
-                            setMiniDialog('Оформление возврата', <ReturnedConfirmed items={items} client={client} geo={geo.current} allPrice={allPrice} organization={organization}/>)
+                            setMiniDialog('Оформление возврата', <ReturnedConfirmed1 items={items} client={client} geo={geo.current} allPrice={allPrice} organization={organization}/>)
                             showMiniDialog(true)
                         }
                         else
