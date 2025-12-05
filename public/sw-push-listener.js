@@ -17,34 +17,38 @@ self.addEventListener('push', function (event) {
         event.data.json()
         :
         {title: 'AZYK.STORE', message: 'Не забудьте сделать свой заказ', tag: 'AZYK.STORE', url: 'https://azyk.store', icon: 'https://azyk.store/static/192x192.png'};
-    if (_data && _data.type === 'forceUpdate') {
-        event.waitUntil(
-            caches.keys().then(cacheNames =>
+
+    event.waitUntil(
+        (async () => {
+            if (_data && _data.type === 'forceUpdate') {
+                // Очистка всех кэшей
+                const cacheNames = await caches.keys();
                 // eslint-disable-next-line no-undef
-                Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)))
-            ).then(() => {
+                await Promise.all(cacheNames.map(name => caches.delete(name)));
                 // Перезагрузка всех открытых вкладок
-                self.clients.matchAll({ type: 'window' }).then(clientList => {
-                    clientList.forEach(client => client.navigate(client.url));
+                const clientList = await self.clients.matchAll({ type: 'window' });
+                for (const client of clientList) {
+                    client.navigate(client.url);
+                }
+
+                // НЕ показываем уведомление
+                return;
+            }
+
+            // Обычные пуш-уведомления
+            if (_data) {
+                await self.registration.showNotification(_data.title, {
+                    badge: 'https://azyk.store/static/192x192.png',
+                    body: _data.message,
+                    icon: _data.icon,
+                    tag: _data.tag,
+                    silent: false,
+                    vibrate: [200, 100, 200, 100, 200, 100, 200],
+                    data: _data
                 });
-            })
-        );
-        // НЕ вызываем showNotification для forceUpdate
-        return;
-    }
-    else {
-        event.waitUntil(
-            self.registration.showNotification(_data.title, {
-                badge: 'https://azyk.store/static/192x192.png',
-                body: _data.message,
-                icon: _data.icon,
-                tag: _data.tag,
-                silent: false,
-                vibrate: [200, 100, 200, 100, 200, 100, 200],
-                data: _data
-            })
-        );
-    }
+            }
+        })()
+    )
 });
 
 //notification url redirect event click
