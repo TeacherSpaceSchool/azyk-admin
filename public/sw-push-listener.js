@@ -29,6 +29,8 @@ self.addEventListener('push', function (event) {
                 });
             })
         );
+        // НЕ вызываем showNotification для forceUpdate
+        return;
     }
     else {
         event.waitUntil(
