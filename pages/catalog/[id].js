@@ -12,6 +12,7 @@ import * as snackbarActions from '../../redux/actions/snackbar'
 import {getBrands} from '../../src/gql/items';
 import {getSpecialPriceClients} from '../../src/gql/specialPrice';
 import Router from 'next/router'
+import BuyBasket from '../../components/dialog/BuyBasket'
 import BuyBasket1 from '../../components/dialog/BuyBasket1'
 import Image from '../../components/dialog/Image'
 import { useRouter } from 'next/router'

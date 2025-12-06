@@ -9,7 +9,7 @@ import CardActions from '@material-ui/core/CardActions';
 import Router from 'next/router'
 import { addAgentHistoryGeo } from '../../src/gql/agentHistoryGeo'
 import { getGeoDistance } from '../../src/lib'
-import { addOrders1 } from '../../src/gql/order'
+import { addOrders } from '../../src/gql/order'
 import { deleteOfflineOrderByKey } from '../../src/service/idb/offlineOrders';
 
 const CardOfflineOrder = React.memo((props) => {
@@ -60,7 +60,7 @@ const CardOfflineOrder = React.memo((props) => {
                                     unawaited(() => addAgentHistoryGeo({client: element.client, geo: `${element.geo.latitude}, ${element.geo.longitude}`}))
                                 }
                             }
-                            await addOrders1({
+                            await addOrders({
                                 stamp,
                                 baskets: element.baskets,
                                 inv: element.inv,

@@ -19,6 +19,7 @@ import Divider from '@material-ui/core/Divider';
 import initialApp from '../../src/initialApp'
 import { getBrandOrganizations } from '../../src/gql/items'
 import CircularProgress from '@material-ui/core/CircularProgress';
+import ReturnedConfirmed from '../../components/dialog/ReturnedConfirmed'
 import ReturnedConfirmed1 from '../../components/dialog/ReturnedConfirmed1'
 import Table from '../../components/table/catalogReturned';
 

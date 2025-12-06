@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { addOrders1 } from '../../src/gql/order'
+import { addOrders } from '../../src/gql/order'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import * as appActions from '../../redux/actions/app'
@@ -25,7 +25,7 @@ import { getDeliveryDate } from '../../src/gql/deliveryDate';
 import { pdDDMMYYYYWW } from '../../src/lib';
 import { putOfflineOrders } from '../../src/service/idb/offlineOrders';
 
-const BuyBasket1 =  React.memo(
+const BuyBasket =  React.memo(
     (props) =>{
         const {isMobileApp} = props.app;
         const {profile} = props.user;
@@ -97,12 +97,12 @@ const BuyBasket1 =  React.memo(
                 {
                     adss&&adss.length?
                         <>
-                            <Link href={`/ads/${organization._id}`}>
-                                <div onClick={() => {showMiniDialog(false)}} className={classes.showAds} style={{width: width}}>
-                                    <WhatshotIcon color='inherit'/>&nbsp;Просмотреть акции
-                                </div>
-                            </Link>
-                            <br/>
+                        <Link href={`/ads/${organization._id}`}>
+                            <div onClick={() => {showMiniDialog(false)}} className={classes.showAds} style={{width: width}}>
+                                <WhatshotIcon color='inherit'/>&nbsp;Просмотреть акции
+                            </div>
+                        </Link>
+                        <br/>
                         </>
                         :
                         null
@@ -122,17 +122,17 @@ const BuyBasket1 =  React.memo(
                 {
                     week.length?
                         <>
-                            <FormControl style={{width: width}} className={isMobileApp?classes.inputM:classes.inputD}>
-                                <InputLabel>День доставки</InputLabel>
-                                <Select value={dateDelivery} onChange={handleDateDelivery}>
-                                    {week.map((element, idx) => {
-                                            if(deliveryDays[idx])
-                                                return <MenuItem value={element}>{pdDDMMYYYYWW(element)}</MenuItem>
-                                        }
-                                    )}
-                                </Select>
-                            </FormControl>
-                            <br/>
+                        <FormControl style={{width: width}} className={isMobileApp?classes.inputM:classes.inputD}>
+                            <InputLabel>День доставки</InputLabel>
+                            <Select value={dateDelivery} onChange={handleDateDelivery}>
+                                {week.map((element, idx) => {
+                                    if(deliveryDays[idx])
+                                        return <MenuItem value={element}>{pdDDMMYYYYWW(element)}</MenuItem>
+                                }
+                                )}
+                            </Select>
+                        </FormControl>
+                        <br/>
                         </>
                         :
                         null
@@ -140,15 +140,15 @@ const BuyBasket1 =  React.memo(
                 {
                     agent?
                         <>
-                            <FormControl style={{width: width}} className={isMobileApp?classes.inputM:classes.inputD}>
-                                <InputLabel>Способ оплаты</InputLabel>
-                                <Select value={paymentMethod} onChange={handlePaymentMethod}>
-                                    {paymentMethods.map((element) =>
-                                        <MenuItem key={element} value={element} >{element}</MenuItem>
-                                    )}
-                                </Select>
-                            </FormControl>
-                            <br/>
+                        <FormControl style={{width: width}} className={isMobileApp?classes.inputM:classes.inputD}>
+                            <InputLabel>Способ оплаты</InputLabel>
+                            <Select value={paymentMethod} onChange={handlePaymentMethod}>
+                                {paymentMethods.map((element) =>
+                                    <MenuItem key={element} value={element} >{element}</MenuItem>
+                                )}
+                            </Select>
+                        </FormControl>
+                        <br/>
                         </>
                         :
                         null
@@ -156,7 +156,7 @@ const BuyBasket1 =  React.memo(
                 {
                     !agent&&organization.minimumOrder?
                         <>
-                            <div style={{width: width}} className={classes.itogo}><b>Минимальный заказ:</b>&nbsp;{formatAmount(organization.minimumOrder)}&nbsp;сом</div>
+                        <div style={{width: width}} className={classes.itogo}><b>Минимальный заказ:</b>&nbsp;{formatAmount(organization.minimumOrder)}&nbsp;сом</div>
                         </>
                         :null
                 }
@@ -180,59 +180,59 @@ const BuyBasket1 =  React.memo(
                         if(unlock.current) {
                             unlock.current = false
                             if(agent || !organization.minimumOrder || organization.minimumOrder<=allPrice) {
-                                if(paymentMethod.length) {
-                                    showMiniDialog(false);
-                                    showLoad(true)
-                                    sessionStorage.catalog = '{}'
-                                    sessionStorage.removeItem('catalogID')
-                                    sessionStorage.removeItem('client')
-                                    // eslint-disable-next-line no-undef
-                                    const seen = new Set();
-                                    const baskets = Object.values(basket)
-                                        .filter(b => b.count)
-                                        .filter(b => {if (seen.has(b._id)) return false; seen.add(b._id); return true;})
-                                        .map(b => ({ _id: b._id, count: b.count }));
-                                    if(navigator.onLine) {
-                                        if(agent&&geo&&client.address[0][1].includes(', ')) {
-                                            let distance = getGeoDistance(geo.coords.latitude, geo.coords.longitude, ...(client.address[0][1].split(', ')))
-                                            if(distance<1000) {
-                                                unawaited(() => addAgentHistoryGeo({client: client._id, geo: `${geo.coords.latitude}, ${geo.coords.longitude}`}))
-                                            }
-                                        }
-                                        await addOrders1({
-                                            stamp,
-                                            baskets,
-                                            inv,
-                                            unite: organization.unite,
-                                            info,
-                                            paymentMethod,
-                                            organization: organization._id,
-                                            client: client._id,
-                                            dateDelivery
-                                        })
-                                        Router.push('/orders')
-                                    }
-                                    else if(profile.role.includes('агент')) {
-                                        await putOfflineOrders({
-                                            ...(geo?{geo: {latitude: geo.coords.latitude, longitude: geo.coords.longitude}}:{}),
-                                            inv,
-                                            unite: organization.unite,
-                                            info,
-                                            paymentMethod,
-                                            organization: organization._id,
-                                            client: client._id,
-                                            dateDelivery,
-                                            baskets,
-                                            address: client.address[0],
-                                            name: client.name,
-                                            allPrice: `${formatAmount(allPrice)} сом`
-                                        })
-                                        Router.push('/statistic/tools/offlineorder')
-                                    }
-                                    showLoad(false)
-                                }
-                                else
-                                    showSnackBar('Заполните все поля')
+                               if(paymentMethod.length) {
+                                   showMiniDialog(false);
+                                   showLoad(true)
+                                   sessionStorage.catalog = '{}'
+                                   sessionStorage.removeItem('catalogID')
+                                   sessionStorage.removeItem('client')
+                                   // eslint-disable-next-line no-undef
+                                   const seen = new Set();
+                                   const baskets = Object.values(basket)
+                                       .filter(b => b.count)
+                                       .filter(b => {if (seen.has(b._id)) return false; seen.add(b._id); return true;})
+                                       .map(b => ({ _id: b._id, count: b.count }));
+                                   if(navigator.onLine) {
+                                       if(agent&&geo&&client.address[0][1].includes(', ')) {
+                                           let distance = getGeoDistance(geo.coords.latitude, geo.coords.longitude, ...(client.address[0][1].split(', ')))
+                                           if(distance<1000) {
+                                               unawaited(() => addAgentHistoryGeo({client: client._id, geo: `${geo.coords.latitude}, ${geo.coords.longitude}`}))
+                                           }
+                                       }
+                                       await addOrders({
+                                           stamp,
+                                           baskets,
+                                           inv,
+                                           unite: organization.unite,
+                                           info,
+                                           paymentMethod,
+                                           organization: organization._id,
+                                           client: client._id,
+                                           dateDelivery
+                                       })
+                                       Router.push('/orders')
+                                   }
+                                   else if(profile.role.includes('агент')) {
+                                       await putOfflineOrders({
+                                           ...(geo?{geo: {latitude: geo.coords.latitude, longitude: geo.coords.longitude}}:{}),
+                                           inv,
+                                           unite: organization.unite,
+                                           info,
+                                           paymentMethod,
+                                           organization: organization._id,
+                                           client: client._id,
+                                           dateDelivery,
+                                           baskets,
+                                           address: client.address[0],
+                                           name: client.name,
+                                           allPrice: `${formatAmount(allPrice)} сом`
+                                       })
+                                       Router.push('/statistic/tools/offlineorder')
+                                   }
+                                   showLoad(false)
+                               }
+                               else
+                                   showSnackBar('Заполните все поля')
                             }
                             else {
                                 showSnackBar('Сумма заказа должна быть выше минимальной')
@@ -269,8 +269,8 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-BuyBasket1.propTypes = {
+BuyBasket.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(dialogContentStyle)(BuyBasket1));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(dialogContentStyle)(BuyBasket));

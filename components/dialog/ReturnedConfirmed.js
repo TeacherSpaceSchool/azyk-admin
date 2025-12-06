@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { addReturned1 } from '../../src/gql/returned'
+import { addReturned } from '../../src/gql/returned'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
@@ -21,7 +21,7 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import { pdDDMMYYYYWW } from '../../src/lib';
 
-const ReturnedConfirmed1 =  React.memo(
+const ReturnedConfirmed =  React.memo(
     (props) =>{
         const {isMobileApp} = props.app;
         const {client, allPrice, organization, items, geo} = props;
@@ -85,17 +85,17 @@ const ReturnedConfirmed1 =  React.memo(
                 {
                     week.length?
                         <>
-                            <FormControl style={{width: width}} className={isMobileApp?classes.inputM:classes.inputD}>
-                                <InputLabel>День доставки</InputLabel>
-                                <Select value={dateDelivery} onChange={handleDateDelivery}>
-                                    {week.map((element, idx) => {
-                                            if(dateDeliverys[idx])
-                                                return <MenuItem value={element}>{pdDDMMYYYYWW(element)}</MenuItem>
-                                        }
-                                    )}
-                                </Select>
-                            </FormControl>
-                            <br/>
+                        <FormControl style={{width: width}} className={isMobileApp?classes.inputM:classes.inputD}>
+                            <InputLabel>День доставки</InputLabel>
+                            <Select value={dateDelivery} onChange={handleDateDelivery}>
+                                {week.map((element, idx) => {
+                                        if(dateDeliverys[idx])
+                                            return <MenuItem value={element}>{pdDDMMYYYYWW(element)}</MenuItem>
+                                    }
+                                )}
+                            </Select>
+                        </FormControl>
+                        <br/>
                         </>
                         :
                         null
@@ -123,7 +123,7 @@ const ReturnedConfirmed1 =  React.memo(
                                     }))
                                 }
                             }
-                            await addReturned1({
+                            await addReturned({
                                 inv,
                                 unite: organization.unite,
                                 info: info,
@@ -160,8 +160,8 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-ReturnedConfirmed1.propTypes = {
+ReturnedConfirmed.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(dialogContentStyle)(ReturnedConfirmed1));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(dialogContentStyle)(ReturnedConfirmed));
