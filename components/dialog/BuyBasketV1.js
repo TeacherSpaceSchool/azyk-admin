@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { addOrders1 } from '../../src/gql/order'
+import { addOrders } from '../../src/gql/order'
+import { addOrdersV1 } from '../../src/gql/orderV1'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
 import * as appActions from '../../redux/actions/app'
@@ -25,7 +26,7 @@ import { getDeliveryDate } from '../../src/gql/deliveryDate';
 import { pdDDMMYYYYWW } from '../../src/lib';
 import { putOfflineOrders } from '../../src/service/idb/offlineOrders';
 
-const BuyBasket1 =  React.memo(
+const BuyBasketV1 =  React.memo(
     (props) =>{
         const {isMobileApp} = props.app;
         const {profile} = props.user;
@@ -199,7 +200,7 @@ const BuyBasket1 =  React.memo(
                                                 unawaited(() => addAgentHistoryGeo({client: client._id, geo: `${geo.coords.latitude}, ${geo.coords.longitude}`}))
                                             }
                                         }
-                                        await addOrders1({
+                                        await addOrdersV1({
                                             stamp,
                                             baskets,
                                             inv,
@@ -269,8 +270,8 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-BuyBasket1.propTypes = {
+BuyBasketV1.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(dialogContentStyle)(BuyBasket1));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(dialogContentStyle)(BuyBasketV1));

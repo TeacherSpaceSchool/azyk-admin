@@ -11,7 +11,7 @@ import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import * as snackbarActions from '../redux/actions/snackbar'
 import Router, {useRouter} from 'next/router'
 import BuyBasket from '../components/dialog/BuyBasket'
-import BuyBasket1 from '../components/dialog/BuyBasket1'
+import BuyBasketV1 from '../components/dialog/BuyBasketV1'
 import SetPackage from '../components/dialog/SetPackage'
 import { getClient, getClients } from '../src/gql/client'
 import TextField from '@material-ui/core/TextField';
@@ -428,7 +428,7 @@ const Catalog = React.memo((props) => {
                     }
                     {
                         isMobileApp?
-                        list.map((row, idx) => {
+                            list.map((row, idx) => {
                                 let price
                                 if(basket[row._id]&&basket[row._id].allPrice)
                                     price = basket[row._id].allPrice
@@ -504,7 +504,7 @@ const Catalog = React.memo((props) => {
                     else {
                         if (allPrice) {
                             if (client) {
-                                setMiniDialog('Купить', <BuyBasket1
+                                setMiniDialog('Купить', <BuyBasketV1
                                     geo={geo.current}
                                     agent
                                     client={client}

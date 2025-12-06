@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { addReturned1 } from '../../src/gql/returned'
+import { addReturned } from '../../src/gql/returned'
+import { addReturnedV1 } from '../../src/gql/returnedV1'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
@@ -21,7 +22,7 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import { pdDDMMYYYYWW } from '../../src/lib';
 
-const ReturnedConfirmed1 =  React.memo(
+const ReturnedConfirmedV1 =  React.memo(
     (props) =>{
         const {isMobileApp} = props.app;
         const {client, allPrice, organization, items, geo} = props;
@@ -123,7 +124,7 @@ const ReturnedConfirmed1 =  React.memo(
                                     }))
                                 }
                             }
-                            await addReturned1({
+                            await addReturnedV1({
                                 inv,
                                 unite: organization.unite,
                                 info: info,
@@ -160,8 +161,8 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-ReturnedConfirmed1.propTypes = {
+ReturnedConfirmedV1.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(dialogContentStyle)(ReturnedConfirmed1));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(dialogContentStyle)(ReturnedConfirmedV1));
