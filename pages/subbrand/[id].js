@@ -33,6 +33,7 @@ import initialApp from '../../src/initialApp'
 import {checkInt, maxImageSize} from '../../src/lib';
 import CardItem from '../../components/card/CardItem';
 import {viewModes} from '../../src/enum';
+import {resizeImg} from '../../src/resizeImg';
 
 const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
 
@@ -55,9 +56,10 @@ const SubBrand = React.memo((props) => {
     //image
     let [preview, setPreview] = useState(data.subBrand?data.subBrand.image:'/static/add.png');
     let [image, setImage] = useState(null);
-    let handleChangeImage = ((event) => {
+    let handleChangeImage = (async (event) => {
         if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            setImage(event.target.files[0])
+            let image = await resizeImg(event.target.files[0])
+            setImage(image)
             setPreview(URL.createObjectURL(event.target.files[0]))
         } else showSnackBar('Файл слишком большой')
     })
@@ -236,7 +238,7 @@ const SubBrand = React.memo((props) => {
                                                 const action = async () => {
                                                     let res = await addSubBrand({image, miniInfo, name, guid, minimumOrder, priotiry, organization: organization._id})
                                                     if(res)
-                                                        Router.push(`/subBrand/${res}`)
+                                                        Router.back()
                                                 }
                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                 showMiniDialog(true)

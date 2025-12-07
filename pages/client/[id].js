@@ -26,6 +26,7 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import { validPhone } from '../../src/lib'
 import initialApp from '../../src/initialApp'
 import {getClientNetworks} from '../../src/gql/clientNetwork';
+import {resizeImg} from '../../src/resizeImg';
 
 const withoutNetwork = {name: 'Без сети', _id: null}
 
@@ -104,9 +105,10 @@ const Client = React.memo((props) => {
     //image
     let [preview, setPreview] = useState(data.client?data.client.image:'/static/add.png');
     let [image, setImage] = useState(null);
-    let handleChangeImage = ((event) => {
+    let handleChangeImage = (async (event) => {
         if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            setImage(event.target.files[0])
+            let image = await resizeImg(event.target.files[0])
+            setImage(image)
             setPreview(URL.createObjectURL(event.target.files[0]))
         } else showSnackBar('Файл слишком большой')
     })
@@ -415,7 +417,7 @@ const Client = React.memo((props) => {
                                                             const action = async () => {
                                                                 const res = await addClient(editElement)
                                                                 if(res)
-                                                                    Router.push(`/client/${res}`)
+                                                                    Router.back()
                                                             }
                                                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                             showMiniDialog(true)

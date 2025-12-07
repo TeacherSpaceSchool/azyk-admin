@@ -227,7 +227,7 @@ const Client = React.memo((props) => {
                                                                 organization: organization._id!=='super'?organization._id:null,
                                                             })
                                                             if(res)
-                                                                Router.push(`/employment/${res}`)
+                                                                Router.back()
                                                         }
                                                         setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                         showMiniDialog(true)

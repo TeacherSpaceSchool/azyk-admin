@@ -18,6 +18,7 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import {resizeImg} from '../../src/resizeImg';
 
 const CardAds = React.memo((props) => {
     const classes = cardAdsStyle();
@@ -27,9 +28,10 @@ const CardAds = React.memo((props) => {
     //addCard
     let [preview, setPreview] = useState(element?element.image:'/static/add.png');
     let [image, setImage] = useState(null);
-    let handleChangeImage = ((event) => {
+    let handleChangeImage = (async (event) => {
         if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            setImage(event.target.files[0])
+            let image = await resizeImg(event.target.files[0])
+            setImage(image)
             setPreview(URL.createObjectURL(event.target.files[0]))
         } else showSnackBar('Файл слишком большой')
     })

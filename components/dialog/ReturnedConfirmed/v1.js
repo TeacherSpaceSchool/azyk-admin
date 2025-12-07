@@ -3,23 +3,23 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { addReturned } from '../../src/gql/returned'
-import * as mini_dialogActions from '../../redux/actions/mini_dialog'
+import { addReturned } from '../../../src/gql/returned'
+import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
-import dialogContentStyle from '../../src/styleMUI/dialogContent'
+import dialogContentStyle from '../../../src/styleMUI/dialogContent'
 import Router from 'next/router'
 import Link from 'next/link';
-import { addAgentHistoryGeo } from '../../src/gql/agentHistoryGeo'
-import {dayStartDefault, formatAmount, getGeoDistance, rowReverseDialog, unawaited} from '../../src/lib'
+import { addAgentHistoryGeo } from '../../../src/gql/agentHistoryGeo'
+import {dayStartDefault, formatAmount, getGeoDistance, rowReverseDialog, unawaited} from '../../../src/lib'
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import { getDeliveryDate } from '../../src/gql/deliveryDate';
+import { getDeliveryDate } from '../../../src/gql/deliveryDate';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
-import { pdDDMMYYYYWW } from '../../src/lib';
+import { pdDDMMYYYYWW } from '../../../src/lib';
 
 const ReturnedConfirmed =  React.memo(
     (props) =>{
@@ -85,17 +85,17 @@ const ReturnedConfirmed =  React.memo(
                 {
                     week.length?
                         <>
-                        <FormControl style={{width: width}} className={isMobileApp?classes.inputM:classes.inputD}>
-                            <InputLabel>День доставки</InputLabel>
-                            <Select value={dateDelivery} onChange={handleDateDelivery}>
-                                {week.map((element, idx) => {
-                                        if(dateDeliverys[idx])
-                                            return <MenuItem value={element}>{pdDDMMYYYYWW(element)}</MenuItem>
-                                    }
-                                )}
-                            </Select>
-                        </FormControl>
-                        <br/>
+                            <FormControl style={{width: width}} className={isMobileApp?classes.inputM:classes.inputD}>
+                                <InputLabel>День доставки</InputLabel>
+                                <Select value={dateDelivery} onChange={handleDateDelivery}>
+                                    {week.map((element, idx) => {
+                                            if(dateDeliverys[idx])
+                                                return <MenuItem value={element}>{pdDDMMYYYYWW(element)}</MenuItem>
+                                        }
+                                    )}
+                                </Select>
+                            </FormControl>
+                            <br/>
                         </>
                         :
                         null

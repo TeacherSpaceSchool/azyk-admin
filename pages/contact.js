@@ -21,6 +21,7 @@ import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Sign from '../components/dialog/Sign';
 import {maxImageSize} from '../src/lib';
+import {resizeImg} from '../src/resizeImg';
 
 const Contact = React.memo((props) => {
     const classes = contactStyle();
@@ -87,9 +88,10 @@ const Contact = React.memo((props) => {
     //image
     let [preview, setPreview] = useState(data.contact.image===''?'/static/add.png':data.contact.image);
     let [image, setImage] = useState(null);
-    let handleChangeImage = ((event) => {
+    let handleChangeImage = (async (event) => {
         if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            setImage(event.target.files[0])
+            let image = await resizeImg(event.target.files[0])
+            setImage(image)
             setPreview(URL.createObjectURL(event.target.files[0]))
         } else showSnackBar('Файл слишком большой')
     })

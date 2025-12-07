@@ -37,7 +37,7 @@ const Banners = React.memo((props) => {
         if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
             let image = await resizeImg(event.target.files[0])
             setUploads([image, ...uploads])
-            setPreviews([image, ...previews])
+            setPreviews([URL.createObjectURL(event.target.files[0]), ...previews])
         } else showSnackBar('Файл слишком большой')
     })
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;

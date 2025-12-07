@@ -332,7 +332,7 @@ const District = React.memo((props) => {
                                                         forwarder: forwarder&&forwarder._id,
                                                     })
                                                     if(res)
-                                                        Router.push(`/district/${res}`)
+                                                        Router.back()
                                                 }
                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                 showMiniDialog(true)

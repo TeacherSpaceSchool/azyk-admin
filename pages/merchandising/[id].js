@@ -98,11 +98,11 @@ const Merchandising = React.memo((props) => {
             let image = await resizeImg(event.target.files[0])
             if(typeImage==='products') {
                 setImages([image, ...images])
-                setPreviews([image, ...previews])
+                setPreviews([URL.createObjectURL(event.target.files[0]), ...previews])
             }
             else if(typeImage==='fhos') {
                 fhos[indexImage].images = [image, ...fhos[indexImage].images]
-                fhos[indexImage].previews = [image, ...fhos[indexImage].previews]
+                fhos[indexImage].previews = [URL.createObjectURL(event.target.files[0]), ...fhos[indexImage].previews]
                 setFhos([...fhos])
             }
         } else showSnackBar('Файл слишком большой')
@@ -628,7 +628,7 @@ const Merchandising = React.memo((props) => {
                                                         comment,
                                                         geo
                                                     })
-                                                    if(res) Router.push(`/merchandising/${res}`)
+                                                    if(res) Router.back()
                                                 }
                                                 setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                 showMiniDialog(true)

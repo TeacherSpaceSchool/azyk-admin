@@ -3,11 +3,10 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { addOrders } from '../../src/gql/order'
-import { addOrdersV1 } from '../../src/gql/orderV1'
-import * as mini_dialogActions from '../../redux/actions/mini_dialog'
-import * as snackbarActions from '../../redux/actions/snackbar'
-import * as appActions from '../../redux/actions/app'
+import { addOrders } from '../../../src/gql/order'
+import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
+import * as snackbarActions from '../../../redux/actions/snackbar'
+import * as appActions from '../../../redux/actions/app'
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -15,18 +14,18 @@ import Select from '@material-ui/core/Select';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
-import dialogContentStyle from '../../src/styleMUI/dialogContent'
+import dialogContentStyle from '../../../src/styleMUI/dialogContent'
 import Checkbox from '@material-ui/core/Checkbox';
 import Router from 'next/router'
 import Link from 'next/link';
 import WhatshotIcon from '@material-ui/icons/Whatshot';
-import { addAgentHistoryGeo } from '../../src/gql/agentHistoryGeo'
-import {dayStartDefault, formatAmount, getGeoDistance, rowReverseDialog, unawaited} from '../../src/lib'
-import { getDeliveryDate } from '../../src/gql/deliveryDate';
-import { pdDDMMYYYYWW } from '../../src/lib';
-import { putOfflineOrders } from '../../src/service/idb/offlineOrders';
+import { addAgentHistoryGeo } from '../../../src/gql/agentHistoryGeo'
+import {dayStartDefault, formatAmount, getGeoDistance, rowReverseDialog, unawaited} from '../../../src/lib'
+import { getDeliveryDate } from '../../../src/gql/deliveryDate';
+import { pdDDMMYYYYWW } from '../../../src/lib';
+import { putOfflineOrders } from '../../../src/service/idb/offlineOrders';
 
-const BuyBasketV1 =  React.memo(
+const BuyBasket =  React.memo(
     (props) =>{
         const {isMobileApp} = props.app;
         const {profile} = props.user;
@@ -200,7 +199,7 @@ const BuyBasketV1 =  React.memo(
                                                 unawaited(() => addAgentHistoryGeo({client: client._id, geo: `${geo.coords.latitude}, ${geo.coords.longitude}`}))
                                             }
                                         }
-                                        await addOrdersV1({
+                                        await addOrders({
                                             stamp,
                                             baskets,
                                             inv,
@@ -270,8 +269,8 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-BuyBasketV1.propTypes = {
+BuyBasket.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(dialogContentStyle)(BuyBasketV1));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(dialogContentStyle)(BuyBasket));

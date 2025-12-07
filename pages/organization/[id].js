@@ -28,6 +28,7 @@ import Geo from '../../components/dialog/Geo'
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import * as lib from '../../src/lib'
+import {resizeImg} from '../../src/resizeImg';
 
 const Organization = React.memo((props) => {
     const classes = organizationStyle();
@@ -123,9 +124,10 @@ const Organization = React.memo((props) => {
     })
     let [preview, setPreview] = useState(data.organization!==null?data.organization.image:'/static/add.png');
     let [image, setImage] = useState(null);
-    let handleChangeImage = ((event) => {
+    let handleChangeImage = (async (event) => {
         if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            setImage(event.target.files[0])
+            let image = await resizeImg(event.target.files[0])
+            setImage(image)
             setPreview(URL.createObjectURL(event.target.files[0]))
         } else showSnackBar('Файл слишком большой')
     })
@@ -555,7 +557,7 @@ const Organization = React.memo((props) => {
                                                                 agentHistory: checkInt(agentHistory)
                                                             })
                                                             if(res)
-                                                                Router.push(`/organization/${res}`)
+                                                                Router.back()
                                                         }
                                                         setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                         showMiniDialog(true)

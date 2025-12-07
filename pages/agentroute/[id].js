@@ -279,7 +279,7 @@ const AgentRoute = React.memo((props) => {
                                                     district: district._id,
                                                 })
                                                 if(res)
-                                                    Router.push(`/agentroute/${res}`)
+                                                    Router.back()
                                             }
                                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                             showMiniDialog(true)

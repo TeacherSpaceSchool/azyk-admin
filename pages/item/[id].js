@@ -27,6 +27,7 @@ import TextField from '@material-ui/core/TextField';
 import Confirmation from '../../components/dialog/Confirmation'
 import Link from 'next/link';
 import { getClientGqlSsr } from '../../src/getClientGQL'
+import {resizeImg} from '../../src/resizeImg';
 
 const withoutSubBrand = {name: 'Без подбренда', _id: null}
 
@@ -86,9 +87,10 @@ const Item = React.memo((props) => {
     //image
     let [preview, setPreview] = useState(data.item?data.item.image:'/static/add.png');
     let [image, setImage] = useState(null);
-    let handleChangeImage = ((event) => {
+    let handleChangeImage = (async (event) => {
         if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            setImage(event.target.files[0])
+            let image = await resizeImg(event.target.files[0])
+            setImage(image)
             setPreview(URL.createObjectURL(event.target.files[0]))
         } else showSnackBar('Файл слишком большой')
     })
@@ -304,7 +306,7 @@ const Item = React.memo((props) => {
                                                                     name, categorys, image, unit, city,
                                                                     ...subBrand?{subBrand: subBrand._id}:{}, organization: organization._id
                                                                 })
-                                                                if(res) Router.push(`/item/${res}`)
+                                                                if(res) Router.back()
                                                             }
                                                             setMiniDialog('Вы уверены?', <Confirmation action={action}/>)
                                                             showMiniDialog(true)
