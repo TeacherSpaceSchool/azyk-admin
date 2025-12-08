@@ -12,7 +12,8 @@ import * as snackbarActions from '../../redux/actions/snackbar'
 import {getBrands} from '../../src/gql/items';
 import {getSpecialPriceClients} from '../../src/gql/specialPrice';
 import Router from 'next/router'
-import BuyBasket from '../../components/dialog/BuyBasket/v1'
+import BuyBasketV1 from '../../components/dialog/BuyBasket/v1.js'
+import BuyBasketV2 from '../../components/dialog/BuyBasket/v2.js'
 import Image from '../../components/dialog/Image'
 import { useRouter } from 'next/router'
 import { getClient } from '../../src/gql/client'
@@ -320,7 +321,7 @@ const Catalog = React.memo((props) => {
                 </div>
                 <div className={isMobileApp?classes.buyM:classes.buyD} onClick={() => {
                     if(allPrice>0) {
-                        setMiniDialog('Купить', <BuyBasket
+                        setMiniDialog('Купить', <BuyBasketV2
                             agent={false}
                             client={client}
                             basket = {Object.values(basket)}

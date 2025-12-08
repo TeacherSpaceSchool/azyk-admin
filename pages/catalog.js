@@ -10,7 +10,8 @@ import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import * as snackbarActions from '../redux/actions/snackbar'
 import Router, {useRouter} from 'next/router'
-import BuyBasket from '../components/dialog/BuyBasket/v1.js'
+import BuyBasketV1 from '../components/dialog/BuyBasket/v1.js'
+import BuyBasketV2 from '../components/dialog/BuyBasket/v2.js'
 import SetPackage from '../components/dialog/SetPackage'
 import { getClient, getClients } from '../src/gql/client'
 import TextField from '@material-ui/core/TextField';
@@ -503,7 +504,7 @@ const Catalog = React.memo((props) => {
                     else {
                         if (allPrice) {
                             if (client) {
-                                setMiniDialog('Купить', <BuyBasket
+                                setMiniDialog('Купить', <BuyBasketV2
                                     geo={geo.current}
                                     agent
                                     client={client}
