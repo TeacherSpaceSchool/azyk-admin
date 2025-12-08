@@ -24,6 +24,7 @@ import {dayStartDefault, formatAmount, getGeoDistance, rowReverseDialog, unawait
 import { getDeliveryDate } from '../../../src/gql/deliveryDate';
 import { pdDDMMYYYYWW } from '../../../src/lib';
 import { putOfflineOrders } from '../../../src/service/idb/offlineOrders';
+import {checkInt} from '../../../redux/constants/other';
 
 const BuyBasketV2 =  React.memo(
     (props) =>{
@@ -191,7 +192,7 @@ const BuyBasketV2 =  React.memo(
                                     const baskets = Object.values(basket)
                                         .filter(b => b.count)
                                         .filter(b => {if (seen.has(b._id)) return false; seen.add(b._id); return true;})
-                                        .map(b => ({ _id: b._id, count: b.count }));
+                                        .map(b => ({ _id: b._id, count: checkInt(b.count)}));
                                     if(navigator.onLine) {
                                         if(agent&&geo&&client.address[0][1].includes(', ')) {
                                             let distance = getGeoDistance(geo.coords.latitude, geo.coords.longitude, ...(client.address[0][1].split(', ')))
