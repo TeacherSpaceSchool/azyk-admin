@@ -103,9 +103,9 @@ const FhoClient = React.memo((props) => {
     let imageRef = useRef(null);
     //render
     return (
-        <App pageName='ФХО клиента v4' showDistrict>
+        <App pageName='ФХО клиента v5' showDistrict>
             <Head>
-                <title>ФХО клиента v4</title>
+                <title>ФХО клиента v5</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
