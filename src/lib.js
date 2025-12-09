@@ -238,11 +238,11 @@ export const isEmpty = (value) => {
 export const maxImageSize = 25
 export const maxFileSize = 50
 
-export const checkImageInput = async (event) => {
+export const checkImageInput = (event) => {
     const file = event.target&&event.target.files[0]
     if(file&&file.size/1024/1024<maxImageSize)
         return {
-            upload: /*await resizeImg(*/file/*)*/,
+            upload: file,
             preview: URL.createObjectURL(file)
         }
 }

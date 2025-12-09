@@ -20,7 +20,8 @@ import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import RemoveIcon from '@material-ui/icons/Delete';
 import * as appActions from '../../../redux/actions/app'
-import {checkImageInput} from '../../../src/lib';
+import {checkImageInput, unawaited} from '../../../src/lib';
+import {resizeImg} from '../../../src/resizeImg';
 
 const Banners = React.memo((props) => {
     const router = useRouter();
@@ -31,13 +32,13 @@ const Banners = React.memo((props) => {
     let [previews, setPreviews] = useState(data.banners?data.banners.images:[]);
     let [uploads, setUploads] = useState([]);
     let [deletedImages, setDeletedImages] = useState([]);
-    let handleChangeImage = (async (event) => {
-        const image = await checkImageInput(event)
+    let handleChangeImage = (event) => {
+        const image = checkImageInput(event)
         if(image) {
-            setUploads([image.upload, ...uploads])
+            unawaited(async () => setUploads([await resizeImg(image.upload), ...uploads]))
             setPreviews([image.preview, ...previews])
         } else showSnackBar('Файл слишком большой')
-    })
+    }
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
     let imageRef = useRef(null);
     return (

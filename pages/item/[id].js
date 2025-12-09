@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { getSubBrands } from '../../src/gql/subBrand'
 import { getOrganizations } from '../../src/gql/organization'
 import { getItem, addItem, setItem, onoffItem, deleteItem } from '../../src/gql/items'
-import {checkInt, checkFloat, inputInt, inputFloat, formatAmount, checkImageInput} from '../../src/lib'
+import {checkInt, checkFloat, inputInt, inputFloat, formatAmount, checkImageInput, unawaited} from '../../src/lib'
 import itemStyle from '../../src/styleMUI/item/item'
 import { useRouter } from 'next/router'
 import Card from '@material-ui/core/Card';
@@ -55,9 +55,9 @@ const Item = React.memo((props) => {
     //categorys
     const defaultCategorys = ['A','B','C','D','Horeca']
     let [categorys, setCategorys] = useState(data.item?data.item.categorys:defaultCategorys);
-    let handleCategorys = (async (event) => {
+    let handleCategorys = (event) => {
         setCategorys(event.target.value)
-    })
+    }
     //organization
     let [organization, setOrganization] = useState(data.item?data.item.organization:profile.organization?{_id: profile.organization}:null);
     let handleOrganization =  (event) => {
@@ -87,13 +87,13 @@ const Item = React.memo((props) => {
     //image
     let [preview, setPreview] = useState(data.item?data.item.image:'/static/add.png');
     let [image, setImage] = useState(null);
-    let handleChangeImage = (async (event) => {
-        const image = await checkImageInput(event)
+    let handleChangeImage = (event) => {
+        const image = checkImageInput(event)
         if(image) {
-            setImage(image.upload)
+            unawaited(async () => setImage(await resizeImg(image.upload)))
             setPreview(image.preview)
         } else showSnackBar('Файл слишком большой')
-    })
+    }
     //render
     return (
         <App pageName={router.query.id==='new'?'Добавить':data.item?data.item.name:'Ничего не найдено'}>

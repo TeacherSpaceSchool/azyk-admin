@@ -22,10 +22,11 @@ import Button from '@material-ui/core/Button';
 import Router from 'next/router'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
-import {checkImageInput, checkInt} from '../../src/lib';
+import {checkImageInput, checkInt, unawaited} from '../../src/lib';
 import CardItem from '../../components/card/CardItem';
 import {viewModes} from '../../src/enum';
 import Confirmation from '../../components/dialog/Confirmation'
+import {resizeImg} from '../../src/resizeImg';
 
 const SubBrand = React.memo((props) => {
     const classes = subBrandStyle();
@@ -46,13 +47,13 @@ const SubBrand = React.memo((props) => {
     //image
     let [preview, setPreview] = useState(data.subBrand?data.subBrand.image:'/static/add.png');
     let [image, setImage] = useState(null);
-    let handleChangeImage = (async (event) => {
-        const image = await checkImageInput(event)
+    let handleChangeImage = (event) => {
+        const image = checkImageInput(event)
         if(image) {
-            setImage(image.upload)
+            unawaited(async () => setImage(await resizeImg(image.upload)))
             setPreview(image.preview)
         } else showSnackBar('Файл слишком большой')
-    })
+    }
     //status
     let [status, setStatus] = useState(data.subBrand?data.subBrand.status:'active');
     //miniInfo

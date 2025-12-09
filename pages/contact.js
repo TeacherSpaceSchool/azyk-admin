@@ -88,13 +88,13 @@ const Contact = React.memo((props) => {
     //image
     let [preview, setPreview] = useState(data.contact.image===''?'/static/add.png':data.contact.image);
     let [image, setImage] = useState(null);
-    let handleChangeImage = (async (event) => {
-        const image = await checkImageInput(event)
+    let handleChangeImage = (event) => {
+        const image = checkImageInput(event)
         if(image) {
             setImage(image.upload)
             setPreview(image.preview)
         } else showSnackBar('Файл слишком большой')
-    })
+    }
     //render
     return (
         <App pageName='Контакты'>

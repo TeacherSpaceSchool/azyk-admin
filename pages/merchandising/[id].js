@@ -40,8 +40,9 @@ import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import {checkImageInput, dayStartDefault, getClientTitle} from '../../src/lib';
+import {checkImageInput, dayStartDefault, getClientTitle, unawaited} from '../../src/lib';
 import {checkInt} from '../../redux/constants/other';
+import {resizeImg} from '../../src/resizeImg';
 
 const marks = [
     {
@@ -92,20 +93,22 @@ const Merchandising = React.memo((props) => {
     let [items, setItems] = useState([]);
     let [typeImage, setTypeImage] = useState('product');
     let [indexImage, setIndexImage] = useState(0);
-    let handleChangeImage = (async (event) => {
-        const image = await checkImageInput(event)
+    let handleChangeImage = (event) => {
+        const image = checkImageInput(event)
         if(image) {
             if(typeImage==='products') {
-                setImages([image.upload, ...images])
+                unawaited(async () => setImages([await resizeImg(image.upload), ...images]))
                 setPreviews([image.preview, ...previews])
             }
             else if(typeImage==='fhos') {
-                fhos[indexImage].images = [image.upload, ...fhos[indexImage].images]
-                fhos[indexImage].previews = [image.preview, ...fhos[indexImage].previews]
-                setFhos([...fhos])
+                unawaited(async () => {
+                    fhos[indexImage].images = [await resizeImg(image.upload), ...fhos[indexImage].images]
+                    fhos[indexImage].previews = [image.preview, ...fhos[indexImage].previews]
+                    setFhos([...fhos])
+                })
             }
         } else showSnackBar('Файл слишком большой')
-    })
+    }
     let [type, setType] = useState(data.merchandising?data.merchandising.type:types[0]);
     let handleType =  (event) => {
         setType(event.target.value)

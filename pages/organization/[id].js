@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import {deleteOrganization, getOrganization} from '../../src/gql/organization'
@@ -19,7 +19,7 @@ import { onoffOrganization, addOrganization, setOrganization } from '../../src/g
 import InputAdornment from '@material-ui/core/InputAdornment';
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Confirmation from '../../components/dialog/Confirmation'
-import {checkFileInput, checkImageInput, checkInt, formatAmount, inputInt} from '../../src/lib'
+import {checkFileInput, checkImageInput, checkInt, formatAmount, inputInt, unawaited} from '../../src/lib'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -28,6 +28,7 @@ import Geo from '../../components/dialog/Geo'
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import * as lib from '../../src/lib'
+import {resizeImg} from '../../src/resizeImg';
 
 const Organization = React.memo((props) => {
     const classes = organizationStyle();
@@ -124,13 +125,13 @@ const Organization = React.memo((props) => {
     })
     let [preview, setPreview] = useState(data.organization!==null?data.organization.image:'/static/add.png');
     let [image, setImage] = useState(null);
-    let handleChangeImage = (async (event) => {
-        const image = await checkImageInput(event)
+    let handleChangeImage = (event) => {
+        const image = checkImageInput(event)
         if(image) {
-            setImage(image.upload)
+            unawaited(async () => setImage(await resizeImg(image.upload)))
             setPreview(image.preview)
         } else showSnackBar('Файл слишком большой')
-    })
+    }
     //render
     return (
         <App pageName={router.query.id==='new'?'Добавить':data.organization!==null?data.organization.name:'Ничего не найдено'}>

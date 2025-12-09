@@ -22,7 +22,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Lightbox from 'react-awesome-lightbox';
 import HistoryAgents from '../dialog/HistoryAgents';
 import History from '@material-ui/icons/History';
-import {checkImageInput, getClientTitle, maxImageSize} from '../../src/lib';
+import {checkImageInput, getClientTitle, maxImageSize, unawaited} from '../../src/lib';
+import {resizeImg} from '../../src/resizeImg';
 
 const models = ['USS175', 'USS374', 'USS440', 'Super FD']
 
@@ -43,18 +44,20 @@ const CardEquipment = React.memo((props) => {
     const refImageInput = useRef()
     const clickImageInput = () => refImageInput.current.click()
     const handleChangeImage = async (event) => {
-        const image = await checkImageInput(event)
+        const image = checkImageInput(event)
         if(image) {
-            showLoad(true)
-            const res = await setEquipment({
-                _id: element._id,
-                image: image.upload
+            unawaited(async () => {
+                showLoad(true)
+                const res = await setEquipment({
+                    _id: element._id,
+                    image: await resizeImg(image.upload)
+                })
+                if(res==='OK')
+                    setPreview(image.preview)
+                else
+                    showSnackBar('Ошибка')
+                showLoad(false)
             })
-            if(res==='OK')
-                setPreview(image.preview)
-            else
-                showSnackBar('Ошибка')
-            showLoad(false)
         } else showSnackBar('Файл слишком большой')
     }
     let [number, setNumber] = useState(element&&element.number?element.number:'');

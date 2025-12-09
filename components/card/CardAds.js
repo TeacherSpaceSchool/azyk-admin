@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import Button from '@material-ui/core/Button';
 import CardActions from '@material-ui/core/CardActions';
 import { deleteAds, addAds, setAds } from '../../src/gql/ads'
-import {checkImageInput, checkInt, maxImageSize, selectedMainColor} from '../../src/lib'
+import {checkImageInput, checkInt, maxImageSize, selectedMainColor, unawaited} from '../../src/lib'
 import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as snackbarActions from '../../redux/actions/snackbar'
@@ -28,13 +28,13 @@ const CardAds = React.memo((props) => {
     //addCard
     let [preview, setPreview] = useState(element?element.image:'/static/add.png');
     let [image, setImage] = useState(null);
-    let handleChangeImage = (async (event) => {
-        const image = await checkImageInput(event)
+    let handleChangeImage = (event) => {
+        const image = checkImageInput(event)
         if(image) {
-            setImage(image.upload)
+            unawaited(async () => setImage(await resizeImg(image.upload)))
             setPreview(image.preview)
         } else showSnackBar('Файл слишком большой')
-    })
+    }
     let [title, setTitle] = useState(element?element.title:'');
     let handleTitle =  (event) => {
         setTitle(event.target.value)

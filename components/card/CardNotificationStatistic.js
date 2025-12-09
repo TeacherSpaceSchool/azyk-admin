@@ -9,9 +9,10 @@ import { addNotificationStatistic } from '../../src/gql/notificationStatisticAzy
 import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as snackbarActions from '../../redux/actions/snackbar'
-import {checkImageInput, isNotEmpty, pdDDMMYYHHMM} from '../../src/lib'
+import {checkImageInput, isNotEmpty, pdDDMMYYHHMM, unawaited} from '../../src/lib'
 import Confirmation from '../dialog/Confirmation'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
+import {resizeImg} from '../../src/resizeImg';
 
 const NotificationStatistic = React.memo((props) => {
     const classes = cardAdsStyle();
@@ -20,13 +21,13 @@ const NotificationStatistic = React.memo((props) => {
     //addCard
     let [preview, setPreview] = useState(element?element.icon:'/static/add.png');
     let [icon, setIcon] = useState(null);
-    let handleChangeIcon = (async (event) => {
-        const image = await checkImageInput(event)
+    let handleChangeIcon = (event) => {
+        const image = checkImageInput(event)
         if(image) {
-            setIcon(image.upload)
+            unawaited(async () => setIcon(await resizeImg(image.upload)))
             setPreview(image.preview)
         } else showSnackBar('Файл слишком большой')
-    })
+    }
     let [title, setTitle] = useState(element?element.title:'');
     let handleTitle =  (event) => {
         setTitle(event.target.value)
