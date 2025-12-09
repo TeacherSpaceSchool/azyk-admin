@@ -1,15 +1,24 @@
 let notificationUrl = 'https://azyk.store';
+// При установке — активируем сразу (если мы вызвали skipWaiting)
+self.addEventListener('install', event => {
+    event.waitUntil((async () => {
+        await self.skipWaiting();
+    })());
+});
 // Полная очистка всех кэшей при активации
 self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(cacheNames =>
-            // eslint-disable-next-line no-undef
-            Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)))
-        )
-    );
-
-    self.clients.claim();
-    self.skipWaiting();
+    event.waitUntil((async () => {
+        // Очистка всех кэшей
+        const cacheNames = await caches.keys();
+        // eslint-disable-next-line no-undef
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+        // Захват всех клиентов новым SW
+        await self.clients.claim();
+        // 🔥 Сообщаем всем вкладкам: "Я новый SW"
+        const clients = await self.clients.matchAll({includeUncontrolled: true});
+        for (const client of clients)
+            client.postMessage({type: 'reload'});
+    })());
 });
 //notification registered feature for getting update automatically from server api
 self.addEventListener('push', function (event) {
@@ -18,16 +27,6 @@ self.addEventListener('push', function (event) {
         :
         {title: 'AZYK.STORE', message: 'Не забудьте сделать свой заказ', tag: 'AZYK.STORE', url: 'https://azyk.store', icon: 'https://azyk.store/static/192x192.png'};
     event.waitUntil((async () => {
-        if(_data.type === 'forceUpdate') {
-            // Очистка всех кэшей
-            const cacheNames = await caches.keys();
-            // eslint-disable-next-line no-undef
-            await Promise.all(cacheNames.map(name => caches.delete(name)));
-            // Перезагрузка всех вкладок
-            const clientList = await self.clients.matchAll({ type: 'window' });
-            for (const client of clientList)
-                client.navigate(client.url);
-        }
         self.registration.showNotification(_data.title, {
             badge: 'https://azyk.store/static/192x192.png',
             body: _data.message,

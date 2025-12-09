@@ -55,8 +55,21 @@ const App = React.memo(props => {
 
     useEffect( () => {
         if(process.browser) {
+            //запуск idb
             unawaited(start)
+            //слушание инета
             window.addEventListener('offline', () => {showSnackBar('Нет подключения к Интернету')})
+            //обновление кеша
+            const handler = event => {
+                if (event.data&&event.data.type === 'reload')
+                    window.location.reload();
+            }
+            if (navigator&&navigator.serviceWorker)
+                navigator.serviceWorker.addEventListener('message', handler);
+            return () => {
+                if (navigator&&navigator.serviceWorker)
+                    navigator.serviceWorker.removeEventListener('message', handler);
+            };
         }
     }, [process.browser])
 
