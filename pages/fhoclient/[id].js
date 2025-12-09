@@ -58,10 +58,10 @@ const FhoClient = React.memo((props) => {
     let [lightboxImages, setLightboxImages] = useState([]);
     let [lightboxIndex, setLightboxIndex] = useState(0);
     let handleChangeImage = (event) => {
-        const file = imageRef.current?.files?.[0]
-        if(file) {
-            unawaited(async () => setUploads([await resizeImg(file), ...uploads]))
-            setPreviews([file, ...previews])
+        const image = checkImageInput(event)
+        if(image) {
+            unawaited(async () => setUploads([await resizeImg(image.upload), ...uploads]))
+            setPreviews([image.preview, ...previews])
         } else showSnackBar('Файл слишком большой')
     }
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
@@ -103,9 +103,9 @@ const FhoClient = React.memo((props) => {
     let imageRef = useRef(null);
     //render
     return (
-        <App pageName='ФХО клиента v3' showDistrict>
+        <App pageName='ФХО клиента v4' showDistrict>
             <Head>
-                <title>ФХО клиента v3</title>
+                <title>ФХО клиента v4</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
@@ -162,6 +162,7 @@ const FhoClient = React.memo((props) => {
                                     <div className={classes.value}>{getClientTitle(client)}</div>
                                 </a>
                             }
+                            {router.query.id!=='new'?<div className={classes.value}>Пожалуйста, подождите 5 секунд после съемки фото</div>:null}
                             {router.query.id!=='new'?<div className={classes.box}>
                                 <Typography component='legend' style={!uploads.length&&!previews.length?{color:'red'}:{}}>Фотографии</Typography>
                                 <GridList className={classes.gridList} cols={isMobileApp?2.5:6.5} style={{display: 'flex'}} wrap={'wrap'}>
