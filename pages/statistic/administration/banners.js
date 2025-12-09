@@ -20,7 +20,7 @@ import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import RemoveIcon from '@material-ui/icons/Delete';
 import * as appActions from '../../../redux/actions/app'
-import {checkImageInput, unawaited} from '../../../src/lib';
+import {checkImageInput, checkImageInput1, unawaited} from '../../../src/lib';
 import {resizeImg} from '../../../src/resizeImg';
 
 const Banners = React.memo((props) => {
@@ -33,7 +33,7 @@ const Banners = React.memo((props) => {
     let [uploads, setUploads] = useState([]);
     let [deletedImages, setDeletedImages] = useState([]);
     let handleChangeImage = (event) => {
-        const image = checkImageInput(event)
+        const image = checkImageInput1(event)
         if(image) {
             unawaited(async () => setUploads([await resizeImg(image.upload), ...uploads]))
             setPreviews([image.preview, ...previews])

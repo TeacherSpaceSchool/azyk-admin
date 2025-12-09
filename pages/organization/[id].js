@@ -19,7 +19,15 @@ import { onoffOrganization, addOrganization, setOrganization } from '../../src/g
 import InputAdornment from '@material-ui/core/InputAdornment';
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Confirmation from '../../components/dialog/Confirmation'
-import {checkFileInput, checkImageInput, checkInt, formatAmount, inputInt, unawaited} from '../../src/lib'
+import {
+    checkFileInput,
+    checkImageInput,
+    checkImageInput1,
+    checkInt,
+    formatAmount,
+    inputInt,
+    unawaited
+} from '../../src/lib'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -126,7 +134,7 @@ const Organization = React.memo((props) => {
     let [preview, setPreview] = useState(data.organization!==null?data.organization.image:'/static/add.png');
     let [image, setImage] = useState(null);
     let handleChangeImage = (event) => {
-        const image = checkImageInput(event)
+        const image = checkImageInput1(event)
         if(image) {
             unawaited(async () => setImage(await resizeImg(image.upload)))
             setPreview(image.preview)

@@ -9,7 +9,7 @@ import { addNotificationStatistic } from '../../src/gql/notificationStatisticAzy
 import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as snackbarActions from '../../redux/actions/snackbar'
-import {checkImageInput, isNotEmpty, pdDDMMYYHHMM, unawaited} from '../../src/lib'
+import {checkImageInput, checkImageInput1, isNotEmpty, pdDDMMYYHHMM, unawaited} from '../../src/lib'
 import Confirmation from '../dialog/Confirmation'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import {resizeImg} from '../../src/resizeImg';
@@ -22,7 +22,7 @@ const NotificationStatistic = React.memo((props) => {
     let [preview, setPreview] = useState(element?element.icon:'/static/add.png');
     let [icon, setIcon] = useState(null);
     let handleChangeIcon = (event) => {
-        const image = checkImageInput(event)
+        const image = checkImageInput1(event)
         if(image) {
             unawaited(async () => setIcon(await resizeImg(image.upload)))
             setPreview(image.preview)
