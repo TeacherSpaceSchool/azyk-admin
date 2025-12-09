@@ -162,7 +162,7 @@ const FhoClient = React.memo((props) => {
                                     <div className={classes.value}>{getClientTitle(client)}</div>
                                 </a>
                             }
-                            {router.query.id!=='new'?<div className={classes.value}>Подождите 5 секунд после фотографирования</div>:null}
+                            {router.query.id!=='new'?<div className={classes.value}>Подождите 10 секунд после фотографирования</div>:null}
                             {router.query.id!=='new'?<div className={classes.box}>
                                 <Typography component='legend' style={!uploads.length&&!previews.length?{color:'red'}:{}}>Фотографии</Typography>
                                 <GridList className={classes.gridList} cols={isMobileApp?2.5:6.5} style={{display: 'flex'}} wrap={'wrap'}>

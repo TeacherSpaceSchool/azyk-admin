@@ -228,7 +228,7 @@ const Merchandising = React.memo((props) => {
                                 :
                                 null
                             }
-                                <div className={classes.value}>Подождите 5 секунд после фотографирования</div>
+                                <div className={classes.value}>Подождите 10 секунд после фотографирования</div>
                             {router.query.id==='new'&&profile.role!=='client'?
                                 <>
                                 <Autocomplete
