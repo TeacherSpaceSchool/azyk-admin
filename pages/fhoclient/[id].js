@@ -26,7 +26,7 @@ import GridListTileBar from '@material-ui/core/GridListTileBar';
 import RemoveIcon from '@material-ui/icons/Delete';
 import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
-import {checkImageInput, dayStartDefault, getClientTitle, maxImageSize, pdDDMMYYHHMM} from '../../src/lib';
+import {checkImageInput, dayStartDefault, getClientTitle, maxImageSize, pdDDMMYYHHMM, unawaited} from '../../src/lib';
 
 const FhoClient = React.memo((props) => {
     const classes = organizationStyle();
@@ -55,7 +55,7 @@ const FhoClient = React.memo((props) => {
     let handleChangeImage = (event) => {
         const image = checkImageInput(event)
         if(image) {
-            setUploads([image.upload, ...uploads])
+            unawaited(async () => setUploads([await resizeImg(image.upload), ...uploads]))
             setPreviews([image.preview, ...previews])
         } else showSnackBar('Файл слишком большой')
     }
