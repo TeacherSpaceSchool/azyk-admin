@@ -28,12 +28,9 @@ import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
 import {
     checkImageInput,
-    checkImageInput1,
     dayStartDefault,
     getClientTitle,
-    maxImageSize,
-    pdDDMMYYHHMM,
-    unawaited
+    pdDDMMYYHHMM, unawaited
 } from '../../src/lib';
 
 const FhoClient = React.memo((props) => {
@@ -61,9 +58,9 @@ const FhoClient = React.memo((props) => {
     let [lightboxImages, setLightboxImages] = useState([]);
     let [lightboxIndex, setLightboxIndex] = useState(0);
     let handleChangeImage = (event) => {
-        const image = checkImageInput1(event)
+        const image = checkImageInput(event)
         if(image) {
-            setUploads([image.upload, ...uploads])
+            unawaited(async () => setUploads([await resizeImg(image.upload), ...uploads]))
             setPreviews([image.preview, ...previews])
         } else showSnackBar('Файл слишком большой')
     }
@@ -235,10 +232,6 @@ const FhoClient = React.memo((props) => {
                                         <Button onClick={() => {
                                             if(uploads.length) {
                                                 const action = async () => {
-                                                    for(let i=0; i<uploads.length; i++) {
-                                                        uploads[i] = await resizeImg(uploads[i])
-                                                    }
-
                                                     await setFhoClient({_id: router.query.id, deletedImages, uploads})
                                                     if (['агент', 'client'].includes(profile.role))
                                                         router.back()
@@ -274,7 +267,6 @@ const FhoClient = React.memo((props) => {
                 </Card>
             <input
                 accept='image/*'
-                capture
                 style={{ display: 'none' }}
                 ref={imageRef}
                 type='file'

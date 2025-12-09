@@ -40,7 +40,7 @@ import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import {checkImageInput, checkImageInput1, dayStartDefault, getClientTitle, unawaited} from '../../src/lib';
+import {checkImageInput, dayStartDefault, getClientTitle, unawaited} from '../../src/lib';
 import {checkInt} from '../../redux/constants/other';
 import {resizeImg} from '../../src/resizeImg';
 
@@ -94,7 +94,7 @@ const Merchandising = React.memo((props) => {
     let [typeImage, setTypeImage] = useState('product');
     let [indexImage, setIndexImage] = useState(0);
     let handleChangeImage = (event) => {
-        const image = checkImageInput1(event)
+        const image = checkImageInput(event)
         if(image) {
             if(typeImage==='products') {
                 unawaited(async () => setImages([await resizeImg(image.upload), ...images]))

@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import Button from '@material-ui/core/Button';
 import CardActions from '@material-ui/core/CardActions';
 import { deleteAds, addAds, setAds } from '../../src/gql/ads'
-import {checkImageInput, checkImageInput1, checkInt, maxImageSize, selectedMainColor, unawaited} from '../../src/lib'
+import {checkImageInput, checkInt, selectedMainColor, unawaited} from '../../src/lib'
 import TextField from '@material-ui/core/TextField';
 import { bindActionCreators } from 'redux'
 import * as snackbarActions from '../../redux/actions/snackbar'
@@ -29,7 +29,7 @@ const CardAds = React.memo((props) => {
     let [preview, setPreview] = useState(element?element.image:'/static/add.png');
     let [image, setImage] = useState(null);
     let handleChangeImage = (event) => {
-        const image = checkImageInput1(event)
+        const image = checkImageInput(event)
         if(image) {
             unawaited(async () => setImage(await resizeImg(image.upload)))
             setPreview(image.preview)

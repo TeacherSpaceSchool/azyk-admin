@@ -20,8 +20,7 @@ import Geo from '../components/dialog/Geo'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Sign from '../components/dialog/Sign';
-import {checkImageInput, checkImageInput1, maxImageSize} from '../src/lib';
-import {resizeImg} from '../src/resizeImg';
+import {checkImageInput} from '../src/lib';
 
 const Contact = React.memo((props) => {
     const classes = contactStyle();
@@ -89,7 +88,7 @@ const Contact = React.memo((props) => {
     let [preview, setPreview] = useState(data.contact.image===''?'/static/add.png':data.contact.image);
     let [image, setImage] = useState(null);
     let handleChangeImage = (event) => {
-        const image = checkImageInput1(event)
+        const image = checkImageInput(event)
         if(image) {
             setImage(image.upload)
             setPreview(image.preview)

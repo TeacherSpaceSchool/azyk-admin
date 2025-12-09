@@ -247,15 +247,6 @@ export const checkImageInput = (event) => {
         }
 }
 
-export const checkImageInput1 = (event) => {
-    const file = event.target&&event.target.files[0]
-    if(file&&file.size/1024/1024<maxImageSize)
-        return {
-            upload: file,
-            preview: URL.createObjectURL(file)
-        }
-}
-
 export const checkFileInput = (event) => {
     const file = event.target&&event.target.files[0]
     if(file&&file.size/1024/1024<maxFileSize)

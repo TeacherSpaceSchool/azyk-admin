@@ -22,7 +22,7 @@ import Button from '@material-ui/core/Button';
 import Router from 'next/router'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
-import {checkImageInput, checkImageInput1, checkInt, unawaited} from '../../src/lib';
+import {checkImageInput, checkInt, unawaited} from '../../src/lib';
 import CardItem from '../../components/card/CardItem';
 import {viewModes} from '../../src/enum';
 import Confirmation from '../../components/dialog/Confirmation'
@@ -48,7 +48,7 @@ const SubBrand = React.memo((props) => {
     let [preview, setPreview] = useState(data.subBrand?data.subBrand.image:'/static/add.png');
     let [image, setImage] = useState(null);
     let handleChangeImage = (event) => {
-        const image = checkImageInput1(event)
+        const image = checkImageInput(event)
         if(image) {
             unawaited(async () => setImage(await resizeImg(image.upload)))
             setPreview(image.preview)

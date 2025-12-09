@@ -22,7 +22,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Lightbox from 'react-awesome-lightbox';
 import HistoryAgents from '../dialog/HistoryAgents';
 import History from '@material-ui/icons/History';
-import {checkImageInput, checkImageInput1, getClientTitle, maxImageSize, unawaited} from '../../src/lib';
+import {checkImageInput, getClientTitle, unawaited} from '../../src/lib';
 import {resizeImg} from '../../src/resizeImg';
 
 const models = ['USS175', 'USS374', 'USS440', 'Super FD']
@@ -44,7 +44,7 @@ const CardEquipment = React.memo((props) => {
     const refImageInput = useRef()
     const clickImageInput = () => refImageInput.current.click()
     const handleChangeImage = async (event) => {
-        const image = checkImageInput1(event)
+        const image = checkImageInput(event)
         if(image) {
             unawaited(async () => {
                 showLoad(true)

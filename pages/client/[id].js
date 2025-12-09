@@ -17,7 +17,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Confirmation from '../../components/dialog/Confirmation'
 import Geo from '../../components/dialog/Geo'
 import { useRouter } from 'next/router'
-import {checkImageInput, checkImageInput1, cities, pdDDMMYYHHMM, unawaited} from '../../src/lib'
+import {checkImageInput, cities, pdDDMMYYHHMM, unawaited} from '../../src/lib'
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import * as snackbarActions from '../../redux/actions/snackbar'
@@ -106,7 +106,7 @@ const Client = React.memo((props) => {
     let [preview, setPreview] = useState(data.client?data.client.image:'/static/add.png');
     let [image, setImage] = useState(null);
     let handleChangeImage = (event) => {
-        const image = checkImageInput1(event)
+        const image = checkImageInput(event)
         if(image) {
             unawaited(async () => setImage(await resizeImg(image.upload)))
             setPreview(image.preview)

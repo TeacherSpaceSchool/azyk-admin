@@ -14,7 +14,6 @@ import {
     formatAmount,
     checkImageInput,
     unawaited,
-    checkImageInput1
 } from '../../src/lib'
 import itemStyle from '../../src/styleMUI/item/item'
 import { useRouter } from 'next/router'
@@ -97,7 +96,7 @@ const Item = React.memo((props) => {
     let [preview, setPreview] = useState(data.item?data.item.image:'/static/add.png');
     let [image, setImage] = useState(null);
     let handleChangeImage = (event) => {
-        const image = checkImageInput1(event)
+        const image = checkImageInput(event)
         if(image) {
             unawaited(async () => setImage(await resizeImg(image.upload)))
             setPreview(image.preview)

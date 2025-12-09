@@ -22,7 +22,6 @@ import Confirmation from '../../components/dialog/Confirmation'
 import {
     checkFileInput,
     checkImageInput,
-    checkImageInput1,
     checkInt,
     formatAmount,
     inputInt,
@@ -134,7 +133,7 @@ const Organization = React.memo((props) => {
     let [preview, setPreview] = useState(data.organization!==null?data.organization.image:'/static/add.png');
     let [image, setImage] = useState(null);
     let handleChangeImage = (event) => {
-        const image = checkImageInput1(event)
+        const image = checkImageInput(event)
         if(image) {
             unawaited(async () => setImage(await resizeImg(image.upload)))
             setPreview(image.preview)
