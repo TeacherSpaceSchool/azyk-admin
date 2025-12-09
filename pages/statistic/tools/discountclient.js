@@ -22,12 +22,10 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import * as snackbarActions from '../../../redux/actions/snackbar'
-import dynamic from 'next/dynamic'
 import {checkInt, formatAmount} from '../../../src/lib'
 import {getOrganizations} from '../../../src/gql/organization';
-
-const Confirmation = dynamic(() => import('../../../components/dialog/Confirmation'))
-const SetDiscountClient = dynamic(() => import('../../../components/dialog/SetDiscountClient'))
+import Confirmation from '../../../components/dialog/Confirmation'
+import SetDiscountClient from '../../../components/dialog/SetDiscountClient'
 
 const DiscountClient = React.memo((props) => {
     const classes = pageListStyle();

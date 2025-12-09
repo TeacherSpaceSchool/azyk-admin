@@ -46,9 +46,11 @@ const Tables =  React.memo(({list, forwarderData, pagination, app, user, appActi
             </span>
             &nbsp;&nbsp;&nbsp;
             <span style={{cursor: 'pointer'}} onClick={async () => {
-                if(isMobileApp)
-                    await document.getElementById('mobile-menu-button').click();
-                document.getElementById('filter-button').click();
+                if(document.getElementById('filter-button')) {
+                    if (isMobileApp)
+                        await document.getElementById('mobile-menu-button').click();
+                    document.getElementById('filter-button').click();
+                }
             }}>
                 <span style={{color: '#707070'}}>Рейс:</span>&nbsp;
                 <span style={!filter?{color: 'red'}:{}}>{filter?filter:'указать'}</span>

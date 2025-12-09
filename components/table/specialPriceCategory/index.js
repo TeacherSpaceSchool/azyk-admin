@@ -21,9 +21,11 @@ const Tables =  React.memo(({middleList, list, specialPriceByItem, setSpecialPri
             style={{display: 'flex', alignItems: 'center', zIndex: 1000, padding: 5, height: 31, position: 'sticky', background: 'white', top: 0, fontWeight: 600, borderRight: '1px solid #00000040', borderBottom: '1px solid #00000040'}}>
             {isEmpty(middleList)?<>
                 <span style={{cursor: 'pointer'}} onClick={async () => {
-                    if(isMobileApp)
-                        await document.getElementById('mobile-menu-button').click();
-                    document.getElementById('filter-button').click();
+                    if(document.getElementById('filter-button')) {
+                        if (isMobileApp)
+                            await document.getElementById('mobile-menu-button').click();
+                        document.getElementById('filter-button').click();
+                    }
                 }}>
                         <span style={{color: '#707070'}}>Категория:</span>&nbsp;
                     <span style={!filter?{color: !filter?'red':'black'}:{}}>{filter?filter:'указать'}</span>

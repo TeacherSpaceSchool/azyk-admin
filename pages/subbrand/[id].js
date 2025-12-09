@@ -3,14 +3,7 @@ import React, {useState, useEffect, useRef, useCallback} from 'react';
 import App from '../../layouts/App';
 import { connect } from 'react-redux'
 import { getOrganizations } from '../../src/gql/organization'
-import {
-    getSubBrand,
-    setSubBrand,
-    deleteSubBrand,
-    addSubBrand,
-    onoffSubBrand,
-    setSubBrandForItems
-} from '../../src/gql/subBrand'
+import {getSubBrand, setSubBrand, deleteSubBrand, addSubBrand, onoffSubBrand, setSubBrandForItems} from '../../src/gql/subBrand'
 import { getItems } from '../../src/gql/items'
 import subBrandStyle from '../../src/styleMUI/district/district'
 import { useRouter } from 'next/router'
@@ -27,15 +20,12 @@ import * as snackbarActions from '../../redux/actions/snackbar'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Router from 'next/router'
-import dynamic from 'next/dynamic'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
-import {checkInt, maxImageSize} from '../../src/lib';
+import {checkImageInput, checkInt} from '../../src/lib';
 import CardItem from '../../components/card/CardItem';
 import {viewModes} from '../../src/enum';
-import {resizeImg} from '../../src/resizeImg';
-
-const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
+import Confirmation from '../../components/dialog/Confirmation'
 
 const SubBrand = React.memo((props) => {
     const classes = subBrandStyle();
@@ -57,10 +47,10 @@ const SubBrand = React.memo((props) => {
     let [preview, setPreview] = useState(data.subBrand?data.subBrand.image:'/static/add.png');
     let [image, setImage] = useState(null);
     let handleChangeImage = (async (event) => {
-        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            let image = await resizeImg(event.target.files[0])
-            setImage(image)
-            setPreview(URL.createObjectURL(event.target.files[0]))
+        const image = await checkImageInput(event)
+        if(image) {
+            setImage(image.upload)
+            setPreview(image.preview)
         } else showSnackBar('Файл слишком большой')
     })
     //status

@@ -18,7 +18,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import Confirmation from '../../../components/dialog/Confirmation'
-import {maxFileSize} from '../../../src/lib';
+import {checkFileInput, maxFileSize, maxImageSize} from '../../../src/lib';
 
 const UploadItems = React.memo((props) => {
     const classes = pageListStyle();
@@ -44,8 +44,9 @@ const UploadItems = React.memo((props) => {
         })()
     }, [city])
     let handleChangeDocument = ((event) => {
-        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxFileSize)
-            setDocument(event.target.files[0])
+        const file = checkFileInput(event)
+        if(file)
+            setDocument(file)
         else showSnackBar('Файл слишком большой')
     })
     return (

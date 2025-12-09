@@ -17,7 +17,7 @@ import { bindActionCreators } from 'redux'
 import * as appActions from '../../../redux/actions/app'
 import * as snackbarActions from '../../../redux/actions/snackbar'
 import Button from '@material-ui/core/Button';
-import {maxFileSize} from '../../../src/lib';
+import {checkFileInput, maxFileSize, maxImageSize} from '../../../src/lib';
 
 const CheckIntegrateClient = React.memo((props) => {
 
@@ -36,8 +36,9 @@ const CheckIntegrateClient = React.memo((props) => {
     const initialRender = useRef(true);
     let [organizations, setOrganizations] = useState(data.organizations);
     let handleChangeDocument1 = ((event) => {
-        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxFileSize)
-            setDocument1(event.target.files[0])
+        const file = checkFileInput(event)
+        if(file)
+            setDocument1(file)
         else showSnackBar('Файл слишком большой')
     })
     useEffect(() => {

@@ -26,7 +26,7 @@ import GridListTileBar from '@material-ui/core/GridListTileBar';
 import RemoveIcon from '@material-ui/icons/Delete';
 import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
-import {dayStartDefault, getClientTitle, maxImageSize, pdDDMMYYHHMM} from '../../src/lib';
+import {checkImageInput, dayStartDefault, getClientTitle, maxImageSize, pdDDMMYYHHMM} from '../../src/lib';
 
 const FhoClient = React.memo((props) => {
     const classes = organizationStyle();
@@ -53,10 +53,10 @@ const FhoClient = React.memo((props) => {
     let [lightboxImages, setLightboxImages] = useState([]);
     let [lightboxIndex, setLightboxIndex] = useState(0);
     let handleChangeImage = (async (event) => {
-        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            let image = await resizeImg(event.target.files[0])
-            setUploads([image, ...uploads])
-            setPreviews([URL.createObjectURL(event.target.files[0]), ...previews])
+        const image = await checkImageInput(event)
+        if(image) {
+            setUploads([image.upload, ...uploads])
+            setPreviews([image.preview, ...previews])
         } else showSnackBar('Файл слишком большой')
     })
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;

@@ -19,7 +19,7 @@ import { onoffOrganization, addOrganization, setOrganization } from '../../src/g
 import InputAdornment from '@material-ui/core/InputAdornment';
 import * as snackbarActions from '../../redux/actions/snackbar'
 import Confirmation from '../../components/dialog/Confirmation'
-import {checkInt, formatAmount, inputInt, maxFileSize, maxImageSize} from '../../src/lib'
+import {checkFileInput, checkImageInput, checkInt, formatAmount, inputInt} from '../../src/lib'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -28,7 +28,6 @@ import Geo from '../../components/dialog/Geo'
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import * as lib from '../../src/lib'
-import {resizeImg} from '../../src/resizeImg';
 
 const Organization = React.memo((props) => {
     const classes = organizationStyle();
@@ -118,17 +117,18 @@ const Organization = React.memo((props) => {
     let [catalog, setCatalog] = useState(null);
     const catalogInput = useRef(true);
     let handleChangeCatalog = ((event) => {
-        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxFileSize)
-            setCatalog(event.target.files[0])
+        const file = checkFileInput(event)
+        if(file)
+            setCatalog(file)
         else showSnackBar('Файл слишком большой')
     })
     let [preview, setPreview] = useState(data.organization!==null?data.organization.image:'/static/add.png');
     let [image, setImage] = useState(null);
     let handleChangeImage = (async (event) => {
-        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            let image = await resizeImg(event.target.files[0])
-            setImage(image)
-            setPreview(URL.createObjectURL(event.target.files[0]))
+        const image = await checkImageInput(event)
+        if(image) {
+            setImage(image.upload)
+            setPreview(image.preview)
         } else showSnackBar('Файл слишком большой')
     })
     //render

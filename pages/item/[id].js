@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { getSubBrands } from '../../src/gql/subBrand'
 import { getOrganizations } from '../../src/gql/organization'
 import { getItem, addItem, setItem, onoffItem, deleteItem } from '../../src/gql/items'
-import {checkInt, checkFloat, inputInt, inputFloat, maxImageSize, formatAmount} from '../../src/lib'
+import {checkInt, checkFloat, inputInt, inputFloat, formatAmount, checkImageInput} from '../../src/lib'
 import itemStyle from '../../src/styleMUI/item/item'
 import { useRouter } from 'next/router'
 import Card from '@material-ui/core/Card';
@@ -88,10 +88,10 @@ const Item = React.memo((props) => {
     let [preview, setPreview] = useState(data.item?data.item.image:'/static/add.png');
     let [image, setImage] = useState(null);
     let handleChangeImage = (async (event) => {
-        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            let image = await resizeImg(event.target.files[0])
-            setImage(image)
-            setPreview(URL.createObjectURL(event.target.files[0]))
+        const image = await checkImageInput(event)
+        if(image) {
+            setImage(image.upload)
+            setPreview(image.preview)
         } else showSnackBar('Файл слишком большой')
     })
     //render

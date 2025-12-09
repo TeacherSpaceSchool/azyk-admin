@@ -92,9 +92,11 @@ const FinanceReport = React.memo((props) => {
     }, [list])
     //
     useEffect(() => {if(!filter) (async () => {
-        if(isMobileApp)
-            await document.getElementById('mobile-menu-button').click();
-        document.getElementById('filter-button').click();
+        if(document.getElementById('filter-button')) {
+            if (isMobileApp)
+                await document.getElementById('mobile-menu-button').click();
+            document.getElementById('filter-button').click();
+        }
     })()}, [filter])
     //showSetting
     const [showSetting, setShowSetting] = useState(false)

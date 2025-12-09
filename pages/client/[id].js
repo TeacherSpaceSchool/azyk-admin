@@ -17,7 +17,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import Confirmation from '../../components/dialog/Confirmation'
 import Geo from '../../components/dialog/Geo'
 import { useRouter } from 'next/router'
-import {cities, maxImageSize, pdDDMMYYHHMM} from '../../src/lib'
+import {checkImageInput, cities, pdDDMMYYHHMM} from '../../src/lib'
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import * as snackbarActions from '../../redux/actions/snackbar'
@@ -26,7 +26,6 @@ import { getClientGqlSsr } from '../../src/getClientGQL'
 import { validPhone } from '../../src/lib'
 import initialApp from '../../src/initialApp'
 import {getClientNetworks} from '../../src/gql/clientNetwork';
-import {resizeImg} from '../../src/resizeImg';
 
 const withoutNetwork = {name: 'Без сети', _id: null}
 
@@ -106,10 +105,10 @@ const Client = React.memo((props) => {
     let [preview, setPreview] = useState(data.client?data.client.image:'/static/add.png');
     let [image, setImage] = useState(null);
     let handleChangeImage = (async (event) => {
-        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            let image = await resizeImg(event.target.files[0])
-            setImage(image)
-            setPreview(URL.createObjectURL(event.target.files[0]))
+        const image = await checkImageInput(event)
+        if(image) {
+            setImage(image.upload)
+            setPreview(image.preview)
         } else showSnackBar('Файл слишком большой')
     })
     //newPass

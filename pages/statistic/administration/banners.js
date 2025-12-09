@@ -10,19 +10,17 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
-import {resizeImg} from '../../../src/resizeImg'
 import { useRouter } from 'next/router'
 import Router from 'next/router'
 import * as snackbarActions from '../../../redux/actions/snackbar'
 import Confirmation from '../../../components/dialog/Confirmation'
 import { getClientGqlSsr } from '../../../src/getClientGQL'
-import Typography from '@material-ui/core/Typography';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import RemoveIcon from '@material-ui/icons/Delete';
 import * as appActions from '../../../redux/actions/app'
-import {maxImageSize} from '../../../src/lib';
+import {checkImageInput} from '../../../src/lib';
 
 const Banners = React.memo((props) => {
     const router = useRouter();
@@ -34,10 +32,10 @@ const Banners = React.memo((props) => {
     let [uploads, setUploads] = useState([]);
     let [deletedImages, setDeletedImages] = useState([]);
     let handleChangeImage = (async (event) => {
-        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            let image = await resizeImg(event.target.files[0])
-            setUploads([image, ...uploads])
-            setPreviews([URL.createObjectURL(event.target.files[0]), ...previews])
+        const image = await checkImageInput(event)
+        if(image) {
+            setUploads([image.upload, ...uploads])
+            setPreviews([image.preview, ...previews])
         } else showSnackBar('Файл слишком большой')
     })
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;

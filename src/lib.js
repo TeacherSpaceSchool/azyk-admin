@@ -1,4 +1,5 @@
 import {viewModes} from './enum';
+import {resizeImg} from './resizeImg';
 
 const regexpUA = /(Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|iOS|Mobile)/
 
@@ -236,6 +237,21 @@ export const isEmpty = (value) => {
 
 export const maxImageSize = 25
 export const maxFileSize = 50
+
+export const checkImageInput = async (event) => {
+    const file = event.target&&event.target.files[0]
+    if(file&&file.size/1024/1024<maxImageSize)
+        return {
+            upload: await resizeImg(file),
+            preview: URL.createObjectURL(file)
+        }
+}
+
+export const checkFileInput = (event) => {
+    const file = event.target&&event.target.files[0]
+    if(file&&file.size/1024/1024<maxFileSize)
+        return file
+}
 
 export const unawaited = (func) => setTimeout(async () => await func())
 

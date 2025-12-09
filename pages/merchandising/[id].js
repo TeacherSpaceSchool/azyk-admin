@@ -11,7 +11,6 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
-import {resizeImg} from '../../src/resizeImg'
 import { useRouter } from 'next/router'
 import FormControl from '@material-ui/core/FormControl';
 import Router from 'next/router'
@@ -41,7 +40,7 @@ import Lightbox from 'react-awesome-lightbox';
 import * as appActions from '../../redux/actions/app'
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import {dayStartDefault, getClientTitle, maxImageSize} from '../../src/lib';
+import {checkImageInput, dayStartDefault, getClientTitle} from '../../src/lib';
 import {checkInt} from '../../redux/constants/other';
 
 const marks = [
@@ -94,15 +93,15 @@ const Merchandising = React.memo((props) => {
     let [typeImage, setTypeImage] = useState('product');
     let [indexImage, setIndexImage] = useState(0);
     let handleChangeImage = (async (event) => {
-        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            let image = await resizeImg(event.target.files[0])
+        const image = await checkImageInput(event)
+        if(image) {
             if(typeImage==='products') {
-                setImages([image, ...images])
-                setPreviews([URL.createObjectURL(event.target.files[0]), ...previews])
+                setImages([image.upload, ...images])
+                setPreviews([image.preview, ...previews])
             }
             else if(typeImage==='fhos') {
-                fhos[indexImage].images = [image, ...fhos[indexImage].images]
-                fhos[indexImage].previews = [URL.createObjectURL(event.target.files[0]), ...fhos[indexImage].previews]
+                fhos[indexImage].images = [image.upload, ...fhos[indexImage].images]
+                fhos[indexImage].previews = [image.preview, ...fhos[indexImage].previews]
                 setFhos([...fhos])
             }
         } else showSnackBar('Файл слишком большой')

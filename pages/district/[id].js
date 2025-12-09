@@ -21,15 +21,14 @@ import * as snackbarActions from '../../redux/actions/snackbar'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Router from 'next/router'
-import dynamic from 'next/dynamic'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import {getWarehouses} from '../../src/gql/warehouse';
 import {getEmployments} from '../../src/gql/employment';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import Confirmation from '../../components/dialog/Confirmation'
+import GeoRouteAgent from '../../components/dialog/GeoRouteAgent'
 
-const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
-const GeoRouteAgent = dynamic(() => import('../../components/dialog/GeoRouteAgent'))
 const defaultWarehouse = {name: 'Основной'}
 
 const District = React.memo((props) => {

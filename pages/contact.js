@@ -20,7 +20,7 @@ import Geo from '../components/dialog/Geo'
 import { getClientGqlSsr } from '../src/getClientGQL'
 import initialApp from '../src/initialApp'
 import Sign from '../components/dialog/Sign';
-import {maxImageSize} from '../src/lib';
+import {checkImageInput, maxImageSize} from '../src/lib';
 import {resizeImg} from '../src/resizeImg';
 
 const Contact = React.memo((props) => {
@@ -89,10 +89,10 @@ const Contact = React.memo((props) => {
     let [preview, setPreview] = useState(data.contact.image===''?'/static/add.png':data.contact.image);
     let [image, setImage] = useState(null);
     let handleChangeImage = (async (event) => {
-        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            let image = await resizeImg(event.target.files[0])
-            setImage(image)
-            setPreview(URL.createObjectURL(event.target.files[0]))
+        const image = await checkImageInput(event)
+        if(image) {
+            setImage(image.upload)
+            setPreview(image.preview)
         } else showSnackBar('Файл слишком большой')
     })
     //render

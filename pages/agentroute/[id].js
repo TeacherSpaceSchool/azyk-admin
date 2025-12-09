@@ -22,15 +22,13 @@ import * as snackbarActions from '../../redux/actions/snackbar'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Router from 'next/router'
-import dynamic from 'next/dynamic'
 import { getClientGqlSsr } from '../../src/getClientGQL'
 import initialApp from '../../src/initialApp'
 import VerticalAlignBottom from '@material-ui/icons/VerticalAlignBottom';
 import VerticalAlignTop from '@material-ui/icons/VerticalAlignTop';
 import GeoRouteAgent from '../../components/dialog/GeoRouteAgent'
 import {getDistrict} from '../../src/gql/district';
-
-const Confirmation = dynamic(() => import('../../components/dialog/Confirmation'))
+import Confirmation from '../../components/dialog/Confirmation'
 
 const AgentRoute = React.memo((props) => {
     const classes = agentRouteStyle();

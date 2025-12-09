@@ -19,7 +19,7 @@ import Button from '@material-ui/core/Button';
 import * as mini_dialogActions from '../../../redux/actions/mini_dialog'
 import Confirmation from '../../../components/dialog/Confirmation'
 import { getAgentRoutes } from '../../../src/gql/agentRoute'
-import {maxFileSize} from '../../../src/lib';
+import {checkFileInput} from '../../../src/lib';
 
 const UploadAgentRoute = React.memo((props) => {
     const {profile} = props.user;
@@ -49,8 +49,9 @@ const UploadAgentRoute = React.memo((props) => {
     let [document, setDocument] = useState(null);
     let documentRef = useRef(null);
     let handleChangeDocument = ((event) => {
-        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxFileSize)
-            setDocument(event.target.files[0])
+        const file = checkFileInput(event)
+        if(file)
+            setDocument(file)
         else showSnackBar('Файл слишком большой')
     })
     useEffect(() => {

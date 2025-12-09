@@ -22,7 +22,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Lightbox from 'react-awesome-lightbox';
 import HistoryAgents from '../dialog/HistoryAgents';
 import History from '@material-ui/icons/History';
-import {getClientTitle, maxImageSize} from '../../src/lib';
+import {checkImageInput, getClientTitle, maxImageSize} from '../../src/lib';
 
 const models = ['USS175', 'USS374', 'USS440', 'Super FD']
 
@@ -43,16 +43,15 @@ const CardEquipment = React.memo((props) => {
     const refImageInput = useRef()
     const clickImageInput = () => refImageInput.current.click()
     const handleChangeImage = async (event) => {
-        if(event.target.files[0]&&event.target.files[0].size/1024/1024<maxImageSize) {
-            const image = event.target.files[0]
-            const preview = URL.createObjectURL(event.target.files[0])
+        const image = await checkImageInput(event)
+        if(image) {
             showLoad(true)
             const res = await setEquipment({
                 _id: element._id,
-                image
+                image: image.upload
             })
             if(res==='OK')
-                setPreview(preview)
+                setPreview(image.preview)
             else
                 showSnackBar('Ошибка')
             showLoad(false)
