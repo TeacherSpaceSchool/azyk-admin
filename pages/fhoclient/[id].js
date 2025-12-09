@@ -58,10 +58,10 @@ const FhoClient = React.memo((props) => {
     let [lightboxImages, setLightboxImages] = useState([]);
     let [lightboxIndex, setLightboxIndex] = useState(0);
     let handleChangeImage = (event) => {
-        const image = checkImageInput(event)
-        if(image) {
-            unawaited(async () => setUploads([await resizeImg(image.upload), ...uploads]))
-            setPreviews([image.preview, ...previews])
+        const file = imageRef.current?.files?.[0]
+        if(file) {
+            unawaited(async () => setUploads([await resizeImg(file), ...uploads]))
+            setPreviews([file, ...previews])
         } else showSnackBar('Файл слишком большой')
     }
     const {setMiniDialog, showMiniDialog} = props.mini_dialogActions;
