@@ -63,7 +63,7 @@ const FhoClient = React.memo((props) => {
     let handleChangeImage = (event) => {
         const image = checkImageInput1(event)
         if(image) {
-            unawaited(async () => setUploads([await resizeImg(image.upload), ...uploads]))
+            setUploads([image.upload, ...uploads])
             setPreviews([image.preview, ...previews])
         } else showSnackBar('Файл слишком большой')
     }
@@ -106,9 +106,9 @@ const FhoClient = React.memo((props) => {
     let imageRef = useRef(null);
     //render
     return (
-        <App pageName='ФХО клиента' showDistrict>
+        <App pageName='ФХО клиента v1' showDistrict>
             <Head>
-                <title>ФХО клиента</title>
+                <title>ФХО клиента v1</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
@@ -235,6 +235,10 @@ const FhoClient = React.memo((props) => {
                                         <Button onClick={() => {
                                             if(uploads.length) {
                                                 const action = async () => {
+                                                    for(let i=0; i<uploads.length; i++) {
+                                                        uploads[i] = await resizeImg(uploads[i])
+                                                    }
+
                                                     await setFhoClient({_id: router.query.id, deletedImages, uploads})
                                                     if (['агент', 'client'].includes(profile.role))
                                                         router.back()
