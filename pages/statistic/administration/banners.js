@@ -101,7 +101,6 @@ const Banners = React.memo((props) => {
             </Card>
             <input
                 accept='image/*'
-                capture
                 style={{ display: 'none' }}
                 ref={imageRef}
                 type='file'
