@@ -242,7 +242,7 @@ export const checkImageInput = async (event) => {
     const file = event.target&&event.target.files[0]
     if(file&&file.size/1024/1024<maxImageSize)
         return {
-            upload: await resizeImg(file),
+            upload: /*await resizeImg(*/file/*)*/,
             preview: URL.createObjectURL(file)
         }
 }
