@@ -531,7 +531,7 @@ const Merchandising = React.memo((props) => {
                                             :
                                             null
                                         }
-                                        {(router.query.id === 'new'?fho.previews:fho.images).map((preview, idx1) => (
+                                        {(router.query.id === 'new'?(fho.previews||[]):fho.images).map((preview, idx1) => (
                                             <GridListTile key={preview}>
                                                 <img src={preview} style={{cursor: 'pointer'}} onClick={() => {
                                                     showAppBar(false)
