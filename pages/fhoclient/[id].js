@@ -103,9 +103,9 @@ const FhoClient = React.memo((props) => {
     let imageRef = useRef(null);
     //render
     return (
-        <App pageName='ФХО клиента v2' showDistrict>
+        <App pageName='ФХО клиента v3' showDistrict>
             <Head>
-                <title>ФХО клиента v2</title>
+                <title>ФХО клиента v3</title>
                 <meta name='robots' content='noindex, nofollow'/>
             </Head>
             <Card className={classes.page}>
@@ -267,6 +267,7 @@ const FhoClient = React.memo((props) => {
                 </Card>
             <input
                 accept='image/*'
+                capture
                 style={{ display: 'none' }}
                 ref={imageRef}
                 type='file'
