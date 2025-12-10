@@ -61,8 +61,10 @@ const App = React.memo(props => {
             window.addEventListener('offline', () => {showSnackBar('Нет подключения к Интернету')})
             //обновление кеша
             const handler = event => {
-                if (event.data&&event.data.type === 'reload')
+                if (event.data&&event.data.type === 'reload') {
+                    showSnackBar('Обновление системы')
                     window.location.reload();
+                }
             }
             if (navigator&&navigator.serviceWorker)
                 navigator.serviceWorker.addEventListener('message', handler);
