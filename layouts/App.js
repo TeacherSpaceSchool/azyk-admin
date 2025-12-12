@@ -59,22 +59,25 @@ const App = React.memo(props => {
             unawaited(start)
             //слушание инета
             window.addEventListener('offline', () => {showSnackBar('Нет подключения к Интернету')})
-            //обновление кеша
-            const handler = event => {
-                if (event.data&&event.data.type === 'reload') {
-                    showSnackBar('Обновление системы')
-                    window.location.reload();
-                }
-            }
-            if (navigator&&navigator.serviceWorker)
-                navigator.serviceWorker.addEventListener('message', handler);
-            return () => {
-                if (navigator&&navigator.serviceWorker)
-                    navigator.serviceWorker.removeEventListener('message', handler);
-            };
         }
     }, [process.browser])
-
+    /*//обновление кеша
+    useEffect(() => {
+        // ⛔ Защита от SSR и от отсутствия окна
+        if (typeof window === 'undefined'||!navigator.serviceWorker) return;
+        // ✔ Единый обработчик сообщений от Service Worker
+        navigator.serviceWorker.onmessage = (event) => {
+            if (event.data && event.data.type === 'reload') {
+                showSnackBar('Обновление системы');
+                window.location.reload();
+            }
+        };
+        // ✔ Очистка при размонтировании
+        return () => {
+            if (navigator.serviceWorker)
+                navigator.serviceWorker.onmessage = null;
+        };
+    }, []);*/
     useEffect( () => {
         const routeChangeStart = (url, err) => {
             if(router.asPath!==url&&(router.asPath.includes('items')||router.asPath.includes('brand')||router.asPath.includes('merchandisings'))) {
