@@ -34,6 +34,7 @@ import Confirmation from '../components/dialog/Confirmation';
 import Table from '../components/table/catalog';
 import {getAdss} from '../src/gql/ads'
 import Ads from '../components/dialog/Ads';
+import Help from '@material-ui/icons/Help';
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
@@ -512,10 +513,10 @@ const Catalog = React.memo((props) => {
             <div className={isMobileApp?classes.bottomBasketM:classes.bottomBasketD}>
                 <div className={isMobileApp?classes.allPriceM:classes.allPriceD} style={!isMobileApp?{display: 'flex'}:{}}>
                     <div className={isMobileApp?classes.value:classes.priceAllText}>
-                        {isMobileApp&&targetAds?<span onClick={() => {
-                            setMiniDialog('Акция', <Ads ads={targetAds}/>)
+                        {isMobileApp&&targetAds?<div style={{display: 'flex', alignItems: 'center'}} onClick={() => {
+                            setMiniDialog(`Акция №${targetAds.idx}`, <Ads ads={targetAds}/>)
                             showMiniDialog(true)
-                        }}>До <span style={{fontWeight: 'bold'}}>{targetAds.idx}й</span> акции <span style={{color: mainColor, fontWeight: 'bold'}}>{targetAds.neededAmount}</span> сом</span>:<span>Итого{!isMobileApp?<>:&nbsp;</>:null}</span>}
+                        }}>До&nbsp;<b>{targetAds.idx}й</b>&nbsp;акции&nbsp;<b style={{color: mainColor}}>{targetAds.neededAmount}</b>&nbsp;сом&nbsp;<Help fontSize='small' style={{color: 'grey'}}/></div>:<span>Итого{!isMobileApp?<>:&nbsp;</>:null}</span>}
                     </div>
                     <div className={classes.row} style={{alignItems: 'baseline'}}>
                         <div className={isMobileApp?classes.nameM:classes.priceAll}>{formatAmount(allPrice)} сом</div>
