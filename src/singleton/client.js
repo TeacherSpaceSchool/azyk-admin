@@ -92,6 +92,7 @@ export class SingletonApolloClient {
                     errorPolicy: 'all',
                 },
                 mutate: {
+                    fetchPolicy: 'no-cache',
                     errorPolicy: 'all',
                 },
             },

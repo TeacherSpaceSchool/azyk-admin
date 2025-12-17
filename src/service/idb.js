@@ -2,6 +2,9 @@ import { openDB, deleteDB } from 'idb';
 import { initReceiveData } from './idb/receiveData';
 import { initOfflineOrders } from './idb/offlineOrders';
 import { SingletonStore } from '../singleton/store';
+
+const dbName = 'b10b11bd-ab56-46e2-99b3-58d4be94a882'
+
 export let db = null
 export let start = async () => {
     try {
@@ -13,29 +16,29 @@ export let start = async () => {
                 &&
                 new SingletonStore().getStore().getState().user.profile.role.includes('агент')
             ) {
-                db = await openDB('b10b11bd-ab56-46e2-99b3-58d4be94a882', 1, {
+                db = await openDB(dbName, 1, {
                     upgrade(db) {
                         if(db) {
                             initReceiveData(db)
                             initOfflineOrders(db)
                         }
                         else {
-                            deleteDB('b10b11bd-ab56-46e2-99b3-58d4be94a882', {});
+                            deleteDB(dbName, {});
                         }
                     },
                     blocked() {
-                        deleteDB('b10b11bd-ab56-46e2-99b3-58d4be94a882', {});
+                        deleteDB(dbName, {});
                     },
                     blocking() {
-                        deleteDB('b10b11bd-ab56-46e2-99b3-58d4be94a882', {});
+                        deleteDB(dbName, {});
                     },
                     terminated() {
-                        deleteDB('b10b11bd-ab56-46e2-99b3-58d4be94a882', {});
+                        deleteDB(dbName, {});
                     }
                 });
             }
             else {
-                deleteDB('b10b11bd-ab56-46e2-99b3-58d4be94a882', {});
+                deleteDB(dbName, {});
             }
         }
     }

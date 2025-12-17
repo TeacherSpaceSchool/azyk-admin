@@ -170,6 +170,28 @@ const MyAppBar = React.memo((props) => {
                 document.getElementById('search').focus();
         }
     }, [openSearch])
+    //popover
+    const [openTooltipViewMode, setOpenTooltipViewMode] = useState(false)
+    useEffect(() => {
+        if(process.browser&&!localStorage.openTooltipViewMode) {
+            localStorage.openTooltipViewMode = true
+            setOpenTooltipViewMode(true)
+        }
+    }, [process.browser])
+    const HandleViewMode = () => <Tooltip title={'Переключить вид: таблица / карточки'} open={openTooltipViewMode} arrow
+            onOpen={() => setOpenTooltipViewMode(true)} onClose={() => setOpenTooltipViewMode(false)}
+        >
+        <IconButton
+            onClick={() => {
+                if(isMobileApp) setOpenTooltipViewMode(false)
+                handleViewMode(viewMode===viewModes.card?viewModes.table:viewModes.card)
+            }}
+            color='inherit'
+        >
+            {viewMode===viewModes.card?<DashboardIcon/>:<ReorderIcon/>}
+        </IconButton>
+    </Tooltip>
+    //render
     return (
         <div className={classes.root}>
             <AppBar position='fixed' className='appBar'>
@@ -215,16 +237,7 @@ const MyAppBar = React.memo((props) => {
                                         <RemoveIcon/>
                                     </IconButton>
                                 </Tooltip>:null}
-                                <Tooltip title={viewMode===viewModes.card?'Карточки':'Таблица'}>
-                                    <IconButton
-                                        aria-owns={openCities ? 'menu-appbar' : null}
-                                        aria-haspopup='true'
-                                        onClick={() => handleViewMode(viewMode===viewModes.card?viewModes.table:viewModes.card)}
-                                        color='inherit'
-                                    >
-                                        {viewMode===viewModes.card?<DashboardIcon/>:<ReorderIcon/>}
-                                    </IconButton>
-                                </Tooltip>
+                                <HandleViewMode/>
                                 {
                                     cityShow||clientNetworkShow||dates||searchShow||filters||sorts?
                                         <IconButton
@@ -654,15 +667,7 @@ const MyAppBar = React.memo((props) => {
                                         <RemoveIcon/>
                                     </IconButton>
                                 </Tooltip>:null}
-                                <Tooltip title={viewMode===viewModes.card?'Карточки':'Таблица'}>
-                                    <IconButton
-                                        aria-haspopup='true'
-                                        onClick={() => handleViewMode(viewMode===viewModes.card?viewModes.table:viewModes.card)}
-                                        color='inherit'
-                                    >
-                                        {viewMode===viewModes.card?<DashboardIcon/>:<ReorderIcon/>}
-                                    </IconButton>
-                                </Tooltip>
+                                <HandleViewMode/>
                                 {cityShow&&['admin'].includes(profile.role)?
                                     <>
                                         <Tooltip title='Город'>

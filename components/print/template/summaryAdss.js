@@ -3,10 +3,11 @@ import {formatAmount, pdDDMMMMYYYY} from '../../../src/lib';
 export default ({list, forwarderData, date, ordersData}) => {
     const columns = [
         {title: '№',          style: 'width: 6mm;'},
-        {title: forwarderData?'Клиент':'Экспедитор', style: 'width: 60.5mm;'},
-        {title: 'Товар',      style: 'width: 60mm;'},
+        {title: forwarderData?'Клиент':'Экспедитор', style: 'width: 48mm;'},
+        {title: 'Товар',      style: 'width: 48mm;'},
         {title: 'Кол-во',     style: 'width: 20mm;'},
         {title: 'Уп-ок',      style: 'width: 20mm;'},
+        {title: 'Сумма',     style: 'width: 20mm;'},
         {title: 'Тоннаж',     style: 'width: 20mm;'},
     ];
 
@@ -24,11 +25,12 @@ export default ({list, forwarderData, date, ordersData}) => {
         return acc + `
               <tr>
                 <td style="${columns[0].style}">${idx+1}</td>
-                <td style="${columns[1].style}">${row[0]}</td>
-                <td style="${columns[2].style}">${row[1]}</td>
-                <td style="${columns[3].style}">${row[2]}</td>
-                <td style="${columns[4].style}">${row[3]}</td>
-                <td style="${columns[5].style}">${row[4]}</td>
+                <td style="${columns[1].style}">${formatAmount(row[0])}</td>
+                <td style="${columns[2].style}">${formatAmount(row[1])}</td>
+                <td style="${columns[3].style}">${formatAmount(row[2])}</td>
+                <td style="${columns[4].style}">${formatAmount(row[3])}</td>
+                <td style="${columns[5].style}">${formatAmount(row[4])}</td>
+                <td style="${columns[6].style}">${formatAmount(row[5])}</td>
               </tr>
             `
     }, '')}
@@ -38,7 +40,8 @@ export default ({list, forwarderData, date, ordersData}) => {
             <td style="border: none;${columns[2].style}"></td>
             <td style="border: none;${columns[3].style}">${formatAmount(ordersData.countAll)}</td>
             <td style="border: none;${columns[4].style}">${formatAmount(ordersData.packageAll)}</td>
-            <td style="border: none;${columns[5].style}">${formatAmount(ordersData.weightAll)}</td>
+            <td style="border: none;${columns[5].style}">${formatAmount(ordersData.priceAll)}</td>
+            <td style="border: none;${columns[6].style}">${formatAmount(ordersData.weightAll)}</td>
           </tr>
       </tbody>
     </table>

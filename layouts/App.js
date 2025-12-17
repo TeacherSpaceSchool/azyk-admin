@@ -64,7 +64,7 @@ const App = React.memo(props => {
     /*//обновление кеша
     useEffect(() => {
         // ⛔ Защита от SSR и от отсутствия окна
-        if (typeof window === 'undefined'||!navigator.serviceWorker) return;
+        if (process.browser) {
         // ✔ Единый обработчик сообщений от Service Worker
         navigator.serviceWorker.onmessage = (event) => {
             if (event.data && event.data.type === 'reload') {
@@ -77,7 +77,8 @@ const App = React.memo(props => {
             if (navigator.serviceWorker)
                 navigator.serviceWorker.onmessage = null;
         };
-    }, []);*/
+        }
+    }, [process.browser]);*/
     useEffect( () => {
         const routeChangeStart = (url, err) => {
             if(router.asPath!==url&&(router.asPath.includes('items')||router.asPath.includes('brand')||router.asPath.includes('merchandisings'))) {

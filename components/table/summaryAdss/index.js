@@ -19,6 +19,7 @@ const Tables =  React.memo(({list, forwarderData, pagination, app, user, appActi
         {title: 'Товар', style: {width: 250}},
         {title: 'Кол-во', style: {width: 60}},
         {title: 'Уп-ок', style: {width: 60}},
+        {title: 'Сумма', style: {width: 60}},
         {title: 'Тоннаж', style: {width: 60}},
     ]
     return <div style={{width: 'fit-content', background: 'white'}}>
@@ -71,22 +72,19 @@ const Tables =  React.memo(({list, forwarderData, pagination, app, user, appActi
         {list?list.map((row, idx) => {
             if(idx<pagination) {
                 return <div className='tableRow' key={`row${idx}`} style={{borderRight: '1px solid #00000040'}}>
-                    <div className='tableCell' style={{...!forwarderData?{cursor: 'pointer'}:{}, ...columns[0].style}} onClick={() => {if(!forwarderData) setForwarder(row[5])}}>
+                    <div className='tableCell' style={{...!forwarderData?{cursor: 'pointer'}:{}, ...columns[0].style}} onClick={() => {if(!forwarderData) setForwarder(row[6])}}>
                         {row[0]}
                     </div>
                     <div className='tableBorder'/>
                     <div className='tableCell' style={columns[1].style}>{row[1]}</div>
                     <div className='tableBorder'/>
-                    <div className='tableCell' style={{...!forwarderData?{cursor: 'pointer'}:{}, ...columns[2].style}} onClick={() => {
-                        /*if(!forwarderData&&['суперорганизация', 'организация', 'admin', 'менеджер'].includes(profile.role)) {
-                            setMiniDialog('Изменить', <SetSettedSummaryAds idx={idx} list={list} setList={setList}/>);
-                            showMiniDialog(true);
-                        }*/
-                    }}>{formatAmount(row[2])}</div>
+                    <div className='tableCell' style={columns[2].style}>{formatAmount(row[2])}</div>
                     <div className='tableBorder'/>
                     <div className='tableCell' style={columns[3].style}>{formatAmount(row[3])}</div>
                     <div className='tableBorder'/>
                     <div className='tableCell' style={columns[4].style}>{formatAmount(row[4])}</div>
+                    <div className='tableBorder'/>
+                    <div className='tableCell' style={columns[5].style}>{formatAmount(row[5])}</div>
                 </div>
             }
         }):[]}

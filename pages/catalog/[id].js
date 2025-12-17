@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import pageListStyle from '../../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat, isNotEmpty, isEmpty, formatAmount} from '../../src/lib';
+import {checkInt, checkFloat, isNotEmpty, isEmpty, formatAmount, mainColor} from '../../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../../redux/actions/mini_dialog'
 import * as snackbarActions from '../../redux/actions/snackbar'
@@ -28,6 +28,7 @@ import {getLimitItemClients} from '../../src/gql/limitItemClient';
 import {getStocks} from '../../src/gql/stock';
 import {getDiscountClient} from '../../src/gql/discountClient';
 import {getFhoClient} from '../../src/gql/fhoClient';
+import Ads from '../../components/dialog/Ads';
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
@@ -199,6 +200,23 @@ const Catalog = React.memo((props) => {
         setClient(client)
         setFhoClient(fhoClient)
     })()}, [])
+    //
+    let [targetAds, setTargetAds] = useState(null);
+    useEffect(() => {
+        targetAds = null
+        if(adss&&adss.length) {
+            const sortedAdss = adss.sort((a, b) => a.targetPrice - b.targetPrice)
+            const targetAdsIdx = sortedAdss.findIndex(sortedAds => sortedAds.targetPrice > allPrice);
+            if(targetAdsIdx!==-1) {
+                targetAds = {
+                    idx: targetAdsIdx+1,
+                    neededAmount: checkInt(sortedAdss[targetAdsIdx].targetPrice - allPrice),
+                    ...sortedAdss[targetAdsIdx]
+                }
+            }
+        }
+        setTargetAds(targetAds)
+    }, [adss, allPrice])
     //render
     return (
         <App defaultOpenSearch={router.query.search} checkPagination={checkPagination} searchShow pageName={data.organization.name}>
@@ -316,8 +334,15 @@ const Catalog = React.memo((props) => {
             <div style={{height: 70}}/>
             <div className={isMobileApp?classes.bottomBasketM:classes.bottomBasketD}>
                 <div className={isMobileApp?classes.allPriceM:classes.allPriceD}>
-                    <div className={isMobileApp?classes.value:classes.priceAllText}>Общая стоимость</div>
-                    <div className={isMobileApp?classes.nameM:classes.priceAll}>{formatAmount(allPrice)} сом</div>
+                    <div className={isMobileApp?classes.value:classes.priceAllText}>
+                        {targetAds?<span onClick={() => {
+                            setMiniDialog('Акция', <Ads ads={targetAds}/>)
+                            showMiniDialog(true)
+                        }}>До <span style={{fontWeight: 'bold'}}>{targetAds.idx}й</span> акции <span style={{color: mainColor, fontWeight: 'bold'}}>{targetAds.neededAmount}</span> сом</span>:'Общая стоимость'}
+                    </div>
+                    <div className={isMobileApp?classes.nameM:classes.priceAll}>
+                        {formatAmount(allPrice)} сом
+                    </div>
                 </div>
                 <div className={isMobileApp?classes.buyM:classes.buyD} onClick={() => {
                     if(allPrice>0) {

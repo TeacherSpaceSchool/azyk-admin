@@ -78,13 +78,15 @@ const FinanceReport = React.memo((props) => {
         ordersData = {
             countAll: 0,
             packageAll: 0,
+            priceAll: 0,
             weightAll: 0,
         }
         const iterableList = list
         for (let i = 0; i < iterableList.length; i++) {
             ordersData.countAll = checkFloat(ordersData.countAll + checkFloat(iterableList[i][2]))
             ordersData.packageAll = checkFloat(ordersData.packageAll + checkFloat(iterableList[i][3]))
-            ordersData.weightAll = checkFloat(ordersData.weightAll + checkFloat(iterableList[i][4]))
+            ordersData.priceAll = checkFloat(ordersData.priceAll + checkFloat(iterableList[i][4]))
+            ordersData.weightAll = checkFloat(ordersData.weightAll + checkFloat(iterableList[i][5]))
         }
         setOrdersData({...ordersData})
     }, [list])
@@ -113,6 +115,8 @@ const FinanceReport = React.memo((props) => {
             Кол-во: {formatAmount(ordersData.countAll)}
             <br/>
             Уп-ок: {formatAmount(ordersData.packageAll)}
+            <br/>
+            Сумма: {formatAmount(ordersData.priceAll)} кг
             <br/>
             Тоннаж: {formatAmount(ordersData.weightAll)} кг
         </div>

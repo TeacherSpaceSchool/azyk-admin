@@ -97,3 +97,5 @@ a {
     height: calc((100vw - #{$app-drawer-width} - 20px)/3);
   }
 }
+
+.MuiTooltip-tooltipPlacementBottom {margin: 0px!important;}

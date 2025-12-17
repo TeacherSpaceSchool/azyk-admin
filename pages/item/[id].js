@@ -312,7 +312,7 @@ const Item = React.memo((props) => {
                                                                     hit, latest, apiece,
                                                                     price, weight, priotiry, packaging: packaging||1,
                                                                     name, categorys, image, unit, city,
-                                                                    ...subBrand?{subBrand: subBrand._id}:{}, organization: organization._id
+                                                                    subBrand: subBrand&&subBrand._id, organization: organization._id
                                                                 })
                                                                 if(res) Router.back()
                                                             }
@@ -328,7 +328,7 @@ const Item = React.memo((props) => {
                                                     <>
                                                         <Button onClick={() => {
                                                             if(categorys.length) {
-                                                                let editElement = {_id: data.item._id, subBrand: subBrand?subBrand._id:subBrand}
+                                                                let editElement = {_id: data.item._id, subBrand: subBrand&&subBrand._id}
                                                                 if(JSON.stringify(categorys)!==JSON.stringify(data.item.categorys))editElement.categorys = categorys
                                                                 if(city!==data.item.city)editElement.city = city
                                                                 if(name.length&&name!==data.item.name)editElement.name = name

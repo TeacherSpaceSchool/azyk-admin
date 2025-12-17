@@ -56,17 +56,3 @@ export const getSummaryAdss = async (variables, client) => {
         console.error(err)
     }
 }
-
-export const setSettedSummaryAds = async (variables) => {
-    try{
-        const client = new SingletonApolloClient().getClient()
-        await client.mutate({
-            variables,
-            mutation : gql`
-                    mutation ($item: ID!, $count: Int!, $forwarder: ID!, $organization: ID!, $dateDelivery: Date!) {
-                        setSettedSummaryAds(item: $item, count: $count, forwarder: $forwarder, organization: $organization, dateDelivery: $dateDelivery)
-                    }`})
-    } catch(err) {
-        console.error(err)
-    }
-}

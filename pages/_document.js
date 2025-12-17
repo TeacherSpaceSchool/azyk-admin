@@ -29,6 +29,9 @@ class MyDocument extends Document {
                 <link rel='apple-touch-icon' href='/static/192x192.png'/>
                 <meta name='msapplication-square310x310logo' content='/static/192x192.png'/>
                 <meta name='google' content='notranslate'/>
+                <meta httpEquiv='cache-control' content='no-cache'/>
+                <meta httpEquiv='expires' content='0'/>
+                <meta httpEquiv='pragma' content='no-cache'/>
             </Head>
             <body>
             <noscript>

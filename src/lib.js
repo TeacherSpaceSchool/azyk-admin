@@ -411,4 +411,5 @@ export const navigationKeyTable = ({ event, row, column, list, middleList }) => 
     }
 };
 
+export const mainColor = 'rgba(255, 179, 0)'
 export const selectedMainColor = 'rgba(255, 179, 0, 0.15)'

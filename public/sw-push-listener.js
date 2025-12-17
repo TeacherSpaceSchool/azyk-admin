@@ -1,17 +1,14 @@
 let notificationUrl = 'https://azyk.store';
 /*// При установке — активируем сразу (если мы вызвали skipWaiting)
-self.addEventListener('install', event => {
-    event.waitUntil((async () => {
-        await self.skipWaiting();
-    })());
+self.addEventListener('install', () => {
+    self.skipWaiting();
 });
 // Полная очистка всех кэшей при активации
 self.addEventListener('activate', event => {
     event.waitUntil((async () => {
         // Очистка всех кэшей
-        const cacheNames = await caches.keys();
         // eslint-disable-next-line no-undef
-        await Promise.all(cacheNames.map(name => caches.delete(name)));
+        await Promise.all((await caches.keys()).map(name => caches.delete(name)));
         // Захват всех клиентов новым SW
         await self.clients.claim();
         // 🔥 Сообщаем всем вкладкам: "Я новый SW"

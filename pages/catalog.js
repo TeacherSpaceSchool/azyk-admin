@@ -5,12 +5,11 @@ import { connect } from 'react-redux'
 import pageListStyle from '../src/styleMUI/catalog/catalog'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import {checkInt, checkFloat, isNotEmpty, formatAmount, getClientTitle} from '../src/lib';
+import {checkInt, checkFloat, isNotEmpty, formatAmount, getClientTitle, mainColor} from '../src/lib';
 import { bindActionCreators } from 'redux'
 import * as mini_dialogActions from '../redux/actions/mini_dialog'
 import * as snackbarActions from '../redux/actions/snackbar'
 import Router, {useRouter} from 'next/router'
-import BuyBasketV1 from '../components/dialog/BuyBasket/v1.js'
 import BuyBasketV2 from '../components/dialog/BuyBasket/v2.js'
 import SetPackage from '../components/dialog/SetPackage'
 import { getClient, getClients } from '../src/gql/client'
@@ -33,6 +32,8 @@ import IconButton from '@material-ui/core/IconButton';
 import {getFhoClient} from '../src/gql/fhoClient';
 import Confirmation from '../components/dialog/Confirmation';
 import Table from '../components/table/catalog';
+import {getAdss} from '../src/gql/ads'
+import Ads from '../components/dialog/Ads';
 
 const Catalog = React.memo((props) => {
     const classes = pageListStyle();
@@ -314,6 +315,23 @@ const Catalog = React.memo((props) => {
     const double = contentRef.current&&contentRef.current.offsetWidth>=1150
     //middleList
     const middleList = list?Math.ceil(list.length/2):0
+    //targetAds
+    let [targetAds, setTargetAds] = useState(null);
+    useEffect(() => {
+        targetAds = null
+        if(data.adss&&data.adss.length) {
+            const sortedAdss = data.adss.sort((a, b) => a.targetPrice - b.targetPrice)
+            const targetAdsIdx = sortedAdss.findIndex(sortedAds => sortedAds.targetPrice > allPrice);
+            if(targetAdsIdx!==-1) {
+                targetAds = {
+                    idx: targetAdsIdx+1,
+                    neededAmount: checkInt(sortedAdss[targetAdsIdx].targetPrice - allPrice),
+                    ...sortedAdss[targetAdsIdx]
+                }
+            }
+        }
+        setTargetAds(targetAds)
+    }, [allPrice])
     //рендер
     return (
         <App showDistrict checkPagination={checkPagination} clearBasket={clearBasket} searchShow pageName='Каталог'>
@@ -493,7 +511,12 @@ const Catalog = React.memo((props) => {
             <div style={{height: 70}}/>
             <div className={isMobileApp?classes.bottomBasketM:classes.bottomBasketD}>
                 <div className={isMobileApp?classes.allPriceM:classes.allPriceD} style={!isMobileApp?{display: 'flex'}:{}}>
-                    <div className={isMobileApp?classes.value:classes.priceAllText}>Итого{!isMobileApp?<>:&nbsp;</>:null}</div>
+                    <div className={isMobileApp?classes.value:classes.priceAllText}>
+                        {isMobileApp&&targetAds?<span onClick={() => {
+                            setMiniDialog('Акция', <Ads ads={targetAds}/>)
+                            showMiniDialog(true)
+                        }}>До <span style={{fontWeight: 'bold'}}>{targetAds.idx}й</span> акции <span style={{color: mainColor, fontWeight: 'bold'}}>{targetAds.neededAmount}</span> сом</span>:<span>Итого{!isMobileApp?<>:&nbsp;</>:null}</span>}
+                    </div>
                     <div className={classes.row} style={{alignItems: 'baseline'}}>
                         <div className={isMobileApp?classes.nameM:classes.priceAll}>{formatAmount(allPrice)} сом</div>
                         {planClient?<>&nbsp;/&nbsp;<div style={{color: allPrice<planClient.visit?'orange':'green'}}>{formatAmount(planClient.visit)} сом</div></>:null}
@@ -539,14 +562,15 @@ Catalog.getInitialProps = async function(ctx) {
             Router.push('/contact')
     //данные
     // eslint-disable-next-line no-undef
-    const [brands, brandOrganizations, client] = await Promise.all([
+    const [brands, brandOrganizations, client, adss] = await Promise.all([
         organization?getBrands({organization, search: '', sort: '-priotiry'}, getClientGqlSsr(ctx.req)):null,
         getBrandOrganizations({search: '', filter: ''}, getClientGqlSsr(ctx.req)),
-        ctx.query.client?getClient(ctx.query.client, getClientGqlSsr(ctx.req)):null
+        ctx.query.client?getClient(ctx.query.client, getClientGqlSsr(ctx.req)):null,
+        getAdss({search: '', organization}, getClientGqlSsr(ctx.req)),
     ])
     return {
         data: {
-            brands, client, brandOrganizations
+            brands, client, brandOrganizations, adss
         }
     };
 };
