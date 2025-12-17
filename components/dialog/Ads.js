@@ -15,6 +15,9 @@ const Ads =  React.memo((props) =>{
             <div style={{fontSize: '1rem', marginBottom: 10, whiteSpace: 'pre-wrap'}}>
                 {ads.title}
             </div>
+            <div style={{fontSize: '0.725rem', color: 'gray', marginBottom: 10, whiteSpace: 'pre-wrap'}}>
+                Методы оплаты: {ads.paymentMethods.toString()}
+            </div>
             <center>
                 <Button variant='text' color='secondary' onClick={() => showMiniDialog(false)} className={classes.button}>
                     Закрыть
